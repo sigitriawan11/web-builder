@@ -11,6 +11,17 @@ body,
   height: 100%;
   overflow: hidden;
   background: #f5f5f5;
+  /* Semua gesture di canvas ditangani editor, bukan browser. */
+  touch-action: none;
+  user-select: none;
+}
+
+#editor-viewport[data-pan="ready"] {
+  cursor: grab;
+}
+
+#editor-viewport[data-pan="active"] {
+  cursor: grabbing;
 }
 
 /* ED-013: satu transform untuk pan/zoom; origin di pojok agar rumus screen↔world sederhana. */

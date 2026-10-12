@@ -2,12 +2,15 @@ import { useEffect, useRef } from "react";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { DemoWorldContent } from "./DemoWorldContent";
+import { usePanInteractions } from "./interactions/use-pan-interactions";
 
 // Setelah kamera diam selama ini, `will-change` dilepas agar teks dirasterisasi ulang dengan tajam (ED-013).
 const WILL_CHANGE_IDLE_MS = 150;
 
 export function CanvasViewport() {
+  const viewportRef = useRef<HTMLElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
+  usePanInteractions(viewportRef);
 
   // ED-013: kamera diterapkan langsung ke DOM di requestAnimationFrame, tanpa render React,
   // sehingga node di dalam world tidak pernah di-render ulang karena pan/zoom.
@@ -40,7 +43,7 @@ export function CanvasViewport() {
   }, []);
 
   return (
-    <main id="editor-viewport" data-testid="editor-viewport">
+    <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
       <div id="world" ref={worldRef}>
         <DemoWorldContent />
       </div>
