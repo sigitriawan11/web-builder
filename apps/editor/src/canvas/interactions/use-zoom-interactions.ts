@@ -1,6 +1,6 @@
 import { type RefObject, useEffect } from "react";
 import { cameraStore } from "../camera-store";
-import { isEditableTarget } from "./pan";
+import { isEditableTarget } from "../../commands/is-editable-target";
 import { nextZoomStep, wheelZoomFactor, zoomAtPoint, zoomKeyDirection } from "./zoom";
 
 // Event gesture Safari (pinch trackpad); tidak ada di lib DOM TypeScript.

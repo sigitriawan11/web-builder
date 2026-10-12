@@ -1,25 +1,28 @@
 import { type RefObject, useEffect } from "react";
+import { effectiveTool, toolStore } from "../../tools/tool-store";
 import { cameraStore } from "../camera-store";
-import { isEditableTarget, panCamera, startsPan, wheelToPanDelta } from "./pan";
+import { panCamera, startsPan, wheelToPanDelta } from "./pan";
 
 const MIDDLE_BUTTON = 1;
 
-// ED-026: pan lewat wheel/trackpad, Space + drag kiri, dan drag tombol tengah.
-// Status Space disimpan lokal di sini; model tool umum (hand tool, tool sementara) menyusul di T0.3.5.
+// ED-026 & ED-047: pan lewat wheel/trackpad, drag tombol tengah, dan drag kiri saat tool efektif = hand
+// (hand tool `H`, atau dipinjam sementara dengan menahan Space — lihat tools/use-tool-shortcuts.ts).
 export function usePanInteractions(viewportRef: RefObject<HTMLElement | null>): void {
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
-    let spaceHeld = false;
     let drag: { pointerId: number; lastX: number; lastY: number } | null = null;
+    const handToolActive = () => effectiveTool(toolStore.getState()) === "hand";
 
     // Kursor grab/grabbing lewat atribut, agar tidak memicu render React.
     const syncCursor = () => {
       if (drag) viewport.dataset.pan = "active";
-      else if (spaceHeld) viewport.dataset.pan = "ready";
+      else if (handToolActive()) viewport.dataset.pan = "ready";
       else delete viewport.dataset.pan;
     };
+    syncCursor();
+    const unsubscribeTool = toolStore.subscribe(syncCursor);
 
     const onWheel = (event: WheelEvent) => {
       // Selalu cegah default: scroll halaman, back-swipe, dan zoom halaman browser (pinch = ctrl+wheel).
@@ -31,7 +34,7 @@ export function usePanInteractions(viewportRef: RefObject<HTMLElement | null>): 
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (drag || !startsPan(event.button, spaceHeld)) return;
+      if (drag || !startsPan(event.button, handToolActive())) return;
       event.preventDefault();
       viewport.setPointerCapture(event.pointerId);
       drag = { pointerId: event.pointerId, lastX: event.clientX, lastY: event.clientY };
@@ -64,25 +67,6 @@ export function usePanInteractions(viewportRef: RefObject<HTMLElement | null>): 
       if (event.button === MIDDLE_BUTTON) event.preventDefault();
     };
 
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.code !== "Space" || isEditableTarget(event.target instanceof HTMLElement ? event.target : null)) return;
-      event.preventDefault(); // cegah halaman ikut scroll
-      if (!spaceHeld) {
-        spaceHeld = true;
-        syncCursor();
-      }
-    };
-    const onKeyUp = (event: KeyboardEvent) => {
-      if (event.code !== "Space") return;
-      spaceHeld = false;
-      syncCursor();
-    };
-    // Keyup bisa hilang saat jendela kehilangan fokus (Alt+Tab sambil menahan Space).
-    const onBlur = () => {
-      spaceHeld = false;
-      syncCursor();
-    };
-
     viewport.addEventListener("wheel", onWheel, { passive: false });
     viewport.addEventListener("pointerdown", onPointerDown);
     viewport.addEventListener("pointermove", onPointerMove);
@@ -90,11 +74,9 @@ export function usePanInteractions(viewportRef: RefObject<HTMLElement | null>): 
     viewport.addEventListener("pointercancel", endDrag);
     viewport.addEventListener("mousedown", onMouseDown);
     viewport.addEventListener("auxclick", onAuxClick);
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("blur", onBlur);
 
     return () => {
+      unsubscribeTool();
       viewport.removeEventListener("wheel", onWheel);
       viewport.removeEventListener("pointerdown", onPointerDown);
       viewport.removeEventListener("pointermove", onPointerMove);
@@ -102,9 +84,6 @@ export function usePanInteractions(viewportRef: RefObject<HTMLElement | null>): 
       viewport.removeEventListener("pointercancel", endDrag);
       viewport.removeEventListener("mousedown", onMouseDown);
       viewport.removeEventListener("auxclick", onAuxClick);
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("blur", onBlur);
     };
   }, [viewportRef]);
 }

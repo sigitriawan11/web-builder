@@ -52,3 +52,40 @@ test("wheel menggeser vertikal, Shift + wheel menggeser horizontal", async ({ pa
   await page.keyboard.up("Shift");
   await expect.poll(() => cameraOffset(page)).toEqual({ x: -100, y: -120 });
 });
+
+test("hand tool (H) menggeser dengan drag kiri sampai Move (V) dipilih lagi", async ({ page }) => {
+  const viewport = page.getByTestId("editor-viewport");
+
+  await page.keyboard.press("KeyH");
+  await expect(viewport).toHaveAttribute("data-pan", "ready");
+  await page.mouse.down();
+  await page.mouse.move(450, 330, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(() => cameraOffset(page)).toEqual({ x: 50, y: 30 });
+
+  await page.keyboard.press("KeyV");
+  await expect(viewport).not.toHaveAttribute("data-pan");
+  await page.mouse.down();
+  await page.mouse.move(550, 430, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(() => cameraOffset(page)).toEqual({ x: 50, y: 30 });
+});
+
+test("melepas Space kembali ke tool sebelumnya", async ({ page }) => {
+  const viewport = page.getByTestId("editor-viewport");
+
+  await page.keyboard.down("Space");
+  await expect(viewport).toHaveAttribute("data-pan", "ready");
+  await page.keyboard.up("Space");
+  await expect(viewport).not.toHaveAttribute("data-pan");
+
+  await page.keyboard.press("KeyH");
+  await page.keyboard.down("Space");
+  await page.keyboard.up("Space");
+  await expect(viewport).toHaveAttribute("data-pan", "ready");
+});
+
+test("Ctrl + H tidak memilih hand tool", async ({ page }) => {
+  await page.keyboard.press("Control+KeyH");
+  await expect(page.getByTestId("editor-viewport")).not.toHaveAttribute("data-pan");
+});

@@ -32,20 +32,8 @@ export function panCamera<C extends { x: number; y: number }>(camera: C, dx: num
   return { x: camera.x - dx, y: camera.y - dy };
 }
 
-export interface EditableTargetLike {
-  tagName?: string;
-  isContentEditable?: boolean;
-}
-
-// ED-026: Space saat mengetik harus menghasilkan spasi, bukan pan.
-export function isEditableTarget(target: EditableTargetLike | null): boolean {
-  if (!target) return false;
-  if (target.isContentEditable) return true;
-  const tag = target.tagName?.toUpperCase();
-  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
-}
-
-// Tombol pointer yang memulai pan: tengah selalu; kiri hanya saat Space ditahan (atau hand tool, T0.3.5).
-export function startsPan(button: number, spaceHeld: boolean): boolean {
-  return button === 1 || (button === 0 && spaceHeld);
+// Tombol pointer yang memulai pan: tengah selalu; kiri hanya saat tool efektif = hand
+// (hand tool dipilih, atau dipinjam sementara dengan menahan Space).
+export function startsPan(button: number, handToolActive: boolean): boolean {
+  return button === 1 || (button === 0 && handToolActive);
 }

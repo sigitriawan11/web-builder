@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { DemoWorldContent } from "./DemoWorldContent";
@@ -11,6 +12,7 @@ const WILL_CHANGE_IDLE_MS = 150;
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
+  useToolShortcuts();
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isEditableTarget, LINE_HEIGHT_PX, panCamera, startsPan, wheelToPanDelta } from "./pan";
+import { LINE_HEIGHT_PX, panCamera, startsPan, wheelToPanDelta } from "./pan";
 
 const PAGE_HEIGHT = 800;
 const wheel = (deltaX: number, deltaY: number, deltaMode = 0, shiftKey = false) => ({
@@ -39,20 +39,6 @@ describe("panCamera", () => {
   });
 });
 
-describe("isEditableTarget", () => {
-  it.each([
-    [{ tagName: "INPUT" }, true],
-    [{ tagName: "textarea" }, true],
-    [{ tagName: "SELECT" }, true],
-    [{ tagName: "DIV", isContentEditable: true }, true],
-    [{ tagName: "DIV", isContentEditable: false }, false],
-    [{ tagName: "MAIN" }, false],
-    [null, false],
-  ])("%o → %s", (target, expected) => {
-    expect(isEditableTarget(target)).toBe(expected);
-  });
-});
-
 describe("startsPan", () => {
   it.each([
     [1, false, true],
@@ -60,7 +46,7 @@ describe("startsPan", () => {
     [0, true, true],
     [0, false, false],
     [2, true, false],
-  ])("tombol %i, Space ditahan %s → %s", (button, spaceHeld, expected) => {
-    expect(startsPan(button, spaceHeld)).toBe(expected);
+  ])("tombol %i, hand tool aktif %s → %s", (button, handToolActive, expected) => {
+    expect(startsPan(button, handToolActive)).toBe(expected);
   });
 });
