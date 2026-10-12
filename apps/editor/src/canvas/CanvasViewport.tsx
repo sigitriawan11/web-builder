@@ -1,15 +1,21 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { NodeStoreContext } from "../document/use-node";
 import { RenderRoot } from "./render-root/RenderRoot";
+import { isolationFromSearch, SHADOW_HOST_CSS, siteCssFromSearch } from "./isolation";
 import { spikeNodeStore, spikePageId } from "./spike-document";
+import { useShadowRoot } from "./use-shadow-root";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 
 // Setelah kamera diam selama ini, `will-change` dilepas agar teks dirasterisasi ulang dengan tajam (ED-013).
 const WILL_CHANGE_IDLE_MS = 150;
+
+const isolation = isolationFromSearch(window.location.search);
+const siteCss = siteCssFromSearch(window.location.search);
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
@@ -17,6 +23,7 @@ export function CanvasViewport() {
   useToolShortcuts();
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
+  const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");
 
   // ED-013: kamera diterapkan langsung ke DOM di requestAnimationFrame, tanpa render React,
   // sehingga node di dalam world tidak pernah di-render ulang karena pan/zoom.
@@ -48,13 +55,22 @@ export function CanvasViewport() {
     };
   }, []);
 
+  const content = (
+    <>
+      <style>{isolation === "shadow" ? `${SHADOW_HOST_CSS}\n${siteCss}` : siteCss}</style>
+      <NodeStoreContext.Provider value={spikeNodeStore}>
+        <RenderRoot pageId={spikePageId} />
+      </NodeStoreContext.Provider>
+    </>
+  );
+
   return (
     <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
-      <div id="world" ref={worldRef}>
-        <NodeStoreContext.Provider value={spikeNodeStore}>
-          <RenderRoot pageId={spikePageId} />
-        </NodeStoreContext.Provider>
+      {/* `#world` tetap menerima transform kamera; isinya di shadow root atau langsung (ED-016). */}
+      <div id="world" ref={worldRef} data-isolation={isolation}>
+        {isolation === "none" && content}
       </div>
+      {shadowRoot && createPortal(content, shadowRoot)}
       <CanvasOverlay />
     </main>
   );
