@@ -1,11 +1,7 @@
 import { createStore } from "zustand/vanilla";
+import type { CameraState } from "./geometry/coordinates";
 
-export interface Camera {
-  // Offset world terhadap pojok kiri atas viewport, dalam piksel screen.
-  x: number;
-  y: number;
-  zoom: number;
-}
+export type Camera = CameraState;
 
 // ED-013 P0: 5%–1600%. Rentang final diputuskan di spike (❓ OPEN 02#1, T0.8.3).
 export const MIN_ZOOM = 0.05;
@@ -15,12 +11,12 @@ export function clampZoom(zoom: number): number {
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
 }
 
-interface CameraState extends Camera {
+interface CameraStoreState extends Camera {
   setCamera(next: Partial<Camera>): void;
 }
 
 export function createCameraStore(initial: Camera = { x: 0, y: 0, zoom: 1 }) {
-  return createStore<CameraState>()((set) => ({
+  return createStore<CameraStoreState>()((set) => ({
     ...initial,
     zoom: clampZoom(initial.zoom),
     setCamera: (next) =>
