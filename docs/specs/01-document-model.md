@@ -628,7 +628,7 @@ interface DataTableProps {
 - **Tipe dasar**:
 
 ```ts
-type TokenRef = { $token: string };             // regex ^[a-z][a-zA-Z0-9]*(\.[a-zA-Z0-9-]+)+$
+type TokenRef = { $token: string };             // regex ^[a-z][a-zA-Z0-9]*(\.[a-zA-Z0-9-]+){1,2}$ — `<group>.<name>`, nested maks 1 level (DM-041)
 type PropRef  = { $prop: string; fallback?: unknown };
 type V<T>     = T | TokenRef;                   // style value
 type CV<T>    = T | TokenRef | PropRef;         // style/prop value di dalam component definition

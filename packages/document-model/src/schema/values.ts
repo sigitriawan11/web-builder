@@ -10,9 +10,10 @@ export const NodeIdSchema = idSchema("pg", "n");
 export const PageIdSchema = idSchema("pg");
 export const AssetIdSchema = idSchema("ast");
 
-// DM-025: referensi token = objek satu key `$token` dengan path dot.
+// DM-025: referensi token = objek satu key `$token`. Path `<group>.<name>` dengan nested
+// maksimal 1 level (DM-041), mis. `color.primary` atau `color.brand.600`.
 export const TokenRefSchema = z.strictObject({
-  $token: z.string().regex(/^[a-z][a-zA-Z0-9]*(\.[a-zA-Z0-9-]+)+$/),
+  $token: z.string().regex(/^[a-z][a-zA-Z0-9]*(\.[a-zA-Z0-9-]+){1,2}$/),
 });
 
 export const UnitSchema = z.enum(["px", "%", "vw", "vh", "rem", "em", "fr"]);
