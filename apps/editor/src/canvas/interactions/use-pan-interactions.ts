@@ -24,7 +24,7 @@ export function usePanInteractions(viewportRef: RefObject<HTMLElement | null>): 
     const onWheel = (event: WheelEvent) => {
       // Selalu cegah default: scroll halaman, back-swipe, dan zoom halaman browser (pinch = ctrl+wheel).
       event.preventDefault();
-      if (event.ctrlKey || event.metaKey) return; // zoom: T0.3.4
+      if (event.ctrlKey || event.metaKey) return; // zoom: use-zoom-interactions
       const { dx, dy } = wheelToPanDelta(event, viewport.clientHeight);
       const camera = cameraStore.getState();
       camera.setCamera(panCamera(camera, dx, dy));

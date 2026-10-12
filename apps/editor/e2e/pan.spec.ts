@@ -1,12 +1,10 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { readCamera } from "./camera";
 
-// Posisi kamera dibaca dari transform `#world` (diterapkan di requestAnimationFrame).
-async function cameraOffset(page: Page): Promise<{ x: number; y: number }> {
-  const transform = await page.locator("#world").evaluate((element) => (element as HTMLElement).style.transform);
-  const match = /translate3d\((-?[\d.]+)px, (-?[\d.]+)px/.exec(transform);
-  if (!match) throw new Error(`transform tidak dikenali: "${transform}"`);
-  return { x: Number(match[1]), y: Number(match[2]) };
-}
+const cameraOffset = async (page: Parameters<typeof readCamera>[0]) => {
+  const { x, y } = await readCamera(page);
+  return { x, y };
+};
 
 test.beforeEach(async ({ page }) => {
   await page.goto("");
