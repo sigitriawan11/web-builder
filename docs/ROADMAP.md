@@ -294,7 +294,8 @@ Termasuk:
 
 #### Epic 0.3 — Viewport, pan & zoom
 
-- [ ] **T0.3.1** Struktur lapisan `#editor-viewport` → `#world` (CSS `transform: translate() scale()`, `transform-origin: 0 0`) → `#overlay` terpisah — ED-013, ED-014 · `apps/editor/src/canvas` · Verifikasi: manual — overlay tidak ikut ter-scale (garis 1px tetap 1px di zoom 400%)
+- [x] **T0.3.1** Struktur lapisan `#editor-viewport` → `#world` (CSS `transform: translate() scale()`, `transform-origin: 0 0`) → `#overlay` terpisah — ED-013, ED-014 · `apps/editor/src/canvas` · Verifikasi: manual — overlay tidak ikut ter-scale (garis 1px tetap 1px di zoom 400%) ✅ 2026-10-13
+  - Catatan: `cameraStore` (Zustand vanilla) diterapkan ke `#world` via rAF tanpa render React; `will-change` dilepas 150 ms setelah idle (ED-013). Kamera awal dari URL `?zoom=4&x=-250&y=-250` (alat cek spike). Isi world & outline overlay masih demo statis (diganti di T0.4.1/T0.5.6). Diverifikasi via screenshot headless Chromium: garis 1px di zoom 1× dan 4× (diukur per piksel); konfirmasi manual owner di browser Windows menyusul. Zustand 5.0.15 ditambahkan.
 - [ ] **T0.3.2** Modul koordinat murni `screenToWorld`, `worldToScreen`, `nodeLocalToWorld` — ED-015 · `apps/editor/src/canvas/geometry` · Verifikasi: unit test (zoom 0.05–16, offset negatif)
 - [ ] **T0.3.3** Pan: trackpad two-finger, Space+drag, middle-mouse drag, scroll wheel vertikal/Shift horizontal — ED-026 · `apps/editor/src/canvas/interactions` · Verifikasi: manual + e2e sederhana Space+drag menggeser world
 - [ ] **T0.3.4** Zoom: Ctrl/⌘+wheel & pinch dengan anchor di kursor, `+`/`-`, clamp rentang kandidat (5%–1600%) — ED-027 · `apps/editor/src/canvas` · Verifikasi: unit test titik di bawah kursor tetap; manual pinch di trackpad Windows

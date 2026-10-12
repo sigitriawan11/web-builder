@@ -12,3 +12,38 @@ body,
   overflow: hidden;
   background: #f5f5f5;
 }
+
+/* ED-013: satu transform untuk pan/zoom; origin di pojok agar rumus screen↔world sederhana. */
+#world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+/* ED-014: saudara #world (bukan anak), jadi tidak ikut ter-scale. */
+#overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.overlay-outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  border: 1px solid #0d99ff;
+}
+
+.overlay-zoom-indicator {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgb(0 0 0 / 70%);
+  color: #ffffff;
+  font: 12px/1.6 system-ui, sans-serif;
+}
