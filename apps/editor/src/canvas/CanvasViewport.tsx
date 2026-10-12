@@ -5,7 +5,7 @@ import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { NodeStoreContext } from "../document/use-node";
 import { RenderRoot } from "./render-root/RenderRoot";
-import { isolationFromSearch, SHADOW_HOST_CSS, siteCssFromSearch } from "./isolation";
+import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import { spikeNodeStore, spikePageId } from "./spike-document";
 import { useShadowRoot } from "./use-shadow-root";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
@@ -57,9 +57,9 @@ export function CanvasViewport() {
 
   const content = (
     <>
-      <style>{isolation === "shadow" ? `${SHADOW_HOST_CSS}\n${siteCss}` : siteCss}</style>
+      <style>{canvasStyleSheet(isolation, siteCss)}</style>
       <NodeStoreContext.Provider value={spikeNodeStore}>
-        <RenderRoot pageId={spikePageId} />
+        <RenderRoot pageId={spikePageId} scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined} />
       </NodeStoreContext.Provider>
     </>
   );
@@ -68,7 +68,7 @@ export function CanvasViewport() {
     <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
       {/* `#world` tetap menerima transform kamera; isinya di shadow root atau langsung (ED-016). */}
       <div id="world" ref={worldRef} data-isolation={isolation}>
-        {isolation === "none" && content}
+        {isolation !== "shadow" && content}
       </div>
       {shadowRoot && createPortal(content, shadowRoot)}
       <CanvasOverlay />

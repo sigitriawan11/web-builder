@@ -42,6 +42,36 @@ test.describe("Opsi A: Shadow DOM", () => {
   });
 });
 
+test.describe("Opsi B: prefix class", () => {
+  test("CSS situs agresif (di-scope ke .pf-root) berlaku di canvas tapi tidak menyentuh UI editor", async ({ page }) => {
+    await page.goto("?fixture=hero&siteCss=aggressive&isolation=prefix");
+
+    expect(await computed(page, HERO_TITLE, "font-family")).toBe("serif");
+    expect(await computed(page, CHROME_ELEMENT, "font-family")).not.toBe("serif");
+  });
+
+  test("pewarisan font & warna dari body editor terblokir oleh reset .pf-root", async ({ page }) => {
+    await page.goto("?fixture=hero&isolation=prefix");
+    const fontFamilyBefore = await computed(page, HERO_TITLE, "font-family");
+
+    await page.addStyleTag({ content: "body { font-family: monospace; color: rgb(1, 2, 3); line-height: 3; }" });
+
+    expect(await computed(page, HERO_TITLE, "font-family")).toBe(fontFamilyBefore);
+    expect(await computed(page, HERO_TITLE, "color")).not.toBe("rgb(1, 2, 3)");
+  });
+
+  // Keterbatasan Opsi B yang terdokumentasi: setiap CSS editor wajib di-scope ke chrome
+  // (mis. Tailwind preflight); aturan global seperti di bawah tetap mengenai isi canvas.
+  test("KETERBATASAN: preflight editor yang tidak di-scope tetap menembus canvas", async ({ page }) => {
+    await page.goto("?fixture=hero&isolation=prefix");
+    const fontSizeBefore = await computed(page, HERO_TITLE, "font-size");
+
+    await page.addStyleTag({ content: CHROME_PREFLIGHT_CSS });
+
+    expect(await computed(page, HERO_TITLE, "font-size")).not.toBe(fontSizeBefore);
+  });
+});
+
 test.describe("pembanding tanpa isolasi", () => {
   test("CSS situs agresif bocor ke UI editor", async ({ page }) => {
     await page.goto("?fixture=hero&siteCss=aggressive&isolation=none");
