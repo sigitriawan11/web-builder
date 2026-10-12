@@ -1,19 +1,21 @@
-import type { SiteDocument } from "@platform/document-model";
-import { memo } from "react";
-import { renderNode } from "./render-node";
+import type { ReactNode } from "react";
+import { NodeView } from "./NodeView";
 import { PROTOTYPE_TOKEN_STYLE } from "./tokens";
 
-interface RenderRootProps {
-  doc: SiteDocument;
-  pageId: string;
-}
-
-// Pembungkus canvas: menyediakan CSS variable token, lalu merender page aktif.
-// Re-render inkremental per node (observe Yjs) menyusul di T0.4.2.
-export const RenderRoot = memo(function RenderRoot({ doc, pageId }: RenderRootProps) {
+// Pembungkus canvas: menyediakan CSS variable token untuk isi dokumen.
+export function RenderScope({ children }: { children: ReactNode }) {
   return (
     <div className="render-root" style={PROTOTYPE_TOKEN_STYLE}>
-      {renderNode(doc, pageId)}
+      {children}
     </div>
   );
-});
+}
+
+// Page aktif dirender inkremental dari Y.Doc (butuh NodeStoreContext.Provider di atasnya).
+export function RenderRoot({ pageId }: { pageId: string }) {
+  return (
+    <RenderScope>
+      <NodeView id={pageId} parent="block" />
+    </RenderScope>
+  );
+}

@@ -1,5 +1,5 @@
-import type { SiteDocument } from "@platform/document-model";
-import { type CSSProperties, createElement, type ReactElement } from "react";
+import type { Node, SiteDocument } from "@platform/document-model";
+import { type CSSProperties, createElement, Fragment, type ReactElement, type ReactNode } from "react";
 import { assetUrl } from "./asset-url";
 import { renderRichText } from "./rich-text";
 import { childLayoutOf, type ParentLayout, styleToCss } from "./style-to-css";
@@ -13,36 +13,25 @@ const BASE_CSS: CSSProperties = { boxSizing: "border-box", margin: 0 };
 // DM-010: lebar artboard desktop default (page.props.canvas.width belum ada di schema prototipe).
 const PAGE_CANVAS_WIDTH = 1440;
 
-function renderChildren(doc: SiteDocument, ids: readonly string[], parent: ParentLayout): (ReactElement | null)[] {
-  return ids.map((childId) => renderNode(doc, childId, parent));
-}
-
 /**
- * Render satu node (dan turunannya) menjadi elemen React. Hanya membaca `doc` (DM-001).
- * Setiap elemen node diberi `data-node-id` untuk hit-test & overlay editor (ED-017).
+ * Elemen DOM satu node; `children` = elemen anak yang sudah dirender pemanggil.
+ * Dipakai bersama oleh render statis (`renderNode`) dan render inkremental (`NodeView`)
+ * agar keduanya selalu menghasilkan HTML yang sama.
  */
-export function renderNode(doc: SiteDocument, id: string, parent: ParentLayout = "block"): ReactElement | null {
-  const node = doc.nodes[id];
-  if (!node) return null;
-
+export function renderNodeElement(node: Node, parent: ParentLayout, children: ReactNode): ReactElement {
   const css: CSSProperties = {
     ...BASE_CSS,
     ...styleToCss(node.style.base, parent),
     // Hide global (mata di layer panel) menang atas display dari layout.
     ...(node.visible ? {} : { display: "none" }),
   };
-  const common = { key: node.id, "data-node-id": node.id };
-  const childLayout = childLayoutOf(node.style.base);
+  const common = { "data-node-id": node.id };
 
   switch (node.type) {
     case "page":
-      return createElement(
-        node.tag ?? "main",
-        { ...common, style: { ...css, width: PAGE_CANVAS_WIDTH } },
-        renderChildren(doc, node.children, childLayout),
-      );
+      return createElement(node.tag ?? "main", { ...common, style: { ...css, width: PAGE_CANVAS_WIDTH } }, children);
     case "frame":
-      return createElement(node.tag ?? "div", { ...common, style: css }, renderChildren(doc, node.children, childLayout));
+      return createElement(node.tag ?? "div", { ...common, style: css }, children);
     case "text": {
       const { content, style } = renderRichText(node.props.content);
       return createElement(node.tag ?? "p", { ...common, style: { ...css, ...style } }, content);
@@ -66,3 +55,19 @@ export function renderNode(doc: SiteDocument, id: string, parent: ParentLayout =
     }
   }
 }
+
+/**
+ * Render statis satu node beserta turunannya langsung dari JSON dokumen (DM-001).
+ * Dipakai untuk snapshot test & pembanding; canvas memakai `NodeView` (inkremental).
+ */
+export function renderNode(doc: SiteDocument, id: string, parent: ParentLayout = "block"): ReactElement | null {
+  const node = doc.nodes[id];
+  if (!node) return null;
+  const childLayout = childLayoutOf(node.style.base);
+  const children =
+    "children" in node
+      ? node.children.map((childId) => <Fragment key={childId}>{renderNode(doc, childId, childLayout)}</Fragment>)
+      : null;
+  return renderNodeElement(node, parent, children);
+}
+

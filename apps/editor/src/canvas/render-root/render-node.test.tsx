@@ -1,11 +1,11 @@
 import { heroDocument, landing2000, nestedDocument } from "@platform/document-model/fixtures";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { RenderRoot } from "./RenderRoot";
+import { RenderScope } from "./RenderRoot";
 import { renderNode } from "./render-node";
 
 const render = (doc: ReturnType<typeof heroDocument>) =>
-  renderToStaticMarkup(<RenderRoot doc={doc} pageId={doc.pageOrder[0] ?? ""} />);
+  renderToStaticMarkup(<RenderScope>{renderNode(doc, doc.pageOrder[0] ?? "")}</RenderScope>);
 
 function nodeIdsIn(html: string): string[] {
   return [...html.matchAll(/data-node-id="([^"]+)"/g)].map((match) => match[1] ?? "");

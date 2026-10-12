@@ -2,16 +2,14 @@ import { useEffect, useRef } from "react";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
-import { fixtureFromSearch } from "./dev-fixture";
+import { NodeStoreContext } from "../document/use-node";
 import { RenderRoot } from "./render-root/RenderRoot";
+import { spikeNodeStore, spikePageId } from "./spike-document";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 
 // Setelah kamera diam selama ini, `will-change` dilepas agar teks dirasterisasi ulang dengan tajam (ED-013).
 const WILL_CHANGE_IDLE_MS = 150;
-
-const doc = fixtureFromSearch(window.location.search);
-const activePageId = doc.pageOrder[0] ?? "";
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
@@ -53,7 +51,9 @@ export function CanvasViewport() {
   return (
     <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
       <div id="world" ref={worldRef}>
-        <RenderRoot doc={doc} pageId={activePageId} />
+        <NodeStoreContext.Provider value={spikeNodeStore}>
+          <RenderRoot pageId={spikePageId} />
+        </NodeStoreContext.Provider>
       </div>
       <CanvasOverlay />
     </main>
