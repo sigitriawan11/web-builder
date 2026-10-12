@@ -1,5 +1,6 @@
 import * as Y from "yjs";
 import type { Node, SiteDocument } from "../schema";
+import { cloneJson } from "./clone-json";
 
 // Nama root type di Y.Doc (DM-058). Prototipe M0: settings/theme/componentDeps menyusul di M1.
 export const YDOC_KEYS = {
@@ -9,12 +10,7 @@ export const YDOC_KEYS = {
   nodes: "nodes",
 } as const;
 
-// Yjs menyimpan nilai JSON per referensi; tanpa salinan, mengubah objek input diam-diam mengubah isi Y.Doc.
-function cloneJson<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value)) as T;
-}
-
-function nodeToYMap(node: Node): Y.Map<unknown> {
+export function nodeToYMap(node: Node): Y.Map<unknown> {
   const yNode = new Y.Map<unknown>();
   for (const [key, value] of Object.entries(node)) {
     if (value === undefined) continue;

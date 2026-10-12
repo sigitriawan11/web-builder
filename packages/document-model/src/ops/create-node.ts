@@ -1,0 +1,84 @@
+import { z } from "zod";
+import { createId } from "../ids";
+import { NodeIdSchema, NodeSchema, StylePatchSchema, StyleSchema, type Style } from "../schema";
+import { nodeToYMap } from "../yjs/mapping";
+import { defineOp, fail } from "./op";
+import { childrenOf, nodesMap } from "./y-access";
+
+const CreatableTypeSchema = z.enum(["frame", "text", "image"]);
+type CreatableType = z.infer<typeof CreatableTypeSchema>;
+
+const MAX_ID_ATTEMPTS = 5;
+
+// DM-027 AC: default ukuran node baru.
+const DEFAULT_BASE_STYLE: Record<CreatableType, Style> = {
+  frame: { size: { width: { mode: "fill" }, height: { mode: "hug" } } },
+  text: { size: { width: { mode: "fill" }, height: { mode: "hug" } } },
+  image: { size: { width: { mode: "fill" }, height: { mode: "fixed", value: 240, unit: "px" } } },
+};
+
+// Image tidak punya default props karena asset wajib dipilih pemanggil.
+const DEFAULT_PROPS: Record<CreatableType, Record<string, unknown>> = {
+  frame: {},
+  text: { content: { type: "doc", content: [{ type: "paragraph" }] } },
+  image: {},
+};
+
+const DEFAULT_NAME: Record<CreatableType, string> = { frame: "Frame", text: "Text", image: "Image" };
+
+export const createNode = defineOp({
+  name: "createNode",
+  input: z.strictObject({
+    parentId: NodeIdSchema,
+    index: z.number().int().nonnegative().optional(),
+    type: CreatableTypeSchema,
+    name: z.string().min(1).max(80).optional(),
+    style: z
+      .strictObject({
+        base: StyleSchema.optional(),
+        tablet: StylePatchSchema.optional(),
+        mobile: StylePatchSchema.optional(),
+      })
+      .optional(),
+    props: z.record(z.string(), z.unknown()).optional(),
+  }),
+  run(ctx, input) {
+    const nodes = nodesMap(ctx.doc);
+    const parent = nodes.get(input.parentId);
+    if (!parent) return fail("NOT_FOUND", `Parent "${input.parentId}" tidak ditemukan`, ["parentId"]);
+    const siblings = childrenOf(parent);
+    if (!siblings) return fail("INVALID_TARGET", `Parent "${input.parentId}" bukan container`, ["parentId"]);
+
+    // DM-007: ID dibuat di client, tetapi tetap dicek agar tidak bertabrakan.
+    const idGen = ctx.idGen ?? createId;
+    let id = idGen("n");
+    for (let attempt = 1; nodes.has(id) && attempt < MAX_ID_ATTEMPTS; attempt++) id = idGen("n");
+    if (nodes.has(id)) return fail("INVALID_RESULT", `Gagal membuat ID unik setelah ${MAX_ID_ATTEMPTS} percobaan`);
+
+    const { style, type } = input;
+    const parsed = NodeSchema.safeParse({
+      id,
+      type,
+      name: input.name ?? DEFAULT_NAME[type],
+      parentId: input.parentId,
+      visible: true,
+      locked: false,
+      ...(type === "frame" ? { children: [] } : {}),
+      style: {
+        base: { ...DEFAULT_BASE_STYLE[type], ...style?.base },
+        ...(style?.tablet ? { tablet: style.tablet } : {}),
+        ...(style?.mobile ? { mobile: style.mobile } : {}),
+      },
+      props: { ...DEFAULT_PROPS[type], ...input.props },
+    });
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      return fail("INVALID_RESULT", `Node ${type} tidak valid: ${issue?.message}`, issue?.path.map(String));
+    }
+
+    const index = Math.min(input.index ?? siblings.length, siblings.length);
+    nodes.set(id, nodeToYMap(parsed.data));
+    siblings.insert(index, [id]);
+    return { ok: true, value: id, affected: [id, input.parentId] };
+  },
+});
