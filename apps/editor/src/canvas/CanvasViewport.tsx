@@ -2,12 +2,16 @@ import { useEffect, useRef } from "react";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
-import { DemoWorldContent } from "./DemoWorldContent";
+import { fixtureFromSearch } from "./dev-fixture";
+import { RenderRoot } from "./render-root/RenderRoot";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 
 // Setelah kamera diam selama ini, `will-change` dilepas agar teks dirasterisasi ulang dengan tajam (ED-013).
 const WILL_CHANGE_IDLE_MS = 150;
+
+const doc = fixtureFromSearch(window.location.search);
+const activePageId = doc.pageOrder[0] ?? "";
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
@@ -49,7 +53,7 @@ export function CanvasViewport() {
   return (
     <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
       <div id="world" ref={worldRef}>
-        <DemoWorldContent />
+        <RenderRoot doc={doc} pageId={activePageId} />
       </div>
       <CanvasOverlay />
     </main>
