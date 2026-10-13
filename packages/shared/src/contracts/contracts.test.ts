@@ -27,7 +27,6 @@ function site() {
     name: "Toko Budi",
     status: "draft",
     documentId: id(),
-    defaultLocale: "id",
     createdAt: now,
     updatedAt: now,
   };
@@ -96,7 +95,7 @@ describe("cursor pagination", () => {
 });
 
 describe("DTO sites & documents", () => {
-  it("site: status & locale dibatasi; nama dirapikan saat dibuat", () => {
+  it("site: status dibatasi; nama dirapikan saat dibuat", () => {
     expect(SiteSchema.safeParse({ ...site(), status: "deleted" }).success).toBe(false);
     expect(SiteSchema.safeParse({ ...site(), id: "123" }).success).toBe(false);
     expect(CreateSiteBodySchema.parse({ name: "  Toko Budi  " })).toEqual({ name: "Toko Budi" });

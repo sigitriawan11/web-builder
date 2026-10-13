@@ -559,7 +559,7 @@ Custom domain: Cloudflare for SaaS (Custom Hostnames) dengan fallback origin `cn
 | Primary key | **UUIDv7** (`uuid` type) dibuat di aplikasi (`@platform/shared/ids` → `uuidv7()`), terurut waktu → index B-tree ramah insert. Pengecualian: tabel append-only bervolume tinggi (`document_updates`, `audit_logs`, `workflow_run_steps`, `credit_ledger`) memakai `bigint generated always as identity`. |
 | ID di dalam dokumen | Node ID di Y.Doc **bukan** UUID: **prefix tipe + `nanoid(10)`** alfabet `0-9a-z` (mis. `n_a8f3k2m1zx`, `pg_k3m9x2a7qp`, `cmp_…`, `ast_…`) — sumber kebenaran: [spec 01 DM-007](./specs/01-document-model.md#dm-007-format-id). Referensi component di dokumen memakai UUID `componentId` + `version` integer. |
 | ID publik | Subdomain acak Free: default 8 karakter (`RANDOM_SUBDOMAIN_LENGTH`), alfabet `a-z2-9` tanpa karakter ambigu (`0 o 1 l i`), diawali huruf, dicek unik + blocklist — detail di [spec 07 PUB-080](./specs/07-publishing-hosting.md#pub-080-generator-subdomain-acak-free). ID resource di URL = UUIDv7. |
-| Timestamp | `created_at timestamptz not null default now()`, `updated_at` (di-set repository), `deleted_at` (soft delete) untuk entitas yang bisa dipulihkan (sites, pages read model, assets, records, members, products). |
+| Timestamp | `created_at timestamptz not null default now()`, `updated_at` (di-set repository), `deleted_at` (soft delete) untuk entitas yang bisa dipulihkan (sites, assets, records, members, products). Read model turunan (`site_pages`) tidak di-soft-delete: dibangun ulang dari dokumen. |
 | Tenant key | Setiap tabel tenant punya `workspace_id` dan/atau `site_id` **NOT NULL** + index komposit diawali kolom tenant. |
 | JSONB | Dipakai untuk: snapshot dokumen JSON, definisi component, schema collection, data record, konfigurasi workflow, settings. Selalu divalidasi Zod sebelum ditulis; ditipkan via `.$type<T>()`. |
 | Uang | `bigint` dalam satuan terkecil (rupiah = 1) + `currency char(3)`; tidak pernah `float`. |
@@ -611,8 +611,8 @@ Tabel Better Auth (`users`, `sessions`, `accounts`, `verifications`, dan tabel p
 
 | Tabel | Kolom kunci | Index penting |
 |---|---|---|
-| `sites` | id, workspace_id, name, status (`draft`/`published`/`suspended`/`archived`), document_id, theme_id, default_locale, live_deployment_id, settings jsonb (SEO default, favicon, analytics), is_dynamic | (workspace_id, deleted_at) |
-| `site_pages` *(read model)* | id (= page node id), site_id, path, title, seo jsonb, sort_order, is_home, node_count, updated_at | unique(site_id, path) |
+| `sites` | id, workspace_id, name, status (`draft`/`published`/`suspended`/`archived`), document_id (unik; FK dua arah dengan `documents.site_id` — buat dokumen → situs → isi `documents.site_id` dalam satu transaksi), deleted_at. Bahasa/SEO/favicon/tema **tidak** di sini — ada di dokumen (DM-078). Ditambah bersama tabel tujuannya: `theme_id` (M2), `live_deployment_id` (M4), `is_dynamic` (M7) | (workspace_id, deleted_at) |
+| `site_pages` *(read model, turunan)* | site_id, page_id (= page node id `pg_…`), path, title, seo jsonb, sort_order, is_home, node_count, updated_at — dibangun ulang dari dokumen; halaman terhapus = baris dihapus | pk(site_id, page_id), unique(site_id, path), satu home per situs |
 | `documents` | id, workspace_id, site_id (null untuk library), kind (`site`/`component`/`template`), schema_version, last_seq, last_snapshot_id, size_bytes | (site_id), (kind) |
 | `document_updates` | id bigint, document_id, seq, update bytea, origin (`local`/`ai`/`server`/`migration`), actor_id, ai_run_id, created_at | unique(document_id, seq) |
 | `document_snapshots` | id, document_id, upto_seq, state bytea (Yjs), json jsonb (opsional, untuk publish/history), kind (`auto`/`named`/`publish`/`pre_ai`), label, created_by | (document_id, created_at desc) |

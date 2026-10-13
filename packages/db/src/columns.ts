@@ -1,5 +1,5 @@
 import { uuidv7 } from "@platform/shared";
-import { bigint, timestamp, uuid } from "drizzle-orm/pg-core";
+import { bigint, customType, timestamp, uuid } from "drizzle-orm/pg-core";
 
 // Helper kolom bersama (ARCHITECTURE §6.1). Nama kolom TS camelCase → snake_case otomatis lewat
 // `casing: "snake_case"` di client & drizzle.config, jadi helper ini tidak menulis nama kolom.
@@ -29,3 +29,10 @@ export const timestamps = {
 export const softDelete = {
   deletedAt: timestamptz(),
 };
+
+/** `bytea` (Drizzle 0.45 belum punya bawaan): update & state Yjs biner (ARCHITECTURE §7.1). */
+export const bytea = customType<{ data: Uint8Array; driverData: Buffer }>({
+  dataType: () => "bytea",
+  toDriver: (value) => Buffer.from(value.buffer, value.byteOffset, value.byteLength),
+  fromDriver: (value) => new Uint8Array(value.buffer, value.byteOffset, value.byteLength),
+});
