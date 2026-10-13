@@ -108,7 +108,8 @@ test("kotak seleksi ikut bergeser selama drag; Esc mengembalikan semuanya tanpa 
   await expect.poll(async () => Math.round((await boxOf(nodeLocator(page, CARD))).x)).toBe(Math.round(card.x));
 });
 
-test("node bukan absolute (anak auto-layout) tidak dipindah lewat drag move", async ({ page }) => {
+// Anak auto-layout memakai reorder (T0.6.5), bukan posisi absolute; Hero satu-satunya section → drop di tempat asal.
+test("node bukan absolute (anak auto-layout) tidak mendapat posisi absolute dari drag", async ({ page }) => {
   await page.goto("?fixture=hero&zoom=0.5&x=20&y=20");
   await page.evaluate(() => {
     const w = window as unknown as { __spike: Spike; __updates: number };

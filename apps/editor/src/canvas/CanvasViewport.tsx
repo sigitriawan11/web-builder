@@ -40,6 +40,8 @@ const dragSessionDeps: DragSessionDeps = {
   opContext: { doc: spikeDoc, origin: LOCAL_ORIGIN },
   geometry: spikeGeometry,
   nodeStore: spikeNodeStore,
+  hitTest: spikeHitTest,
+  viewportOffset: spikeMarqueeContext.viewportOffset,
 };
 const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest, marquee: spikeMarqueeContext };
 

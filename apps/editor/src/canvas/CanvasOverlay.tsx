@@ -4,6 +4,7 @@ import { cameraStore } from "./camera-store";
 import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
 import { spikeGeometry } from "./geometry/spike-geometry";
 import { MarqueeOverlay } from "./MarqueeOverlay";
+import { ReorderOverlay } from "./overlay/ReorderOverlay";
 import { SelectionOverlay } from "./overlay/SelectionOverlay";
 import { spikeNodeStore } from "./spike-document";
 
@@ -21,6 +22,7 @@ export function CanvasOverlay() {
       {hoveredId && <GeometryOutline nodeId={hoveredId} className="overlay-hover-outline" />}
       <SelectionOverlay nodeStore={spikeNodeStore} geometry={spikeGeometry} />
       <MarqueeOverlay />
+      <ReorderOverlay />
       <div className="overlay-zoom-indicator">{Math.round(zoom * 100)}%</div>
     </div>
   );

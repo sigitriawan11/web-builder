@@ -94,6 +94,23 @@ body,
   color: #0d99ff;
 }
 
+/* ED-063: ghost node saat reorder & penanda sisip 2px. */
+.overlay-reorder-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  border: 1px dashed #0d99ff;
+  background: rgb(13 153 255 / 12%);
+}
+
+.overlay-insertion-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #0d99ff;
+}
+
 /* ED-053: kotak marquee (biru transparan) dan node yang akan terpilih. */
 .overlay-marquee {
   position: absolute;
