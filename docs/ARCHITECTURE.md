@@ -632,7 +632,7 @@ Tabel Better Auth (`users`, `sessions`, `accounts`, `verifications`, dan tabel p
 
 | Tabel | Kolom kunci | Index penting |
 |---|---|---|
-| `assets` | id, workspace_id, site_id (null = pustaka workspace), kind (`image`/`video`/`font`/`file`), storage_key, mime, size_bytes, width, height, blurhash, sha256, variants jsonb, status (`pending`/`ready`/`rejected`), uploaded_by, deleted_at | (site_id, created_at), (workspace_id, sha256) |
+| `assets` | id (text `ast_…` = ID di dokumen, DM-078; check format), workspace_id, site_id (null = pustaka workspace), kind (`image`/`video`/`file`/`font`/`svg` = `AssetEntry.kind`), storage_key, mime, size_bytes, width, height, blurhash, sha256, variants jsonb, status (`pending`/`ready`/`rejected`), uploaded_by, deleted_at | (site_id, created_at), (workspace_id, sha256) |
 | `storage_usage` | workspace_id, bytes_used, updated_at | pk(workspace_id) |
 
 **Deployments & domains** (`schema/hosting.ts`) — [spec 07](./specs/07-publishing-hosting.md)
@@ -700,7 +700,7 @@ Entitlement efektif = `plans.entitlements` + override per workspace (`workspaces
 | `moderation_reports` | id, site_id, hostname, reporter_email, reason, details, status | (status, created_at) |
 | `moderation_actions` | id, site_id, action (`warn`/`unpublish`/`suspend`/`restore`), reason, admin_user_id | (site_id) |
 | `content_scans` | id, site_id, deployment_id, result jsonb, score, flagged | (flagged, created_at) |
-| `audit_logs` | id bigint, workspace_id, site_id, actor_type (`user`/`admin`/`system`/`ai`), actor_id, action (`site.publish`, `payment_config.update`, …), target_type, target_id, ip, user_agent, metadata jsonb, created_at | (workspace_id, created_at desc), (site_id, created_at desc) |
+| `audit_logs` | id bigint, actor_type (`user`/`staff`/`system`/`ai`), actor_id text (di-hash saat akun dihapus), impersonator_id, workspace_id, site_id, action (`site.publish`, `payment_config.update`, …), target_type, target_id, before/after jsonb, reason, ip, user_agent, metadata jsonb, created_at — **tanpa FK**; append-only ditegakkan role `platform_app` (SELECT/INSERT saja) + trigger penolak UPDATE/DELETE/TRUNCATE | (workspace_id, created_at desc), (site_id, created_at desc), (target_type, target_id), (actor_id, created_at) |
 | `outbound_messages` | id, site_id, channel (`email`/`whatsapp`), provider, to_hash, template, status, provider_ref, error | (site_id, created_at desc) |
 
 `audit_logs` append-only (role DB aplikasi hanya punya `INSERT, SELECT`); dipartisi bulanan saat besar ([§17](#17-scalability-path)).

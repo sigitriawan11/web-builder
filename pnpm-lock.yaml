@@ -141,6 +141,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@platform/document-model':
+        specifier: workspace:*
+        version: link:../document-model
       '@platform/shared':
         specifier: workspace:*
         version: link:../shared

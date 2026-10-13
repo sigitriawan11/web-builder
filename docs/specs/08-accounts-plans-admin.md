@@ -1857,7 +1857,7 @@ Unique parsial: satu `personal` per `owner_user_id`.
 ### ACC-372 Skema admin, moderasi, notifikasi
 - **P0 · M4**
 
-**`audit_logs`** (append-only): `id`, `actor_type` (`user`/`staff`/`system`), `actor_id`, `impersonator_id` null, `workspace_id` null, `action` (mis. `site.suspend`, `entitlement.override.create`), `target_type`, `target_id`, `before` jsonb, `after` jsonb, `reason`, `ip`, `user_agent`, `created_at`; index `(target_type, target_id)`, `(actor_id, created_at)`.
+**`audit_logs`** (append-only): `id`, `actor_type` (`user`/`staff`/`system`/`ai`), `actor_id` (text; di-hash saat akun dihapus), `site_id` null, `metadata` jsonb, `impersonator_id` null, `workspace_id` null, `action` (mis. `site.suspend`, `entitlement.override.create`), `target_type`, `target_id`, `before` jsonb, `after` jsonb, `reason`, `ip`, `user_agent`, `created_at`; index `(target_type, target_id)`, `(actor_id, created_at)`.
 
 **`moderation_rules`**: `id`, `category`, `type` (`keyword`/`regex`/`domain`/`pattern`), `value`, `weight`, `locale`, `active`, `updated_by`.
 

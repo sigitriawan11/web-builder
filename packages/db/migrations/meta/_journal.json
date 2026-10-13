@@ -22,6 +22,20 @@
       "when": 1791886630014,
       "tag": "0002_sites_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791886890792,
+      "tag": "0003_assets_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791886913552,
+      "tag": "0004_audit_append_only",
+      "breakpoints": true
     }
   ]
 }
