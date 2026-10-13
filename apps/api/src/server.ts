@@ -1,6 +1,6 @@
 import type { Server } from "node:http";
 import { createDb } from "@platform/db";
-import { createLogger, type Logger } from "@platform/shared/node";
+import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
 import { createApp } from "./app";
 import type { ApiEnv } from "./config/env";
 
@@ -13,13 +13,23 @@ export interface RunningServer {
   close: (reason: string) => Promise<void>;
 }
 
-export async function startServer(env: ApiEnv): Promise<RunningServer> {
-  const logger = createLogger({
+/** Logger api: JSON (pretty di lokal) + konteks request (requestId, user, tenant) di setiap baris. */
+export function createApiLogger(
+  env: Pick<ApiEnv, "APP_ENV" | "LOG_LEVEL">,
+  destination?: LoggerOptions["destination"],
+): Logger {
+  return createLogger({
     service: "api",
     env: env.APP_ENV,
     level: env.LOG_LEVEL,
-    pretty: env.APP_ENV === "local",
+    pretty: env.APP_ENV === "local" && !destination,
+    mixin: contextLogFields,
+    ...(destination ? { destination } : {}),
   });
+}
+
+export async function startServer(env: ApiEnv): Promise<RunningServer> {
+  const logger = createApiLogger(env);
   const { close: closeDb } = createDb({ connectionString: env.DATABASE_URL, maxConnections: env.DATABASE_POOL_MAX });
   const app = createApp({ logger });
 
