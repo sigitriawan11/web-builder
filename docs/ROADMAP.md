@@ -381,7 +381,16 @@ Termasuk:
 - [x] **T0.7.3** Harness benchmark Playwright: buka fixture 200 & 2.000 node, rekam trace (`performance.measure` + `requestAnimationFrame` counter) untuk pan, zoom, drag, reorder, resize, klik→seleksi — ED-022 · `apps/editor/bench` · Verifikasi: `pnpm bench:canvas` mencetak tabel fps/latency ✅ 2026-10-13
   - Catatan: `bench/canvas.bench.ts` mencetak tabel §M0.e langsung (kolom Shadow DOM / Prefix / Non-iframe / Iframe). Pan/zoom = kamera terprogram per frame; drag/reorder/resize = mouse sungguhan dengan bukti interaksi aktif (translate preview, penanda sisip ≥ 50% frame, lebar grid berubah) sehingga benchmark gagal alih-alih melaporkan angka palsu (mutation check: preview drag dimatikan → gagal). Drag move memakai landing 200 + satu frame absolute di page (landing generator hanya auto-layout). Klik → seleksi = `pointerup` → rAF+task setelah seleksi berubah, 30 klik bergantian dua section. Kolom iframe/non-iframe hanya pan/zoom (interaksi mouse di frame breakpoint belum ada). Opsi env: `BENCH_VARIANTS`, `BENCH_DURATION_MS` (default 3000), `BENCH_RAW=1` (JSON mentah ke stdout → `| tee bench/results/…` di T0.7.4), `BENCH_TRACE=1` (trace Chrome per skenario, di-gitignore). Tanpa `@types/node`: tsconfig editor sengaja DOM-only, cukup deklarasi `process.env` di `bench/env.d.ts`. Run WSL2 headless (1,5 s/gerak): semua skenario 58–60 fps (dibatasi vsync headless), klik → seleksi p95 5–9 ms — indikatif, angka resmi T0.7.4.
 - [ ] **T0.7.4** Jalankan benchmark di laptop referensi; isi tabel hasil (§M0.e) untuk kandidat Shadow DOM vs prefix dan iframe vs non-iframe — ED-022 · docs · Verifikasi: tabel terisi, data mentah disimpan di `apps/editor/bench/results/`
-- [ ] **T0.7.5** 🧪 Ukur biaya Yjs: ukuran update per drag, ukuran state 2.000 node, waktu `jsonToYDoc` & `yDocToJson` — DM-061, DM-077 · `packages/document-model` · Verifikasi: angka dicatat; bandingkan dengan target DM-077
+- [x] **T0.7.5** 🧪 Ukur biaya Yjs: ukuran update per drag, ukuran state 2.000 node, waktu `jsonToYDoc` & `yDocToJson` — DM-061, DM-077 · `packages/document-model` · Verifikasi: angka dicatat; bandingkan dengan target DM-077 ✅ 2026-10-13
+  - Catatan: `pnpm --filter @platform/document-model bench` (Vitest 5 `context.bench`, file `bench/yjs-cost.bench.ts`, tsconfig terpisah agar `src` tetap tanpa lib DOM). Angka WSL2 (indikatif):
+
+    | Fixture landing | JSON | State Yjs | State/JSON | Validasi Zod | `jsonToYDoc` | `yDocToJson` | Decode state |
+    |---|---|---|---|---|---|---|---|
+    | 200 node | 87 KB | 99 KB | 1,14 | 1,3 ms | 2,5 ms | 0,9 ms | 2,9 ms |
+    | 2.000 node | 876 KB | 1.010 KB | 1,15 | 13 ms | 30 ms | 11 ms | 32 ms |
+    | 5.000 node | 2.193 KB | 2.549 KB | 1,16 | 41 ms | 82 ms | 31 ms | 84 ms |
+
+    Update per aksi (tak bergantung ukuran dokumen): commit drag ≈ 56 B, resize ≈ 87 B, reorder ≈ 40 B; pembanding bila preview drag ditulis ke Yjs tiap frame: ≈ 3,3 KB/detik (60 update) — membenarkan preview tanpa Yjs (ED-024). Banding target: DM-061 decode 5.000 node < 500 ms ✅ (84 ms); DM-062 10.000 edit acak pada 2.000 node → state/JSON 1,23 ≤ 3 ✅; DM-077 bench validasi 5k & round-trip Yjs 5k kini ada (≈ 41 ms & ≈ 113 ms; DM-077 tidak menetapkan angka — usulan batas diputuskan di T0.8.6). Bench "resolve 200 instance" & "compile site 10 page" DM-077 menunggu fitur instance/renderer (M1+). Vitest memberi peringatan overhead getter export (`cloneJson`) — angka sedikit pesimistis.
 
 #### Epic 0.8 — Keputusan spike & laporan
 

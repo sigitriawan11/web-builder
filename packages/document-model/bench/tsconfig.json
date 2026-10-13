@@ -1,0 +1,7 @@
+{
+  // Benchmark berjalan di Node (Vitest) dan butuh `console`/`TextEncoder`; `src` sengaja tetap ES-only
+  // agar document-model tidak bergantung pada API lingkungan.
+  "extends": "@platform/config/tsconfig/base.json",
+  "compilerOptions": { "lib": ["ES2022", "DOM"] },
+  "include": ["."]
+}
