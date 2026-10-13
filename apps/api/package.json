@@ -24,6 +24,7 @@
     "@platform/document-model": "workspace:*",
     "@platform/i18n": "workspace:*",
     "@platform/shared": "workspace:*",
+    "bullmq": "6.3.10",
     "cors": "2.8.6",
     "drizzle-orm": "0.45.3",
     "express": "5.2.1",

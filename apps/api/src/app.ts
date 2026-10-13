@@ -7,6 +7,7 @@ import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-h
 import { httpLogger } from "./middleware/http-logger";
 import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
+import type { QueueProducer } from "./queues/producer";
 
 // createApp(): susunan middleware + router (ARCHITECTURE §5.3). Tanpa `listen` agar bisa diuji dengan supertest.
 // Urutan middleware mengikuti tabel §5.3; auth, tenant, rate limit menyusul (T1.4.5, T1.5).
@@ -15,6 +16,8 @@ export interface AppDeps {
   logger: Logger;
   // Redis untuk rate limit per router (T1.4.5); router publik memasangnya saat dibuat.
   redis?: Redis;
+  // Producer job untuk service (enqueue lewat `withTransaction` + afterCommit).
+  queues?: QueueProducer;
   // Pengecekan `/health/ready` (DB, Redis, storage) — dirakit server dari dependensi nyata.
   readinessChecks?: Readonly<Record<string, ReadinessCheck>>;
   // Untuk test & komposisi: router tambahan dipasang sebelum handler 404/error.

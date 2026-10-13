@@ -6,6 +6,7 @@ import { createApp } from "./app";
 import type { ApiEnv } from "./config/env";
 import { storageCheck } from "./health/readiness";
 import { createRedis, waitForRedis } from "./lib/redis";
+import { createQueueProducer } from "./queues/producer";
 
 // Batas tunggu request yang sedang berjalan saat shutdown, sebelum koneksi dipaksa tutup.
 export const SHUTDOWN_TIMEOUT_MS = 10_000;
@@ -55,9 +56,18 @@ export async function startServer(
   // Mulai melayani setelah Redis siap, agar readiness & rate limit langsung akurat. Redis mati → tetap start
   // (rate limit memakai limiter cadangan, /health/ready melapor 503).
   await waitForRedis(redis, options.redisConnectTimeoutMs ?? REDIS_CONNECT_TIMEOUT_MS);
+  // Producer BullMQ (koneksi Redis sendiri); dipakai service lewat afterCommit (T1.4.8).
+  let queueErrorLogged = false;
+  const queues = createQueueProducer(env.REDIS_URL, {
+    onError: (error) => {
+      if (!queueErrorLogged) logger.warn({ err: error }, "koneksi antrean BullMQ bermasalah");
+      queueErrorLogged = true;
+    },
+  });
   const app = createApp({
     logger,
     redis,
+    queues,
     readinessChecks: {
       db: async () => {
         await db.execute(sql`select 1`);
@@ -89,6 +99,7 @@ export async function startServer(
         server.closeIdleConnections();
       });
       clearTimeout(forced);
+      await queues.close();
       await closeDb();
       redis.disconnect();
       logger.info("api shutdown selesai");
