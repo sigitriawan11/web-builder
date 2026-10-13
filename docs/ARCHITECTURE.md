@@ -1376,7 +1376,8 @@ Validasi: tiap app memanggil `parseEnv(app, schema, source)` dari `@platform/sha
 | `pnpm db:generate` | `drizzle-kit generate` (dari `packages/db`) |
 | `pnpm db:migrate` | Terapkan migration ke `DATABASE_URL` |
 | `pnpm db:seed` | Plan, user dev (`owner@platform.test` / `admin@platform.test`), library seed, situs contoh |
-| `pnpm db:reset` | Drop + migrate + seed (lokal saja; menolak jika `APP_ENV != local`) |
+| `pnpm db:reset` | Drop + migrate + seed (lokal saja; menolak jika `APP_ENV != local` atau host `DATABASE_URL` bukan loopback) |
+| `pnpm db:check` | Migration check: `drizzle-kit check` + `generate`; gagal bila schema berubah tanpa migration (dipakai CI) |
 | `pnpm dev` | `turbo run dev --parallel` → web, editor, api, worker, realtime, site-host |
 | `pnpm dev --filter=@platform/api...` | Hanya api dan dependensinya |
 | `pnpm lint` / `pnpm lint:deps` / `pnpm typecheck` | Biome, dependency-cruiser, `tsc -b` |

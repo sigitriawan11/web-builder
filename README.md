@@ -36,7 +36,8 @@ Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 | `pnpm test:e2e` | Playwright |
 | `pnpm bench` / `pnpm bench:canvas` | Benchmark Vitest (document-model) / benchmark canvas Playwright |
 | `pnpm infra:up` / `pnpm infra:down` | Nyalakan / matikan infrastruktur lokal (data tetap di volume) |
-| `pnpm db:generate` / `db:migrate` / `db:seed` / `db:reset` | Migration Drizzle, seed data dev, reset (lokal saja) |
+| `pnpm db:generate` / `db:migrate` / `db:seed` / `db:reset` | Migration Drizzle, seed data dev, reset: drop + migrate + seed (lokal saja) |
+| `pnpm db:check` | Gagal bila schema Drizzle berubah tetapi migration belum di-generate |
 
 `.env` di root dimuat sekali oleh script root di atas dan diwarisi semua app. Karena itu jalankan lewat script root; `pnpm --filter <paket> <script>` melewati pemuatan `.env` — pakai `pnpm <script> -- --filter=<paket>` bila butuh env.
 

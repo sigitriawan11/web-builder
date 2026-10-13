@@ -45,6 +45,9 @@
     },
     "bench": {
       "cache": false
+    },
+    "db:check": {
+      "cache": false
     }
   }
 }
