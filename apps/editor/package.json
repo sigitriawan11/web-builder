@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "bench:frames": "playwright test --config playwright.bench.config.ts",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "bench:canvas": "playwright test --config playwright.bench.config.ts canvas.bench"
   },
   "dependencies": {
     "@platform/document-model": "workspace:*",
