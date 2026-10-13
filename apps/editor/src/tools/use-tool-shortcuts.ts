@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { isEditableTarget } from "../commands/is-editable-target";
+import { isEditableEvent } from "../commands/is-editable-target";
 import { type ToolId, toolStore } from "./tool-store";
 
 // Shortcut tool M0. Sistem command & keybinding (tinykeys, command palette) menyusul di M2.
@@ -10,7 +10,7 @@ export function useToolShortcuts(): void {
     const { dispatch } = toolStore.getState();
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (isEditableTarget(event.target instanceof HTMLElement ? event.target : null)) return;
+      if (isEditableEvent(event)) return;
 
       if (event.code === "Space") {
         event.preventDefault(); // cegah halaman ikut scroll

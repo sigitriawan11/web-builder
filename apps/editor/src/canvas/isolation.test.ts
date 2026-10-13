@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { canvasStyleSheet, DEFAULT_ISOLATION, isolationFromSearch, scopeCss, siteCssFromSearch } from "./isolation";
+import {
+  canvasStyleSheet,
+  DEFAULT_ISOLATION,
+  isolationFromSearch,
+  scopeCss,
+  siteCssFromSearch,
+  TEXT_EDITOR_CSS,
+} from "./isolation";
 
 describe("isolationFromSearch", () => {
   it.each([
@@ -33,17 +40,22 @@ describe("scopeCss (Opsi B)", () => {
 describe("canvasStyleSheet", () => {
   const siteCss = "* { font-family: serif; }";
 
-  it("shadow: reset :host + CSS situs apa adanya (sudah terisolasi shadow root)", () => {
-    expect(canvasStyleSheet("shadow", siteCss)).toBe(":host { all: initial; display: block; }\n* { font-family: serif; }");
+  it("shadow: reset :host, CSS editor teks, lalu CSS situs apa adanya", () => {
+    expect(canvasStyleSheet("shadow", siteCss).split("\n")).toEqual([
+      ":host { all: initial; display: block; }",
+      TEXT_EDITOR_CSS,
+      siteCss,
+    ]);
   });
 
-  it("prefix: reset .pf-root + CSS situs di-scope", () => {
-    expect(canvasStyleSheet("prefix", siteCss)).toBe(
-      ".pf-root { all: initial; display: block; }\n.pf-root, .pf-root * { font-family: serif; }",
-    );
+  it("prefix: reset .pf-root, lalu CSS editor teks & CSS situs di-scope", () => {
+    const [reset, editorCss, scopedSite] = canvasStyleSheet("prefix", siteCss).split("\n");
+    expect(reset).toBe(".pf-root { all: initial; display: block; }");
+    expect(editorCss).toContain(".pf-root .ProseMirror {");
+    expect(scopedSite).toBe(".pf-root, .pf-root * { font-family: serif; }");
   });
 
   it("none: CSS situs global tanpa perlindungan", () => {
-    expect(canvasStyleSheet("none", siteCss)).toBe(siteCss);
+    expect(canvasStyleSheet("none", siteCss).split("\n")).toEqual([TEXT_EDITOR_CSS, siteCss]);
   });
 });

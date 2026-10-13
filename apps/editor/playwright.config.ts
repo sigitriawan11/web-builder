@@ -11,7 +11,11 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}/editor/`,
     trace: "retain-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // WebKit (mesin Safari) butuh library sistem tambahan di WSL2 (`playwright install-deps webkit`, perlu sudo).
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+  ],
   webServer: {
     command: `vite --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}/editor/`,

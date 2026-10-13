@@ -7,6 +7,7 @@ import { NodeStoreContext } from "../document/use-node";
 import { RenderRoot } from "./render-root/RenderRoot";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import { spikeNodeStore, spikePageId } from "./spike-document";
+import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
@@ -23,6 +24,7 @@ export function CanvasViewport() {
   useToolShortcuts();
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
+  useTextEditingInteractions(viewportRef, spikeNodeStore);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");
 
   // ED-013: kamera diterapkan langsung ke DOM di requestAnimationFrame, tanpa render React,

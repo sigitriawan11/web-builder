@@ -34,7 +34,8 @@ export function renderNodeElement(node: Node, parent: ParentLayout, children: Re
       return createElement(node.tag ?? "div", { ...common, style: css }, children);
     case "text": {
       const { content, style } = renderRichText(node.props.content);
-      return createElement(node.tag ?? "p", { ...common, style: { ...css, ...style } }, content);
+      // `children` dipakai editor teks inline (ED-115) untuk menggantikan isi hasil render.
+      return createElement(node.tag ?? "p", { ...common, style: { ...css, ...style } }, children ?? content);
     }
     case "image": {
       const { image, fit, decorative, loading } = node.props;

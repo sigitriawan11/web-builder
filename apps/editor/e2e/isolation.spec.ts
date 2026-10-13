@@ -20,10 +20,14 @@ const CHROME_ELEMENT = "#editor-viewport";
 
 test.describe("Opsi A: Shadow DOM", () => {
   test("CSS situs agresif berlaku di canvas tapi tidak menyentuh UI editor", async ({ page }) => {
+    await page.goto("?fixture=hero");
+    const chromeFontBefore = await computed(page, CHROME_ELEMENT, "font-family");
     await page.goto("?fixture=hero&siteCss=aggressive");
 
     expect(await computed(page, HERO_TITLE, "font-family")).toBe("serif");
-    expect(await computed(page, CHROME_ELEMENT, "font-family")).not.toBe("serif");
+    expect(await computed(page, HERO_TITLE, "letter-spacing")).toBe("7px");
+    expect(await computed(page, CHROME_ELEMENT, "font-family")).toBe(chromeFontBefore);
+    expect(await computed(page, CHROME_ELEMENT, "letter-spacing")).not.toBe("7px");
   });
 
   test("reset & pewarisan CSS editor tidak masuk ke canvas", async ({ page }) => {
@@ -44,10 +48,14 @@ test.describe("Opsi A: Shadow DOM", () => {
 
 test.describe("Opsi B: prefix class", () => {
   test("CSS situs agresif (di-scope ke .pf-root) berlaku di canvas tapi tidak menyentuh UI editor", async ({ page }) => {
+    await page.goto("?fixture=hero&isolation=prefix");
+    const chromeFontBefore = await computed(page, CHROME_ELEMENT, "font-family");
     await page.goto("?fixture=hero&siteCss=aggressive&isolation=prefix");
 
     expect(await computed(page, HERO_TITLE, "font-family")).toBe("serif");
-    expect(await computed(page, CHROME_ELEMENT, "font-family")).not.toBe("serif");
+    expect(await computed(page, HERO_TITLE, "letter-spacing")).toBe("7px");
+    expect(await computed(page, CHROME_ELEMENT, "font-family")).toBe(chromeFontBefore);
+    expect(await computed(page, CHROME_ELEMENT, "letter-spacing")).not.toBe("7px");
   });
 
   test("pewarisan font & warna dari body editor terblokir oleh reset .pf-root", async ({ page }) => {
@@ -77,6 +85,7 @@ test.describe("pembanding tanpa isolasi", () => {
     await page.goto("?fixture=hero&siteCss=aggressive&isolation=none");
 
     expect(await computed(page, CHROME_ELEMENT, "font-family")).toBe("serif");
+    expect(await computed(page, CHROME_ELEMENT, "letter-spacing")).toBe("7px");
   });
 
   test("reset & pewarisan CSS editor bocor ke canvas", async ({ page }) => {

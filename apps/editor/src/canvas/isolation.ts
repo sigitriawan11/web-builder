@@ -39,21 +39,31 @@ export function scopeCss(css: string, scope: string): string {
   });
 }
 
+// CSS dasar ProseMirror (ED-115). Tiptap menyuntikkan CSS-nya ke document.head, yang tidak berlaku
+// di dalam shadow root, jadi CSS ini selalu ikut stylesheet canvas.
+export const TEXT_EDITOR_CSS =
+  ".ProseMirror { white-space: pre-wrap; word-wrap: break-word; outline: none; } " +
+  ".ProseMirror p, .ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 " +
+  "{ margin: 0; font: inherit; }";
+
 // Stylesheet yang dipasang bersama isi canvas untuk tiap mode.
 export function canvasStyleSheet(mode: IsolationMode, siteCss: string): string {
   switch (mode) {
     case "shadow":
-      return `${SHADOW_HOST_CSS}\n${siteCss}`;
-    case "prefix":
-      return `${PREFIX_ROOT_CSS}\n${scopeCss(siteCss, `.${PREFIX_ROOT_CLASS}`)}`;
+      return [SHADOW_HOST_CSS, TEXT_EDITOR_CSS, siteCss].join("\n");
+    case "prefix": {
+      const scope = `.${PREFIX_ROOT_CLASS}`;
+      return [PREFIX_ROOT_CSS, scopeCss(TEXT_EDITOR_CSS, scope), scopeCss(siteCss, scope)].join("\n");
+    }
     case "none":
-      return siteCss;
+      return [TEXT_EDITOR_CSS, siteCss].join("\n");
   }
 }
 
 // Fixture AC ED-016: CSS situs agresif tidak boleh merusak UI editor.
 const SITE_CSS_FIXTURES: Record<string, string> = {
-  aggressive: "* { box-sizing: content-box; font-family: serif; }",
+  // `letter-spacing` = penanda kebocoran yang unik di semua browser (font default Firefox memang serif).
+  aggressive: "* { box-sizing: content-box; font-family: serif; letter-spacing: 7px; }",
 };
 
 // SEMENTARA: situs belum punya CSS kustom (DM-034 melarang customCss di M1–M8); ini hanya untuk eksperimen.

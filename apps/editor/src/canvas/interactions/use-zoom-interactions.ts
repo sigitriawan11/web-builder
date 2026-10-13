@@ -1,6 +1,6 @@
 import { type RefObject, useEffect } from "react";
 import { cameraStore } from "../camera-store";
-import { isEditableTarget } from "../../commands/is-editable-target";
+import { isEditableEvent } from "../../commands/is-editable-target";
 import { nextZoomStep, wheelZoomFactor, zoomAtPoint, zoomKeyDirection } from "./zoom";
 
 // Event gesture Safari (pinch trackpad); tidak ada di lib DOM TypeScript.
@@ -52,7 +52,7 @@ export function useZoomInteractions(viewportRef: RefObject<HTMLElement | null>):
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (isEditableTarget(event.target instanceof HTMLElement ? event.target : null)) return;
+      if (isEditableEvent(event)) return;
       const direction = zoomKeyDirection(event);
       if (!direction) return;
       event.preventDefault(); // cegah zoom halaman bawaan browser (Ctrl + =/-)
