@@ -1207,7 +1207,7 @@ Runtime API juga melayani endpoint publik baca yang dapat di-cache (mis. daftar 
 
 **Database test:** Postgres dari docker compose (port `5433`, DB `platform_test`). Global setup menjalankan migration ke `platform_test_template`; setiap worker Vitest membuat DB dari template (`CREATE DATABASE … TEMPLATE …`) → cepat & terisolasi. Di CI memakai service container yang sama.
 
-**Factories:** `packages/db/test/factories` (`createUser`, `createWorkspace`, `createSite({ plan })`, `createCollection`, `createOrder`) memakai `@faker-js/faker` locale `id_ID`; document fixture di `packages/document-model/test/fixtures`. Factory menulis lewat repository (bukan SQL mentah) agar konsisten dengan aturan bisnis.
+**Factories:** `packages/db/test/factories` (`createUser`, `createWorkspace`, `createSite({ plan })`, `createCollection`, `createOrder`) memakai `@faker-js/faker` locale `id_ID`; document fixture di `packages/document-model/test/fixtures`. Factory menulis lewat query builder Drizzle (bukan SQL mentah) dan menegakkan aturan bisnis yang sama dengan produk (mis. user selalu punya personal workspace + owner, situs dibuat bersama dokumennya); repository API tidak bisa dipakai karena packages dilarang mengimport apps (§4.3). Dipakai paket lain lewat `@platform/db/testing` (`createTestDb`, factories).
 
 **Aturan:** bug yang diperbaiki wajib punya test regresi; PR yang mengubah `document-model` atau `renderer` wajib lulus snapshot + visual regression.
 
