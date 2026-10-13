@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useHoverHighlight } from "../tools/select/use-hover-highlight";
 import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-tool";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
+import { useUndoShortcuts } from "../document/use-undo-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { setAppliedZoom, spikeGeometry } from "./geometry/spike-geometry";
@@ -19,6 +20,7 @@ import {
   spikeMarqueeContext,
   spikeNodeStore,
   spikePageId,
+  spikeUndo,
 } from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
@@ -42,6 +44,7 @@ const dragSessionDeps: DragSessionDeps = {
   nodeStore: spikeNodeStore,
   hitTest: spikeHitTest,
   viewportOffset: spikeMarqueeContext.viewportOffset,
+  undoBoundary: () => spikeUndo.stopCapturing(),
 };
 const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest, marquee: spikeMarqueeContext };
 
@@ -49,6 +52,7 @@ export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
   useToolShortcuts();
+  useUndoShortcuts(spikeUndo);
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
   useTextEditingInteractions(viewportRef);

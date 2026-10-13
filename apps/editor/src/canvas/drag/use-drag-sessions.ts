@@ -23,6 +23,8 @@ export interface DragSessionDeps {
   // Untuk reorder (ED-063): node di bawah pointer & posisi viewport (konversi screen → world).
   hitTest(clientX: number, clientY: number): { nodeId: string; path: readonly string[] } | null;
   viewportOffset(): { left: number; top: number };
+  // Batas langkah undo di sekitar commit (ED-197: aksi diskrit tidak digabung captureTimeout).
+  undoBoundary(): void;
 }
 
 type ResizeState = Extract<InteractionState, { type: "dragResize" }>;
@@ -214,7 +216,9 @@ export function useDragSessions(deps: DragSessionDeps): void {
           target?.parentId === node?.parentId && parent && "children" in parent && parent.children.indexOf(id) === target?.index;
         // Satu moveNode = satu transaksi (ED-024); indeks = posisi akhir di parent tujuan.
         if (effect.type === "commit" && target && !unchanged) {
+          deps.undoBoundary();
           runOp(deps.opContext, moveNode, { id, newParentId: target.parentId, index: target.index });
+          deps.undoBoundary();
         }
         endReorder();
         moving = null;
@@ -226,11 +230,13 @@ export function useDragSessions(deps: DragSessionDeps): void {
         if (effect.type === "commit" && items.length > 0) {
           const delta = deltaFor(drag);
           // Semua node dalam SATU transaksi (= satu update Yjs & satu langkah undo, ED-024).
+          deps.undoBoundary();
           deps.opContext.doc.transact(() => {
             for (const item of items) {
               runOp(deps.opContext, updateStyle, { ids: [item.id], patch: { position: movedPosition(item.start, delta) } });
             }
           }, deps.opContext.origin);
+          deps.undoBoundary();
         }
         endMove();
         return;
@@ -240,7 +246,11 @@ export function useDragSessions(deps: DragSessionDeps): void {
       const patch = effect.type === "commit" ? resizePatchFor(drag) : null;
       resizing = null;
       // Commit dulu, baru buang preview: keduanya di-batch React, jadi tidak ada kedipan ukuran lama.
-      if (patch) runOp(deps.opContext, updateStyle, { ids: [drag.nodeId], patch });
+      if (patch) {
+        deps.undoBoundary();
+        runOp(deps.opContext, updateStyle, { ids: [drag.nodeId], patch });
+        deps.undoBoundary();
+      }
       previewStore.getState().clear([drag.nodeId]);
     });
 
