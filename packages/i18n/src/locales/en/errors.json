@@ -2,6 +2,7 @@
   "VALIDATION_FAILED": "The submitted data is invalid. Please check your input.",
   "UNAUTHENTICATED": "Please sign in first.",
   "FORBIDDEN": "You don't have access to perform this action.",
+  "CAPTCHA_REQUIRED": "Please confirm you are not a robot to continue.",
   "NOT_FOUND": "The requested data was not found.",
   "CONFLICT": "The data has changed or conflicts with other data. Reload and try again.",
   "WEAK_PASSWORD": "Passwords must be at least 8 characters and not a commonly used password (e.g. password123). Choose another one.",

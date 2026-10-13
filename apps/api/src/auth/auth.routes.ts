@@ -1,9 +1,12 @@
+import type { Logger } from "@platform/shared/node";
 import { toNodeHandler } from "better-auth/node";
 import express, { type Request, type RequestHandler, type Router } from "express";
 import type { Redis } from "../lib/redis";
 import { JSON_LIMIT } from "../middleware/body-parsers";
 import { RATE_LIMITS, rateLimit } from "../middleware/rate-limit";
 import { type Auth, authRequestHandler } from "./auth";
+import type { CaptchaVerifier } from "./captcha";
+import { signInGuard } from "./sign-in";
 import { signUpGuard } from "./sign-up";
 
 // Router `/auth/*` (ARCHITECTURE §9.1): rate limit → guard registrasi → handler Better Auth. Dipasang sebelum body
@@ -29,7 +32,13 @@ const jsonForBetterAuth = (): RequestHandler[] => [
   },
 ];
 
-export function createAuthRouter(deps: { auth: Auth; redis?: Redis; rateLimitPrefix?: string }): Router {
+export function createAuthRouter(deps: {
+  auth: Auth;
+  logger: Logger;
+  redis?: Redis;
+  rateLimitPrefix?: string;
+  verifyCaptcha: CaptchaVerifier;
+}): Router {
   const router = express.Router();
   const limiterOptions = deps.rateLimitPrefix ? { keyPrefix: deps.rateLimitPrefix } : {};
   if (deps.redis) {
@@ -51,6 +60,12 @@ export function createAuthRouter(deps: { auth: Auth; redis?: Redis; rateLimitPre
     signUpGuard(),
   );
   if (deps.redis) {
+    // Login: kunci per (email, IP) & Turnstile setelah gagal berulang (ACC-004).
+    router.post(
+      "/sign-in/email",
+      ...jsonForBetterAuth(),
+      signInGuard({ redis: deps.redis, verifyCaptcha: deps.verifyCaptcha, logger: deps.logger }),
+    );
     router.post(
       "/send-verification-email",
       ...jsonForBetterAuth(),

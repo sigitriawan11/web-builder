@@ -16,6 +16,7 @@ const baseEnv = {
   INTERNAL_JWT_SECRET: "test-internal-secret-0123456789abcdef",
   BETTER_AUTH_SECRET: "test-better-auth-secret-0123456789abcdef",
   BETTER_AUTH_URL: "http://app.localhost:3000/api/auth",
+  CAPTCHA_SECRET: "1x0000000000000000000000000000000AA",
   PUBLIC_APP_URL: "http://app.localhost:3000",
 };
 

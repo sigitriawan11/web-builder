@@ -1,7 +1,7 @@
 import type { TestDb } from "@platform/db/testing";
 import { uuidv7 } from "@platform/shared";
 import type { Redis } from "ioredis";
-import { createApp } from "../app";
+import { type AppDeps, createApp } from "../app";
 import type { QueueProducer } from "../queues/producer";
 import { silentLogger } from "../test-utils";
 import { createAuth } from "./auth";
@@ -29,7 +29,12 @@ export function recordingQueues(): QueueProducer & { jobs: RecordedJob[] } {
   };
 }
 
-export function authTestApp(testDb: TestDb, redis: Redis, queues: QueueProducer = recordingQueues()) {
+export function authTestApp(
+  testDb: TestDb,
+  redis: Redis,
+  queues: QueueProducer = recordingQueues(),
+  extra: Pick<AppDeps, "verifyCaptcha" | "mountRoutes"> = {},
+) {
   const auth = createAuth({
     db: testDb.db,
     redis,
@@ -42,7 +47,7 @@ export function authTestApp(testDb: TestDb, redis: Redis, queues: QueueProducer 
       secureCookies: false,
     },
   });
-  return createApp({ logger: silentLogger(), auth, redis, rateLimitPrefix: `rl-test:${uuidv7()}` });
+  return createApp({ logger: silentLogger(), auth, redis, rateLimitPrefix: `rl-test:${uuidv7()}`, ...extra });
 }
 
 export const uniqueEmail = () =>

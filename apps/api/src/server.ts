@@ -3,6 +3,7 @@ import { createDb, sql } from "@platform/db";
 import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
 import { createApp } from "./app";
 import { createAuth } from "./auth/auth";
+import { turnstileVerifier } from "./auth/captcha";
 import type { ApiEnv } from "./config/env";
 import { storageCheck } from "./health/readiness";
 import { createRedis, waitForRedis } from "./lib/redis";
@@ -80,6 +81,9 @@ export async function startServer(
   const app = createApp({
     logger,
     auth,
+    verifyCaptcha: turnstileVerifier(env.CAPTCHA_SECRET, (error) =>
+      logger.warn({ err: error }, "verifikasi Turnstile gagal dihubungi"),
+    ),
     redis,
     queues,
     internalJwtSecret: env.INTERNAL_JWT_SECRET,

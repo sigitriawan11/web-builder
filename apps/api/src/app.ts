@@ -2,9 +2,11 @@ import type { Logger } from "@platform/shared/node";
 import express, { type Express } from "express";
 import { AUTH_BASE_PATH, type Auth } from "./auth/auth";
 import { createAuthRouter } from "./auth/auth.routes";
+import type { CaptchaVerifier } from "./auth/captcha";
 import { type ReadinessCheck, readinessHandler } from "./health/readiness";
 import { createInternalRouter } from "./internal/internal.routes";
 import type { Redis } from "./lib/redis";
+import { authSession } from "./middleware/auth-session";
 import { bodyParsers } from "./middleware/body-parsers";
 import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-handler";
 import { httpLogger } from "./middleware/http-logger";
@@ -21,8 +23,10 @@ export interface AppDeps {
   redis?: Redis;
   // Prefix kunci rate limit (test: counter terpisah per app).
   rateLimitPrefix?: string;
-  // Better Auth (T1.5.1); bila ada, handler dipasang di `/auth/*`.
+  // Better Auth (T1.5.1); bila ada, handler dipasang di `/auth/*` dan authSession mengisi `req.ctx.user`.
   auth?: Auth;
+  // Verifikasi Turnstile untuk login setelah gagal berulang; default menolak (fail closed).
+  verifyCaptcha?: CaptchaVerifier;
   // Secret JWT internal; bila ada, router `/internal/v1` dipasang (dilindungi service token).
   internalJwtSecret?: string;
   // Producer job untuk service (enqueue lewat `withTransaction` + afterCommit).
@@ -51,6 +55,8 @@ export function createApp(deps: AppDeps): Express {
       AUTH_BASE_PATH,
       createAuthRouter({
         auth: deps.auth,
+        logger: deps.logger,
+        verifyCaptcha: deps.verifyCaptcha ?? (async () => false),
         ...(deps.redis ? { redis: deps.redis } : {}),
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
       }),
@@ -63,6 +69,9 @@ export function createApp(deps: AppDeps): Express {
   });
   // Readiness: dependensi terjangkau → 200, salah satu gagal → 503.
   app.get("/health/ready", readinessHandler(deps.readinessChecks ?? {}, { logger: deps.logger }));
+
+  // 6 — sesi pengguna untuk router berikutnya (health di atas tidak menyentuh sesi).
+  if (deps.auth) app.use(authSession(deps.auth));
 
   if (deps.internalJwtSecret)
     app.use("/internal/v1", createInternalRouter({ internalJwtSecret: deps.internalJwtSecret }));

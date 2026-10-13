@@ -45,8 +45,9 @@ export const RATE_LIMITS = {
   webhook: [{ points: 100, durationSeconds: 60 }],
 } as const satisfies Record<string, readonly RateWindow[]>;
 
-/** Kunci default: IP (dari X-Forwarded-For via `trust proxy`). Setelah auth (T1.5) menjadi userId bila login. */
-export const byUserOrIp = (req: Request): string => `ip:${req.ip ?? "unknown"}`;
+/** Kunci default: userId bila login (authSession), selain itu IP (dari X-Forwarded-For via `trust proxy`). */
+export const byUserOrIp = (req: Request): string =>
+  req.ctx.user ? `user:${req.ctx.user.id}` : `ip:${req.ip ?? "unknown"}`;
 
 export function rateLimit(redis: Redis, policy: RateLimitPolicy, options: { keyPrefix?: string } = {}): RequestHandler {
   const limiters = policy.windows.map((window) => {

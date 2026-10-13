@@ -18,6 +18,8 @@ export const apiEnvSchema = {
   BETTER_AUTH_SECRET: envField.secret(32),
   BETTER_AUTH_URL: envField.url(),
   PUBLIC_APP_URL: envField.url(),
+  // Cloudflare Turnstile secret (ACC-004); lokal memakai secret uji yang selalu lolos.
+  CAPTCHA_SECRET: envField.secret(16),
 };
 
 export type ApiEnv = ReturnType<typeof loadApiEnv>;

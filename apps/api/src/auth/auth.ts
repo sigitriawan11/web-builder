@@ -4,14 +4,16 @@ import type { JobPayload } from "@platform/shared/contracts";
 import { getContext, type Logger } from "@platform/shared/node";
 import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { setSessionCookie } from "better-auth/cookies";
 import { emailOTP } from "better-auth/plugins";
 import type { Redis } from "ioredis";
+import { recordAudit } from "../audit/audit.repository";
 import type { QueueProducer } from "../queues/producer";
 import { AUTH_TABLES, insertConsents } from "./auth.repository";
 import { afterAuthCommit, currentAuthTransaction, trackTransactions } from "./auth-transaction";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
+import { currentSignIn, recordSignInFailure } from "./sign-in";
 import { signUpConsents } from "./sign-up";
 import { currentSignUp } from "./sign-up-context";
 
@@ -136,6 +138,64 @@ const signUpAutoSignIn = {
   },
 } satisfies BetterAuthPlugin;
 
+/**
+ * Setelah `POST /sign-in/email` (ACC-004): berhasil → reset penghitung gagal + audit `auth.login`; kredensial salah →
+ * tambah penghitung (Turnstile / kunci di signInGuard) + audit `auth.login_failed`. Tanpa password di log/audit.
+ * Kegagalan Redis/audit dicatat tetapi tidak mengubah hasil login.
+ */
+function signInTracking(deps: { db: Db; redis: Redis; logger: Logger }) {
+  const safely = async (operation: string, fn: () => Promise<unknown>) => {
+    try {
+      await fn();
+    } catch (error) {
+      deps.logger.error({ err: error, operation }, "pencatatan login gagal");
+    }
+  };
+  return {
+    id: "platform-sign-in",
+    hooks: {
+      after: [
+        {
+          matcher: (ctx) => ctx.path === "/sign-in/email",
+          handler: createAuthMiddleware(async (ctx) => {
+            const signIn = currentSignIn();
+            if (!signIn) return;
+            const evidence = { ip: signIn.ip ?? null, userAgent: signIn.userAgent ?? null };
+            const session = ctx.context.newSession;
+            if (session) {
+              await safely("reset", () => deps.redis.del(signIn.failureKey));
+              await safely("audit", () =>
+                recordAudit(deps.db, {
+                  actorType: "user",
+                  actorId: session.user.id,
+                  action: "auth.login",
+                  targetType: "user",
+                  targetId: session.user.id,
+                  ...evidence,
+                  metadata: { method: "email" },
+                }),
+              );
+              return;
+            }
+            const returned = ctx.context.returned;
+            if (returned instanceof APIError && returned.statusCode === 401) {
+              await safely("count", () => recordSignInFailure(deps.redis, signIn.failureKey));
+              await safely("audit", () =>
+                recordAudit(deps.db, {
+                  actorType: "user",
+                  action: "auth.login_failed",
+                  ...evidence,
+                  metadata: { method: "email", email: signIn.email, reason: "invalid_credentials" },
+                }),
+              );
+            }
+          }),
+        },
+      ],
+    },
+  } satisfies BetterAuthPlugin;
+}
+
 export function createAuth(deps: {
   db: Db;
   redis: Redis;
@@ -235,6 +295,7 @@ export function createAuth(deps: {
     },
     plugins: [
       signUpAutoSignIn,
+      signInTracking({ db: deps.db, redis: deps.redis, logger }),
       emailOTP({
         expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
         allowedAttempts: OTP_ALLOWED_ATTEMPTS,
@@ -265,6 +326,16 @@ export function createAuth(deps: {
       defaultCookieAttributes: { httpOnly: true, sameSite: "lax" },
     },
     telemetry: { enabled: false },
+    // Log Better Auth ke logger terstruktur (requestId ikut lewat mixin). Mulai `warn`: log info BA memuat email.
+    logger: {
+      level: "warn",
+      log: (level, message, ...args) => {
+        const fields = args.length > 0 ? { args } : {};
+        if (level === "error") logger.error(fields, `better-auth: ${message}`);
+        else if (level === "warn") logger.warn(fields, `better-auth: ${message}`);
+        else logger.debug(fields, `better-auth: ${message}`);
+      },
+    },
   });
   createVerificationCode = (email) => auth.api.createVerificationOTP({ body: { email, type: "email-verification" } });
   return auth;

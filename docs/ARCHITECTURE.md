@@ -476,6 +476,7 @@ Express 5 sudah meneruskan rejection dari async handler ke error handler — **t
 | Tidak login | 401 | `UNAUTHENTICATED` |
 | Tidak berhak / resource tenant lain | 404 | `NOT_FOUND` |
 | Role kurang (dalam tenant sendiri) | 403 | `FORBIDDEN` |
+| Captcha wajib (login setelah 3× gagal) | 403 | `CAPTCHA_REQUIRED` — `details: { reason: "missing" \| "invalid" }` (ACC-004) |
 | Batas angka paket tercapai | 402 | `PLAN_LIMIT_REACHED` — `details: { key, used, limit, upgrade? }` (`key` = kunci entitlement: `sites.max`, `seats`, `storage.bytesMax`, kuota bulanan, dst.) |
 | Fitur tidak ada di paket | 402 | `PLAN_FEATURE_REQUIRED` — `details: { feature, upgrade? }` |
 | Kredit AI kurang | 402 | `INSUFFICIENT_CREDITS` |
@@ -1000,7 +1001,9 @@ Semua endpoint `/internal/*` juga dibatasi jaringan (private network/allowlist) 
 
 | Scope | Key | Limit awal (dapat dikonfigurasi) |
 |---|---|---|
-| Auth platform (login/register/reset) | IP + email (M1: IP saja untuk semua mutasi `/auth/*`; per email+IP bersama login ACC-004, T1.5.4) | 10/menit, 50/jam |
+| Auth platform (login/register/reset) | IP (semua mutasi `/auth/*`) | 10/menit, 50/jam |
+| Login gagal | email + IP | ≥ 3 gagal → Turnstile; ≥ 5 gagal dalam 15 menit → terkunci 15 menit (ACC-004) |
+| Kirim ulang verifikasi email | email | 1/menit, 5/jam (ACC-003) |
 | Registrasi | IP | 3/jam, 10/hari (ACC-255) |
 | Platform API umum | userId | 300/menit |
 | Publish | siteId | 10/jam (Free), 60/jam (berbayar) |

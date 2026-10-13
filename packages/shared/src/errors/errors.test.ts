@@ -7,6 +7,7 @@ describe("katalog kode error (ARCHITECTURE §5.3)", () => {
       VALIDATION_FAILED: 422,
       UNAUTHENTICATED: 401,
       FORBIDDEN: 403,
+      CAPTCHA_REQUIRED: 403,
       NOT_FOUND: 404,
       CONFLICT: 409,
       WEAK_PASSWORD: 422,
