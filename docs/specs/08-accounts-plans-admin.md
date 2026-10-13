@@ -261,7 +261,7 @@ Auth platform memakai **Better Auth** di `apps/api` (handler di-mount di `/api/a
   - Tiap anggota (kecuali `billing` & `viewer`, OPEN) memakai 1 **seat**. Undangan pending juga mengklaim seat agar tidak melebihi batas.
   - Undangan bisa dibatalkan & dikirim ulang.
 - **Acceptance criteria**:
-  - [ ] Undangan ke-N yang melebihi seat ditolak dengan `402 SEAT_LIMIT` + CTA tambah seat (add-on, [§7.6](#76-add-on)).
+  - [ ] Undangan ke-N yang melebihi seat ditolak dengan `402 PLAN_LIMIT_REACHED` (`details.key = "seats"`) + CTA tambah seat (add-on, [§7.6](#76-add-on)).
   - [ ] Token undangan tidak bisa dipakai setelah dibatalkan/kedaluwarsa/dipakai.
   - [ ] Pengundang harus terverifikasi email.
 
@@ -382,7 +382,7 @@ Route di `apps/web`: `app.platformmu.com/w/{workspaceSlug}` (lokal `app.localhos
   - Cek entitlement `sites.max` sebelum membuat. Jika penuh → modal upgrade.
   - Site baru: status `draft`, belum punya subdomain sampai publish pertama (atau subdomain acak di-reserve saat dibuat — keputusan di [07](./07-publishing-hosting.md)).
 - **Acceptance criteria**:
-  - [ ] Melebihi batas site → `402 PLAN_LIMIT` dengan `{ limit: 'sites.max', current, max, upgradeTo }`.
+  - [ ] Melebihi batas site → `402 PLAN_LIMIT_REACHED` dengan `details: { key: 'sites.max', used, limit, upgrade }`.
   - [ ] Template premium tidak bisa dipakai di paket yang tidak mencakupnya (tombol "Upgrade untuk memakai").
 
 ### ACC-052 Duplikasi website
@@ -862,11 +862,14 @@ type ResolvedEntitlements = Entitlements & {
 ```json
 {
   "error": {
-    "code": "PLAN_LIMIT",
-    "key": "sites.max",
-    "used": 3, "limit": 3,
+    "code": "PLAN_LIMIT_REACHED",
     "message": "Batas website untuk paket Starter sudah tercapai.",
-    "upgrade": { "suggestedPlan": "pro", "url": "/w/ws_abc/billing?upgrade=pro&reason=sites.max" }
+    "details": {
+      "key": "sites.max",
+      "used": 3, "limit": 3,
+      "upgrade": { "suggestedPlan": "pro", "url": "/w/ws_abc/billing?upgrade=pro&reason=sites.max" }
+    },
+    "requestId": "0190f6c2-…"
   }
 }
 ```
@@ -1665,7 +1668,7 @@ formatRelative(date, 'id')        // "3 menit lalu"
 - **P0 · M4**
 - **Perilaku**: `platformmu.com/bantuan` (ID) & `/help` (EN): artikel memulai, editor, publish & domain (panduan DNS per registrar populer di Indonesia), paket & pembayaran, AI, data dinamis, toko online, keamanan akun. Sumber: MDX di repo (`apps/web/content/help/{id,en}`), pencarian sisi klien. Editor & dashboard memiliki tombol "?" kontekstual yang membuka artikel terkait.
 - **Acceptance criteria**:
-  - [ ] Setiap error kode yang terlihat user (`PLAN_LIMIT`, `DOMAIN_VERIFICATION_FAILED`, …) punya tautan artikel.
+  - [ ] Setiap error kode yang terlihat user (`PLAN_LIMIT_REACHED`, `DOMAIN_VERIFICATION_FAILED`, …) punya tautan artikel.
 
 ### ACC-331 Kanal support per paket
 - **P1 · M5**
@@ -1909,7 +1912,7 @@ Semua di `apps/api`, prefix `/api`. Auth Better Auth di `/api/auth/*`. Modul: `a
 | `POST /moderation/appeals` | ACC-247 | login / publik (banned) |
 | `/admin/*` | users, workspaces, sites, impersonate, overrides, plans, prices, coupons, invoices, refunds, library, moderation, flags, announcements, health, audit | staff/super_admin |
 
-Error envelope seragam (`{ error: { code, message, ... } }`) — kode baru di dokumen ini: `EMAIL_NOT_VERIFIED`, `ACCOUNT_SUSPENDED`, `PLAN_LIMIT`, `PLAN_FEATURE`, `SEAT_LIMIT`, `QUOTA_EXCEEDED`, `IMPERSONATION_READ_ONLY`, `RATE_LIMITED`, `PAYMENT_PENDING`, `HELD_FOR_REVIEW`.
+Error envelope seragam (`{ error: { code, message, ... } }`) — kode di dokumen ini: `EMAIL_NOT_VERIFIED`, `ACCOUNT_SUSPENDED`, `PLAN_LIMIT_REACHED` (semua batas angka: site, seat, storage, kuota bulanan — dibedakan `details.key`), `PLAN_FEATURE_REQUIRED` (fitur tidak ada di paket — `details.feature`), `INSUFFICIENT_CREDITS`, `IMPERSONATION_READ_ONLY`, `RATE_LIMITED`, `PAYMENT_PENDING`, `HELD_FOR_REVIEW`.
 
 ---
 

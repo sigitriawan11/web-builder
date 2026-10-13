@@ -198,7 +198,7 @@ sequenceDiagram
 - **Prioritas:** P0 · **Fase:** M7
 - **Deskripsi / Perilaku:** Site hanya bisa mengaktifkan fitur dinamis (`site.features.dynamic = true`) jika paket
   owner menyertakan AI/dinamis (lihat [08](./08-accounts-plans-admin.md)). Saat downgrade ke paket statis: data
-  **tidak dihapus**, runtime API mengembalikan `402 PLAN_REQUIRED` untuk operasi tulis dan baca privat; list publik
+  **tidak dihapus**, runtime API mengembalikan `402 PLAN_FEATURE_REQUIRED` (`details.feature = "dynamic"`) untuk operasi tulis dan baca privat; list publik
   memakai snapshot terakhir hasil publish (read-only) selama masa tenggang 30 hari, setelah itu node data-bound
   dirender sebagai empty state. Editor menampilkan banner upgrade.
 - **Acceptance criteria:**
@@ -430,7 +430,7 @@ Konversi tipe yang didukung:
 - **Deskripsi / Perilaku:** Batas jumlah collection per site, field per collection (maks 100), record per site,
   dan index per site ditegakkan di service layer. Nilai per paket di [§14](#14-kuota-per-paket).
 - **Acceptance criteria:**
-  - [ ] Melebihi batas → `402 QUOTA_EXCEEDED` dengan `{ quota, used, limit }`; UI menampilkan CTA upgrade.
+  - [ ] Melebihi batas → `402 PLAN_LIMIT_REACHED` dengan `details: { key, used, limit }`; UI menampilkan CTA upgrade.
 
 ### DATA-020 Collection sistem
 - **Prioritas:** P0 · **Fase:** M7
@@ -1551,7 +1551,7 @@ type Step = { id: string; type: StepType; name?: string; params: Record<string, 
   Kuota email/bulan per paket; bounce/complaint tinggi → site di-throttle dan owner diberi tahu (anti-abuse, [08](./08-accounts-plans-admin.md)).
 - **Acceptance criteria:**
   - [ ] Email dengan `{{trigger.data.nama}}` berisi `<b>x</b>` tampil sebagai teks literal.
-  - [ ] Melebihi kuota → step gagal `QUOTA_EXCEEDED`, run `failed`, owner dinotifikasi sekali per hari.
+  - [ ] Melebihi kuota → step gagal `PLAN_LIMIT_REACHED` (`details.key` = kuota terkait), run `failed`, owner dinotifikasi sekali per hari.
 
 ### DATA-235 `send_whatsapp`
 - **Prioritas:** P1 · **Fase:** M7

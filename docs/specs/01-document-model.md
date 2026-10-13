@@ -1884,9 +1884,9 @@ registerAsset(i: { assetId: AssetId; entry: AssetEntry }): void                 
 
 ### DM-075 Command & lock/permission
 - **P0 · M2**
-- Command menolak mengubah node `locked` (kecuali `setLocked` dan `force: true` dari UI dengan konfirmasi). Command yang butuh fitur paket (dynamic/commerce/embed) memeriksa `ctx.plan` dan mengembalikan `PLAN_FEATURE` (lihat [08](./08-accounts-plans-admin.md)). Server juga memvalidasi ulang saat publish (klien tidak dipercaya).
+- Command menolak mengubah node `locked` (kecuali `setLocked` dan `force: true` dari UI dengan konfirmasi). Command yang butuh fitur paket (dynamic/commerce/embed) memeriksa `ctx.plan` dan mengembalikan `PLAN_FEATURE_REQUIRED` (lihat [08](./08-accounts-plans-admin.md)). Server juga memvalidasi ulang saat publish (klien tidak dipercaya).
 - **Acceptance criteria**:
-  - [ ] Issue `PLAN_FEATURE` (kode error 08) membawa `feature` sehingga UI bisa menampilkan upsell.
+  - [ ] Issue `PLAN_FEATURE_REQUIRED` (kode error 08) membawa `feature` sehingga UI bisa menampilkan upsell.
 
 ---
 
@@ -1912,7 +1912,7 @@ registerAsset(i: { assetId: AssetId; entry: AssetEntry }): void                 
 | Token total | 500 | |
 
 - **Acceptance criteria**:
-  - [ ] Command yang melanggar batas mengembalikan `LIMIT_EXCEEDED` dengan nama batas; tidak ada penulisan parsial.
+  - [ ] Command yang melanggar batas mengembalikan `LIMIT_EXCEEDED` dengan nama batas; tidak ada penulisan parsial. (Batas teknis dokumen, bukan batas paket — batas paket memakai `PLAN_LIMIT_REACHED`.)
   - [ ] Server menolak update Yjs yang membuat state > batas (DM-061).
 
 ### DM-077 Target performa

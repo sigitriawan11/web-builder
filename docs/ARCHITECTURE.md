@@ -461,9 +461,9 @@ Express 5 sudah meneruskan rejection dari async handler ke error handler — **t
 // error
 {
   "error": {
-    "code": "SITE_LIMIT_REACHED",            // UPPER_SNAKE, stabil, didefinisikan di @platform/shared/errors
+    "code": "PLAN_LIMIT_REACHED",            // UPPER_SNAKE, stabil, didefinisikan di @platform/shared/errors
     "message": "Batas jumlah website untuk paket Free sudah tercapai.",  // sudah dilokalkan (Accept-Language)
-    "details": { "limit": 3, "current": 3 }, // opsional, untuk UI
+    "details": { "key": "sites.max", "used": 3, "limit": 3 }, // opsional, untuk UI
     "requestId": "0190f6c2-…"
   }
 }
@@ -475,7 +475,9 @@ Express 5 sudah meneruskan rejection dari async handler ke error handler — **t
 | Tidak login | 401 | `UNAUTHENTICATED` |
 | Tidak berhak / resource tenant lain | 404 | `NOT_FOUND` |
 | Role kurang (dalam tenant sendiri) | 403 | `FORBIDDEN` |
-| Batas paket / kredit | 402 | `PLAN_LIMIT_REACHED`, `INSUFFICIENT_CREDITS` |
+| Batas angka paket tercapai | 402 | `PLAN_LIMIT_REACHED` — `details: { key, used, limit, upgrade? }` (`key` = kunci entitlement: `sites.max`, `seats`, `storage.bytesMax`, kuota bulanan, dst.) |
+| Fitur tidak ada di paket | 402 | `PLAN_FEATURE_REQUIRED` — `details: { feature, upgrade? }` |
+| Kredit AI kurang | 402 | `INSUFFICIENT_CREDITS` |
 | Konflik versi | 409 | `CONFLICT`, `SUBDOMAIN_TAKEN` |
 | Rate limit | 429 | `RATE_LIMITED` (+ `Retry-After`) |
 

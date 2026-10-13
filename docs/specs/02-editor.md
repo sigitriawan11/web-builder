@@ -628,7 +628,7 @@ Canvas page "Home"
   - Slug bentrok → validasi inline "Slug sudah dipakai".
   - Slug dengan karakter non-ASCII → di-slugify otomatis (`Tentang Kami` → `tentang-kami`), user bisa edit.
   - Menghapus page yang dirujuk link di page lain → tampilkan daftar link yang akan rusak; link berubah status "broken" (warning di inspector Prototype).
-  - Batas jumlah page per paket (`pages.perSiteMax`, [08](./08-accounts-plans-admin.md)) → tombol tambah disabled + CTA upgrade; server/command menolak dengan `PLAN_LIMIT`.
+  - Batas jumlah page per paket (`pages.perSiteMax`, [08](./08-accounts-plans-admin.md)) → tombol tambah disabled + CTA upgrade; server/command menolak dengan `PLAN_LIMIT_REACHED` (`details.key = "pages.perSiteMax"`).
 - Acceptance criteria:
   - [ ] CRUD page tercermin di Yjs document & bisa di-undo.
   - [ ] Route unik per website divalidasi di klien dan server.
@@ -1993,7 +1993,7 @@ Konsep, versioning, publish library, dan aturan override didefinisikan di [03-co
   - Format: JPG, PNG, WebP, GIF (animasi → disimpan apa adanya), SVG (disanitasi server-side), AVIF; HEIC (P1, dikonversi).
   - Upload langsung ke object storage via presigned URL; progress per file; batas ukuran per file & total storage per paket ([08](./08-accounts-plans-admin.md)).
 - Edge case:
-  - Kuota storage penuh (`storage.bytesMax`) → upload ditolak (`PLAN_LIMIT`) dengan CTA upgrade; node tidak dibuat.
+  - Kuota storage penuh (`storage.bytesMax`) → upload ditolak (`PLAN_LIMIT_REACHED`, `details.key = "storage.bytesMax"`) dengan CTA upgrade; node tidak dibuat.
   - Offline → upload diantrekan (blob di IndexedDB) dan dilanjutkan saat online; node menampilkan "Menunggu koneksi".
   - Paste gambar dari halaman web (HTML clipboard dengan `<img src>`) → ambil via URL server-side.
 - Acceptance criteria:
@@ -2083,7 +2083,7 @@ Konsep, versioning, publish library, dan aturan override didefinisikan di [03-co
   - **Klik**: smart insert — section disisipkan setelah section terseleksi (atau di akhir page sebelum footer); elemen disisipkan setelah node terseleksi di parent yang sama (atau sebagai child jika node terseleksi adalah frame auto-layout).
   - Aturan validitas: section hanya di page root; Navbar disarankan di atas, Footer di bawah (auto-snap ke posisi tsb, dengan opsi abaikan); form hanya di frame biasa (bukan di dalam button/link).
   - Setelah insert: node baru terseleksi, kamera scroll agar terlihat, highlight 1 detik.
-- Edge case: Insert component yang membutuhkan fitur paket lebih tinggi (`ComponentDefinition.requires`) → dialog upgrade, tidak disisipkan (error `PLAN_FEATURE`).
+- Edge case: Insert component yang membutuhkan fitur paket lebih tinggi (`ComponentDefinition.requires`) → dialog upgrade, tidak disisipkan (error `PLAN_FEATURE_REQUIRED`).
 - Acceptance criteria:
   - [ ] Klik "Footer" saat tidak ada seleksi menaruhnya di paling bawah.
   - [ ] Drag Hero ke antara Navbar dan Features menyisipkannya di indeks 1.
@@ -2368,7 +2368,7 @@ Versi web dari "Prototype" Figma: fokus pada link, state, dan animasi ringan. Ou
 
 ### ED-198 Transaction & origin
 - Prioritas: P0 · Fase: M1
-- Deskripsi: Semua mutasi dokumen lewat lapisan `commands` (`packages/document-model`, daftar & signature di [01 DM-074](./01-document-model.md#dm-074-daftar-command-signature), mis. `createNode`, `moveNode`, `updateStyle`, `setBreakpointOverride`, `createPage`, `setProp`, `detachInstance`) yang membungkus `doc.transact(fn, origin)`. Command yang butuh fitur/batas paket mengembalikan error `PLAN_FEATURE` / `PLAN_LIMIT` (kode 08) untuk ditampilkan sebagai upsell.
+- Deskripsi: Semua mutasi dokumen lewat lapisan `commands` (`packages/document-model`, daftar & signature di [01 DM-074](./01-document-model.md#dm-074-daftar-command-signature), mis. `createNode`, `moveNode`, `updateStyle`, `setBreakpointOverride`, `createPage`, `setProp`, `detachInstance`) yang membungkus `doc.transact(fn, origin)`. Command yang butuh fitur/batas paket mengembalikan error `PLAN_FEATURE_REQUIRED` / `PLAN_LIMIT_REACHED` (kode 08, ARCHITECTURE §5.3) untuk ditampilkan sebagai upsell.
 - Perilaku:
   - Satu aksi user = satu transaction (bahkan bila menyentuh banyak node).
   - AI run: tool call berjalan di draft (fork) dan baru masuk dokumen saat **Terapkan**, sebagai satu transaction origin `ai:<runId>` = satu grup undo ([04 §7](./04-ai-agent.md#7-draft--transaction-model), [ED-010](#ed-010-ai-panel)); UI menyediakan "Batalkan semua perubahan AI ini".

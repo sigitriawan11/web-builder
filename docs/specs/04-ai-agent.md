@@ -583,7 +583,7 @@ Format hasil ke model (`tool_result.content`) selalu JSON ringkas: `{ ok: true, 
 | `PROP_INVALID` | props tidak sesuai schema component | sertakan schema props singkat |
 | `LOCKED` | node terkunci / instance tanpa izin override | gunakan `set_prop` atau `detach_instance` |
 | `CHANGE_LIMIT_REACHED` | budget perubahan habis | `finish` dengan ringkasan parsial |
-| `ENTITLEMENT_REQUIRED` | butuh paket lebih tinggi | jelaskan ke user, jangan coba lagi |
+| `PLAN_FEATURE_REQUIRED` | butuh paket lebih tinggi | jelaskan ke user, jangan coba lagi |
 | `TOOL_NOT_AVAILABLE` | tool tidak terdaftar di run ini | jangan panggil lagi |
 | `USER_DECLINED` | user menolak konfirmasi | cari alternatif atau `finish` |
 | `RATE_LIMITED` / `UPSTREAM_ERROR` | layanan eksternal (stock image, renderer) | coba sekali lagi atau lewati |
