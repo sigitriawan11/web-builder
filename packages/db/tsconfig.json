@@ -1,5 +1,5 @@
 {
   "extends": "@platform/config/tsconfig/node.json",
-  "include": ["src", "drizzle.config.ts", "vitest.config.ts"],
+  "include": ["src", "test", "drizzle.config.ts", "vitest.config.ts", "vitest.integration.config.ts"],
   "references": [{ "path": "../config" }, { "path": "../shared" }, { "path": "../document-model" }]
 }
