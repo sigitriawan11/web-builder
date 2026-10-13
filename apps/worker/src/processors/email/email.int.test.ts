@@ -48,7 +48,7 @@ describe("processor email (ACC-271)", () => {
       const { user } = await createUser(testDb.db, { email, name: "Budi Santoso" });
       await testDb.db.update(schema.users).set({ locale }).where(eq(schema.users.id, user.id));
 
-      await processor()({ requestId: `req-${uuidv7()}`, template: "account_exists", userId: user.id }, context());
+      await processor()({ requestId: `req-${uuidv7()}`, template: "auth.account_exists", userId: user.id }, context());
 
       await expect.poll(() => messagesTo(email), { timeout: 5_000 }).toHaveLength(1);
       const [summary] = await messagesTo(email);
@@ -67,7 +67,7 @@ describe("processor email (ACC-271)", () => {
 
   it("user sudah tidak ada → selesai tanpa mengirim (tidak di-retry)", async () => {
     await expect(
-      processor()({ requestId: `req-${uuidv7()}`, template: "account_exists", userId: uuidv7() }, context()),
+      processor()({ requestId: `req-${uuidv7()}`, template: "auth.account_exists", userId: uuidv7() }, context()),
     ).resolves.toBeUndefined();
   });
 
@@ -76,7 +76,7 @@ describe("processor email (ACC-271)", () => {
     const down = smtpProvider("smtp://127.0.0.1:1");
     const failing = createEmailProcessor({ db: testDb.db, provider: down, from: "a@b.c", appUrl });
     await expect(
-      failing({ requestId: `req-${uuidv7()}`, template: "account_exists", userId: user.id }, context()),
+      failing({ requestId: `req-${uuidv7()}`, template: "auth.account_exists", userId: user.id }, context()),
     ).rejects.toThrow();
     down.close?.();
     expect(QUEUE_POLICIES.email).toMatchObject({ attempts: 5, backoff: { type: "exponential", delayMs: 30_000 } });

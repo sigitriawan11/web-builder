@@ -225,7 +225,7 @@ describe("registrasi email + password (ACC-001)", () => {
     await expect
       .poll(() => queues.jobs)
       .toEqual([
-        { queue: "email", payload: expect.objectContaining({ template: "account_exists", userId: existing?.id }) },
+        { queue: "email", payload: expect.objectContaining({ template: "auth.account_exists", userId: existing?.id }) },
       ]);
     const users = await testDb.db.select().from(schema.users).where(eq(schema.users.email, email));
     expect(users).toHaveLength(1);

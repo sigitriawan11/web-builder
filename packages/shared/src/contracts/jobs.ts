@@ -88,9 +88,23 @@ export const JOB_PAYLOADS = {
   publish: z.object({ ...jobBase, siteId: UuidV7Schema, deploymentId: UuidV7Schema }),
   // Dedupe dengan jobId `thumb:<documentId>:<snapshotId>`.
   thumbnails: z.object({ ...jobBase, documentId: UuidV7Schema, snapshotId: UuidV7Schema }),
-  // Email transaksional (ACC-271): hanya template + penerima; worker merender isi dalam bahasa user (T1.13.2).
-  // Template lain (verifikasi, reset, selamat datang) ditambah bersama fiturnya (T1.5.3, T1.5.5, T1.5.13).
-  email: z.object({ ...jobBase, template: z.enum(["account_exists"]), userId: UuidV7Schema }),
+  // Email transaksional (ACC-271): template (nama = type katalog ACC-270) + penerima; worker merender isi dalam
+  // bahasa user. Pengecualian "hanya ID": URL bertoken dibuat Better Auth saat request dan tidak bisa dimuat ulang
+  // worker, jadi ikut payload (token berumur pendek; payload tidak pernah dicatat ke log).
+  email: z.discriminatedUnion("template", [
+    z.object({ ...jobBase, template: z.literal("auth.welcome"), userId: UuidV7Schema }),
+    z.object({ ...jobBase, template: z.literal("auth.account_exists"), userId: UuidV7Schema }),
+    z.object({
+      ...jobBase,
+      template: z.literal("auth.verify_email"),
+      userId: UuidV7Schema,
+      verifyUrl: z.url(),
+      // Kode 6 digit untuk user yang membuka email di perangkat lain (ACC-003).
+      code: z.string().regex(/^\d{6}$/),
+    }),
+    z.object({ ...jobBase, template: z.literal("auth.password_reset"), userId: UuidV7Schema, resetUrl: z.url() }),
+    z.object({ ...jobBase, template: z.literal("auth.password_changed"), userId: UuidV7Schema }),
+  ]),
 } satisfies Partial<Record<QueueName, z.ZodType>>;
 
 export type JobPayload<Q extends keyof typeof JOB_PAYLOADS> = z.infer<(typeof JOB_PAYLOADS)[Q]>;

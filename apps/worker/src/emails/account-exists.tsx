@@ -1,18 +1,10 @@
-import { type Locale, t } from "@platform/i18n";
 import { APP_PATHS } from "@platform/shared";
 import { Button, Link, Section, Text } from "react-email";
-import { EmailLayout, emailButton, emailText } from "./layout";
+import { type BaseEmailProps, EmailLayout, emailButton, emailCopy, emailText } from "./layout";
 
 // ACC-001: dikirim saat seseorang mendaftar dengan email yang sudah terdaftar (respons API tetap generik).
-
-export interface AccountExistsProps {
-  locale: Locale;
-  name: string;
-  appUrl: string;
-}
-
-export function AccountExistsEmail({ locale, name, appUrl }: AccountExistsProps) {
-  const text = (key: string, values?: Record<string, string>) => t(locale, "emails", `account_exists.${key}`, values);
+export function AccountExistsEmail({ locale, name, appUrl }: BaseEmailProps) {
+  const text = emailCopy(locale, "auth.account_exists");
   return (
     <EmailLayout locale={locale} preview={text("preview")}>
       <Text style={emailText}>{text("greeting", { name })}</Text>

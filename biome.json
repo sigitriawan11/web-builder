@@ -8,7 +8,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/.turbo", "!**/dist", "!**/coverage"]
+    "includes": ["**", "!**/node_modules", "!**/.turbo", "!**/dist", "!**/coverage", "!**/__snapshots__"]
   },
   "overrides": [
     {

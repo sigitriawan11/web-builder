@@ -16,9 +16,9 @@ describe("i18n dasar (ACC-290)", () => {
   });
 
   it("t(): placeholder {nama} diganti; yang tidak diberi nilai dibiarkan", () => {
-    expect(t("id", "emails", "account_exists.greeting", { name: "Budi" })).toBe("Halo Budi,");
-    expect(t("en", "emails", "account_exists.greeting")).toBe("Hi {name},");
-    expect(t("en", "emails", "account_exists.greeting", { other: 1 })).toBe("Hi {name},");
+    expect(t("id", "emails", "auth.account_exists.greeting", { name: "Budi" })).toBe("Halo Budi,");
+    expect(t("en", "emails", "auth.account_exists.greeting")).toBe("Hi {name},");
+    expect(t("en", "emails", "auth.account_exists.greeting", { other: 1 })).toBe("Hi {name},");
   });
 
   it("t(): bahasa diminta → default id → key", () => {

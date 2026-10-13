@@ -1,21 +1,19 @@
 import { type Locale, t } from "@platform/i18n";
 import type { JobPayload } from "@platform/shared/contracts";
+import type { ReactElement } from "react";
 import { render } from "react-email";
 import { AccountExistsEmail } from "./account-exists";
+import type { BaseEmailProps } from "./layout";
+import { PasswordChangedEmail } from "./password-changed";
+import { PasswordResetEmail } from "./password-reset";
+import { VerifyEmailEmail } from "./verify-email";
+import { WelcomeEmail } from "./welcome";
 
-// Template email per jenis job (`JOB_PAYLOADS.email.template`). Subjek & isi dari @platform/i18n sesuai users.locale.
+// Template email per job (`JOB_PAYLOADS.email`, nama = type katalog ACC-270). Subjek & isi dari @platform/i18n
+// sesuai users.locale. `switch` atas union payload: tiap template menerima data spesifiknya dengan tipe tepat.
 
-export type EmailTemplate = JobPayload<"email">["template"];
-
-export interface EmailRecipientProps {
-  locale: Locale;
-  name: string;
-  appUrl: string;
-}
-
-const TEMPLATES = {
-  account_exists: (props: EmailRecipientProps) => <AccountExistsEmail {...props} />,
-} satisfies Record<EmailTemplate, (props: EmailRecipientProps) => React.ReactElement>;
+export type EmailJob = JobPayload<"email">;
+export type EmailTemplate = EmailJob["template"];
 
 export interface RenderedEmail {
   subject: string;
@@ -23,8 +21,27 @@ export interface RenderedEmail {
   text: string;
 }
 
-export async function renderEmail(template: EmailTemplate, props: EmailRecipientProps): Promise<RenderedEmail> {
-  const element = TEMPLATES[template](props);
+function emailElement(job: EmailJob, props: BaseEmailProps): ReactElement {
+  switch (job.template) {
+    case "auth.welcome":
+      return <WelcomeEmail {...props} />;
+    case "auth.account_exists":
+      return <AccountExistsEmail {...props} />;
+    case "auth.verify_email":
+      return <VerifyEmailEmail {...props} verifyUrl={job.verifyUrl} code={job.code} />;
+    case "auth.password_reset":
+      return <PasswordResetEmail {...props} resetUrl={job.resetUrl} />;
+    case "auth.password_changed":
+      return <PasswordChangedEmail {...props} />;
+  }
+}
+
+export async function renderEmail(
+  job: EmailJob,
+  recipient: { locale: Locale; name: string },
+  appUrl: string,
+): Promise<RenderedEmail> {
+  const element = emailElement(job, { ...recipient, appUrl });
   const [html, text] = await Promise.all([render(element), render(element, { plainText: true })]);
-  return { subject: t(props.locale, "emails", `${template}.subject`), html, text };
+  return { subject: t(recipient.locale, "emails", `${job.template}.subject`), html, text };
 }

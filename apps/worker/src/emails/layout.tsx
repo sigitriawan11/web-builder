@@ -39,3 +39,15 @@ export const emailButton = {
   padding: "12px 20px",
   textDecoration: "none",
 } as const;
+
+/** Teks satu template dari namespace i18n `emails` (key `<template>.<bagian>`). */
+export function emailCopy(locale: Locale, template: string) {
+  return (key: string, values?: Readonly<Record<string, string>>) => t(locale, "emails", `${template}.${key}`, values);
+}
+
+/** Props bersama semua template: penerima + basis URL web. */
+export interface BaseEmailProps {
+  locale: Locale;
+  name: string;
+  appUrl: string;
+}

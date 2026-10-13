@@ -25,11 +25,7 @@ export function createEmailProcessor(deps: EmailProcessorDeps): JobHandler<"emai
       logger.warn({ userId: payload.userId, template: payload.template }, "penerima email tidak ditemukan; dilewati");
       return;
     }
-    const email = await renderEmail(payload.template, {
-      locale: recipient.locale,
-      name: recipient.name,
-      appUrl: deps.appUrl,
-    });
+    const email = await renderEmail(payload, { locale: recipient.locale, name: recipient.name }, deps.appUrl);
     const { providerMessageId } = await deps.provider.send({
       from: deps.from,
       to: recipient.email,

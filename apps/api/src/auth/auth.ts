@@ -153,10 +153,10 @@ export function createAuth(deps: {
         deps.queues
           ?.enqueue("email", {
             requestId: getContext()?.requestId ?? uuidv7(),
-            template: "account_exists",
+            template: "auth.account_exists",
             userId: user.id,
           })
-          .catch((error: unknown) => logger.warn({ err: error }, "enqueue email account_exists gagal"));
+          .catch((error: unknown) => logger.warn({ err: error }, "enqueue email auth.account_exists gagal"));
       },
     },
     user: {
