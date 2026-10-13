@@ -1369,7 +1369,7 @@ Validasi: tiap app memanggil `parseEnv(app, schema, source)` dari `@platform/sha
 | Perintah | Fungsi |
 |---|---|
 | `pnpm install` | Install semua workspace |
-| `pnpm infra:up` / `pnpm infra:down` | `docker compose -f docker/docker-compose.yml up -d` / `down` |
+| `pnpm infra:up` / `pnpm infra:down` | `docker/infra.sh`: `compose up -d --wait` + `minio-init` / `down` (env dari `.env`) |
 | `pnpm db:generate` | `drizzle-kit generate` (dari `packages/db`) |
 | `pnpm db:migrate` | Terapkan migration ke `DATABASE_URL` |
 | `pnpm db:seed` | Plan, user dev (`owner@platform.test` / `admin@platform.test`), library seed, situs contoh |
@@ -1378,6 +1378,10 @@ Validasi: tiap app memanggil `parseEnv(app, schema, source)` dari `@platform/sha
 | `pnpm dev --filter=@platform/api...` | Hanya api dan dependensinya |
 | `pnpm lint` / `pnpm lint:deps` / `pnpm typecheck` | Biome, dependency-cruiser, `tsc -b` |
 | `pnpm test` / `pnpm test:integration` / `pnpm test:e2e` | Vitest unit / integration / Playwright |
+| `pnpm bench` / `pnpm bench:canvas` | Vitest bench (document-model) / benchmark canvas Playwright (editor) |
+| `pnpm format` | Biome `check --write` |
+
+Script root yang butuh env berbentuk `dotenv -e .env -- turbo run <task>`; argumen ke task diteruskan dengan `pnpm <script> -- <argumen>` (mis. `pnpm dev -- --port 5190`). Panduan lengkap & troubleshooting WSL2: `README.md` root.
 
 Alur pertama kali: `pnpm install && pnpm infra:up && pnpm db:migrate && pnpm db:seed && pnpm dev` → buka `http://app.localhost:3000`, login user dev, publish situs contoh → buka `http://<subdomain-acak>.localhost:8787`.
 

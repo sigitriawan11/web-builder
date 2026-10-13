@@ -36,6 +36,15 @@
     },
     "db:migrate": {
       "cache": false
+    },
+    "db:seed": {
+      "cache": false
+    },
+    "db:reset": {
+      "cache": false
+    },
+    "bench": {
+      "cache": false
     }
   }
 }
