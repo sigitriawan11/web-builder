@@ -571,18 +571,19 @@ Custom domain: Cloudflare for SaaS (Custom Hostnames) dengan fallback origin `cn
 **Keputusan:** isolasi **ditegakkan di repository layer** (wajib, P0) dan **Row Level Security sebagai defense-in-depth (P1)**.
 
 ```ts
-// @platform/db/src/tenant.ts
-export type TenantContext =
-  | { kind: 'site'; workspaceId: string; siteId: string; actor: Actor }
-  | { kind: 'workspace'; workspaceId: string; actor: Actor }
-  | { kind: 'system'; reason: string };              // worker/cron, wajib dilog
+// @platform/db/src/tenant.ts — tipe di-brand: hanya bisa dibuat lewat siteScope/workspaceScope/systemScope
+export type TenantContext = SiteTenant | WorkspaceTenant | SystemTenant;
+//   SiteTenant      { kind: 'site'; workspaceId; siteId; actor }   ← siteScope({...}) (UUIDv7 divalidasi)
+//   WorkspaceTenant { kind: 'workspace'; workspaceId; actor }      ← workspaceScope({...})
+//   SystemTenant    { kind: 'system'; reason }                     ← systemScope(reason) — worker/cron, wajib dilog
 
-// Contoh repository: tenant selalu parameter pertama, filter selalu ditambahkan
-export async function findPage(db: Db, t: SiteTenant, pageId: string) {
-  return db.query.sitePages.findFirst({
-    where: and(eq(sitePages.siteId, t.siteId), eq(sitePages.id, pageId), isNull(sitePages.deletedAt)),
+// Contoh repository: tenant selalu parameter pertama, filter selalu ditambahkan lewat helper
+export async function findSite(db: Db, t: WorkspaceTenant | SiteTenant, siteId: string) {
+  return db.query.sites.findFirst({
+    where: and(workspaceWhere(t, sites), eq(sites.id, siteId), notDeleted(sites)),
   });
 }
+// siteWhere(t, table) memfilter site_id (+ workspace_id bila tabel punya keduanya); tenantLogFields(t) untuk log.
 ```
 
 - Tidak ada query tenant tanpa `TenantContext`; lint rule kustom/grep di CI melarang `db.select().from(<tabelTenant>)` di luar folder `*.repository.ts`.

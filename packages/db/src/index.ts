@@ -3,3 +3,18 @@
 export { type CreateDbOptions, createDb, type Db } from "./client";
 export { id, identityId, softDelete, timestamps } from "./columns";
 export * as schema from "./schema";
+export {
+  type Actor,
+  ActorSchema,
+  notDeleted,
+  type SiteTenant,
+  type SystemTenant,
+  siteScope,
+  siteWhere,
+  systemScope,
+  type TenantContext,
+  tenantLogFields,
+  type WorkspaceTenant,
+  workspaceScope,
+  workspaceWhere,
+} from "./tenant";
