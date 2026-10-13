@@ -1,4 +1,4 @@
-import type { Node, SiteDocument } from "@platform/document-model";
+import { type Breakpoint, type Node, resolveStyle, type SiteDocument, type Style } from "@platform/document-model";
 import { type CSSProperties, createElement, Fragment, type ReactElement, type ReactNode } from "react";
 import { assetUrl } from "./asset-url";
 import { renderRichText } from "./rich-text";
@@ -10,18 +10,26 @@ import { childLayoutOf, type ParentLayout, styleToCss } from "./style-to-css";
 // Reset agar tag semantik (h1, p, …) tidak membawa margin bawaan browser.
 const BASE_CSS: CSSProperties = { boxSizing: "border-box", margin: 0 };
 
-// DM-010: lebar artboard desktop default (page.props.canvas.width belum ada di schema prototipe).
-const PAGE_CANVAS_WIDTH = 1440;
+import { DESKTOP_FRAME } from "./breakpoint-context";
+
+export interface RenderNodeContext {
+  // Style efektif node di breakpoint frame (hasil `resolveStyle`).
+  style: Style;
+  parent: ParentLayout;
+  // Lebar artboard frame; dipakai node page.
+  frameWidth: number;
+}
 
 /**
  * Elemen DOM satu node; `children` = elemen anak yang sudah dirender pemanggil.
  * Dipakai bersama oleh render statis (`renderNode`) dan render inkremental (`NodeView`)
  * agar keduanya selalu menghasilkan HTML yang sama.
  */
-export function renderNodeElement(node: Node, parent: ParentLayout, children: ReactNode): ReactElement {
+export function renderNodeElement(node: Node, context: RenderNodeContext, children: ReactNode): ReactElement {
+  const { style, parent, frameWidth } = context;
   const css: CSSProperties = {
     ...BASE_CSS,
-    ...styleToCss(node.style.base, parent),
+    ...styleToCss(style, parent),
     // Hide global (mata di layer panel) menang atas display dari layout.
     ...(node.visible ? {} : { display: "none" }),
   };
@@ -29,7 +37,7 @@ export function renderNodeElement(node: Node, parent: ParentLayout, children: Re
 
   switch (node.type) {
     case "page":
-      return createElement(node.tag ?? "main", { ...common, style: { ...css, width: PAGE_CANVAS_WIDTH } }, children);
+      return createElement(node.tag ?? "main", { ...common, style: { ...css, width: frameWidth } }, children);
     case "frame":
       return createElement(node.tag ?? "div", { ...common, style: css }, children);
     case "text": {
@@ -61,14 +69,21 @@ export function renderNodeElement(node: Node, parent: ParentLayout, children: Re
  * Render statis satu node beserta turunannya langsung dari JSON dokumen (DM-001).
  * Dipakai untuk snapshot test & pembanding; canvas memakai `NodeView` (inkremental).
  */
-export function renderNode(doc: SiteDocument, id: string, parent: ParentLayout = "block"): ReactElement | null {
+export function renderNode(
+  doc: SiteDocument,
+  id: string,
+  parent: ParentLayout = "block",
+  frame: { breakpoint: Breakpoint; width: number } = DESKTOP_FRAME,
+): ReactElement | null {
   const node = doc.nodes[id];
   if (!node) return null;
-  const childLayout = childLayoutOf(node.style.base);
+  const style = resolveStyle(node.style, frame.breakpoint);
+  const childLayout = childLayoutOf(style);
   const children =
     "children" in node
-      ? node.children.map((childId) => <Fragment key={childId}>{renderNode(doc, childId, childLayout)}</Fragment>)
+      ? node.children.map((childId) => (
+          <Fragment key={childId}>{renderNode(doc, childId, childLayout, frame)}</Fragment>
+        ))
       : null;
-  return renderNodeElement(node, parent, children);
+  return renderNodeElement(node, { style, parent, frameWidth: frame.width }, children);
 }
-

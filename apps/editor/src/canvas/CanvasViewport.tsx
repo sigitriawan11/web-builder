@@ -4,7 +4,8 @@ import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { NodeStoreContext } from "../document/use-node";
-import { RenderRoot } from "./render-root/RenderRoot";
+import { CanvasFrames } from "./frames/CanvasFrames";
+import { frameOptionsFromSearch } from "./frames/frame-layout";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import { spikeNodeStore, spikePageId } from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
@@ -17,6 +18,7 @@ const WILL_CHANGE_IDLE_MS = 150;
 
 const isolation = isolationFromSearch(window.location.search);
 const siteCss = siteCssFromSearch(window.location.search);
+const frameOptions = frameOptionsFromSearch(window.location.search);
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
@@ -61,7 +63,12 @@ export function CanvasViewport() {
     <>
       <style>{canvasStyleSheet(isolation, siteCss)}</style>
       <NodeStoreContext.Provider value={spikeNodeStore}>
-        <RenderRoot pageId={spikePageId} scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined} />
+        <CanvasFrames
+          pageId={spikePageId}
+          showAll={frameOptions.showAll}
+          mode={frameOptions.mode}
+          scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
+        />
       </NodeStoreContext.Provider>
     </>
   );

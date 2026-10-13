@@ -1,8 +1,10 @@
-import { memo } from "react";
+import { resolveStyle } from "@platform/document-model";
+import { memo, useContext, useMemo } from "react";
 import { useStore } from "zustand";
 import { useNode } from "../../document/use-node";
 import { textEditingStore } from "../../store/text-editing-store";
 import { InlineTextEditor } from "../text-editing/InlineTextEditor";
+import { FrameContext } from "./breakpoint-context";
 import { renderProbe } from "./render-probe";
 import { renderNodeElement } from "./render-node";
 import { childLayoutOf, type ParentLayout } from "./style-to-css";
@@ -20,16 +22,19 @@ interface NodeViewProps {
 // sehingga anak dirender lewat versi tanpa memo dan selalu ikut render ulang.
 export const NodeView = memo(function NodeViewRender({ id, parent }: NodeViewProps) {
   const node = useNode(id);
+  const frame = useContext(FrameContext);
   // Selector boolean: hanya node yang mulai/selesai diedit yang render ulang.
   const editing = useStore(textEditingStore, (state) => state.editingId === id);
+  const style = useMemo(() => (node ? resolveStyle(node.style, frame.breakpoint) : null), [node, frame.breakpoint]);
   renderProbe.onNodeRender?.(id);
-  if (!node) return null;
+  if (!node || !style) return null;
 
+  const context = { style, parent, frameWidth: frame.width };
   if (node.type === "text") {
-    return renderNodeElement(node, parent, editing ? <InlineTextEditor content={node.props.content} /> : null);
+    return renderNodeElement(node, context, editing ? <InlineTextEditor content={node.props.content} /> : null);
   }
-  const childLayout = childLayoutOf(node.style.base);
+  const childLayout = childLayoutOf(style);
   const children =
     "children" in node ? node.children.map((childId) => <NodeView key={childId} id={childId} parent={childLayout} />) : null;
-  return renderNodeElement(node, parent, children);
+  return renderNodeElement(node, context, children);
 });

@@ -46,6 +46,15 @@ describe("renderNode (T0.4.1)", () => {
     expect(html).toMatch(/<img data-node-id="n_lvl4img0001"[^>]*alt=""/);
   });
 
+  it("merender style efektif breakpoint frame (DM-036) dan lebar frame", () => {
+    const doc = heroDocument();
+    const html = renderToStaticMarkup(renderNode(doc, "pg_home000001", "block", { breakpoint: "mobile", width: 390 }));
+
+    expect(html).toMatch(/<main data-node-id="pg_home000001" style="[^"]*width:390px/);
+    expect(html).toMatch(/<section data-node-id="n_hero000001" style="[^"]*padding:var\(--space-10\) var\(--space-8\) var\(--space-10\)/);
+    expect(html).toMatch(/<section data-node-id="n_hero000001" style="[^"]*min-height:420px/);
+  });
+
   it("mengembalikan null untuk node yang tidak ada", () => {
     expect(renderNode(heroDocument(), "n_ghost00001")).toBeNull();
   });
