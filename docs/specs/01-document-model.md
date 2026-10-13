@@ -1893,19 +1893,19 @@ registerAsset(i: { assetId: AssetId; entry: AssetEntry }): void                 
 ## 19. Batasan & performa
 
 ### DM-076 Batas dokumen
-- **P0 · M1** (angka bisa disesuaikan per paket, lihat 08)
+- **P0 · M1** (angka bisa disesuaikan per paket, lihat 08). **Sumber tunggal** angka batas dokumen; ED-223 (02) mengikuti tabel ini. Angka node & ukuran ditetapkan dari benchmark spike M0 (T0.8.6, 2026-10-13); dicek ulang di laptop referensi (T0.7.4): bila relayout 5.000 node > 50 ms, hard limit node per page turun ke 3.000.
 
 | Batas | Nilai default | Alasan |
 |---|---|---|
-| Node per page | 3.000 (soft warning 1.500) | Performa canvas DOM & ukuran HTML |
+| Node per page | 5.000 (soft warning 2.000) | Spike: perubahan layout pada 5.000 node → paint ≤ 40 ms; 10.000 node → 71 ms (jank). 2.000 = target performa M2 |
 | Node per site | 20.000 | Memori editor, ukuran Y.Doc |
 | Page per site | 100 (Free: ❓ OPEN, lihat 08) | |
-| Kedalaman tree | 32 | Rekursi renderer, CSS specificity |
+| Kedalaman tree | 32 (soft 20) | Rekursi renderer, CSS specificity |
 | Kedalaman instance bersarang | 8 | DM-051 |
 | Children per container | 500 | |
-| JSON snapshot | 8 MB (soft 4 MB) | Waktu load & snapshot |
-| Y.Doc state | 16 MB | |
-| Text content per node | 20.000 karakter | Gunakan collection untuk konten panjang (blog, 05) |
+| JSON snapshot | 12 MB (soft 6 MB) | Waktu load & snapshot; ≈ 0,44 KB/node → 20.000 node ≈ 9 MB |
+| Y.Doc state | 16 MB (soft 8 MB) | ≈ 0,5 KB/node, ≈ 0,63 KB/node setelah banyak edit → 20.000 node ≈ 12,6 MB; decode 5.000 node 84 ms (T0.7.5) |
+| Text content per node | 20.000 karakter (soft 5.000) | Gunakan collection untuk konten panjang (blog, 05) |
 | Fills/strokes/effects | 8 / 4 / 6 | |
 | Interactions per node / actions | 10 / 5 | |
 | Overrides per instance | 200 path | |

@@ -2770,15 +2770,15 @@ Versi web dari "Prototype" Figma: fokus pada link, state, dan animasi ringan. Ou
 
 ### ED-223 Batasan dokumen
 - Prioritas: P0 · Fase: M2
-- Deskripsi: Batas keras (hard) dan lunak (soft, warning) untuk menjaga editor & website cepat.
+- Deskripsi: Batas keras (hard) dan lunak (soft, warning) untuk menjaga editor & website cepat. Angka node, kedalaman, ukuran state, dan teks mengikuti **[01 DM-076](./01-document-model.md)** (sumber tunggal; ditetapkan T0.8.6).
 
 | Item | Soft limit (warning) | Hard limit (ditolak) | Catatan |
 |---|---|---|---|
-| Node per page | 2.000 | 5.000 | Indikator di bottom bar ([ED-009](#ed-009-bottom-bar--zoom-control)) |
-| Kedalaman nesting | 20 | 40 | |
+| Node per page | 2.000 | 5.000 | Indikator di bottom bar ([ED-009](#ed-009-bottom-bar--zoom-control)); benchmark T0.8.6 |
+| Kedalaman nesting | 20 | 32 | |
 | Page per website | per paket | per paket | [08](./08-accounts-plans-admin.md) |
-| Ukuran Yjs state per website | 5 MB | 20 MB | dikompres; snapshot GC |
-| Teks per node | 5.000 karakter | 50.000 | Artikel panjang → gunakan collection/blog (M7) |
+| Ukuran Yjs state per website | 8 MB | 16 MB | snapshot GC; ≈ 0,5–0,63 KB/node (T0.7.5) |
+| Teks per node | 5.000 karakter | 20.000 | Artikel panjang → gunakan collection/blog (M7) |
 | Font family per website | 4 | 10 | |
 | Gambar per page | 100 | 500 | lazy load wajib |
 | Ukuran upload per file | 10 MB (gambar) | per paket | [08](./08-accounts-plans-admin.md) |
@@ -2789,7 +2789,7 @@ Versi web dari "Prototype" Figma: fokus pada link, state, dan animasi ringan. Ou
 - Acceptance criteria:
   - [ ] Paste yang akan melampaui hard limit node ditolak seluruhnya (atomik), bukan sebagian.
 
-> ❓ OPEN: Angka final batas (node per page, ukuran state) setelah benchmark M0/M2.
+> ✅ Diputuskan (T0.8.6, 2026-10-13): angka awal dari benchmark spike M0, sumber tunggal di 01 DM-076. Dievaluasi ulang dengan data laptop referensi (T0.7.4) dan benchmark M2 (T2.18).
 
 ### ED-224 Lazy load font & gambar di editor
 - Prioritas: P0 · Fase: M2
@@ -3196,7 +3196,7 @@ Legenda: **✅ P0** = ada di rilis fase terkait · **P1** = menyusul · **P2** =
 | 10 | §25 | Shortcut layout grid. Figma memakai `Ctrl+G` (Mac: `⌃G`), yang di Windows bentrok dengan Group (`Ctrl+G`). Usulan: Windows `Ctrl+Shift+4`, Mac `⌃G`. Konfirmasi setelah uji pengguna. |
 | 11 | §27 | ~~Iframe per breakpoint frame di canvas~~ — **diputuskan T0.8.2**: tanpa iframe (ADR-013). |
 | 12 | §30 | Model data konten multi-bahasa (map per field vs dokumen terpisah per locale) dan paket mana yang mendapatkannya. Harus diputuskan sebelum M7 agar binding data dinamis kompatibel. |
-| 13 | §31 | Angka final batas (node per page, ukuran state) setelah benchmark M0/M2. |
+| 13 | §31 | ~~Angka final batas~~ — **diputuskan T0.8.6**: node/page 2.000/5.000, state 8/16 MB (01 DM-076). |
 
 ---
 
