@@ -10,6 +10,8 @@ const baseEnv = {
   // Pool pg baru membuka koneksi saat query pertama; health/live tidak menyentuh DB.
   DATABASE_URL: "postgres://platform:platform@127.0.0.1:1/unused",
   DATABASE_POOL_MAX: 2,
+  // Redis sengaja tidak tersedia: server tetap start & shutdown rapi (rate limit pakai limiter cadangan).
+  REDIS_URL: "redis://127.0.0.1:1",
 };
 
 describe("server & graceful shutdown (T1.4.1)", () => {

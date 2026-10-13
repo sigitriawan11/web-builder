@@ -3,6 +3,7 @@ import { createDb } from "@platform/db";
 import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
 import { createApp } from "./app";
 import type { ApiEnv } from "./config/env";
+import { createRedis } from "./lib/redis";
 
 // Batas tunggu request yang sedang berjalan saat shutdown, sebelum koneksi dipaksa tutup.
 export const SHUTDOWN_TIMEOUT_MS = 10_000;
@@ -31,7 +32,17 @@ export function createApiLogger(
 export async function startServer(env: ApiEnv): Promise<RunningServer> {
   const logger = createApiLogger(env);
   const { close: closeDb } = createDb({ connectionString: env.DATABASE_URL, maxConnections: env.DATABASE_POOL_MAX });
-  const app = createApp({ logger });
+  const redis = createRedis(env.REDIS_URL);
+  // Tanpa listener, event `error` ioredis (mis. Redis mati) membuat proses crash.
+  let redisDownLogged = false;
+  redis.on("error", (error) => {
+    if (!redisDownLogged) logger.warn({ err: error }, "redis tidak terhubung; rate limit memakai limiter cadangan");
+    redisDownLogged = true;
+  });
+  redis.on("ready", () => {
+    redisDownLogged = false;
+  });
+  const app = createApp({ logger, redis });
 
   const server = await new Promise<Server>((resolve, reject) => {
     const listening = app.listen(env.API_PORT, (error?: Error) => (error ? reject(error) : resolve(listening)));
@@ -54,6 +65,7 @@ export async function startServer(env: ApiEnv): Promise<RunningServer> {
       });
       clearTimeout(forced);
       await closeDb();
+      redis.disconnect();
       logger.info("api shutdown selesai");
     })();
     return closing;

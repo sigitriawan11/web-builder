@@ -9,6 +9,7 @@ export const apiEnvSchema = {
   API_PORT: envField.port().default(4000),
   DATABASE_URL: envField.url(),
   DATABASE_POOL_MAX: envField.int().default(10),
+  REDIS_URL: envField.url(),
 };
 
 export type ApiEnv = ReturnType<typeof loadApiEnv>;

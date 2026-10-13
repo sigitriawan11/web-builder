@@ -1,5 +1,6 @@
 import type { Logger } from "@platform/shared/node";
 import express, { type Express } from "express";
+import type { Redis } from "./lib/redis";
 import { bodyParsers } from "./middleware/body-parsers";
 import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-handler";
 import { httpLogger } from "./middleware/http-logger";
@@ -11,6 +12,8 @@ import { securityHeaders } from "./middleware/security";
 
 export interface AppDeps {
   logger: Logger;
+  // Redis untuk rate limit per router (T1.4.5) & readiness (T1.4.6); router publik memasangnya saat dibuat.
+  redis?: Redis;
   // Untuk test & komposisi: router tambahan dipasang sebelum handler 404/error.
   mountRoutes?: (app: Express) => void;
   // Pelapor error tak terduga (Sentry, T1.16.3); default hanya log.
