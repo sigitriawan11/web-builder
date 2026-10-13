@@ -200,3 +200,18 @@ describe("positionToCss (DM-028)", () => {
     });
   });
 });
+
+describe("sizeToCss & radiusToCss — sisa kasus", () => {
+  it("tinggi fixed di parent kolom boleh menyusut bila ada maxHeight", () => {
+    expect(
+      sizeToCss({ height: { mode: "fixed", value: 300, unit: "px" }, maxHeight: { value: 50, unit: "vh" } }, "column"),
+    ).toEqual({ height: "300px", flexShrink: 1, maxHeight: "50vh" });
+  });
+
+  it("radius sebagian sudut kanan-atas & kiri-bawah", () => {
+    expect(radiusToCss({ topRight: px(3), bottomLeft: px(6) })).toEqual({
+      borderTopRightRadius: "3px",
+      borderBottomLeftRadius: "6px",
+    });
+  });
+});

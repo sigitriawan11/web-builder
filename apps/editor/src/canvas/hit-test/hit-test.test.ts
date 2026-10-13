@@ -65,3 +65,13 @@ describe("hitTestNode (ED-020)", () => {
     expect(hitTestNode(at(byId("n_title00001"), byId("pg_home000001")), 0, 0, isSelectable)).toBeNull();
   });
 });
+
+describe("hitTestNode — atribut kosong", () => {
+  it("elemen dengan data-node-id kosong tidak masuk path", () => {
+    document.body.innerHTML = `<main data-node-id="pg_home000001"><div data-node-id=""><p data-node-id="n_text000001">x</p></div></main>`;
+    const text = document.querySelector('[data-node-id="n_text000001"]') as Element;
+    const root = { elementsFromPoint: () => [text] } as unknown as DocumentOrShadowRoot;
+
+    expect(hitTestNode(root, 0, 0, () => true)?.path).toEqual(["n_text000001", "pg_home000001"]);
+  });
+});

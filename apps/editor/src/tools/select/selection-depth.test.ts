@@ -85,3 +85,21 @@ describe("resolveDoubleClick (ED-038)", () => {
     expect(dblclick("title", [])).toEqual({ type: "none" });
   });
 });
+
+describe("node yang tidak dikenal (dokumen sedang berubah)", () => {
+  const partial = (id: string) => (id === "title" ? { type: "text", parentId: "missing" } : (TREE[id] ?? null));
+
+  it("rantai konteks berhenti di parent yang tidak dikenal; tetap jatuh ke konteks page", () => {
+    expect(resolveClickSelection(pathTo("cardTitle"), ["title"], partial)).toBe("fitur");
+  });
+
+  it("anak di path yang tidak dikenal tidak memicu pengecualian teks/gambar; aturan konteks berlaku", () => {
+    // Konteks = grid (parent kartu) → anak grid pada path = kartu itu sendiri.
+    expect(resolveClickSelection(["ghostChild", "card", "grid", "fitur", "page"], ["card"], lookup)).toBe("card");
+  });
+
+  it("seleksi berisi node yang sudah tidak ada diabaikan", () => {
+    expect(resolveClickSelection(pathTo("title"), ["ghost"], lookup)).toBe("hero");
+    expect(resolveDoubleClick(pathTo("title"), ["ghost"], lookup)).toEqual({ type: "none" });
+  });
+});

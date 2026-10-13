@@ -10,7 +10,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "bench:frames": "playwright test --config playwright.bench.config.ts"
+    "bench:frames": "playwright test --config playwright.bench.config.ts",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@platform/document-model": "workspace:*",
@@ -28,6 +29,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "5.0.4",
     "jsdom": "30.1.2",
     "vite": "8.3.4",
     "vitest": "5.0.4"

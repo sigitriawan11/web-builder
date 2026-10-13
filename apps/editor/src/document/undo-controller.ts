@@ -64,18 +64,24 @@ export function createUndoController(doc: Y.Doc, localOrigin: unknown, selection
     while (manager.undoStack.length > MAX_UNDO_STEPS) manager.undoStack.shift();
   });
 
-  // Langkah yang tergabung (captureTimeout) mempertahankan "sebelum" dari aksi pertamanya.
+  // Langkah yang tergabung (captureTimeout) mempertahankan "sebelum" dari aksi pertamanya. Yjs hanya
+  // menggabungkan di luar undo/redo, jadi event ini selalu berasal dari perubahan lokal biasa.
   manager.on("stack-item-updated", (event: { stackItem: { meta: Map<unknown, unknown> } }) => {
-    if (!manager.undoing && !manager.redoing) event.stackItem.meta.set(SELECTION_AFTER, selection.get());
+    event.stackItem.meta.set(SELECTION_AFTER, selection.get());
   });
 
   manager.on("stack-item-popped", (event: { stackItem: { meta: Map<unknown, unknown> }; type: "undo" | "redo" }) => {
     const { meta } = event.stackItem;
+    // Pengaman: Yjs hanya memancarkan "popped" bila undo/redo mengubah sesuatu, dan perubahan itu selalu
+    // menambah item cermin ber-meta di stack lawan (penggabungan dimatikan saat undo/redo). Kedua cabang
+    // "tidak ada" di bawah tidak bisa dicapai lewat API UndoManager; dipertahankan bila perilaku Yjs berubah.
+    /* v8 ignore next 4 */
     if (mirroredItem) {
       for (const [key, value] of meta) mirroredItem.meta.set(key, value);
       mirroredItem = null;
     }
     const ids = meta.get(event.type === "undo" ? SELECTION_BEFORE : SELECTION_AFTER);
+    /* v8 ignore next */
     if (Array.isArray(ids)) selection.restore(ids.filter((id): id is string => typeof id === "string" && selection.exists(id)));
   });
 

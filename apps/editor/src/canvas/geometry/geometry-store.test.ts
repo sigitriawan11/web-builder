@@ -166,3 +166,68 @@ describe("GeometryStore (ED-019)", () => {
     expect(store.getRect("n_card000001")).toEqual({ x: 100, y: 100, width: 10, height: 10 });
   });
 });
+
+describe("GeometryStore — siklus hidup", () => {
+  it("getElement mengembalikan elemen terdaftar, null bila tidak ada", () => {
+    const { store, element } = setup();
+    const card = element({ left: 0, top: 0, width: 1, height: 1 });
+    store.register("n_card000001", card);
+
+    expect(store.getElement("n_card000001")).toBe(card);
+    expect(store.getElement("n_ghost00001")).toBeNull();
+  });
+
+  it("mendaftarkan elemen yang sama dua kali tidak mengukur ulang; unregister id asing aman", () => {
+    const { store, element, reads, flushFrame } = setup();
+    const card = element({ left: 100, top: 50, width: 20, height: 20 });
+    store.register("n_card000001", card);
+    flushFrame();
+    reads.length = 0;
+
+    store.register("n_card000001", card);
+    store.unregister("n_ghost00001");
+    flushFrame();
+
+    expect(reads).toHaveLength(0);
+  });
+
+  it("ResizeObserver untuk elemen yang sudah tidak terdaftar diabaikan", () => {
+    const { store, element, reads, resize, flushFrame } = setup();
+    const card = element({ left: 100, top: 50, width: 20, height: 20 });
+    store.register("n_card000001", card);
+    flushFrame();
+    store.unregister("n_card000001");
+    reads.length = 0;
+
+    resize(card);
+    flushFrame();
+
+    expect(reads).toHaveLength(0);
+  });
+
+  it("berhenti berlangganan menghentikan notifikasi", () => {
+    const { store, element, setScreenRect, resize, flushFrame } = setup();
+    const card = element({ left: 100, top: 50, width: 20, height: 20 });
+    store.register("n_card000001", card);
+    flushFrame();
+    let notified = 0;
+    const unsubscribe = store.subscribe("n_card000001", () => notified++);
+
+    unsubscribe();
+    setScreenRect(card, { left: 140, top: 50, width: 20, height: 20 });
+    resize(card);
+    flushFrame();
+
+    expect(notified).toBe(0);
+  });
+
+  it("destroy memutus pengamat ukuran dan mengosongkan cache", () => {
+    const { store, element, observed } = setup();
+    store.register("n_card000001", element({ left: 0, top: 0, width: 1, height: 1 }));
+
+    store.destroy();
+
+    expect(observed.size).toBe(0);
+    expect(store.getRect("n_card000001")).toBeNull();
+  });
+});

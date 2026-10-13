@@ -165,3 +165,16 @@ describe("UndoController (ED-197, DM-060)", () => {
     expect(editor.selected()).toEqual([CARD]);
   });
 });
+
+describe("UndoController — status stack", () => {
+  it("canUndo/canRedo mengikuti isi stack", () => {
+    const editor = setup();
+    expect([editor.undo.canUndo(), editor.undo.canRedo()]).toEqual([false, false]);
+
+    editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 1 } } });
+    expect([editor.undo.canUndo(), editor.undo.canRedo()]).toEqual([true, false]);
+
+    editor.undo.undo();
+    expect([editor.undo.canUndo(), editor.undo.canRedo()]).toEqual([false, true]);
+  });
+});

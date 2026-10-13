@@ -75,3 +75,20 @@ describe("insertionMarker (ED-063)", () => {
     expect(insertionMarker([], 0, "column", false, container)).toMatchObject({ x: -10, y: -10 });
   });
 });
+
+describe("insertionMarker — ujung awal & akhir", () => {
+  const container = { x: 0, y: 0, width: 300, height: 300 };
+
+  it("kolom: sebelum anak pertama di tepi atasnya, setelah anak terakhir di tepi bawahnya", () => {
+    expect(insertionMarker(column, 0, "column", false, container)).toMatchObject({ y: 0 });
+    expect(insertionMarker(column, 3, "column", false, container)).toMatchObject({ y: 140 });
+  });
+
+  it("baris tanpa wrap: penanda setinggi container", () => {
+    expect(insertionMarker(row, 2, "row", false, container)).toEqual({ x: 230, y: 0, length: 300, orientation: "vertical" });
+  });
+
+  it("wrap kosong: di awal container", () => {
+    expect(insertionMarker([], 0, "row", true, container)).toEqual({ x: 0, y: 0, length: 300, orientation: "vertical" });
+  });
+});
