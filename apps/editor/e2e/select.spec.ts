@@ -73,7 +73,8 @@ test("AC ED-047: klik dengan hand tool tidak mengubah seleksi", async ({ page })
   await node(page, hero).click({ position: { x: 4, y: 4 } });
 
   await page.keyboard.press("KeyH");
-  await node(page, feature).click({ position: { x: 4, y: 4 } });
+  // Bukan di pojok: sudut kiri-atas Fitur 1 berimpit dengan handle sudut Hero yang sedang terseleksi.
+  await node(page, feature).click({ position: { x: 40, y: 40 } });
   await page.mouse.click(1200, 400);
 
   expect(await selected(page)).toEqual([hero]);

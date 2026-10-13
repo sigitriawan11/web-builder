@@ -36,7 +36,9 @@ test.describe("marquee top-level (dari luar page)", () => {
 
     expect(await selectedIds(page)).toEqual([id.Hero, id["Fitur 1"]]);
     await expect(page.locator(".overlay-marquee")).toHaveCount(0);
-    await expect(page.locator(".overlay-selection-outline")).toHaveCount(2);
+    // Multi-seleksi: satu kotak gabungan + outline tipis per node.
+    await expect(page.locator(".overlay-selection-outline")).toHaveCount(1);
+    await expect(page.locator(".overlay-selection-member")).toHaveCount(2);
     expect(await selectedIds(page)).not.toContain(id["Fitur 2"]);
   });
 

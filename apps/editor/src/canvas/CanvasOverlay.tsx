@@ -1,23 +1,25 @@
 import { useStore } from "zustand";
-import { selectionStore } from "../store/selection-store";
+import { hoverStore } from "../store/hover-store";
 import { cameraStore } from "./camera-store";
 import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
+import { spikeGeometry } from "./geometry/spike-geometry";
 import { MarqueeOverlay } from "./MarqueeOverlay";
+import { SelectionOverlay } from "./overlay/SelectionOverlay";
+import { spikeNodeStore } from "./spike-document";
 
 const outlineNodeId = outlineNodeFromSearch(window.location.search);
 
-// ED-014: overlay digambar dalam koordinat screen agar garis selalu 1px di zoom berapa pun.
-// Selection box & handles menyusul di T0.5.6.
+// ED-014: overlay digambar dalam koordinat screen agar garis selalu 1px dan handle tidak ikut membesar
+// di zoom berapa pun. Hanya handle yang menerima pointer; sisanya pointer-events: none.
 export function CanvasOverlay() {
   const zoom = useStore(cameraStore, (state) => state.zoom);
-  const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
+  const hoveredId = useStore(hoverStore, (state) => state.hoveredId);
 
   return (
     <div id="overlay">
       {outlineNodeId && <GeometryOutline nodeId={outlineNodeId} />}
-      {selectedIds.map((id) => (
-        <GeometryOutline key={id} nodeId={id} className="overlay-selection-outline" />
-      ))}
+      {hoveredId && <GeometryOutline nodeId={hoveredId} className="overlay-hover-outline" />}
+      <SelectionOverlay nodeStore={spikeNodeStore} geometry={spikeGeometry} />
       <MarqueeOverlay />
       <div className="overlay-zoom-indicator">{Math.round(zoom * 100)}%</div>
     </div>

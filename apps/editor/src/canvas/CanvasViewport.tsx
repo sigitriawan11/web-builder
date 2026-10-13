@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useHoverHighlight } from "../tools/select/use-hover-highlight";
 import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-tool";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
@@ -42,6 +43,7 @@ export function CanvasViewport() {
   useZoomInteractions(viewportRef);
   useTextEditingInteractions(viewportRef);
   useSelectTool(viewportRef, selectToolDeps);
+  useHoverHighlight(viewportRef, selectToolDeps);
   useInteractionMachine(viewportRef, interactionDeps);
   useBrowserGuards(viewportRef);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");

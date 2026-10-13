@@ -12,12 +12,13 @@ export interface InteractionAdapterDeps {
   resolveTarget(hit: { nodeId: string; path: readonly string[] } | null): PressTarget;
 }
 
-// Handle resize di overlay (T0.5.6) ditandai `data-handle` + `data-node-id`.
+// Handle resize di overlay (T0.5.6) ditandai `data-handle` + `data-handle-node` (bukan `data-node-id`,
+// agar tidak dianggap node canvas oleh hit-test & query DOM).
 function handleTarget(event: Event): PressTarget | null {
   for (const target of event.composedPath()) {
     if (!(target instanceof HTMLElement) || !target.dataset.handle) continue;
-    const { handle, nodeId } = target.dataset;
-    if (nodeId) return { kind: "handle", nodeId, handle: handle as ResizeHandle };
+    const { handle, handleNode } = target.dataset;
+    if (handleNode) return { kind: "handle", nodeId: handleNode, handle: handle as ResizeHandle };
   }
   return null;
 }
