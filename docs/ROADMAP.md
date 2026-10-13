@@ -400,7 +400,16 @@ Termasuk:
   - ✅ 2026-10-13 — **ADR-013 diterima owner** (tanpa iframe, mengikuti model Figma); OPEN 02#11 ditutup. Dampak renderer: mode editor = style ter-resolve per frame, mode publish = media query (dijaga visual regression ED-240). Mode `?bpMode=iframe` spike dibuang di T0.8.7.
 - [x] **T0.8.3** ⚑ Putuskan **rentang zoom** final (5%–1600% atau sampai 3200%); tutup OPEN 02#1 — ED-027 · docs · Verifikasi: nilai di spec 02 diperbarui
   - Status: rekomendasi **5%–1600%** (tetap). Eksperimen sementara `MAX_ZOOM = 32` (dikembalikan): pan landing 200 di 400%/1600%/3200% semuanya 60 fps, teks & overlay 1px tetap tajam (Chromium headless). 3200% secara teknis aman, tetapi nilai tambahnya kecil untuk website builder (1 px = 16 px layar di 1600%), dan Safari/GPU belum diuji. Bisa dinaikkan kapan saja: hanya konstanta `MAX_ZOOM`. Diputuskan owner 2026-10-13: **5%–1600%**; OPEN 02#1 ditutup. ✅
-- [ ] **T0.8.4** ⚑ 🧪 Prototipe deteksi overflow statis (tanpa DOM) untuk rule `stackRows` pada 10 section nyata; bandingkan dengan pengukuran DOM; putuskan "hitung statis" vs "selalu stack + `keepRowOnMobile`"; tutup OPEN-DM-5 — DM-038 · `packages/document-model` (prototipe) · Verifikasi: tabel akurasi ≥ 9/10 atau keputusan alternatif
+- [x] **T0.8.4** ⚑ 🧪 Prototipe deteksi overflow statis (tanpa DOM) untuk rule `stackRows` pada 10 section nyata; bandingkan dengan pengukuran DOM; putuskan "hitung statis" vs "selalu stack + `keepRowOnMobile`"; tutup OPEN-DM-5 — DM-038 · `packages/document-model` (prototipe) · Verifikasi: tabel akurasi ≥ 9/10 atau keputusan alternatif
+  - ✅ 2026-10-13 — **Diputuskan owner: hitung statis + margin 0,9**; OPEN-DM-5 ditutup, DM-038 diperbarui. Estimator murni `estimateMaxContentWidth` / `estimateAvailableWidth` / `rowOverflowsStatic` di `@platform/document-model` (`src/query/estimate-width.ts`, 21 unit test); fixture `responsiveSectionsDocument()` = 10 section UMKM (navbar, hero, fitur, statistik, logo, CTA, testimoni, harga, footer, kontak; beberapa row sengaja dekat ambang). Pembanding DOM: `bench/overflow-estimate.bench.ts` mengukur `width: max-content` tiap row di frame Mobile 390 px; metrik font (em/karakter 400 & 700) dikalibrasi sekali per font dari kalimat terpisah (meniru katalog font), bukan dari isi fixture.
+
+    | Font | Row benar | Section benar | Galat lebar rata-rata | Margin 0,9: row meluber lolos | Margin 0,9: tumpuk tak perlu |
+    |---|---|---|---|---|---|
+    | system-ui | 18/18 | 10/10 | 4,2% | 0 | 0 |
+    | Inter | 18/18 | 10/10 | 5,2% | 0 | 0 |
+    | Poppins | 17/18 | 9/10 | 5,2% | 0 | 1 |
+
+    Galat per row maksimum ≈ 10%; satu-satunya salah = grup tombol hero (DOM 362 px vs tersedia 358 px, 1% di atas ambang). **Rekomendasi: hitung statis** dengan margin keamanan 0,9 (row ditumpuk bila ≥ 90% penuh) — condong menumpuk karena row meluber (scroll horizontal) lebih buruk daripada row muat yang ikut ditumpuk; user tetap bisa membatalkan dengan override `direction` di mobile (DM-038: rule tidak berlaku bila properti di-override) tanpa flag baru `keepRowOnMobile`. Syarat: katalog font (M2) menyimpan em/karakter per weight; font size dari typography eksplisit (UA default dipakai hanya di prototipe). Belum diuji: teks non-Latin, letter-spacing, gambar tanpa lebar fixed (estimator memakai `asset.width`, sama dengan lebar alami di browser).
 - [ ] **T0.8.5** ⚑ Validasi keputusan rich text spec 01 (`Y.XmlFragment` + `y-prosemirror` + Tiptap) di spike: edit teks inline, undo, dan isolasi style canvas berjalan; jika gagal, eskalasi ke owner sebelum M1 — DM-013, ED-125 · docs · Verifikasi: catatan hasil spike di spec 01 §4.4
 - [ ] **T0.8.6** Tetapkan angka batas awal (node per page, ukuran state) dari hasil benchmark; perbarui DM-076 & OPEN 02#13 — DM-076, ED-223 · docs · Verifikasi: angka di spec 01 & 02
 - [ ] **T0.8.7** Laporan spike & keputusan **go/no-go** (§M0.e) ditandatangani owner; tandai kode spike yang dibuang vs dipertahankan — ADR-001 · docs · Verifikasi: checklist go/no-go terisi
@@ -2250,7 +2259,7 @@ Cara pakai: saat keputusan diambil, tulis di kolom "Keputusan" (tanggal + piliha
 | Isolasi style canvas: Shadow DOM vs prefix class | 02 #2, ED-016 | Shadow DOM bila Tiptap OK | T0.8.1 | 2026-10-13: Shadow DOM (ADR-012) |
 | Iframe per breakpoint frame vs class-scope | 02 #11, ED-034 | Tanpa iframe (class `.bp-*`) | T0.8.2 | 2026-10-13: tanpa iframe (ADR-013) |
 | Rentang zoom | 02 #1, ED-027 | 5%–1600% | T0.8.3 | 2026-10-13: 5%–1600% |
-| Deteksi overflow statis untuk `stackRows` | 01 OPEN-DM-5, DM-038 | Hitung statis; alternatif `keepRowOnMobile` | T0.8.4 | |
+| Deteksi overflow statis untuk `stackRows` | 01 OPEN-DM-5, DM-038 | Hitung statis; alternatif `keepRowOnMobile` | T0.8.4 | 2026-10-13: statis + margin 0,9 |
 | Rich text JSON utuh vs `y-prosemirror` | 02 #5, DM-013 | — | Spec 01 | ✅ **Diputuskan:** `Y.XmlFragment` + `y-prosemirror` sejak M2 (spec 01). T0.8.5 hanya memvalidasi di spike. |
 | Angka batas node/ukuran state | 02 #13, DM-076 | Dari benchmark | T0.8.6 | |
 
@@ -2531,6 +2540,7 @@ Catat setiap perubahan struktural: task ditambah/dipecah/dipindah/dibatalkan, ke
 | 2026-10-12 | semua | Roadmap v1 dibuat dari PRD, ARCHITECTURE, spec 01–08 | Awal project | owner + Claude Code |
 | 2026-10-13 | T0.8.1 | OPEN 02#2 diputuskan: Shadow DOM (ADR-012) | Isolasi dijamin browser; Tiptap & performa setara prefix | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.2 | OPEN 02#11 diputuskan: canvas tanpa iframe (ADR-013) | Model Figma; iframe tidak lebih cepat & jauh lebih rumit | Claude Code (disetujui owner) |
+| 2026-10-13 | T0.8.4 | OPEN-DM-5 diputuskan: `stackRows` statis + margin 0,9, tanpa `keepRowOnMobile` | Akurasi spike ≥ 9/10 di 3 font; baris kecil tetap berjajar | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.3 | OPEN 02#1 diputuskan: zoom 5%–1600% | 3200% aman tapi tak dibutuhkan; mudah dinaikkan | Claude Code (disetujui owner) |
 | | | | | |
 

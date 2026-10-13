@@ -8,3 +8,4 @@ export {
   wrapGridDocument,
 } from "./basic-documents";
 export { generateLandingDocument, type LandingOptions, landing200, landing2000 } from "./landing-generator";
+export { responsiveSectionsDocument } from "./responsive-sections";

@@ -7,6 +7,7 @@ import {
   landing2000,
   minimalDocument,
   nestedDocument,
+  responsiveSectionsDocument,
   wrapGridDocument,
 } from "@platform/document-model/fixtures";
 
@@ -21,6 +22,8 @@ const FIXTURES: Record<string, () => SiteDocument> = {
   minimal: minimalDocument,
   landing200,
   landing2000,
+  // T0.8.4: 10 section untuk uji deteksi overflow `stackRows`.
+  responsive10: () => responsiveSectionsDocument().document,
 };
 
 export const DEFAULT_FIXTURE = "landing200";

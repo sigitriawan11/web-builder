@@ -948,7 +948,7 @@ interface AutoResponsiveConfig {
   - [ ] Setiap rule punya unit test input→output di `packages/renderer` dengan fixture.
   - [ ] Render editor & publish memanggil fungsi yang sama `applyAutoResponsive(resolvedTree, bp, config)`.
   - [ ] User bisa melihat "properti ini diatur otomatis" di panel (02) — renderer mengekspos `autoApplied: RuleId[]` per node di mode editor.
-  - [ ] ❓ OPEN: threshold "lebar konten > previewWidth" dihitung statis dari nilai style (tanpa DOM) — perlu validasi di spike M0 apakah cukup akurat; alternatif: selalu stack row di mobile kecuali ditandai `keepRowOnMobile`.
+  - [ ] Threshold `stackRows` dihitung **statis** (tanpa DOM): lebar max-content row (teks = karakter × font size × em/karakter per font & weight dari katalog font; gambar = lebar fixed atau `asset.width`) dibanding lebar tersedia (previewWidth − padding ancestor). Row ditumpuk bila konten ≥ **90%** lebar tersedia (margin keamanan, condong menumpuk karena row meluber lebih buruk). User membatalkan dengan override `direction` di breakpoint itu — tidak ada flag `keepRowOnMobile`. (Diputuskan T0.8.4; prototipe `estimate-width.ts` di document-model, dipindah ke renderer di M1.)
 
 ### DM-039 Visibility per breakpoint
 - **P0 · M1**
@@ -2174,7 +2174,7 @@ Site kecil: 1 page, navbar instance, hero frame auto-layout, product grid instan
 > ❓ OPEN-DM-2: Set ikon brand (WhatsApp/Instagram/TikTok) — Simple Icons sebagai `set: "brands"`? Lisensi logo perlu dicek. (DM-015)
 > ❓ OPEN-DM-3: Node khusus `map` (Google Maps) vs `embed` iframe allowlist. (DM-021)
 > ❓ OPEN-DM-4: Model style untuk bagian internal `formField` (label/input/error/placeholder). (DM-022)
-> ❓ OPEN-DM-5: Akurasi deteksi "konten melebihi lebar" untuk rule `stackRows` tanpa DOM; alternatif selalu stack + flag `keepRowOnMobile`. Validasi di spike M0. (DM-038)
+> ✅ OPEN-DM-5 diputuskan (T0.8.4, 2026-10-13): deteksi **statis** dengan margin keamanan 0,9 — akurasi spike 17–18/18 row, 9–10/10 section di 3 font; tanpa flag `keepRowOnMobile`. (DM-038)
 > ❓ OPEN-DM-6: Kebutuhan dark mode untuk pengunjung website UMKM. (DM-043)
 > ❓ OPEN-DM-7: Apakah instance boleh meng-override link/interaction target, atau hanya via prop `link`. (DM-049)
 > ❓ OPEN-DM-8: Ekspresi kondisional sederhana di template binding (`if stock > 0`) pada M7. (DM-054)
