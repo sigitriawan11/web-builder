@@ -21,6 +21,12 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
 
+  apps/api:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+
   apps/editor:
     dependencies:
       '@platform/document-model':
@@ -79,7 +85,43 @@ importers:
         specifier: 5.0.4
         version: 5.0.4(@vitest/coverage-v8@5.0.4)(jsdom@30.1.2)(vite@8.3.4)
 
+  apps/realtime:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+
+  apps/site-host:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+
+  apps/web:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+
+  apps/worker:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+
+  packages/ai-tools:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
+
   packages/config: {}
+
+  packages/db:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
 
   packages/document-model:
     dependencies:
@@ -99,6 +141,48 @@ importers:
       vitest:
         specifier: 5.0.4
         version: 5.0.4(@vitest/coverage-v8@5.0.4)(jsdom@30.1.2)(vite@8.3.4)
+
+  packages/i18n:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
+
+  packages/library-seed:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
+
+  packages/renderer:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
+
+  packages/sdk:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
+
+  packages/shared:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
+
+  packages/ui:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
+
+  packages/workflow-blocks:
+    devDependencies:
+      '@platform/config':
+        specifier: workspace:*
+        version: link:../config
 
 packages:
 
