@@ -1,5 +1,7 @@
 {
   "extends": "@platform/config/tsconfig/base.json",
   "include": ["src", "vitest.config.ts"],
+  // `src/node` = subpath khusus server (tipe Node); project terpisah agar sisa paket tetap isomorfik.
+  "exclude": ["src/node"],
   "references": [{ "path": "../config" }]
 }

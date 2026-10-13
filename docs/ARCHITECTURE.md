@@ -1300,15 +1300,15 @@ VITE_SENTRY_DSN=
 
 # ── apps/api ─────────────────────────────────────────
 API_PORT=4000
-BETTER_AUTH_SECRET=change-me-32-bytes-min
+BETTER_AUTH_SECRET=local-dev-only-change-me-better-auth-secret
 BETTER_AUTH_URL=http://app.localhost:3000/api/auth
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-REALTIME_TOKEN_SECRET=change-me
-AI_STREAM_TOKEN_SECRET=change-me
-INTERNAL_JWT_SECRET=change-me
-SITE_HOST_SIGNING_SECRET=change-me
-SITE_HOST_INTERNAL_TOKEN=change-me
+REALTIME_TOKEN_SECRET=local-dev-only-change-me-realtime-token-secret
+AI_STREAM_TOKEN_SECRET=local-dev-only-change-me-ai-stream-token-secret
+INTERNAL_JWT_SECRET=local-dev-only-change-me-internal-jwt-secret
+SITE_HOST_SIGNING_SECRET=local-dev-only-change-me-site-host-signing-secret
+SITE_HOST_INTERNAL_TOKEN=local-dev-only-change-me-site-host-internal-token
 CREDENTIALS_KEK_CURRENT=1
 CREDENTIALS_KEK_V1=base64-32-bytes
 BILLING_PROVIDER=midtrans                          # OPEN: midtrans | xendit
