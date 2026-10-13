@@ -1,4 +1,4 @@
-import { type OpContext, resolveStyle, runOp, updateStyle } from "@platform/document-model";
+import { type OpContext, type PositionStyle, resolveStyle, runOp, updateStyle } from "@platform/document-model";
 import { useEffect } from "react";
 import type { NodeStore } from "../../document/node-store";
 import { interactionStore } from "../../store/interaction-store";
@@ -11,7 +11,7 @@ import { screenDeltaToWorld } from "../geometry/coordinates";
 import type { GeometryStore, WorldRect } from "../geometry/geometry-store";
 import type { InteractionState } from "../interactions/interaction-machine";
 import { moveDelta, movedPosition } from "./move";
-import { fixedSizePatch, resizedSize } from "./resize-preview";
+import { resizePatch, resizeRect } from "./resize";
 import { clearPreviewTranslate, setPreviewTranslate } from "./transform-preview";
 
 export interface DragSessionDeps {
@@ -33,25 +33,28 @@ interface MoveItem {
 /**
  * ED-024: selama drag hanya ada preview sementara (tanpa Yjs); saat dilepas, SATU transaksi dokumen
  * (= satu update Yjs & satu langkah undo); Esc/pointercancel membuang preview tanpa menyentuh dokumen.
- * Resize memakai override style sementara (T0.6.1); pindah memakai `translate` sementara (T0.6.2).
+ * Resize (8 handle, T0.6.3) memakai override style sementara; pindah memakai `translate` sementara (T0.6.2).
  */
 export function useDragSessions(deps: DragSessionDeps): void {
   useEffect(() => {
     // Rect awal node diukur sekali saat drag dimulai, bukan di setiap pointermove (AC ED-019).
-    let session: { nodeId: string; start: WorldRect } | null = null;
+    let resizing: { nodeId: string; start: WorldRect; position: PositionStyle | undefined } | null = null;
 
-    const sizeFor = (state: ResizeState) => {
-      if (!session || session.nodeId !== state.nodeId) {
+    // ED-065: patch style hasil resize; dipakai sama persis untuk preview & commit.
+    const resizePatchFor = (state: ResizeState) => {
+      if (!resizing || resizing.nodeId !== state.nodeId) {
         const start = deps.geometry.getRect(state.nodeId);
-        session = start ? { nodeId: state.nodeId, start } : null;
+        const node = deps.nodeStore.getNode(state.nodeId);
+        resizing = start && node ? { nodeId: state.nodeId, start, position: resolveStyle(node.style, "base").position } : null;
       }
-      if (!session) return null;
+      if (!resizing) return null;
       const delta = screenDeltaToWorld(
         state.current.x - state.origin.x,
         state.current.y - state.origin.y,
         cameraStore.getState().zoom,
       );
-      return resizedSize(session.start, state.handle, delta);
+      const next = resizeRect(resizing.start, state.handle, delta);
+      return resizePatch(resizing.start, next, state.handle, resizing.position);
     };
 
     // ED-062 + ED-038: drag pada node terseleksi memindahkan seluruh seleksi; drag pada node lain memilihnya
@@ -87,8 +90,8 @@ export function useDragSessions(deps: DragSessionDeps): void {
 
     const unsubscribeState = interactionStore.subscribe(({ state }) => {
       if (state.type === "dragResize") {
-        const size = sizeFor(state);
-        if (size) previewStore.getState().setStyle(state.nodeId, fixedSizePatch(size));
+        const patch = resizePatchFor(state);
+        if (patch) previewStore.getState().setStyle(state.nodeId, patch);
       } else if (state.type === "dragMove") {
         moving ??= beginMove(state);
         if (moving.length === 0) return;
@@ -118,10 +121,10 @@ export function useDragSessions(deps: DragSessionDeps): void {
       }
 
       if (drag.type !== "dragResize") return;
-      const size = effect.type === "commit" ? sizeFor(drag) : null;
-      session = null;
+      const patch = effect.type === "commit" ? resizePatchFor(drag) : null;
+      resizing = null;
       // Commit dulu, baru buang preview: keduanya di-batch React, jadi tidak ada kedipan ukuran lama.
-      if (size) runOp(deps.opContext, updateStyle, { ids: [drag.nodeId], patch: fixedSizePatch(size) });
+      if (patch) runOp(deps.opContext, updateStyle, { ids: [drag.nodeId], patch });
       previewStore.getState().clear([drag.nodeId]);
     });
 
