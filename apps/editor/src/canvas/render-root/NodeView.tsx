@@ -49,7 +49,7 @@ export const NodeView = memo(function NodeViewRender({ id, parent }: NodeViewPro
 
   const context = { style, parent, frameWidth: frame.width, ref: geometry ? ref : undefined };
   if (node.type === "text") {
-    return renderNodeElement(node, context, editing ? <InlineTextEditor content={node.props.content} /> : null);
+    return renderNodeElement(node, context, editing ? <InlineTextEditor nodeId={id} /> : null);
   }
   const childLayout = childLayoutOf(style);
   const children =

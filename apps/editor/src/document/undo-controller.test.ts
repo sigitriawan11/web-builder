@@ -24,7 +24,7 @@ afterEach(() => {
 function setup(fixture: SiteDocument = freeformDocument()) {
   const doc = jsonToYDoc(fixture);
   let selected: readonly string[] = [];
-  const undo = createUndoController(doc, LOCAL, {
+  const undo = createUndoController(doc, [LOCAL], {
     get: () => selected,
     restore: (ids) => {
       selected = ids;
@@ -176,5 +176,56 @@ describe("UndoController — status stack", () => {
 
     editor.undo.undo();
     expect([editor.undo.canUndo(), editor.undo.canRedo()]).toEqual([false, true]);
+  });
+});
+
+describe("UndoController — grup sesi edit teks (ED-115)", () => {
+  it("langkah di dalam grup tetap granular, lalu digabung jadi satu langkah saat grup ditutup", () => {
+    const editor = setup();
+    const initial = editor.read();
+    editor.select([CARD]);
+    const group = editor.undo.beginGroup();
+    editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 1 } } });
+    editor.select([IMAGE]);
+    editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 2 } } });
+    editor.select([TEXT]);
+    editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 3 } } });
+    expect(editor.undo.manager.undoStack).toHaveLength(3);
+
+    group.end();
+    const final = editor.read();
+
+    expect(editor.undo.manager.undoStack).toHaveLength(1);
+    editor.undo.undo();
+    expect(editor.read()).toEqual(initial);
+    expect(editor.selected()).toEqual([CARD]);
+    editor.undo.redo();
+    expect(editor.read()).toEqual(final);
+    expect(editor.selected()).toEqual([TEXT]);
+  });
+
+  it("langkah sebelum grup tidak ikut digabung; grup tanpa perubahan tidak menambah langkah", () => {
+    const editor = setup();
+    editor.action(updateStyle, { ids: [IMAGE], patch: { position: { y: 9 } } });
+    editor.undo.beginGroup().end();
+    expect(editor.undo.manager.undoStack).toHaveLength(1);
+
+    const group = editor.undo.beginGroup();
+    editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 1 } } });
+    editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 2 } } });
+    group.end();
+    expect(editor.undo.manager.undoStack).toHaveLength(2);
+  });
+
+  it("undo di dalam grup melewati awal grup → tidak ada yang digabung", () => {
+    const editor = setup();
+    editor.action(updateStyle, { ids: [IMAGE], patch: { position: { y: 9 } } });
+    const group = editor.undo.beginGroup();
+    editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 1 } } });
+    editor.undo.undo();
+    editor.undo.undo();
+    group.end();
+    expect(editor.undo.manager.undoStack).toHaveLength(0);
+    expect(editor.undo.manager.redoStack).toHaveLength(2);
   });
 });

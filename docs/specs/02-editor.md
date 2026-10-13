@@ -1569,7 +1569,7 @@ Urutan bagian di tab Design (mengikuti Figma, disesuaikan web): **Breadcrumb & t
 
 ## 14. Typography
 
-Teks diedit **inline di canvas** menggunakan **Tiptap** (ProseMirror). Konten teks disimpan sebagai rich text JSON (struktur di [01](./01-document-model.md)); di Yjs `props.content` adalah `Y.XmlFragment` yang di-bind ke Tiptap via `y-prosemirror` (**keputusan 01**, §14 Yjs mapping) sejak M2.
+Teks diedit **inline di canvas** menggunakan **Tiptap** (ProseMirror). Konten teks disimpan sebagai rich text JSON (struktur di [01](./01-document-model.md)); di Yjs `props.content` adalah `Y.XmlFragment` yang di-bind ke Tiptap via `@tiptap/y-tiptap` (fork `y-prosemirror` untuk Tiptap 3; **keputusan 01**, §14 Yjs mapping) — sudah tervalidasi di spike M0 (T0.8.5).
 
 ### ED-115 Text editing inline (Tiptap)
 - Prioritas: P0 · Fase: M2
@@ -1577,7 +1577,7 @@ Teks diedit **inline di canvas** menggunakan **Tiptap** (ProseMirror). Konten te
 - Perilaku:
   - Tiptap di-mount di `#text-editor-host` yang ditempatkan di world (ikut transform) agar caret & selection sejajar.
   - Saat aktif: shortcut canvas dinonaktifkan kecuali `Esc`, `Mod+Z/Y` (undo di level Tiptap selama sesi edit), format (`Mod+B/I/U`, `Mod+Shift+X` strikethrough, `Mod+K` link, `Mod+Shift+7/8` list).
-  - Keluar: `Esc`, klik di luar node. Dengan `y-prosemirror`, perubahan tercatat ke `Y.XmlFragment` per ketikan dan digabung UndoManager menjadi satu langkah per sesi edit (`stopCapturing()` saat masuk & keluar).
+  - Keluar: `Esc`, klik di luar node. Dengan binding y-tiptap, perubahan tercatat ke `Y.XmlFragment` per ketikan; selama sesi Ctrl+Z granular per jeda ketik, dan saat keluar UndoManager dokumen menggabungkan seluruh sesi menjadi satu langkah (`beginGroup()`/`end()` di UndoController, T0.8.5).
   - Mini toolbar mengambang di atas teks (P1): bold, italic, link, warna, text style.
   - Enter = paragraf baru; `Shift+Enter` = line break (`<br>`).
 - Edge case:
@@ -1589,7 +1589,7 @@ Teks diedit **inline di canvas** menggunakan **Tiptap** (ProseMirror). Konten te
   - [ ] Caret tampil di posisi benar pada zoom 25%, 100%, 400%.
   - [ ] Paste dari Google Docs mempertahankan bold/italic/link dan membuang font asing.
 
-> ✅ Diputuskan di 01 (bukan OPEN lagi): `props.content` = `Y.XmlFragment` + `y-prosemirror` sejak M2; JSON ↔ fragment memakai `prosemirrorJSONToYXmlFragment` / `yXmlFragmentToProseMirrorRootNode` dengan `richTextSchema` ([01 §14](./01-document-model.md)).
+> ✅ Diputuskan di 01 (bukan OPEN lagi): `props.content` = `Y.XmlFragment` + `@tiptap/y-tiptap`; JSON ↔ fragment memakai konversi milik document-model (`richTextToYXmlFragment` / `yXmlFragmentToRichText`, encoding identik y-tiptap) — divalidasi di spike T0.8.5 ([01 §14](./01-document-model.md)).
 
 ### ED-116 Font family (Google Fonts)
 - Prioritas: P0 · Fase: M2
@@ -3188,7 +3188,7 @@ Legenda: **✅ P0** = ada di rilis fase terkait · **P1** = menyusul · **P2** =
 | 2 | §4 | ~~Shadow DOM vs prefix class~~ — **diputuskan T0.8.1**: Shadow DOM (ADR-012). |
 | 3 | §6 | Apakah preview width custom disimpan per website (dokumen) atau per user (UI state)? Usulan: per user (UI state). |
 | 4 | §11 | Urutan layer panel — "DOM order (atas = pertama)" vs "Figma order (atas = paling depan)". Usulan: DOM order untuk semua, karena output adalah HTML dan mayoritas user bukan pengguna Figma. Z-order untuk node absolute dikendalikan via `z-index` eksplisit (Bring forward/Send backward). |
-| 5 | §14 | ~~`y-prosemirror` vs JSON utuh~~ — **sudah diputuskan di 01**: `Y.XmlFragment` + `y-prosemirror` sejak M2. |
+| 5 | §14 | ~~`y-prosemirror` vs JSON utuh~~ — **sudah diputuskan di 01**: `Y.XmlFragment` + `@tiptap/y-tiptap` (divalidasi T0.8.5). |
 | 6 | §17 | ~~Group sebagai node type vs flag `isGroup`~~ — **sudah diputuskan di 01 DM-012**: node type `group`. |
 | 7 | §19 | Sumber stock image (Unsplash API, Pexels API, atau keduanya) dan kebutuhan atribusi/batas rate. Juga apakah AI image generation masuk (lihat [04](./04-ai-agent.md)). |
 | 8 | §21 | Daftar final auto-responsive rules dan nilai skala (0.75/0.5) perlu divalidasi dengan template nyata di M4. |

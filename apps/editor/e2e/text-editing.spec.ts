@@ -85,15 +85,17 @@ for (const isolation of ["shadow", "prefix"]) {
       );
     });
 
-    test("Esc & klik di luar mengakhiri edit (spike: perubahan belum disimpan)", async ({ page }) => {
+    test("Esc & klik di luar mengakhiri edit; ketikan tersimpan ke dokumen (T0.8.5)", async ({ page }) => {
       await startEditing(page, isolation);
       await page.keyboard.type("xyz");
       await page.keyboard.press("Escape");
       await expect(page.locator(EDITOR)).toHaveCount(0);
-      await expect(page.locator(TITLE)).toHaveText("Kue rumahan, fresh setiap hari");
+      // Teks dirender ulang dari Y.XmlFragment (bukan dari editor yang sudah ditutup).
+      await expect(page.locator(TITLE)).toHaveText("Kue rumahan, fresh setiap harixyz");
 
       await page.locator(TITLE).dblclick();
       await expect(page.locator(EDITOR)).toBeFocused();
+      await expect(page.locator(EDITOR)).toHaveText("Kue rumahan, fresh setiap harixyz");
       await page.mouse.click(5, 5);
       await expect(page.locator(EDITOR)).toHaveCount(0);
     });

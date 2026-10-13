@@ -23,6 +23,9 @@ export interface UndoController {
   canRedo(): boolean;
   // Batas antar aksi diskrit (commit drag/resize/reorder, paste): mencegah digabung oleh captureTimeout.
   stopCapturing(): void;
+  // ED-115: sesi edit teks. Selama grup terbuka, langkah tetap granular (Ctrl+Z di editor teks);
+  // `end()` menggabungkan semua langkah sejak `beginGroup` menjadi satu langkah undo.
+  beginGroup(): { end(): void };
   readonly manager: Y.UndoManager;
   destroy(): void;
 }
@@ -31,8 +34,11 @@ export interface UndoController {
  * Undo/redo dokumen (ED-197, DM-060): hanya origin lokal yang dilacak, sehingga perubahan `system`
  * (migrasi, repair) dan `remote` (kolaborator) tidak pernah di-undo. Setiap langkah menyimpan seleksi
  * sebelum & sesudah; undo memulihkan "sebelum", redo memulihkan "sesudah".
+ * `localOrigins`: semua origin milik user ini — command canvas dan binding teks Tiptap (`ySyncPluginKey`),
+ * sehingga ketikan dan aksi canvas berbagi satu stack undo.
  */
-export function createUndoController(doc: Y.Doc, localOrigin: unknown, selection: SelectionAccess): UndoController {
+export function createUndoController(doc: Y.Doc, localOrigins: readonly unknown[], selection: SelectionAccess): UndoController {
+  const tracked = new Set(localOrigins);
   const manager = new Y.UndoManager(
     [
       doc.getMap(YDOC_KEYS.nodes),
@@ -40,13 +46,13 @@ export function createUndoController(doc: Y.Doc, localOrigin: unknown, selection
       doc.getMap(YDOC_KEYS.meta),
       doc.getMap(YDOC_KEYS.assets),
     ],
-    { trackedOrigins: new Set([localOrigin]), captureTimeout: CAPTURE_TIMEOUT_MS },
+    { trackedOrigins: tracked, captureTimeout: CAPTURE_TIMEOUT_MS },
   );
 
   // Seleksi saat transaksi lokal dimulai = "sebelum" untuk langkah yang dibuat transaksi itu.
   let selectionAtTransactionStart: readonly string[] = [];
   const onBeforeTransaction = (transaction: Y.Transaction) => {
-    if (transaction.origin === localOrigin) selectionAtTransactionStart = selection.get();
+    if (tracked.has(transaction.origin)) selectionAtTransactionStart = selection.get();
   };
   doc.on("beforeTransaction", onBeforeTransaction);
 
@@ -85,6 +91,30 @@ export function createUndoController(doc: Y.Doc, localOrigin: unknown, selection
     if (Array.isArray(ids)) selection.restore(ids.filter((id): id is string => typeof id === "string" && selection.exists(id)));
   });
 
+  type Item = (typeof manager.undoStack)[number];
+  const beginGroup = () => {
+    manager.stopCapturing();
+    const before = new Set<Item>(manager.undoStack);
+    return {
+      end: () => {
+        manager.stopCapturing();
+        const stack = manager.undoStack;
+        // Langkah grup = ekor stack yang belum ada saat grup dibuka (undo melewati awal grup → tidak ada).
+        let start = stack.length;
+        while (start > 0 && !before.has(stack[start - 1] as Item)) start--;
+        const items = stack.slice(start);
+        const [first, ...rest] = items;
+        const last = items.at(-1);
+        if (!first || !last || rest.length === 0) return;
+        // Sama dengan cara Yjs menggabungkan langkah dalam captureTimeout.
+        first.insertions = Y.mergeDeleteSets(items.map((item) => item.insertions));
+        first.deletions = Y.mergeDeleteSets(items.map((item) => item.deletions));
+        first.meta.set(SELECTION_AFTER, last.meta.get(SELECTION_AFTER));
+        stack.splice(start + 1);
+      },
+    };
+  };
+
   return {
     undo: () => {
       manager.undo();
@@ -95,6 +125,7 @@ export function createUndoController(doc: Y.Doc, localOrigin: unknown, selection
     canUndo: () => manager.undoStack.length > 0,
     canRedo: () => manager.redoStack.length > 0,
     stopCapturing: () => manager.stopCapturing(),
+    beginGroup,
     manager,
     destroy: () => {
       doc.off("beforeTransaction", onBeforeTransaction);

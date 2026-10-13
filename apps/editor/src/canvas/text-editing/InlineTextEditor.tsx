@@ -1,52 +1,69 @@
-import type { RichTextDoc } from "@platform/document-model";
-import { EditorContent, type JSONContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { EditorContent, Extension, useEditor } from "@tiptap/react";
+import { ySyncPlugin } from "@tiptap/y-tiptap";
+import { useContext, useEffect, useMemo } from "react";
+import type * as Y from "yjs";
+import { UndoContext } from "../../document/undo-context";
+import type { UndoController } from "../../document/undo-controller";
+import { NodeStoreContext } from "../../document/use-node";
 import { textEditingStore } from "../../store/text-editing-store";
-
-// Hanya node & mark yang ada di schema rich text dokumen (DM-013); sisanya dimatikan.
-const extensions = [
-  StarterKit.configure({
-    blockquote: false,
-    bulletList: false,
-    code: false,
-    codeBlock: false,
-    dropcursor: false,
-    gapcursor: false,
-    horizontalRule: false,
-    link: false,
-    listItem: false,
-    listKeymap: false,
-    orderedList: false,
-  }),
-];
-
-// Rich text dokumen sudah berformat ProseMirror JSON (DM-013); serialisasi membuang field
-// `undefined` yang ditolak tipe JSONContent di bawah exactOptionalPropertyTypes.
-function toJsonContent(doc: RichTextDoc): JSONContent {
-  return JSON.parse(JSON.stringify(doc)) as JSONContent;
-}
+import { richTextExtensions } from "./rich-text-extensions";
 
 /**
- * SPIKE T0.4.5: editor teks inline di posisi node (ED-115) untuk menguji seleksi, IME, dan
- * copy/paste di tiap mode isolasi. Perubahan BELUM disimpan ke dokumen; binding
- * `Y.XmlFragment` + `y-prosemirror` diputuskan di T0.8.5.
+ * DM-058 / T0.8.5: Tiptap terikat langsung ke `props.content` (Y.XmlFragment) lewat `ySyncPlugin`
+ * (@tiptap/y-tiptap): setiap ketikan = transaksi Yjs ber-origin `ySyncPluginKey`, digabung per karakter.
+ * Sengaja tanpa extension Collaboration: undo plugin-nya memanggil `destroy()` pada UndoManager yang
+ * diberikan saat editor ditutup, sehingga undo dokumen global akan mati setelah sekali edit teks.
  */
-export function InlineTextEditor({ content }: { content: RichTextDoc }) {
-  const editor = useEditor({
-    extensions,
-    content: toJsonContent(content),
-    autofocus: "end",
-    // CSS bawaan Tiptap disuntik ke document.head dan tidak berlaku di shadow root,
-    // jadi CSS dasar ProseMirror ikut stylesheet canvas (lihat isolation.ts).
-    injectCSS: false,
-    immediatelyRender: true,
-    editorProps: {
-      handleKeyDown: (_view, event) => {
-        if (event.key !== "Escape") return false;
-        textEditingStore.getState().stopEditing();
+function yjsBinding(fragment: Y.XmlFragment, undo: UndoController) {
+  return Extension.create({
+    name: "yjsBinding",
+    addProseMirrorPlugins: () => [ySyncPlugin(fragment)],
+    addKeyboardShortcuts: () => ({
+      "Mod-z": () => {
+        undo.undo();
         return true;
       },
-    },
+      "Shift-Mod-z": () => {
+        undo.redo();
+        return true;
+      },
+      "Mod-y": () => {
+        undo.redo();
+        return true;
+      },
+    }),
   });
+}
+
+export function InlineTextEditor({ nodeId }: { nodeId: string }) {
+  const nodeStore = useContext(NodeStoreContext);
+  const undo = useContext(UndoContext);
+  const fragment = nodeStore?.getRichTextFragment(nodeId) ?? null;
+  if (!fragment || !undo) throw new Error(`InlineTextEditor: node "${nodeId}" tanpa rich text atau di luar UndoContext`);
+  const extensions = useMemo(() => [...richTextExtensions, yjsBinding(fragment, undo)], [fragment, undo]);
+  // ED-115: satu sesi edit = satu langkah undo setelah editor ditutup.
+  useEffect(() => {
+    const group = undo.beginGroup();
+    return () => group.end();
+  }, [undo]);
+
+  const editor = useEditor(
+    {
+      extensions,
+      autofocus: "end",
+      // CSS bawaan Tiptap disuntik ke document.head dan tidak berlaku di shadow root,
+      // jadi CSS dasar ProseMirror ikut stylesheet canvas (lihat isolation.ts).
+      injectCSS: false,
+      immediatelyRender: true,
+      editorProps: {
+        handleKeyDown: (_view, event) => {
+          if (event.key !== "Escape") return false;
+          textEditingStore.getState().stopEditing();
+          return true;
+        },
+      },
+    },
+    [extensions],
+  );
   return <EditorContent editor={editor} className="text-editor-host" />;
 }

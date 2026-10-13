@@ -1,4 +1,5 @@
 import { createNode, deleteNodes, jsonToYDoc, moveNode, runOp, updateStyle } from "@platform/document-model";
+import { ySyncPluginKey } from "@tiptap/y-tiptap";
 import { NodeStore } from "../document/node-store";
 import { createUndoController } from "../document/undo-controller";
 import { interactionStore } from "../store/interaction-store";
@@ -51,8 +52,8 @@ export const spikeMarqueeContext: MarqueeContext = {
 // Origin lokal untuk UndoManager (DM-060).
 export const LOCAL_ORIGIN = { kind: "user", sessionId: "local" } as const;
 
-// Undo/redo dokumen (ED-197): origin lokal saja, seleksi ikut dipulihkan.
-export const spikeUndo = createUndoController(spikeDoc, LOCAL_ORIGIN, {
+// Undo/redo dokumen (ED-197): origin lokal saja (command canvas + ketikan Tiptap), seleksi ikut dipulihkan.
+export const spikeUndo = createUndoController(spikeDoc, [LOCAL_ORIGIN, ySyncPluginKey], {
   get: () => selectionStore.getState().selectedIds,
   restore: (ids) => selectionStore.getState().select(ids),
   exists: (id) => spikeNodeStore.getNode(id) !== null,

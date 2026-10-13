@@ -440,6 +440,11 @@ type Mark =
   - [ ] Tiptap editor & renderer memakai schema yang sama (`richTextSchema`), satu sumber di package.
   - [ ] Konten di luar schema (mis. node `image` di dalam text) ditolak validator.
   - [ ] `plainText(content)` util tersedia (untuk outline AI, SEO description otomatis, search).
+- **Hasil spike M0 (T0.8.5, 2026-10-13) — keputusan `Y.XmlFragment` + Tiptap tervalidasi:**
+  - Edit inline tersimpan ke `Y.XmlFragment` per ketikan (origin `ySyncPluginKey`); render canvas membaca ulang dari fragment. Edit konkuren dua klien pada teks yang sama digabung per karakter (unit test).
+  - **Undo:** satu `Y.UndoManager` dokumen melacak origin command canvas **dan** `ySyncPluginKey`; Ctrl+Z di editor teks memanggil undo dokumen (granular per jeda ketik), dan saat editor ditutup seluruh sesi digabung menjadi satu langkah (ED-115). Extension Collaboration Tiptap **tidak dipakai**: undo plugin-nya memanggil `destroy()` pada UndoManager yang diberikan saat editor ditutup.
+  - **Isolasi Shadow DOM (ADR-012):** y-tiptap memanggil `root.createRange()`/`root.getSelection()`; ShadowRoot tidak punya `createRange` → shadow root canvas diberi shim yang meneruskan ke `document` (`shadow-root-compat.ts`). Tanpa shim, perubahan Yjs (undo/remote) ke editor yang sedang fokus gagal diterapkan.
+  - **Gap untuk M2:** schema Tiptap prototipe (StarterKit) belum punya `align` paragraf/heading, link, list, & `textStyle` → atribut itu bisa hilang saat blok diedit. `richTextSchema` tunggal (AC di atas) wajib sebelum M2 teks.
 
 ### DM-014 `image`
 - **P0 · M1**
@@ -1471,7 +1476,7 @@ Y.Doc (guid = siteId)
 ```
 
 - **Granularitas**: daun (`JSON`) diperlakukan atomik (last-writer-wins). Pemisahan sampai level `styleGroup` per breakpoint berarti dua user yang mengubah `fills` dan `layout` node yang sama tidak konflik, tetapi dua user yang mengubah `layout.gap` dan `layout.padding` bersamaan → salah satu menang (dapat diterima; ❓ OPEN: pecah `layout` lebih halus jika multiplayer menunjukkan masalah).
-- **Rich text**: `props.content` text node = `Y.XmlFragment` yang di-bind ke Tiptap via `y-prosemirror` (extension Collaboration) — editing teks per karakter ter-merge. Konversi JSON ↔ fragment memakai `prosemirrorJSONToYXmlFragment` / `yXmlFragmentToProseMirrorRootNode` dengan `richTextSchema`.
+- **Rich text**: `props.content` text node = `Y.XmlFragment` yang di-bind ke Tiptap via `ySyncPlugin` dari **`@tiptap/y-tiptap`** (fork resmi `y-prosemirror` untuk Tiptap 3; diputuskan T0.8.5) — editing teks per karakter ter-merge. Konversi JSON ↔ fragment ditulis sendiri di document-model (`richTextToYXmlFragment` / `yXmlFragmentToRichText`, hanya bergantung pada `yjs`) dengan encoding yang sama persis dengan y-tiptap (blok → `Y.XmlElement`, deretan teks → satu `Y.XmlText`, mark → atribut format); kesetaraan dijaga test round-trip dua arah terhadap y-tiptap di `apps/editor`. JSON ↔ Y node lewat `yNodeToJson`.
 - **Acceptance criteria**:
   - [ ] `jsonToYDoc(doc)` & `yDocToJson(ydoc)` di `packages/document-model/yjs`, round-trip lossless untuk semua fixture.
   - [ ] Editor membaca dokumen via selector ter-memoize dari Y.Doc (observeDeep → invalidasi per nodeId), bukan `yDocToJson` penuh per perubahan.

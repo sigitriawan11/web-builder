@@ -1,5 +1,5 @@
-import { type Node, NodeSchema, YDOC_KEYS } from "@platform/document-model";
-import type * as Y from "yjs";
+import { type Node, NodeSchema, YDOC_KEYS, yNodeToJson } from "@platform/document-model";
+import * as Y from "yjs";
 
 type Listener = () => void;
 
@@ -33,6 +33,13 @@ export class NodeStore {
     return this.cache.get(id) ?? null;
   };
 
+  // DM-058: isi rich text node text sebagai Y.XmlFragment, untuk binding editor teks (Tiptap ↔ Yjs).
+  getRichTextFragment = (id: string): Y.XmlFragment | null => {
+    const props = this.nodes.get(id)?.get("props");
+    const content = props instanceof Y.Map ? props.get("content") : null;
+    return content instanceof Y.XmlFragment ? content : null;
+  };
+
   subscribe = (id: string, listener: Listener): (() => void) => {
     let set = this.listeners.get(id);
     if (!set) {
@@ -50,7 +57,7 @@ export class NodeStore {
     const yNode = this.nodes.get(id);
     if (!yNode) return null;
     // Y.Doc bisa berisi update remote, jadi divalidasi di boundary ini (CLAUDE.md: Zod di setiap boundary).
-    const parsed = NodeSchema.safeParse(yNode.toJSON());
+    const parsed = NodeSchema.safeParse(yNodeToJson(yNode));
     if (!parsed.success) {
       console.error(`Node "${id}" di Y.Doc tidak valid; tidak dirender.`, parsed.error.issues);
       return null;

@@ -70,15 +70,57 @@ test("dua drag cepat berturut-turut tetap dua langkah undo (tidak digabung captu
   expect(await undoSteps(page)).toBe(2);
 });
 
-test("Ctrl+Z saat mengedit teks tidak membatalkan perubahan dokumen", async ({ page }) => {
+const TEXT = "n_ftext00001";
+const ORIGINAL_TEXT = "Seret aku ke mana saja";
+const cardX = (page: Page) =>
+  page.evaluate(() => {
+    const spike = (window as unknown as { __spike: { doc: { getMap(name: string): { get(id: string): { toJSON(): { style: { base: { position: { x: number } } } } } } } } }).__spike;
+    return spike.doc.getMap("nodes").get("n_fcard00001").toJSON().style.base.position.x;
+  });
+
+async function editText(page: Page, typed: string) {
+  await select(page, [TEXT]);
+  await nodeLocator(page, TEXT).dblclick();
+  await expect(nodeLocator(page, TEXT).locator(".ProseMirror")).toBeFocused();
+  await page.keyboard.press("End");
+  await page.keyboard.type(typed);
+}
+
+// T0.8.5: ketikan Tiptap masuk Y.XmlFragment dengan origin ySync dan berbagi stack undo dengan aksi canvas.
+test("Ctrl+Z saat mengedit teks membatalkan ketikan, bukan aksi canvas sebelumnya", async ({ page }) => {
+  // Regresi T0.8.5: binding y-tiptap memanggil `root.createRange()`, yang tidak ada di ShadowRoot (ADR-012).
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
   await select(page, [CARD]);
   await dragNode(page, CARD, 30, 0);
-  const afterDrag = await docJson(page);
+  const xAfterDrag = await cardX(page);
 
-  await select(page, ["n_ftext00001"]);
-  await nodeLocator(page, "n_ftext00001").dblclick();
-  await expect(nodeLocator(page, "n_ftext00001").locator(".ProseMirror")).toBeFocused();
+  await editText(page, "abc");
+  await expect(nodeLocator(page, TEXT).locator(".ProseMirror")).toHaveText(`${ORIGINAL_TEXT}abc`);
   await page.keyboard.press("Control+KeyZ");
 
-  expect(await docJson(page)).toBe(afterDrag);
+  await expect(nodeLocator(page, TEXT).locator(".ProseMirror")).toHaveText(ORIGINAL_TEXT);
+  expect(await cardX(page)).toBe(xAfterDrag);
+  expect(errors).toEqual([]);
+});
+
+test("Ctrl+Z di dalam sesi edit granular per jeda ketik; setelah keluar, satu sesi = satu langkah undo", async ({ page }) => {
+  await editText(page, "abc");
+  // Jeda > captureTimeout (500 ms) memisahkan langkah selama sesi masih terbuka.
+  await page.waitForTimeout(700);
+  await page.keyboard.type("def");
+  await page.keyboard.press("Control+KeyZ");
+  await expect(nodeLocator(page, TEXT).locator(".ProseMirror")).toHaveText(`${ORIGINAL_TEXT}abc`);
+  await page.keyboard.press("Control+Shift+KeyZ");
+  await expect(nodeLocator(page, TEXT).locator(".ProseMirror")).toHaveText(`${ORIGINAL_TEXT}abcdef`);
+
+  await page.keyboard.press("Escape");
+  await expect(nodeLocator(page, TEXT)).toHaveText(`${ORIGINAL_TEXT}abcdef`);
+  await select(page, [CARD]);
+  await page.keyboard.press("Control+KeyZ");
+
+  await expect(nodeLocator(page, TEXT)).toHaveText(ORIGINAL_TEXT);
+  expect(await selectedIds(page)).toEqual([TEXT]);
+  await page.keyboard.press("Control+Shift+KeyZ");
+  await expect(nodeLocator(page, TEXT)).toHaveText(`${ORIGINAL_TEXT}abcdef`);
 });

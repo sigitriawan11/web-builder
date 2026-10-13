@@ -7,6 +7,7 @@ import { useUndoShortcuts } from "../document/use-undo-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { setAppliedZoom, spikeGeometry } from "./geometry/spike-geometry";
+import { UndoContext } from "../document/undo-context";
 import { NodeStoreContext } from "../document/use-node";
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
@@ -104,13 +105,15 @@ export function CanvasViewport() {
     <>
       <style>{canvasStyleSheet(isolation, siteCss)}</style>
       <NodeStoreContext.Provider value={spikeNodeStore}>
-        <CanvasFrames
-          pageId={spikePageId}
-          showAll={frameOptions.showAll}
-          mode={frameOptions.mode}
-          scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
-          siteFont={siteFont}
-        />
+        <UndoContext.Provider value={spikeUndo}>
+          <CanvasFrames
+            pageId={spikePageId}
+            showAll={frameOptions.showAll}
+            mode={frameOptions.mode}
+            scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
+            siteFont={siteFont}
+          />
+        </UndoContext.Provider>
       </NodeStoreContext.Provider>
     </>
   );

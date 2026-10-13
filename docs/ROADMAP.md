@@ -410,7 +410,8 @@ Termasuk:
     | Poppins | 17/18 | 9/10 | 5,2% | 0 | 1 |
 
     Galat per row maksimum ≈ 10%; satu-satunya salah = grup tombol hero (DOM 362 px vs tersedia 358 px, 1% di atas ambang). **Rekomendasi: hitung statis** dengan margin keamanan 0,9 (row ditumpuk bila ≥ 90% penuh) — condong menumpuk karena row meluber (scroll horizontal) lebih buruk daripada row muat yang ikut ditumpuk; user tetap bisa membatalkan dengan override `direction` di mobile (DM-038: rule tidak berlaku bila properti di-override) tanpa flag baru `keepRowOnMobile`. Syarat: katalog font (M2) menyimpan em/karakter per weight; font size dari typography eksplisit (UA default dipakai hanya di prototipe). Belum diuji: teks non-Latin, letter-spacing, gambar tanpa lebar fixed (estimator memakai `asset.width`, sama dengan lebar alami di browser).
-- [ ] **T0.8.5** ⚑ Validasi keputusan rich text spec 01 (`Y.XmlFragment` + `y-prosemirror` + Tiptap) di spike: edit teks inline, undo, dan isolasi style canvas berjalan; jika gagal, eskalasi ke owner sebelum M1 — DM-013, ED-125 · docs · Verifikasi: catatan hasil spike di spec 01 §4.4
+- [x] **T0.8.5** ⚑ Validasi keputusan rich text spec 01 (`Y.XmlFragment` + `y-prosemirror` + Tiptap) di spike: edit teks inline, undo, dan isolasi style canvas berjalan; jika gagal, eskalasi ke owner sebelum M1 — DM-013, ED-125 · docs · Verifikasi: catatan hasil spike di spec 01 §4.4
+  - ✅ 2026-10-13 — **Lolos.** Keputusan owner: binding `@tiptap/y-tiptap` 3.0.9 (fork resmi y-prosemirror untuk Tiptap 3; dependency baru `apps/editor`) dan konversi JSON ↔ `Y.XmlFragment` ditulis sendiri di document-model (aturan dependensi `zod`/`yjs`/`nanoid` tetap). `props.content` text node kini `Y.XmlFragment` (`jsonToYDoc`/`yDocToJson`/`yNodeToJson`); test kompatibilitas dua arah vs y-tiptap. Editor: `ySyncPlugin` lewat extension kecil (bukan Collaboration — undo plugin-nya men-`destroy()` UndoManager yang diberikan), Ctrl+Z → UndoController dokumen yang kini melacak `[LOCAL_ORIGIN, ySyncPluginKey]`; `beginGroup()/end()` menggabung satu sesi edit jadi satu langkah (ED-115). **Bug Shadow DOM ditemukan & diperbaiki:** y-tiptap memanggil `root.createRange()` yang tidak ada di ShadowRoot → update Yjs ke editor fokus gagal; shim `shadow-root-compat.ts` (regresi E2E dengan `pageerror`). Mutation check: origin ySync dilepas & grup dimatikan → E2E gagal. Gap M2: schema Tiptap belum punya align/link/list/textStyle (`richTextSchema` tunggal). Bundle 803 → 889 kB (lazy-load Tiptap di M2). Catatan di spec 01 DM-013 (spec tidak punya §4.4).
 - [ ] **T0.8.6** Tetapkan angka batas awal (node per page, ukuran state) dari hasil benchmark; perbarui DM-076 & OPEN 02#13 — DM-076, ED-223 · docs · Verifikasi: angka di spec 01 & 02
 - [ ] **T0.8.7** Laporan spike & keputusan **go/no-go** (§M0.e) ditandatangani owner; tandai kode spike yang dibuang vs dipertahankan — ADR-001 · docs · Verifikasi: checklist go/no-go terisi
 
@@ -472,7 +473,7 @@ Termasuk: semua requirement P0 berfase M1 di spec 01 (DM-*), 02 (ED-012, ED-017,
 - M0 selesai dengan keputusan **GO**; ADR isolasi style & breakpoint canvas sudah ada.
 - Keputusan OPEN yang harus diputuskan sebelum mulai:
   - 08 OPEN #1 — Better Auth dipertahankan atau diganti (rekomendasi: pertahankan).
-  - Rich text di Yjs sudah diputuskan di spec 01 (`y-prosemirror`); pastikan T0.8.5 lolos.
+  - Rich text di Yjs sudah diputuskan di spec 01 (`Y.XmlFragment` + `@tiptap/y-tiptap`); T0.8.5 lolos ✅.
   - Group sudah diputuskan: node type `group` (DM-012).
   - 02 OPEN #4 — urutan layer (DOM order) — mempengaruhi semantik `children`.
   - ARCHITECTURE A12 — secret manager & remote cache (boleh ditunda; tidak memblokir).
@@ -2198,7 +2199,7 @@ Fitur Figma lanjutan, override responsif manual UI penuh (bila belum di M4), pak
 
 #### Epic 9.3 — Multiplayer real-time
 
-- [ ] **T9.3.1** Migrasi rich text ke `y-prosemirror` (bila belum) — DM-013, ED-125 · `packages/document-model`, `apps/editor` · Verifikasi: migrasi fixture
+- [ ] **T9.3.1** Migrasi rich text ke `y-prosemirror` (bila belum — catatan: sudah `Y.XmlFragment` + y-tiptap sejak M0 T0.8.5; task ini kemungkinan cukup verifikasi multiplayer) — DM-013, ED-125 · `packages/document-model`, `apps/editor` · Verifikasi: migrasi fixture
 - [ ] **T9.3.2** Lepas single-editor lock → multi-editor; normalisasi konflik produksi — DM-063, ARCHITECTURE §5.5 · `apps/realtime` · Verifikasi: test 2 klien konkuren
 - [ ] **T9.3.3** Presence avatar & multiplayer cursor — ED-232, ED-233 · `apps/editor/src/collaboration` · Verifikasi: e2e 2 browser
 - [ ] **T9.3.4** Follow/spotlight & seleksi user lain — ED-234, ED-236 · `apps/editor` · Verifikasi: e2e
@@ -2540,6 +2541,7 @@ Catat setiap perubahan struktural: task ditambah/dipecah/dipindah/dibatalkan, ke
 | 2026-10-12 | semua | Roadmap v1 dibuat dari PRD, ARCHITECTURE, spec 01–08 | Awal project | owner + Claude Code |
 | 2026-10-13 | T0.8.1 | OPEN 02#2 diputuskan: Shadow DOM (ADR-012) | Isolasi dijamin browser; Tiptap & performa setara prefix | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.2 | OPEN 02#11 diputuskan: canvas tanpa iframe (ADR-013) | Model Figma; iframe tidak lebih cepat & jauh lebih rumit | Claude Code (disetujui owner) |
+| 2026-10-13 | T0.8.5 | Rich text: `@tiptap/y-tiptap` menggantikan `y-prosemirror`; konversi JSON ↔ fragment di document-model tanpa ProseMirror | Tiptap 3 memakai fork resmi; aturan dependensi document-model dipertahankan | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.4 | OPEN-DM-5 diputuskan: `stackRows` statis + margin 0,9, tanpa `keepRowOnMobile` | Akurasi spike ≥ 9/10 di 3 font; baris kecil tetap berjajar | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.3 | OPEN 02#1 diputuskan: zoom 5%–1600% | 3200% aman tapi tak dibutuhkan; mudah dinaikkan | Claude Code (disetujui owner) |
 | | | | | |
