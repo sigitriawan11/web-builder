@@ -1,5 +1,6 @@
 import type { Logger } from "@platform/shared/node";
 import express, { type Express } from "express";
+import { type ReadinessCheck, readinessHandler } from "./health/readiness";
 import type { Redis } from "./lib/redis";
 import { bodyParsers } from "./middleware/body-parsers";
 import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-handler";
@@ -12,8 +13,10 @@ import { securityHeaders } from "./middleware/security";
 
 export interface AppDeps {
   logger: Logger;
-  // Redis untuk rate limit per router (T1.4.5) & readiness (T1.4.6); router publik memasangnya saat dibuat.
+  // Redis untuk rate limit per router (T1.4.5); router publik memasangnya saat dibuat.
   redis?: Redis;
+  // Pengecekan `/health/ready` (DB, Redis, storage) — dirakit server dari dependensi nyata.
+  readinessChecks?: Readonly<Record<string, ReadinessCheck>>;
   // Untuk test & komposisi: router tambahan dipasang sebelum handler 404/error.
   mountRoutes?: (app: Express) => void;
   // Pelapor error tak terduga (Sentry, T1.16.3); default hanya log.
@@ -36,6 +39,8 @@ export function createApp(deps: AppDeps): Express {
   app.get("/health/live", (_req, res) => {
     res.json({ status: "ok" });
   });
+  // Readiness: dependensi terjangkau → 200, salah satu gagal → 503.
+  app.get("/health/ready", readinessHandler(deps.readinessChecks ?? {}, { logger: deps.logger }));
 
   deps.mountRoutes?.(app);
 

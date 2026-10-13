@@ -1,12 +1,16 @@
 import type { Server } from "node:http";
 import { createDb } from "@platform/db";
 import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
+import { sql } from "drizzle-orm";
 import { createApp } from "./app";
 import type { ApiEnv } from "./config/env";
-import { createRedis } from "./lib/redis";
+import { storageCheck } from "./health/readiness";
+import { createRedis, waitForRedis } from "./lib/redis";
 
 // Batas tunggu request yang sedang berjalan saat shutdown, sebelum koneksi dipaksa tutup.
 export const SHUTDOWN_TIMEOUT_MS = 10_000;
+// Lama menunggu Redis saat start sebelum tetap melayani tanpa Redis.
+export const REDIS_CONNECT_TIMEOUT_MS = 5_000;
 
 export interface RunningServer {
   server: Server;
@@ -29,9 +33,15 @@ export function createApiLogger(
   });
 }
 
-export async function startServer(env: ApiEnv): Promise<RunningServer> {
+export async function startServer(
+  env: ApiEnv,
+  options: { redisConnectTimeoutMs?: number } = {},
+): Promise<RunningServer> {
   const logger = createApiLogger(env);
-  const { close: closeDb } = createDb({ connectionString: env.DATABASE_URL, maxConnections: env.DATABASE_POOL_MAX });
+  const { db, close: closeDb } = createDb({
+    connectionString: env.DATABASE_URL,
+    maxConnections: env.DATABASE_POOL_MAX,
+  });
   const redis = createRedis(env.REDIS_URL);
   // Tanpa listener, event `error` ioredis (mis. Redis mati) membuat proses crash.
   let redisDownLogged = false;
@@ -42,7 +52,22 @@ export async function startServer(env: ApiEnv): Promise<RunningServer> {
   redis.on("ready", () => {
     redisDownLogged = false;
   });
-  const app = createApp({ logger, redis });
+  // Mulai melayani setelah Redis siap, agar readiness & rate limit langsung akurat. Redis mati → tetap start
+  // (rate limit memakai limiter cadangan, /health/ready melapor 503).
+  await waitForRedis(redis, options.redisConnectTimeoutMs ?? REDIS_CONNECT_TIMEOUT_MS);
+  const app = createApp({
+    logger,
+    redis,
+    readinessChecks: {
+      db: async () => {
+        await db.execute(sql`select 1`);
+      },
+      redis: async () => {
+        await redis.ping();
+      },
+      storage: storageCheck(env.S3_ENDPOINT),
+    },
+  });
 
   const server = await new Promise<Server>((resolve, reject) => {
     const listening = app.listen(env.API_PORT, (error?: Error) => (error ? reject(error) : resolve(listening)));

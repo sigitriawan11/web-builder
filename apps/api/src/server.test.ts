@@ -12,12 +12,13 @@ const baseEnv = {
   DATABASE_POOL_MAX: 2,
   // Redis sengaja tidak tersedia: server tetap start & shutdown rapi (rate limit pakai limiter cadangan).
   REDIS_URL: "redis://127.0.0.1:1",
+  S3_ENDPOINT: "http://127.0.0.1:1",
 };
 
 describe("server & graceful shutdown (T1.4.1)", () => {
   it("close() menghentikan listener; dipanggil berulang aman", async () => {
     const port = await freePort();
-    const running = await startServer({ ...baseEnv, API_PORT: port });
+    const running = await startServer({ ...baseEnv, API_PORT: port }, { redisConnectTimeoutMs: 100 });
     expect((await fetch(`http://127.0.0.1:${port}/health/live`)).status).toBe(200);
     await Promise.all([running.close("test"), running.close("test-lagi")]);
     expect(running.server.listening).toBe(false);

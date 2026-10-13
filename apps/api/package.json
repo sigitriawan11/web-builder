@@ -24,6 +24,7 @@
     "@platform/i18n": "workspace:*",
     "@platform/shared": "workspace:*",
     "cors": "2.8.6",
+    "drizzle-orm": "0.45.3",
     "express": "5.2.1",
     "helmet": "8.3.0",
     "ioredis": "6.0.0",
