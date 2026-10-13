@@ -1118,33 +1118,7 @@ Nama env var mengikuti [ARCHITECTURE §15.4 `.env.example`](../ARCHITECTURE.md#1
 - **Prioritas:** P0 · **Fase:** M1
 - **Deskripsi / Perilaku:** Semua akses storage dari Node (api, worker) melalui `@aws-sdk/client-s3` dengan `forcePathStyle: true` saat lokal. Bucket dibuat otomatis oleh service `minio-init`.
 
-```yaml
-# docker-compose.yml (cuplikan)
-services:
-  postgres:
-    image: postgres:16
-    environment: { POSTGRES_USER: platform, POSTGRES_PASSWORD: platform, POSTGRES_DB: platform }
-    ports: ["5432:5432"]
-    volumes: [pgdata:/var/lib/postgresql/data]
-  redis:
-    image: redis:7
-    ports: ["6379:6379"]
-  minio:
-    image: minio/minio:latest   # pin versi saat implementasi
-    command: server /data --console-address ":9001"
-    environment: { MINIO_ROOT_USER: minioadmin, MINIO_ROOT_PASSWORD: minioadmin }
-    ports: ["9000:9000", "9001:9001"]
-    volumes: [miniodata:/data]
-  minio-init:
-    image: minio/mc:latest
-    depends_on: [minio]
-    entrypoint: >
-      /bin/sh -c "
-      mc alias set local http://minio:9000 minioadmin minioadmin &&
-      mc mb -p local/pf-sites local/pf-media local/pf-private local/pf-library &&
-      mc anonymous set download local/pf-library"
-volumes: { pgdata: {}, miniodata: {} }
-```
+Definisi lengkap: `docker/docker-compose.yml` (ARCHITECTURE §15.2) — `postgres:17` (DB `platform_dev`), `postgres-test` (tmpfs), `redis:7`, MinIO (`pgsty/minio`, build komunitas karena image resmi `minio/minio` tidak lagi diterbitkan), `minio-init` (`mc`) yang membuat bucket `sites`, `assets` (public-read), `uploads`, `backups`, dan Mailpit. Nama bucket mengikuti variabel `S3_BUCKET_*` di `.env` (§15.4).
 - **Acceptance criteria:**
   - [ ] Tidak ada kode yang memanggil API khusus R2 dari Node; semua S3-compatible.
 

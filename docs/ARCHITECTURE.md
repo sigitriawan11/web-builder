@@ -1220,13 +1220,15 @@ Runtime API juga melayani endpoint publik baca yang dapat di-cache (mis. daftar 
 
 ### 15.2 docker-compose (`docker/docker-compose.yml`)
 
+`pnpm infra:up` / `pnpm infra:down` (skrip `docker/infra.sh`). Port host bisa diatur lewat `.env` (`POSTGRES_PORT`, `POSTGRES_TEST_PORT`, `REDIS_PORT`, `MINIO_PORT`, `MINIO_CONSOLE_PORT`, `MAILPIT_SMTP_PORT`, `MAILPIT_UI_PORT`) bila bentrok dengan service lain di mesin developer; default di tabel.
+
 | Service | Image | Port host | Catatan |
 |---|---|---|---|
 | `postgres` | `postgres:17` | 5432 | DB `platform_dev`, user `platform` |
 | `postgres-test` | `postgres:17` | 5433 | tmpfs, untuk integration test |
 | `redis` | `redis:7` | 6379 | `appendonly yes` |
-| `minio` | `minio/minio` | 9000 (S3), 9001 (console) | Bucket `sites`, `assets` (public-read), `uploads`, `backups` dibuat oleh `minio-init` |
-| `mailpit` | `axllent/mailpit` | 1025 (SMTP), 8025 (UI) | Semua email lokal tertangkap di sini |
+| `minio` | `pgsty/minio` (build komunitas MinIO; image resmi `minio/minio` tidak lagi diterbitkan sejak 2025) | 9000 (S3), 9001 (console) | Bucket `sites`, `assets` (public-read), `uploads`, `backups` dibuat oleh `minio-init` (profil `init`, `mc`) |
+| `mailpit` | `axllent/mailpit:v1.31.2` | 1025 (SMTP), 8025 (UI) | Semua email lokal tertangkap di sini |
 
 ### 15.3 Port mapping
 

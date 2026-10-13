@@ -1,0 +1,93 @@
+# Infrastruktur lokal (ARCHITECTURE §15.2, PUB-191). Jalankan dari root: `pnpm infra:up` / `pnpm infra:down`.
+# Port host bisa diatur lewat `.env` root (mis. POSTGRES_PORT=5434 bila 5432 sudah dipakai Postgres lain);
+# kredensial di sini khusus lokal.
+name: platform
+
+x-minio-image: &minio-image
+  # Image resmi minio/minio tidak lagi diterbitkan (2025); build komunitas dari kode MinIO yang sama.
+  image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: platform
+      POSTGRES_PASSWORD: platform
+      POSTGRES_DB: platform_dev
+    ports: ["${POSTGRES_PORT:-5432}:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platform -d platform_dev"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Integration test (ARCHITECTURE §14): data di tmpfs & durability dimatikan — cepat, hilang saat container berhenti.
+  postgres-test:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: platform
+      POSTGRES_PASSWORD: platform
+      POSTGRES_DB: platform_test
+    command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
+    ports: ["${POSTGRES_TEST_PORT:-5433}:5432"]
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platform -d platform_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+    ports: ["${REDIS_PORT:-6379}:6379"]
+    volumes: [redisdata:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  minio:
+    <<: *minio-image
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY:-minioadmin}
+    ports: ["${MINIO_PORT:-9000}:9000", "${MINIO_CONSOLE_PORT:-9001}:9001"]
+    volumes: [miniodata:/data]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/minio/health/live"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Sekali jalan: bucket (ARCHITECTURE §15.2). `assets` public-read untuk URL aset (PUBLIC_ASSETS_URL); idempoten.
+  # Profil `init` agar `up --wait` tidak menganggap container yang selesai (exit 0) sebagai gagal;
+  # dijalankan `docker/infra.sh up` lewat `compose run` setelah MinIO sehat.
+  minio-init:
+    <<: *minio-image
+    profiles: [init]
+    depends_on:
+      minio: { condition: service_healthy }
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY:-minioadmin}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"
+        mc mb --ignore-existing local/sites local/assets local/uploads local/backups
+        mc anonymous set download local/assets
+    restart: "no"
+
+  mailpit:
+    image: axllent/mailpit:v1.31.2
+    ports: ["${MAILPIT_SMTP_PORT:-1025}:1025", "${MAILPIT_UI_PORT:-8025}:8025"]
+
+volumes:
+  pgdata: {}
+  redisdata: {}
+  miniodata: {}

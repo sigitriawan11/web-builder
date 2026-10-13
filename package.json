@@ -14,6 +14,8 @@
     "lint": "biome check .",
     "lint:deps": "depcruise apps packages --config .dependency-cruiser.cjs",
     "format": "biome check --write .",
+    "infra:up": "dotenv -e .env -- sh docker/infra.sh up",
+    "infra:down": "dotenv -e .env -- sh docker/infra.sh down",
     "test": "dotenv -e .env -- turbo run test",
     "test:coverage": "dotenv -e .env -- turbo run test:coverage",
     "test:integration": "dotenv -e .env -- turbo run test:integration",
