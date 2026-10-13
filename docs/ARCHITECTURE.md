@@ -1385,7 +1385,7 @@ Validasi: tiap app memanggil `parseEnv(app, schema, source)` dari `@platform/sha
 | `pnpm bench` / `pnpm bench:canvas` | Vitest bench (document-model) / benchmark canvas Playwright (editor) |
 | `pnpm format` | Biome `check --write` |
 
-Script root yang butuh env berbentuk `dotenv -e .env -- turbo run <task>`; argumen ke task diteruskan dengan `pnpm <script> -- <argumen>` (mis. `pnpm dev -- --port 5190`). Panduan lengkap & troubleshooting WSL2: `README.md` root.
+Script root yang butuh env berbentuk `dotenv -e .env -- turbo run <task>`; argumen ke task diteruskan dengan `pnpm <script> -- <argumen>` (mis. `pnpm dev -- --port 5190`) — ke **semua** task; untuk memilih paket pakai `pnpm exec dotenv -e .env -- turbo run <task> --filter=<paket>` atau `pnpm dev:api`/`pnpm dev:editor`. Panduan lengkap & troubleshooting WSL2: `README.md` root.
 
 Alur pertama kali: `pnpm install && pnpm infra:up && pnpm db:migrate && pnpm db:seed && pnpm dev` → buka `http://app.localhost:3000`, login user dev, publish situs contoh → buka `http://<subdomain-acak>.localhost:8787`.
 

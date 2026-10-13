@@ -27,6 +27,7 @@ Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 | Perintah | Fungsi |
 |---|---|
 | `pnpm dev` | Semua app dalam mode dev (turbo) |
+| `pnpm dev:api` / `pnpm dev:editor` | Satu app saja (API di http://localhost:4000) |
 | `pnpm build` | Build semua app |
 | `pnpm typecheck` | `tsc -b` dengan project references |
 | `pnpm lint` / `pnpm format` | Biome: cek (lint + format + urutan import) / perbaiki otomatis |
@@ -39,7 +40,7 @@ Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 | `pnpm db:generate` / `db:migrate` / `db:seed` / `db:reset` | Migration Drizzle, seed data dev, reset: drop + migrate + seed (lokal saja) |
 | `pnpm db:check` | Gagal bila schema Drizzle berubah tetapi migration belum di-generate |
 
-`.env` di root dimuat sekali oleh script root di atas dan diwarisi semua app. Karena itu jalankan lewat script root; `pnpm --filter <paket> <script>` melewati pemuatan `.env` — pakai `pnpm <script> -- --filter=<paket>` bila butuh env.
+`.env` di root dimuat sekali oleh script root di atas dan diwarisi semua app. Untuk menjalankan **satu app** saja: `pnpm dev:api` / `pnpm dev:editor`, atau umum `pnpm exec dotenv -e .env -- turbo run <task> --filter=<paket>`. Jangan pakai `pnpm <script> --filter …` (pnpm mengambil alih `--filter` dan melewati `.env`) maupun `pnpm <script> -- --filter …` (argumen diteruskan ke semua app).
 
 ## URL lokal
 

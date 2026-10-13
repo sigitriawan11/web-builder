@@ -9,6 +9,8 @@
   },
   "scripts": {
     "dev": "dotenv -e .env -- turbo run dev",
+    "dev:api": "dotenv -e .env -- turbo run dev --filter=@platform/api",
+    "dev:editor": "dotenv -e .env -- turbo run dev --filter=@platform/editor",
     "build": "dotenv -e .env -- turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "biome check .",
