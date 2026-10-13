@@ -12,6 +12,8 @@ export const apiEnvSchema = {
   REDIS_URL: envField.url(),
   // Object storage S3-compatible (MinIO lokal / R2), ARCHITECTURE §15.4.
   S3_ENDPOINT: envField.url(),
+  // JWT service-to-service (ARCHITECTURE §9.3).
+  INTERNAL_JWT_SECRET: envField.secret(32),
 };
 
 export type ApiEnv = ReturnType<typeof loadApiEnv>;

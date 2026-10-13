@@ -1,6 +1,7 @@
 import type { Logger } from "@platform/shared/node";
 import express, { type Express } from "express";
 import { type ReadinessCheck, readinessHandler } from "./health/readiness";
+import { createInternalRouter } from "./internal/internal.routes";
 import type { Redis } from "./lib/redis";
 import { bodyParsers } from "./middleware/body-parsers";
 import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-handler";
@@ -16,6 +17,8 @@ export interface AppDeps {
   logger: Logger;
   // Redis untuk rate limit per router (T1.4.5); router publik memasangnya saat dibuat.
   redis?: Redis;
+  // Secret JWT internal; bila ada, router `/internal/v1` dipasang (dilindungi service token).
+  internalJwtSecret?: string;
   // Producer job untuk service (enqueue lewat `withTransaction` + afterCommit).
   queues?: QueueProducer;
   // Pengecekan `/health/ready` (DB, Redis, storage) — dirakit server dari dependensi nyata.
@@ -44,6 +47,9 @@ export function createApp(deps: AppDeps): Express {
   });
   // Readiness: dependensi terjangkau → 200, salah satu gagal → 503.
   app.get("/health/ready", readinessHandler(deps.readinessChecks ?? {}, { logger: deps.logger }));
+
+  if (deps.internalJwtSecret)
+    app.use("/internal/v1", createInternalRouter({ internalJwtSecret: deps.internalJwtSecret }));
 
   deps.mountRoutes?.(app);
 

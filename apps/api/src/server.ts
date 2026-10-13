@@ -68,6 +68,7 @@ export async function startServer(
     logger,
     redis,
     queues,
+    internalJwtSecret: env.INTERNAL_JWT_SECRET,
     readinessChecks: {
       db: async () => {
         await db.execute(sql`select 1`);

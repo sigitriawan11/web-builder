@@ -13,6 +13,7 @@ const baseEnv = {
   // Redis sengaja tidak tersedia: server tetap start & shutdown rapi (rate limit pakai limiter cadangan).
   REDIS_URL: "redis://127.0.0.1:1",
   S3_ENDPOINT: "http://127.0.0.1:1",
+  INTERNAL_JWT_SECRET: "test-internal-secret-0123456789abcdef",
 };
 
 describe("server & graceful shutdown (T1.4.1)", () => {

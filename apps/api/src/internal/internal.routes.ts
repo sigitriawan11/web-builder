@@ -1,0 +1,14 @@
+import express, { type Router } from "express";
+import { requireServiceToken } from "./service-token";
+
+// Router `/internal/v1` (ARCHITECTURE §5.3, §9.3): host resolve, doc state, callback job — ditambah bersama fiturnya.
+// Selain token, sebaiknya juga dibatasi jaringan (private network / allowlist) di infrastruktur.
+export function createInternalRouter(deps: { internalJwtSecret: string }): Router {
+  const router = express.Router();
+  router.use(requireServiceToken(deps.internalJwtSecret));
+  // Cek konektivitas & token antar service.
+  router.get("/ping", (req, res) => {
+    res.json({ data: { service: req.service?.sub }, meta: { requestId: req.ctx.requestId } });
+  });
+  return router;
+}
