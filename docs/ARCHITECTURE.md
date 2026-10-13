@@ -601,8 +601,8 @@ export async function findPage(db: Db, t: SiteTenant, pageId: string) {
 | `sessions` | id, user_id, token, expires_at, ip, user_agent | unique(token), (user_id) |
 | `accounts` | id, user_id, provider_id, account_id, password (hash) | unique(provider_id, account_id) |
 | `verifications` | id, identifier, value, expires_at | (identifier) |
-| `workspaces` | id, name, owner_user_id, plan_code, billing_email, settings jsonb | (owner_user_id) |
-| `workspace_members` | workspace_id, user_id, role (`owner`/`admin`/`editor`/`viewer`/`billing`, spec 08) | pk(workspace_id, user_id) |
+| `workspaces` | id (uuid), slug (unik, URL `/w/{slug}`), type (`personal`/`team`), name, logo_url, owner_user_id, status, deleted_at; paket **tidak** disimpan di sini (diturunkan dari `subscriptions`, tanpa langganan = free); billing (balance_idr, billing_profile) ditambah M5 | (owner_user_id), unique(owner_user_id) WHERE type='personal' |
+| `workspace_members` | workspace_id, user_id, role (`owner`/`admin`/`editor`/`viewer`/`billing`, spec 08), invited_by, joined_at | pk(workspace_id, user_id), (user_id), unique(workspace_id) WHERE role='owner' |
 | `workspace_invitations` | id, workspace_id, email, role, token_hash, expires_at | (workspace_id), unique(token_hash) |
 
 Tabel Better Auth (`users`, `sessions`, `accounts`, `verifications`, dan tabel plugin 2FA) dibuat lewat Drizzle adapter Better Auth dengan nama tabel jamak; skema di-generate lalu di-commit ke `packages/db`.

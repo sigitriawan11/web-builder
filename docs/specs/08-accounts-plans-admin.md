@@ -1774,7 +1774,7 @@ Konvensi: PK mengikuti [ARCHITECTURE §6](../ARCHITECTURE.md#6-data-architecture
 **`workspaces`**
 | Kolom | Tipe | Catatan |
 |---|---|---|
-| id | text PK | `ws_…` |
+| id | uuid PK | UUIDv7 (diputuskan T1.3.3); `ws_…` adalah **slug** untuk URL (ACC-030), bukan PK |
 | type | text | `personal` \| `team` |
 | name, slug | text | slug unique |
 | logo_url | text null | |
