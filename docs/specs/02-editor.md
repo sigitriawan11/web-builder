@@ -1314,11 +1314,12 @@ Sizing frame **sendiri** (bukan sebagai child): Hug = ukuran mengikuti konten (`
 
 ### ED-090 Reorder via drag & keyboard (ringkas)
 - Prioritas: P0 · Fase: M2
-- Deskripsi: Lihat [ED-063](#ed-063-move-di-dalam-auto-layout-reorder--reparent). Tambahan: di layers panel, drag mengubah urutan; urutan layer = urutan DOM = urutan visual auto-layout (catatan: Figma menampilkan child pertama di **bawah** daftar layer untuk frame non-auto; editor ini menampilkan urutan **DOM dari atas ke bawah** untuk semua frame agar sesuai mental model web).
+- Deskripsi: Lihat [ED-063](#ed-063-move-di-dalam-auto-layout-reorder--reparent). Tambahan: di layers panel, drag mengubah urutan. Layers panel memakai **urutan Figma**: atas = paling depan = child **terakhir** di `children`. Data dokumen tidak berubah — `children` tetap urutan DOM/render (DM-006); panel hanya menampilkan terbalik dan memetakan posisi drag di panel ke index DOM terbalik.
 - Acceptance criteria:
-  - [ ] Urutan di layers panel selalu sama dengan urutan DOM output.
+  - [ ] Urutan di layers panel selalu kebalikan urutan DOM output (child terakhir di atas), untuk semua jenis frame.
+  - [ ] Drag di layers panel ke posisi teratas = node menjadi child terakhir (paling depan).
 
-> ❓ OPEN: Urutan layer panel — "DOM order (atas = pertama)" vs "Figma order (atas = paling depan)". Usulan: DOM order untuk semua, karena output adalah HTML dan mayoritas user bukan pengguna Figma. Z-order untuk node absolute dikendalikan via `z-index` eksplisit (Bring forward/Send backward).
+> ✅ Diputuskan (2026-10-13, owner): **Figma order** (atas = paling depan) untuk layers panel. Hanya tampilan: `children` di dokumen tetap urutan DOM, sehingga keputusan ini bisa diubah tanpa migrasi data. Konsekuensi yang diterima: section pertama halaman (mis. navbar) tampil paling bawah di daftar layer. Z-order node absolute tetap lewat urutan DOM + `z-index` (ED-091).
 
 ### ED-091 Bring forward / send backward
 - Prioritas: P0 · Fase: M2
@@ -3066,7 +3067,7 @@ Legenda: **✅ P0** = ada di rilis fase terkait · **P1** = menyusul · **P2** =
 | 87 | Structure | Mask | P2 | ED-149 |
 | 88 | Layers | Tree, rename, reorder, reparent | ✅ P0 | ED-136..ED-138 |
 | 89 | Layers | Search/filter layers | P1 | ED-142 |
-| 90 | Layers | Urutan Figma (atas = paling depan) | ❌ (diganti DOM order) | ED-090, OPEN |
+| 90 | Layers | Urutan Figma (atas = paling depan) | ✅ (tampilan; `children` tetap DOM order) | ED-090 |
 | 91 | Components | Create component | ✅ P0 (Admin) / P1 (lokal) | ED-150 |
 | 92 | Components | Variants | ✅ P0 | ED-152 |
 | 93 | Components | Component properties | ✅ P0 | ED-153 (props) |
@@ -3187,7 +3188,7 @@ Legenda: **✅ P0** = ada di rilis fase terkait · **P1** = menyusul · **P2** =
 | 1 | §4 | ~~Rentang zoom final~~ — **diputuskan T0.8.3**: 5%–1600%. |
 | 2 | §4 | ~~Shadow DOM vs prefix class~~ — **diputuskan T0.8.1**: Shadow DOM (ADR-012). |
 | 3 | §6 | Apakah preview width custom disimpan per website (dokumen) atau per user (UI state)? Usulan: per user (UI state). |
-| 4 | §11 | Urutan layer panel — "DOM order (atas = pertama)" vs "Figma order (atas = paling depan)". Usulan: DOM order untuk semua, karena output adalah HTML dan mayoritas user bukan pengguna Figma. Z-order untuk node absolute dikendalikan via `z-index` eksplisit (Bring forward/Send backward). |
+| 4 | §11 | ~~Urutan layer panel~~ — **diputuskan 2026-10-13: Figma order** (atas = paling depan; hanya tampilan, `children` tetap DOM order). |
 | 5 | §14 | ~~`y-prosemirror` vs JSON utuh~~ — **sudah diputuskan di 01**: `Y.XmlFragment` + `@tiptap/y-tiptap` (divalidasi T0.8.5). |
 | 6 | §17 | ~~Group sebagai node type vs flag `isGroup`~~ — **sudah diputuskan di 01 DM-012**: node type `group`. |
 | 7 | §19 | Sumber stock image (Unsplash API, Pexels API, atau keduanya) dan kebutuhan atribusi/batas rate. Juga apakah AI image generation masuk (lihat [04](./04-ai-agent.md)). |

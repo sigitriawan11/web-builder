@@ -484,10 +484,10 @@ Termasuk: semua requirement P0 berfase M1 di spec 01 (DM-*), 02 (ED-012, ED-017,
 
 - M0 selesai dengan keputusan **GO**; ADR isolasi style & breakpoint canvas sudah ada.
 - Keputusan OPEN yang harus diputuskan sebelum mulai:
-  - 08 OPEN #1 — Better Auth dipertahankan atau diganti (rekomendasi: pertahankan).
+  - 08 OPEN #1 — Better Auth dipertahankan atau diganti → ✅ dipertahankan (2026-10-13).
   - Rich text di Yjs sudah diputuskan di spec 01 (`Y.XmlFragment` + `@tiptap/y-tiptap`); T0.8.5 lolos ✅.
   - Group sudah diputuskan: node type `group` (DM-012).
-  - 02 OPEN #4 — urutan layer (DOM order) — mempengaruhi semantik `children`.
+  - 02 OPEN #4 — urutan layer → ✅ Figma order di layers panel (2026-10-13); `children` tetap DOM order, jadi semantik data tidak berubah.
   - ARCHITECTURE A12 — secret manager & remote cache (boleh ditunda; tidak memblokir).
 - Non-pemblokir (pakai rekomendasi): A4 (Y.Doc per halaman — tunda), OPEN-DM-9 (granularitas `layout` di Yjs — atomik dulu).
 
@@ -717,7 +717,7 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 - M1 selesai (exit criteria tercentang).
 - Keputusan OPEN yang harus diputuskan sebelum/selama awal M2:
-  - 02 OPEN #4 — urutan layer panel: harus sudah diputuskan di M1 (Epic 1.8, lihat Lampiran A); Epic 2.13 hanya mengikuti keputusan itu.
+  - 02 OPEN #4 — urutan layer panel: ✅ diputuskan 2026-10-13 (Figma order, tampilan saja); Epic 2.13 mengikuti ED-090.
   - Group: node type `group` (DM-012, sudah diputuskan) — dipakai di T2.13.9.
   - 02 OPEN #3 — preview width custom disimpan per user (rekomendasi UI state) — **sebelum T2.15.2**.
   - 02 OPEN #10 — shortcut layout grid Windows vs Mac — non-pemblokir (layout grid P1 M4).
@@ -2280,9 +2280,9 @@ Cara pakai: saat keputusan diambil, tulis di kolom "Keputusan" (tanggal + piliha
 
 | Topik | Rujukan | Rekomendasi sementara | Sebelum | Keputusan |
 |---|---|---|---|---|
-| Better Auth dipertahankan/diganti | 08 #1 | Pertahankan | Epic 1.5 | |
+| Better Auth dipertahankan/diganti | 08 #1 | Pertahankan | Epic 1.5 | 2026-10-13: dipertahankan |
 | Group: tipe node vs flag `isGroup` | 02 #6, DM-012 | — | Spec 01 | ✅ **Diputuskan:** node type `group` (DM-012), command `groupNodes`/`unwrap`. |
-| Urutan layer (DOM order vs Figma order) | 02 #4 | DOM order | Epic 1.8 (semantik `children`) | |
+| Urutan layer (DOM order vs Figma order) | 02 #4 | DOM order | Epic 1.8 (semantik `children`) | 2026-10-13: **Figma order** di layers panel; `children` tetap DOM order (semantik data tidak berubah) |
 | Granularitas Yjs untuk `layout` | 01 OPEN-DM-9 | Atomik dulu | T1.9.1 (non-pemblokir) | |
 | Y.Doc per halaman | ARCH A4 | Tunda | — (non-pemblokir) | |
 | Secret manager & remote cache Turborepo | ARCH A12 | Tidak wajib di awal | — (non-pemblokir) | |
@@ -2553,6 +2553,7 @@ Catat setiap perubahan struktural: task ditambah/dipecah/dipindah/dibatalkan, ke
 | 2026-10-12 | semua | Roadmap v1 dibuat dari PRD, ARCHITECTURE, spec 01–08 | Awal project | owner + Claude Code |
 | 2026-10-13 | T0.8.1 | OPEN 02#2 diputuskan: Shadow DOM (ADR-012) | Isolasi dijamin browser; Tiptap & performa setara prefix | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.2 | OPEN 02#11 diputuskan: canvas tanpa iframe (ADR-013) | Model Figma; iframe tidak lebih cepat & jauh lebih rumit | Claude Code (disetujui owner) |
+| 2026-10-13 | M1.b | 08 OPEN #1: Better Auth dipertahankan; 02 OPEN #4: layers panel Figma order (tampilan saja, `children` tetap DOM order) | Prasyarat M1 | owner |
 | 2026-10-13 | T0.8.7 | M0 ditutup: go/no-go = GO bersyarat (T0.7.4 & Safari) | Semua kriteria §M0.e lulus di pengukuran otomatis; keputusan ⚑ lengkap | owner |
 | 2026-10-13 | T0.8.6 | OPEN 02#13 diputuskan; DM-076 jadi sumber tunggal batas dokumen, ED-223 diselaraskan | Dua spec bertentangan; angka dari benchmark spike | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.5 | Rich text: `@tiptap/y-tiptap` menggantikan `y-prosemirror`; konversi JSON ↔ fragment di document-model tanpa ProseMirror | Tiptap 3 memakai fork resmi; aturan dependensi document-model dipertahankan | Claude Code (disetujui owner) |

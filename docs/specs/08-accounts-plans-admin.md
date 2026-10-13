@@ -85,7 +85,7 @@ Di luar cakupan (dirujuk saja):
 
 Auth platform memakai **Better Auth** di `apps/api` (handler di-mount di `/api/auth/*`), UI di `apps/web`. Session berbasis cookie httpOnly di domain `app.platformmu.com` (lokal `app.localhost`). Editor (`apps/editor`) memakai cookie yang sama (same-site, subpath atau subdomain yang sama — lihat [ARCHITECTURE](../ARCHITECTURE.md)).
 
-> ❓ OPEN: Better Auth boleh diganti (mis. Lucia-style custom / Auth.js) bila ada kendala; spec ini menulis perilaku, bukan detail library. Tabel `users`/`sessions`/`accounts`/`verifications` mengikuti skema Better Auth dengan kolom tambahan.
+> ✅ Diputuskan (2026-10-13, owner): **Better Auth dipertahankan**. Bila spike kecil di T1.5.1 menemukan kendala (nama tabel, Express 5), keputusan ini dibuka ulang sebelum lanjut. Spec ini tetap menulis perilaku, bukan detail library. Tabel `users`/`sessions`/`accounts`/`verifications` mengikuti skema Better Auth dengan kolom tambahan.
 
 ### ACC-001 Registrasi email + password
 - **P0 · M1**
@@ -1934,7 +1934,7 @@ Urutan kerja yang disarankan untuk AI coding agent dalam satu fase: **skema (Dri
 
 | # | Topik | Bagian |
 |---|---|---|
-| 1 | Better Auth dipertahankan atau diganti | §2 |
+| 1 | ~~Better Auth dipertahankan atau diganti~~ — **diputuskan 2026-10-13: dipertahankan** | §2 |
 | 2 | Provider OAuth tambahan (Apple/Facebook/Microsoft) | ACC-002 |
 | 3 | Passkey/WebAuthn; 2FA via WA | ACC-006 |
 | 4 | Trial Business 14 hari tanpa kartu | ACC-031 |
