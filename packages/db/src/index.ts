@@ -1,3 +1,5 @@
-// @platform/db: Drizzle schema & migration (satu-satunya tempat), client, TenantContext, seed, test factories (ARCHITECTURE §4.2, §6).
-// Kerangka T1.1.1; isi menyusul di task fitur masing-masing.
-export {};
+// @platform/db: Drizzle schema & migration (satu-satunya tempat), client, TenantContext, seed, test factories
+// (ARCHITECTURE §4.2, §6). Hanya untuk api, worker, realtime — dilarang di editor/web/site-host (§4.3).
+export { type CreateDbOptions, createDb, type Db } from "./client";
+export { id, identityId, softDelete, timestamps } from "./columns";
+export * as schema from "./schema";
