@@ -1,17 +1,20 @@
 import type { Logger } from "@platform/shared/node";
 import express, { type Express } from "express";
 import { bodyParsers } from "./middleware/body-parsers";
+import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-handler";
 import { httpLogger } from "./middleware/http-logger";
 import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
 
 // createApp(): susunan middleware + router (ARCHITECTURE §5.3). Tanpa `listen` agar bisa diuji dengan supertest.
-// Urutan middleware mengikuti tabel §5.3; sisanya (auth, tenant, rate limit, validate, error) T1.4.3–T1.5.
+// Urutan middleware mengikuti tabel §5.3; auth, tenant, rate limit menyusul (T1.4.5, T1.5).
 
 export interface AppDeps {
   logger: Logger;
   // Untuk test & komposisi: router tambahan dipasang sebelum handler 404/error.
   mountRoutes?: (app: Express) => void;
+  // Pelapor error tak terduga (Sentry, T1.16.3); default hanya log.
+  reportError?: ErrorReporter;
 }
 
 export function createApp(deps: AppDeps): Express {
@@ -32,5 +35,8 @@ export function createApp(deps: AppDeps): Express {
   });
 
   deps.mountRoutes?.(app);
+
+  app.use(notFound()); // 12
+  app.use(errorHandler({ logger: deps.logger, ...(deps.reportError ? { reportError: deps.reportError } : {}) }));
   return app;
 }

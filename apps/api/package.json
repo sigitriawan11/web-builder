@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@platform/db": "workspace:*",
+    "@platform/i18n": "workspace:*",
     "@platform/shared": "workspace:*",
     "cors": "2.8.6",
     "express": "5.2.1",

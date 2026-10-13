@@ -1,0 +1,13 @@
+{
+  "VALIDATION_FAILED": "Data yang dikirim tidak valid. Periksa kembali isian Anda.",
+  "UNAUTHENTICATED": "Silakan masuk terlebih dahulu.",
+  "FORBIDDEN": "Anda tidak memiliki akses untuk tindakan ini.",
+  "NOT_FOUND": "Data yang dicari tidak ditemukan.",
+  "CONFLICT": "Data sudah berubah atau bentrok dengan data lain. Muat ulang lalu coba lagi.",
+  "PAYLOAD_TOO_LARGE": "Data yang dikirim terlalu besar.",
+  "PLAN_LIMIT_REACHED": "Batas paket Anda sudah tercapai. Upgrade paket untuk menambah kapasitas.",
+  "PLAN_FEATURE_REQUIRED": "Fitur ini tidak tersedia di paket Anda. Upgrade paket untuk memakainya.",
+  "INSUFFICIENT_CREDITS": "Kredit AI tidak mencukupi. Tambah kredit untuk melanjutkan.",
+  "RATE_LIMITED": "Terlalu banyak permintaan. Coba lagi sebentar lagi.",
+  "INTERNAL_ERROR": "Terjadi kesalahan pada server. Coba lagi nanti."
+}

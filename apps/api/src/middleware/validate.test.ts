@@ -1,5 +1,4 @@
-import { isAppError } from "@platform/shared";
-import express, { type ErrorRequestHandler } from "express";
+import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
@@ -11,12 +10,6 @@ const schemas = {
   params: z.object({ siteId: z.uuid() }),
   query: z.object({ limit: z.coerce.number().int().min(1).max(100).default(20) }),
   body: z.object({ name: z.string().trim().min(1).max(80), password: z.string().min(8).optional() }),
-};
-
-// Error handler sementara khusus test; renderer error sungguhan = T1.4.4.
-const renderAppError: ErrorRequestHandler = (error, _req, res, _next) => {
-  if (isAppError(error)) res.status(error.status).json({ error: { code: error.code, details: error.details } });
-  else res.status(500).json({ error: { code: "INTERNAL_ERROR" } });
 };
 
 function app() {
@@ -34,7 +27,6 @@ function app() {
         }),
       );
       app.use(router);
-      app.use(renderAppError);
     },
   });
 }
@@ -53,6 +45,7 @@ describe("validate (middleware 10)", () => {
     const response = await request(app()).patch(`/sites/${SITE}`).send({ name: "", password: "pendek-" });
     expect(response.status).toBe(422);
     expect(response.body.error.code).toBe("VALIDATION_FAILED");
+    expect(response.body.error.requestId).toBe(response.headers["x-request-id"]);
     expect(response.body.error.details.issues).toEqual([
       expect.objectContaining({ location: "body", path: "name", code: "too_small" }),
       expect.objectContaining({ location: "body", path: "password", code: "too_small" }),

@@ -7,9 +7,11 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "@platform/config": "workspace:*"
+    "@platform/config": "workspace:*",
+    "vitest": "5.0.4"
   }
 }

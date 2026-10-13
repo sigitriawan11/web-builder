@@ -38,6 +38,9 @@ importers:
       '@platform/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@platform/i18n':
+        specifier: workspace:^
+        version: link:../../packages/i18n
       '@platform/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -249,6 +252,9 @@ importers:
       '@platform/config':
         specifier: workspace:*
         version: link:../config
+      vitest:
+        specifier: 5.0.4
+        version: 5.0.4(@types/node@22.20.5)(@vitest/coverage-v8@5.0.4)(jsdom@30.1.2(@noble/hashes@1.8.0))(vite@8.3.4(@types/node@22.20.5)(esbuild@0.28.2)(tsx@4.23.15))
 
   packages/library-seed:
     devDependencies:
