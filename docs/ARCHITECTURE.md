@@ -1349,7 +1349,20 @@ HOST_RESOLVER=api                                  # api (lokal) | kv
 SITE_STORAGE_PUBLIC_BASE=http://localhost:9000/sites
 RUNTIME_API_ORIGIN=http://localhost:4000
 # SITE_HOST_SIGNING_SECRET & SITE_HOST_INTERNAL_TOKEN sama dengan api
+
+# ── Infrastruktur lokal (docker/docker-compose.yml, `pnpm infra:up`) ──
+# Ubah bila port bentrok dengan service lain di mesin Anda (mis. POSTGRES_PORT=5434),
+# lalu sesuaikan port di DATABASE_URL di atas.
+POSTGRES_PORT=5432
+POSTGRES_TEST_PORT=5433
+REDIS_PORT=6379
+MINIO_PORT=9000
+MINIO_CONSOLE_PORT=9001
+MAILPIT_SMTP_PORT=1025
+MAILPIT_UI_PORT=8025
 ```
+
+Validasi: tiap app memanggil `parseEnv(app, schema, source)` dari `@platform/shared/env` (isomorfik: `process.env` atau `import.meta.env`) di awal start; gagal → `EnvError` berisi daftar semua variabel bermasalah tanpa menampilkan nilainya. `KEY=` (string kosong) dianggap tidak diisi. Test `packages/shared/test/env-example.test.ts` memastikan `.env.example` tetap lolos validasi contoh.
 
 ### 15.5 Script
 

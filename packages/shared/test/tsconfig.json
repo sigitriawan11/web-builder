@@ -1,0 +1,6 @@
+{
+  // Test yang membaca file repo (Node); `src` tetap isomorfik tanpa tipe Node.
+  "extends": "@platform/config/tsconfig/node.json",
+  "include": ["."],
+  "references": [{ "path": ".." }]
+}
