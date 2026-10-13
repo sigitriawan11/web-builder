@@ -43,6 +43,10 @@ async function start(processors: ProcessorRegistry, extra: Record<string, string
     APP_ENV: "local",
     REDIS_URL: redisUrl,
     WORKER_HEALTH_PORT: String(await freePort()),
+    DATABASE_URL: "postgres://unused@localhost:5432/unused",
+    SMTP_URL: "smtp://localhost:1025",
+    EMAIL_FROM: "Platform <no-reply@platformmu.com>",
+    PUBLIC_APP_URL: "http://app.localhost:3000",
     ...extra,
   });
   running = await startWorkerProcess(env, {

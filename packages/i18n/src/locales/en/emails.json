@@ -1,0 +1,10 @@
+{
+  "layout.footer": "This email was sent automatically by Platform. Please do not reply.",
+  "account_exists.subject": "You already have a Platform account",
+  "account_exists.preview": "Someone tried to sign up with your email.",
+  "account_exists.greeting": "Hi {name},",
+  "account_exists.body": "Someone (maybe you) tried to sign up for Platform with this email address. It is already registered, so no new account was created.",
+  "account_exists.cta": "Sign in to your account",
+  "account_exists.forgot": "Forgot your password? Reset it here.",
+  "account_exists.ignore": "If you did not try to sign up, you can ignore this email. Your account is still safe."
+}

@@ -2,7 +2,14 @@ import { EnvError } from "@platform/shared/env";
 import { describe, expect, it } from "vitest";
 import { loadWorkerEnv } from "./env";
 
-const base = { APP_ENV: "local", REDIS_URL: "redis://localhost:6379" };
+const base = {
+  APP_ENV: "local",
+  REDIS_URL: "redis://localhost:6379",
+  DATABASE_URL: "postgres://platform:platform@localhost:5432/platform_dev",
+  SMTP_URL: "smtp://localhost:1025",
+  EMAIL_FROM: "Platform <no-reply@platformmu.com>",
+  PUBLIC_APP_URL: "http://app.localhost:3000",
+};
 
 describe("env worker", () => {
   it.each([
@@ -17,6 +24,14 @@ describe("env worker", () => {
   it("queue tidak dikenal → gagal start dengan nama queue", () => {
     expect(() => loadWorkerEnv({ ...base, WORKER_QUEUES: "email,emial" })).toThrow(EnvError);
     expect(() => loadWorkerEnv({ ...base, WORKER_QUEUES: "email,emial" })).toThrow(/emial/);
+  });
+
+  it("kredensial provider email yang dipilih wajib ada", () => {
+    expect(() => loadWorkerEnv({ ...base, SMTP_URL: "" })).toThrow(/SMTP_URL: wajib diisi bila EMAIL_PROVIDER=smtp/);
+    expect(() => loadWorkerEnv({ ...base, EMAIL_PROVIDER: "resend" })).toThrow(/RESEND_API_KEY/);
+    expect(loadWorkerEnv({ ...base, EMAIL_PROVIDER: "resend", RESEND_API_KEY: "re_12345678" }).EMAIL_PROVIDER).toBe(
+      "resend",
+    );
   });
 
   it("port health default 4200", () => {

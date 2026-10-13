@@ -1,0 +1,10 @@
+{
+  "layout.footer": "Email ini dikirim otomatis oleh Platform. Mohon tidak membalas email ini.",
+  "account_exists.subject": "Anda sudah punya akun Platform",
+  "account_exists.preview": "Ada percobaan mendaftar dengan email Anda.",
+  "account_exists.greeting": "Halo {name},",
+  "account_exists.body": "Seseorang (mungkin Anda) mencoba mendaftar di Platform dengan alamat email ini. Email ini sudah terdaftar, jadi tidak ada akun baru yang dibuat.",
+  "account_exists.cta": "Masuk ke akun Anda",
+  "account_exists.forgot": "Lupa password? Atur ulang password Anda.",
+  "account_exists.ignore": "Bila bukan Anda yang mencoba mendaftar, abaikan email ini. Akun Anda tetap aman."
+}

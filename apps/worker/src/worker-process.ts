@@ -1,7 +1,9 @@
 import type { Server } from "node:http";
+import { createDb } from "@platform/db";
 import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
 import { Redis } from "ioredis";
 import type { WorkerEnv } from "./config/env";
+import { createEmailProvider } from "./email/provider";
 import { createHealthApp, listen } from "./health/health-server";
 import { createProcessors } from "./processors";
 import type { ProcessorRegistry } from "./processors/types";
@@ -30,12 +32,42 @@ export function createWorkerLogger(
   });
 }
 
+interface WorkerResources {
+  processors: ProcessorRegistry;
+  emailProvider: ReturnType<typeof createEmailProvider>;
+  closeDb: () => Promise<void>;
+}
+
+/** Dependensi nyata processor (DB, provider email); test boleh menyuntik `processors` sendiri. */
+function createResources(env: WorkerEnv): WorkerResources {
+  const { db, close: closeDb } = createDb({
+    connectionString: env.DATABASE_URL,
+    maxConnections: env.DATABASE_POOL_MAX,
+  });
+  const emailProvider = createEmailProvider(
+    env.EMAIL_PROVIDER === "smtp"
+      ? { provider: "smtp", smtpUrl: env.SMTP_URL ?? "" }
+      : { provider: "resend", apiKey: env.RESEND_API_KEY ?? "" },
+  );
+  const processors = createProcessors({
+    email: {
+      db,
+      provider: emailProvider,
+      from: env.EMAIL_FROM,
+      appUrl: env.PUBLIC_APP_URL.replace(/\/$/, ""),
+      ...(env.EMAIL_REPLY_TO ? { replyTo: env.EMAIL_REPLY_TO } : {}),
+    },
+  });
+  return { processors, emailProvider, closeDb };
+}
+
 export async function startWorkerProcess(
   env: WorkerEnv,
   options: { logger?: Logger; processors?: ProcessorRegistry; prefix?: string; shutdownTimeoutMs?: number } = {},
 ): Promise<RunningWorkerProcess> {
   const logger = options.logger ?? createWorkerLogger(env);
-  const processors = options.processors ?? createProcessors();
+  const resources = options.processors ? undefined : createResources(env);
+  const processors = options.processors ?? (resources as WorkerResources).processors;
   const queues = selectQueues(env.WORKER_QUEUES, processors);
   if (queues.length === 0) logger.warn("belum ada processor terdaftar; worker hanya melayani health");
 
@@ -69,6 +101,8 @@ export async function startWorkerProcess(
       });
       await health.close();
       redis.disconnect();
+      resources?.emailProvider.close?.();
+      await resources?.closeDb();
       logger.info("worker shutdown selesai");
     })();
     return closing;

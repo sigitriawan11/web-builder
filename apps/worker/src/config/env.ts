@@ -1,5 +1,5 @@
 import { QUEUE_NAMES, type QueueName } from "@platform/shared/contracts";
-import { envField, parseEnv } from "@platform/shared/env";
+import { EnvError, envField, parseEnv } from "@platform/shared/env";
 import { z } from "zod";
 
 // Env apps/worker (ARCHITECTURE §5.4, §15.4), divalidasi saat boot. Variabel ditambah seiring processor.
@@ -30,10 +30,26 @@ export const workerEnvSchema = {
   WORKER_QUEUES: queueSelection,
   // Health + Bull Board (lokal) — ARCHITECTURE §15.
   WORKER_HEALTH_PORT: envField.port().default(4200),
+  DATABASE_URL: envField.url(),
+  DATABASE_POOL_MAX: envField.int().default(5),
+  // Email (ACC-271): Mailpit lewat SMTP di lokal, Resend di production.
+  EMAIL_PROVIDER: z.enum(["smtp", "resend"]).default("smtp"),
+  SMTP_URL: envField.url().optional(),
+  RESEND_API_KEY: envField.secret(8).optional(),
+  EMAIL_FROM: envField.string(),
+  EMAIL_REPLY_TO: envField.string().optional(),
+  // Basis link di email (halaman web).
+  PUBLIC_APP_URL: envField.url(),
 };
 
 export type WorkerEnv = ReturnType<typeof loadWorkerEnv>;
 
 export function loadWorkerEnv(source: Readonly<Record<string, string | undefined>> = process.env) {
-  return parseEnv("worker", workerEnvSchema, source);
+  const env = parseEnv("worker", workerEnvSchema, source);
+  // Syarat lintas variabel: kredensial provider yang dipilih wajib ada (gagal saat start, bukan saat job pertama).
+  if (env.EMAIL_PROVIDER === "smtp" && !env.SMTP_URL)
+    throw new EnvError("worker", [{ key: "SMTP_URL", message: "wajib diisi bila EMAIL_PROVIDER=smtp" }]);
+  if (env.EMAIL_PROVIDER === "resend" && !env.RESEND_API_KEY)
+    throw new EnvError("worker", [{ key: "RESEND_API_KEY", message: "wajib diisi bila EMAIL_PROVIDER=resend" }]);
+  return env;
 }

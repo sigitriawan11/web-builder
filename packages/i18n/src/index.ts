@@ -1,4 +1,6 @@
+import enEmails from "./locales/en/emails.json" with { type: "json" };
 import enErrors from "./locales/en/errors.json" with { type: "json" };
+import idEmails from "./locales/id/emails.json" with { type: "json" };
 import idErrors from "./locales/id/errors.json" with { type: "json" };
 
 // @platform/i18n (ACC-290): string UI/API ID (default) & EN. Fondasi minimal untuk pesan error API (T1.4.4);
@@ -9,16 +11,28 @@ export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "id";
 
 const MESSAGES = {
-  id: { errors: idErrors },
-  en: { errors: enErrors },
+  id: { errors: idErrors, emails: idEmails },
+  en: { errors: enErrors, emails: enEmails },
 } as const;
 
 export type Namespace = keyof (typeof MESSAGES)["id"];
 
-/** Teks untuk key; jatuh ke bahasa default, lalu ke key itu sendiri (tidak pernah melempar). */
-export function t(locale: Locale, namespace: Namespace, key: string): string {
+/**
+ * Teks untuk key; jatuh ke bahasa default, lalu ke key itu sendiri (tidak pernah melempar). `{nama}` diganti nilai
+ * `values` (teks biasa — escaping tanggung jawab renderer, mis. React); placeholder tanpa nilai dibiarkan.
+ */
+export function t(
+  locale: Locale,
+  namespace: Namespace,
+  key: string,
+  values?: Readonly<Record<string, string | number>>,
+): string {
   const pick = (target: Locale) => (MESSAGES[target][namespace] as Readonly<Record<string, string>>)[key];
-  return pick(locale) ?? pick(DEFAULT_LOCALE) ?? key;
+  const text = pick(locale) ?? pick(DEFAULT_LOCALE) ?? key;
+  if (!values) return text;
+  return text.replace(/\{(\w+)\}/g, (match, name: string) =>
+    Object.hasOwn(values, name) ? String(values[name]) : match,
+  );
 }
 
 export function hasMessage(locale: Locale, namespace: Namespace, key: string): boolean {

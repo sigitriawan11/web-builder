@@ -1,5 +1,12 @@
 {
   "extends": "@platform/config/tsconfig/node.json",
-  "include": ["src", "vitest.config.ts", "vitest.integration.config.ts"],
-  "references": [{ "path": "../../packages/config" }, { "path": "../../packages/shared" }]
+  // Template email = React (react-email), dirender di Node.
+  "compilerOptions": { "jsx": "react-jsx" },
+  "include": ["src", "test", "vitest.config.ts", "vitest.integration.config.ts"],
+  "references": [
+    { "path": "../../packages/config" },
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/i18n" },
+    { "path": "../../packages/db" }
+  ]
 }
