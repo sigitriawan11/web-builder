@@ -424,15 +424,16 @@ Termasuk:
     | 10.000 | 2,2 s | 177 MB | 19 ms | 46 / 71 ms |
 
     Pan headless selalu 60 fps (compositor) sehingga tidak membedakan ukuran; pembedanya relayout. **Syarat:** ulangi di laptop referensi (T0.7.4) — bila relayout 5.000 node > 50 ms, hard limit turun ke 3.000.
-- [ ] **T0.8.7** Laporan spike & keputusan **go/no-go** (§M0.e) ditandatangani owner; tandai kode spike yang dibuang vs dipertahankan — ADR-001 · docs · Verifikasi: checklist go/no-go terisi
+- [x] **T0.8.7** Laporan spike & keputusan **go/no-go** (§M0.e) ditandatangani owner; tandai kode spike yang dibuang vs dipertahankan — ADR-001 · docs · Verifikasi: checklist go/no-go terisi
+  - ✅ 2026-10-13 — **GO bersyarat, ditandatangani owner** di [docs/reports/m0-spike-report.md](./reports/m0-spike-report.md) §7. Syarat konfirmasi: T0.7.4 (laptop referensi, termasuk relayout 5.000 node ≤ 50 ms) & uji manual Safari. Daftar kode dipertahankan/dibuang disetujui "selagi on track dengan requirement"; pembersihan kode spike jadi task awal M1.
 
 ### M0.d Exit criteria / demo
 
 - [ ] Demo: fixture 200 node — pan/zoom trackpad mulus, klik memilih, marquee, drag, resize, reorder di auto-layout, undo/redo.
 - [ ] Target M0 ED-022 lulus pada laptop referensi: pan/zoom 60 fps @ 200; drag 60 fps @ 200; reorder ≥ 50 fps @ 200; resize auto-layout 100 child ≥ 45 fps; klik→seleksi < 50 ms.
-- [ ] Fixture 2.000 node terbuka dan bisa di-pan (angka fps dicatat sebagai baseline M2, tidak wajib lulus target M2).
-- [ ] Keputusan T0.8.1–T0.8.6 tercatat (ADR/spec diperbarui).
-- [ ] Go/no-go = **GO**.
+- [x] Fixture 2.000 node terbuka dan bisa di-pan (angka fps dicatat sebagai baseline M2, tidak wajib lulus target M2). ✅ headless 59–60 fps (T0.7.3)
+- [x] Keputusan T0.8.1–T0.8.6 tercatat (ADR/spec diperbarui). ✅ ADR-012/013, spec 01 & 02, Lampiran A/D
+- [x] Go/no-go = **GO**. ✅ 2026-10-13 (bersyarat T0.7.4 & Safari)
 
 ### M0.e Kriteria go/no-go & tabel hasil
 
@@ -2552,6 +2553,7 @@ Catat setiap perubahan struktural: task ditambah/dipecah/dipindah/dibatalkan, ke
 | 2026-10-12 | semua | Roadmap v1 dibuat dari PRD, ARCHITECTURE, spec 01–08 | Awal project | owner + Claude Code |
 | 2026-10-13 | T0.8.1 | OPEN 02#2 diputuskan: Shadow DOM (ADR-012) | Isolasi dijamin browser; Tiptap & performa setara prefix | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.2 | OPEN 02#11 diputuskan: canvas tanpa iframe (ADR-013) | Model Figma; iframe tidak lebih cepat & jauh lebih rumit | Claude Code (disetujui owner) |
+| 2026-10-13 | T0.8.7 | M0 ditutup: go/no-go = GO bersyarat (T0.7.4 & Safari) | Semua kriteria §M0.e lulus di pengukuran otomatis; keputusan ⚑ lengkap | owner |
 | 2026-10-13 | T0.8.6 | OPEN 02#13 diputuskan; DM-076 jadi sumber tunggal batas dokumen, ED-223 diselaraskan | Dua spec bertentangan; angka dari benchmark spike | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.5 | Rich text: `@tiptap/y-tiptap` menggantikan `y-prosemirror`; konversi JSON ↔ fragment di document-model tanpa ProseMirror | Tiptap 3 memakai fork resmi; aturan dependensi document-model dipertahankan | Claude Code (disetujui owner) |
 | 2026-10-13 | T0.8.4 | OPEN-DM-5 diputuskan: `stackRows` statis + margin 0,9, tanpa `keepRowOnMobile` | Akurasi spike ≥ 9/10 di 3 font; baris kecil tetap berjajar | Claude Code (disetujui owner) |
