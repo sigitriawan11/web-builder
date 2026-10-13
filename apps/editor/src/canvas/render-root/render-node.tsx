@@ -40,8 +40,11 @@ export function renderNodeElement(node: Node, context: RenderNodeContext, childr
   switch (node.type) {
     case "page":
       return createElement(node.tag ?? "main", { ...common, style: { ...css, width: frameWidth } }, children);
-    case "frame":
-      return createElement(node.tag ?? "div", { ...common, style: css }, children);
+    case "frame": {
+      // DM-011: clipContent = alias editor untuk overflow hidden; anak yang terpotong juga tidak bisa diklik (ED-020).
+      const frameCss = node.props.clipContent ? { ...css, overflow: "hidden" } : css;
+      return createElement(node.tag ?? "div", { ...common, style: frameCss }, children);
+    }
     case "text": {
       const { content, style } = renderRichText(node.props.content);
       // `children` dipakai editor teks inline (ED-115) untuk menggantikan isi hasil render.

@@ -55,6 +55,16 @@ describe("renderNode (T0.4.1)", () => {
     expect(html).toMatch(/<section data-node-id="n_hero000001" style="[^"]*min-height:420px/);
   });
 
+  it("frame clipContent dirender overflow hidden (DM-011)", () => {
+    const doc = heroDocument();
+    const hero = doc.nodes.n_hero000001;
+    if (hero?.type !== "frame") throw new Error("fixture berubah");
+    hero.props.clipContent = true;
+
+    expect(render(doc)).toMatch(/<section data-node-id="n_hero000001" style="[^"]*overflow:hidden/);
+    expect(render(heroDocument())).not.toContain("overflow:hidden");
+  });
+
   it("mengembalikan null untuk node yang tidak ada", () => {
     expect(renderNode(heroDocument(), "n_ghost00001")).toBeNull();
   });

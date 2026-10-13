@@ -1,17 +1,15 @@
-// SPIKE T0.4.6: hit-test titik screen → ID node, untuk membandingkan kompleksitas tiap mode frame.
-// Hit-test resmi (locked/hidden, kedalaman klik) dikerjakan di T0.5.2.
+import { type HitResult, hitTestNode } from "./hit-test";
 
-function nodeIdAt(root: DocumentOrShadowRoot, x: number, y: number): string | null {
-  for (const element of root.elementsFromPoint(x, y)) {
-    // Bukan `instanceof HTMLElement`: elemen dokumen iframe dibuat oleh window iframe (realm lain),
-    // sehingga instanceof terhadap constructor halaman utama selalu false (temuan T0.4.6).
-    const id = element.getAttribute("data-node-id");
-    if (id) return id;
-  }
-  return null;
-}
-
-export function hitTestNodeId(world: HTMLElement, clientX: number, clientY: number): string | null {
+/**
+ * Hit-test canvas untuk semua mode spike: isolasi shadow/prefix (Opsi A/B) dan frame class/iframe (T0.4.6).
+ * Mode iframe dipertahankan sampai keputusan T0.8.2; logika aturannya tetap di `hitTestNode`.
+ */
+export function hitTestCanvas(
+  world: HTMLElement,
+  clientX: number,
+  clientY: number,
+  isSelectable: (path: readonly string[]) => boolean,
+): HitResult | null {
   // Opsi A isolasi: elementsFromPoint dokumen berhenti di host shadow; harus bertanya ke shadow root.
   const root: DocumentOrShadowRoot = world.shadowRoot ?? document;
 
@@ -22,7 +20,7 @@ export function hitTestNodeId(world: HTMLElement, clientX: number, clientY: numb
     if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) continue;
     const scale = rect.width / iframe.offsetWidth;
     const doc = iframe.contentDocument;
-    return doc ? nodeIdAt(doc, (clientX - rect.left) / scale, (clientY - rect.top) / scale) : null;
+    return doc ? hitTestNode(doc, (clientX - rect.left) / scale, (clientY - rect.top) / scale, isSelectable) : null;
   }
-  return nodeIdAt(root, clientX, clientY);
+  return hitTestNode(root, clientX, clientY, isSelectable);
 }

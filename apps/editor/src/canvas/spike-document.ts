@@ -3,7 +3,8 @@ import { NodeStore } from "../document/node-store";
 import { cameraStore } from "./camera-store";
 import { fixtureFromSearch } from "./dev-fixture";
 import { spikeGeometry } from "./geometry/spike-geometry";
-import { hitTestNodeId } from "./hit-test/spike-hit-test";
+import { isSelectablePath } from "./hit-test/hit-test";
+import { hitTestCanvas } from "./hit-test/spike-hit-test";
 
 // SEMENTARA (spike M0): satu Y.Doc dari fixture untuk seluruh editor. Lifecycle Y.Doc sungguhan
 // (IndexedDB → Hocuspocus) menyusul di M1 (T1.15.7).
@@ -15,6 +16,15 @@ export const spikePageId = fixture.pageOrder[0] ?? "";
 
 // ED-019: transaksi dokumen bisa menggeser node tanpa mengubah ukurannya → ukur ulang semua (lazy).
 spikeDoc.on("afterTransaction", () => spikeGeometry.invalidateAll());
+
+// ED-020: node terkunci (atau ancestor-nya terkunci) tidak bisa dipilih di canvas.
+export const isSelectable = (path: readonly string[]) =>
+  isSelectablePath(path, (id) => spikeNodeStore.getNode(id)?.locked === true);
+
+export function spikeHitTest(clientX: number, clientY: number) {
+  const world = document.getElementById("world");
+  return world ? hitTestCanvas(world, clientX, clientY, isSelectable) : null;
+}
 
 // Origin lokal untuk UndoManager (T0.7.1).
 export const LOCAL_ORIGIN = { kind: "user", sessionId: "local" } as const;
@@ -30,10 +40,8 @@ if (import.meta.env.DEV) {
       // Dipakai E2E & benchmark spike (T0.4.6, T0.7.3).
       camera: cameraStore,
       geometry: spikeGeometry,
-      hitTest: (clientX: number, clientY: number) => {
-        const world = document.getElementById("world");
-        return world ? hitTestNodeId(world, clientX, clientY) : null;
-      },
+      hitTest: (clientX: number, clientY: number) => spikeHitTest(clientX, clientY)?.nodeId ?? null,
+      hit: spikeHitTest,
     },
   });
 }
