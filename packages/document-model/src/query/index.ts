@@ -1,1 +1,1 @@
-export { type Breakpoint, BREAKPOINTS, resolveStyle } from "./resolve-style";
+export { applyStylePatch, type Breakpoint, BREAKPOINTS, resolveStyle } from "./resolve-style";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ResponsiveStyle } from "../schema";
-import { resolveStyle } from "./resolve-style";
+import { applyStylePatch, resolveStyle } from "./resolve-style";
 
 const px = (value: number) => ({ value, unit: "px" as const });
 
@@ -62,5 +62,21 @@ describe("resolveStyle (DM-036)", () => {
     const snapshot = JSON.stringify(dm036);
     resolveStyle(dm036, "mobile");
     expect(JSON.stringify(dm036)).toBe(snapshot);
+  });
+});
+
+describe("applyStylePatch", () => {
+  it("merge per aturan DM-036 dan mengembalikan style bertipe", () => {
+    expect(
+      applyStylePatch(
+        { size: { width: { mode: "fill" }, height: { mode: "hug" } }, radius: px(4) },
+        { size: { height: { mode: "fixed", value: 120, unit: "px" } }, radius: null },
+      ),
+    ).toEqual({ size: { width: { mode: "fill" }, height: { mode: "fixed", value: 120, unit: "px" } } });
+  });
+
+  it("patch yang menghasilkan style tidak valid diabaikan", () => {
+    const style = { layout: { mode: "none" as const } };
+    expect(applyStylePatch(style, { layout: { mode: "flex" } })).toBe(style);
   });
 });

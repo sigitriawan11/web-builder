@@ -101,6 +101,11 @@ export class GeometryStore {
     return entry.rect;
   }
 
+  // Elemen DOM node (untuk preview transform sementara, ED-024).
+  getElement(id: string): Element | null {
+    return this.entries.get(id)?.element ?? null;
+  }
+
   // Rect terakhir di cache tanpa mengukur (boleh sedikit basi).
   peekRect(id: string): WorldRect | null {
     return this.entries.get(id)?.rect ?? null;

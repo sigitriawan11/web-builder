@@ -5,14 +5,16 @@ import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-t
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
-import { setAppliedZoom } from "./geometry/spike-geometry";
+import { setAppliedZoom, spikeGeometry } from "./geometry/spike-geometry";
 import { NodeStoreContext } from "../document/use-node";
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
 import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import {
+  LOCAL_ORIGIN,
   resolveSpikeTarget,
+  spikeDoc,
   spikeHitTest,
   spikeMarqueeContext,
   spikeNodeStore,
@@ -20,6 +22,7 @@ import {
 } from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
+import { type DragSessionDeps, useDragSessions } from "./drag/use-drag-sessions";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
@@ -33,6 +36,7 @@ const siteCss = siteCssFromSearch(window.location.search);
 const frameOptions = frameOptionsFromSearch(window.location.search);
 const siteFont = siteFontFromSearch(window.location.search);
 const interactionDeps: InteractionAdapterDeps = { hitTest: spikeHitTest, resolveTarget: resolveSpikeTarget };
+const dragSessionDeps: DragSessionDeps = { opContext: { doc: spikeDoc, origin: LOCAL_ORIGIN }, geometry: spikeGeometry };
 const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest, marquee: spikeMarqueeContext };
 
 export function CanvasViewport() {
@@ -44,6 +48,7 @@ export function CanvasViewport() {
   useTextEditingInteractions(viewportRef);
   useSelectTool(viewportRef, selectToolDeps);
   useHoverHighlight(viewportRef, selectToolDeps);
+  useDragSessions(dragSessionDeps);
   useInteractionMachine(viewportRef, interactionDeps);
   useBrowserGuards(viewportRef);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");

@@ -1,4 +1,5 @@
-import { createNode, deleteNodes, jsonToYDoc, moveNode, runOp, updateStyle } from "@platform/document-model";
+import { createNode, deleteNodes, jsonToYDoc, moveNode, runOp, updateStyle, YDOC_KEYS } from "@platform/document-model";
+import * as Y from "yjs";
 import { NodeStore } from "../document/node-store";
 import { interactionStore } from "../store/interaction-store";
 import { selectionStore } from "../store/selection-store";
@@ -47,8 +48,15 @@ export const spikeMarqueeContext: MarqueeContext = {
   viewportOffset: () => document.getElementById("editor-viewport")?.getBoundingClientRect() ?? { left: 0, top: 0 },
 };
 
-// Origin lokal untuk UndoManager (T0.7.1).
+// Origin lokal untuk UndoManager (DM-060).
 export const LOCAL_ORIGIN = { kind: "user", sessionId: "local" } as const;
+
+// SEMENTARA (spike): UndoManager atas origin lokal agar "1 drag = 1 langkah undo" bisa diverifikasi (T0.6.1).
+// Shortcut Mod+Z & grouping captureTimeout dikerjakan di T0.7.1.
+export const spikeUndoManager = new Y.UndoManager(
+  [spikeDoc.getMap(YDOC_KEYS.nodes), spikeDoc.getArray(YDOC_KEYS.pageOrder), spikeDoc.getMap(YDOC_KEYS.meta), spikeDoc.getMap(YDOC_KEYS.assets)],
+  { trackedOrigins: new Set([LOCAL_ORIGIN]) },
+);
 
 // Dev saja: ubah dokumen dari console browser untuk cek manual render inkremental, mis.
 // __spike.run(__spike.ops.updateStyle, { ids: ["n_0000000a"], patch: { fills: [{ type: "solid", color: "#FF0000" }] } })
@@ -61,6 +69,7 @@ if (import.meta.env.DEV) {
       // Dipakai E2E & benchmark spike (T0.4.6, T0.7.3).
       camera: cameraStore,
       geometry: spikeGeometry,
+      undoManager: spikeUndoManager,
       hitTest: (clientX: number, clientY: number) => spikeHitTest(clientX, clientY)?.nodeId ?? null,
       hit: spikeHitTest,
       interaction: interactionStore,

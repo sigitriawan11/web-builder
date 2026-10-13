@@ -1,7 +1,8 @@
-import { resolveStyle } from "@platform/document-model";
+import { applyStylePatch, resolveStyle } from "@platform/document-model";
 import { memo, useCallback, useContext, useMemo } from "react";
 import { useStore } from "zustand";
 import { useNode } from "../../document/use-node";
+import { previewStore } from "../../store/preview-store";
 import { textEditingStore } from "../../store/text-editing-store";
 import { GeometryContext } from "../geometry/geometry-context";
 import { InlineTextEditor } from "../text-editing/InlineTextEditor";
@@ -26,7 +27,13 @@ export const NodeView = memo(function NodeViewRender({ id, parent }: NodeViewPro
   const frame = useContext(FrameContext);
   // Selector boolean: hanya node yang mulai/selesai diedit yang render ulang.
   const editing = useStore(textEditingStore, (state) => state.editingId === id);
-  const style = useMemo(() => (node ? resolveStyle(node.style, frame.breakpoint) : null), [node, frame.breakpoint]);
+  // ED-024: override sementara selama drag; selector per node agar hanya node itu yang render ulang.
+  const preview = useStore(previewStore, (state) => state.styles[id]);
+  const style = useMemo(() => {
+    if (!node) return null;
+    const resolved = resolveStyle(node.style, frame.breakpoint);
+    return preview ? applyStylePatch(resolved, preview) : resolved;
+  }, [node, frame.breakpoint, preview]);
   const geometry = useContext(GeometryContext);
   // ED-019: elemen didaftarkan ke geometry store selama ter-mount (cleanup ref callback React 19).
   const ref = useCallback(
