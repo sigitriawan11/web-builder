@@ -4,6 +4,7 @@
   "FORBIDDEN": "You don't have access to perform this action.",
   "NOT_FOUND": "The requested data was not found.",
   "CONFLICT": "The data has changed or conflicts with other data. Reload and try again.",
+  "WEAK_PASSWORD": "Passwords must be at least 8 characters and not a commonly used password (e.g. password123). Choose another one.",
   "PAYLOAD_TOO_LARGE": "The submitted data is too large.",
   "PLAN_LIMIT_REACHED": "You've reached your plan limit. Upgrade your plan to add capacity.",
   "PLAN_FEATURE_REQUIRED": "This feature isn't available on your plan. Upgrade to use it.",

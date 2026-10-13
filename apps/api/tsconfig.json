@@ -1,6 +1,6 @@
 {
   "extends": "@platform/config/tsconfig/node.json",
-  "include": ["src", "test", "vitest.config.ts", "vitest.integration.config.ts"],
+  "include": ["src", "src/**/*.json", "test", "vitest.config.ts", "vitest.integration.config.ts"],
   "references": [
     { "path": "../../packages/config" },
     { "path": "../../packages/shared" },

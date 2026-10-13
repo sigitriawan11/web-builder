@@ -9,6 +9,7 @@ export const ERROR_STATUS = {
   FORBIDDEN: 403, // role kurang di tenant sendiri
   NOT_FOUND: 404, // juga resource tenant lain — jangan bocorkan keberadaannya
   CONFLICT: 409,
+  WEAK_PASSWORD: 422, // details: { reason: "too_short" | "too_long" | "too_common" } (ACC-001)
   PAYLOAD_TOO_LARGE: 413, // body melebihi batas parser (JSON 1 MB, biner 16 MB)
   PLAN_LIMIT_REACHED: 402, // details: { key, used, limit, upgrade? } — site, seat, storage, kuota bulanan
   // Batas paket: satu kode per konsep, jenisnya di details (diseragamkan 2026-10-13, lihat ARCHITECTURE §5.3).

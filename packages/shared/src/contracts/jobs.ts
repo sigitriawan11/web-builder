@@ -28,6 +28,9 @@ export const JOB_PAYLOADS = {
   publish: z.object({ ...jobBase, siteId: UuidV7Schema, deploymentId: UuidV7Schema }),
   // Dedupe dengan jobId `thumb:<documentId>:<snapshotId>`.
   thumbnails: z.object({ ...jobBase, documentId: UuidV7Schema, snapshotId: UuidV7Schema }),
+  // Email transaksional (ACC-271): hanya template + penerima; worker merender isi dalam bahasa user (T1.13.2).
+  // Template lain (verifikasi, reset, selamat datang) ditambah bersama fiturnya (T1.5.3, T1.5.5, T1.5.13).
+  email: z.object({ ...jobBase, template: z.enum(["account_exists"]), userId: UuidV7Schema }),
 } satisfies Partial<Record<QueueName, z.ZodType>>;
 
 export type JobPayload<Q extends keyof typeof JOB_PAYLOADS> = z.infer<(typeof JOB_PAYLOADS)[Q]>;

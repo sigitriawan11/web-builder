@@ -4,6 +4,7 @@
   "FORBIDDEN": "Anda tidak memiliki akses untuk tindakan ini.",
   "NOT_FOUND": "Data yang dicari tidak ditemukan.",
   "CONFLICT": "Data sudah berubah atau bentrok dengan data lain. Muat ulang lalu coba lagi.",
+  "WEAK_PASSWORD": "Password minimal 8 karakter dan bukan password yang umum dipakai (mis. password123). Pilih password lain.",
   "PAYLOAD_TOO_LARGE": "Data yang dikirim terlalu besar.",
   "PLAN_LIMIT_REACHED": "Batas paket Anda sudah tercapai. Upgrade paket untuk menambah kapasitas.",
   "PLAN_FEATURE_REQUIRED": "Fitur ini tidak tersedia di paket Anda. Upgrade paket untuk memakainya.",

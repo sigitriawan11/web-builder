@@ -9,6 +9,7 @@ describe("katalog kode error (ARCHITECTURE §5.3)", () => {
       FORBIDDEN: 403,
       NOT_FOUND: 404,
       CONFLICT: 409,
+      WEAK_PASSWORD: 422,
       PAYLOAD_TOO_LARGE: 413,
       PLAN_LIMIT_REACHED: 402,
       PLAN_FEATURE_REQUIRED: 402,

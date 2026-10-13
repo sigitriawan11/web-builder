@@ -472,6 +472,7 @@ Express 5 sudah meneruskan rejection dari async handler ke error handler — **t
 | Kondisi | Status | `code` contoh |
 |---|---|---|
 | Validasi gagal | 422 | `VALIDATION_FAILED` (`details.issues` = Zod issues) |
+| Password tidak memenuhi kebijakan | 422 | `WEAK_PASSWORD` — `details: { reason: "too_short" \| "too_long" \| "too_common" }` (ACC-001) |
 | Tidak login | 401 | `UNAUTHENTICATED` |
 | Tidak berhak / resource tenant lain | 404 | `NOT_FOUND` |
 | Role kurang (dalam tenant sendiri) | 403 | `FORBIDDEN` |
@@ -998,7 +999,8 @@ Semua endpoint `/internal/*` juga dibatasi jaringan (private network/allowlist) 
 
 | Scope | Key | Limit awal (dapat dikonfigurasi) |
 |---|---|---|
-| Auth platform (login/register/reset) | IP + email | 10/menit, 50/jam |
+| Auth platform (login/register/reset) | IP + email (M1: IP saja untuk semua mutasi `/auth/*`; per email+IP bersama login ACC-004, T1.5.4) | 10/menit, 50/jam |
+| Registrasi | IP | 3/jam, 10/hari (ACC-255) |
 | Platform API umum | userId | 300/menit |
 | Publish | siteId | 10/jam (Free), 60/jam (berbayar) |
 | AI run | workspaceId | 10 run bersamaan/menit + saldo kredit |

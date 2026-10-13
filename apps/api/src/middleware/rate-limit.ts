@@ -26,6 +26,11 @@ export const RATE_LIMITS = {
     { points: 10, durationSeconds: 60 },
     { points: 50, durationSeconds: 3600 },
   ],
+  // Registrasi per IP (spec 08 ACC-255; Turnstile menyusul di form, M4).
+  signUp: [
+    { points: 3, durationSeconds: 3600 },
+    { points: 10, durationSeconds: 86_400 },
+  ],
   publishFree: [{ points: 10, durationSeconds: 3600 }],
   runtimeFormSubmit: [{ points: 10, durationSeconds: 60 }],
   memberLogin: [

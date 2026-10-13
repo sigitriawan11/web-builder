@@ -1,10 +1,17 @@
 import type { Db } from "@platform/db";
 import { uuidv7 } from "@platform/shared";
-import type { Logger } from "@platform/shared/node";
-import { betterAuth } from "better-auth";
+import { getContext, type Logger } from "@platform/shared/node";
+import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
+import { setSessionCookie } from "better-auth/cookies";
 import type { Redis } from "ioredis";
-import { AUTH_TABLES } from "./auth.repository";
+import type { QueueProducer } from "../queues/producer";
+import { AUTH_TABLES, insertConsents } from "./auth.repository";
+import { currentAuthTransaction, trackTransactions } from "./auth-transaction";
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
+import { signUpConsents } from "./sign-up";
+import { currentSignUp } from "./sign-up-context";
 
 // Auth akun platform (ARCHITECTURE §9.1, spec 08 ACC-004). API me-mount handler di `/auth/*`; browser mengaksesnya
 // sebagai `app.<domain>/api/auth/*` lewat rewrite Next.js (prefix `/api` dibuang, sama seperti `/api/v1/*`).
@@ -84,8 +91,40 @@ function redisSessionCache(redis: Redis, logger: Logger) {
   };
 }
 
-export function createAuth(deps: { db: Db; redis: Redis; logger: Logger; config: AuthConfig }) {
-  const { config } = deps;
+/**
+ * Auto-login setelah registrasi baru (ACC-001). Better Auth hanya memberi respons generik untuk email yang sudah
+ * terdaftar bila `autoSignIn: false`; sesi untuk user yang BENAR-BENAR baru dibuat di sini, sehingga body respons
+ * kedua kasus identik (`token: null`) dan hanya cookie yang berbeda — keputusan owner 2026-10-13 (ditekan rate limit).
+ */
+const signUpAutoSignIn = {
+  id: "platform-sign-up",
+  hooks: {
+    after: [
+      {
+        matcher: (ctx) => ctx.path === "/sign-up/email",
+        handler: createAuthMiddleware(async (ctx) => {
+          const signUp = currentSignUp();
+          if (!signUp?.createdUserId) return;
+          const user = await ctx.context.internalAdapter.findUserById(signUp.createdUserId);
+          if (!user) return;
+          const dontRememberMe = signUp.rememberMe === false;
+          const session = await ctx.context.internalAdapter.createSession(user.id, dontRememberMe);
+          await setSessionCookie(ctx, { session, user }, dontRememberMe);
+        }),
+      },
+    ],
+  },
+} satisfies BetterAuthPlugin;
+
+export function createAuth(deps: {
+  db: Db;
+  redis: Redis;
+  logger: Logger;
+  config: AuthConfig;
+  // Email "Anda sudah punya akun" untuk registrasi dengan email terdaftar (ACC-001).
+  queues?: QueueProducer;
+}) {
+  const { config, logger } = deps;
   const publicUrl = new URL(config.publicAuthUrl);
   return betterAuth({
     secret: config.secret,
@@ -93,16 +132,72 @@ export function createAuth(deps: { db: Db; redis: Redis; logger: Logger; config:
     baseURL: `${publicUrl.origin}${publicUrl.pathname.replace(/\/auth\/?$/, "")}`,
     basePath: AUTH_BASE_PATH,
     trustedOrigins: config.trustedOrigins,
-    database: drizzleAdapter(deps.db, {
+    database: drizzleAdapter(trackTransactions(deps.db), {
       provider: "pg",
       schema: AUTH_TABLES,
+      // Registrasi (user + akun + consent) dalam satu transaksi.
+      transaction: true,
     }),
     secondaryStorage: redisSessionCache(deps.redis, deps.logger),
     emailAndPassword: {
       enabled: true,
       // Verifikasi email wajib diaktifkan bersama pengiriman email (T1.5.3).
       requireEmailVerification: false,
+      // Respons generik untuk email terdaftar; auto-login user baru lewat plugin `platform-sign-up`.
+      autoSignIn: false,
+      // Kebijakan lengkap (daftar password umum) di signUpGuard; batas ini cadangan untuk endpoint BA lain.
+      minPasswordLength: PASSWORD_MIN_LENGTH,
+      maxPasswordLength: PASSWORD_MAX_LENGTH,
+      onExistingUserSignUp: async ({ user }) => {
+        // Tidak ditunggu: waktu respons tidak boleh membedakan email terdaftar (enqueue bisa lambat saat Redis mati).
+        deps.queues
+          ?.enqueue("email", {
+            requestId: getContext()?.requestId ?? uuidv7(),
+            template: "account_exists",
+            userId: user.id,
+          })
+          .catch((error: unknown) => logger.warn({ err: error }, "enqueue email account_exists gagal"));
+      },
     },
+    user: {
+      // Kolom platform yang diisi saat registrasi; tidak bisa diisi dari body dan tidak ikut respons BA
+      // (respons email baru vs terdaftar harus berbentuk sama).
+      additionalFields: {
+        locale: { type: "string", required: false, input: false, returned: false },
+        timezone: { type: "string", required: false, input: false, returned: false },
+      },
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => {
+            const signUp = currentSignUp();
+            if (!signUp) return;
+            return {
+              data: { ...user, locale: signUp.locale, ...(signUp.timezone ? { timezone: signUp.timezone } : {}) },
+            };
+          },
+          // Setelah commit: user benar-benar ada → boleh login otomatis.
+          after: async (user) => {
+            const signUp = currentSignUp();
+            if (signUp) signUp.createdUserId = user.id;
+          },
+        },
+      },
+      account: {
+        create: {
+          // Berjalan di transaksi registrasi tepat setelah insert user → consent ikut commit/rollback bersama user.
+          before: async (account) => {
+            const signUp = currentSignUp();
+            if (!signUp || account.providerId !== "credential") return;
+            await insertConsents(currentAuthTransaction(), signUpConsents(account.userId, signUp));
+          },
+        },
+      },
+    },
+    plugins: [signUpAutoSignIn],
+    // Rate limit memakai limiter API sendiri (Redis, 429 + Retry-After, ACC-255) di auth.routes.ts.
+    rateLimit: { enabled: false },
     session: {
       expiresIn: SESSION_EXPIRES_IN,
       updateAge: DAY,

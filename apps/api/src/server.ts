@@ -68,6 +68,7 @@ export async function startServer(
     db,
     redis,
     logger,
+    queues,
     config: {
       secret: env.BETTER_AUTH_SECRET,
       publicAuthUrl: env.BETTER_AUTH_URL,
