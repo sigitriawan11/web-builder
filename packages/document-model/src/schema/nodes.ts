@@ -53,8 +53,7 @@ export const AssetRefSchema = z.strictObject({
 // ── Props per tipe ─────────────────────────────────────────────────────────
 
 // DM-010: "/" untuk home, segmen lowercase atau segmen dinamis `[slug]`.
-const PAGE_PATH_PATTERN =
-  /^\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\])*(\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\]))*$|^\/$/;
+const PAGE_PATH_PATTERN = /^\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\])*(\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\]))*$|^\/$/;
 
 export const PagePropsSchema = z.strictObject({
   path: z.string().regex(PAGE_PATH_PATTERN),
@@ -126,9 +125,7 @@ export const TextNodeSchema = z.strictObject({
   id: ChildIdSchema,
   type: z.literal("text"),
   parentId: NodeIdSchema,
-  tag: z
-    .enum(["p", "h1", "h2", "h3", "h4", "h5", "h6", "span", "blockquote", "li", "label", "figcaption"])
-    .optional(),
+  tag: z.enum(["p", "h1", "h2", "h3", "h4", "h5", "h6", "span", "blockquote", "li", "label", "figcaption"]).optional(),
   props: TextPropsSchema,
 });
 

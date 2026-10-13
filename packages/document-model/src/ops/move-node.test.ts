@@ -50,7 +50,11 @@ describe("moveNode", () => {
       code: "INVALID_TARGET",
     },
     { name: "node tidak ada", input: { id: "n_ghost00001", newParentId: "n_lvl1000001", index: 0 }, code: "NOT_FOUND" },
-    { name: "index negatif", input: { id: "n_lvl4img0001", newParentId: "n_lvl1000001", index: -1 }, code: "INVALID_INPUT" },
+    {
+      name: "index negatif",
+      input: { id: "n_lvl4img0001", newParentId: "n_lvl1000001", index: -1 },
+      code: "INVALID_INPUT",
+    },
   ])("gagal tanpa perubahan saat memindah $name", ({ input, code }) => {
     const { ctx, read } = setupDoc(nestedDocument());
 

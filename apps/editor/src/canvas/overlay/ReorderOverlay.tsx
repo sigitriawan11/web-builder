@@ -29,8 +29,16 @@ export function ReorderOverlay() {
           data-orientation={marker.orientation}
           style={
             marker.orientation === "vertical"
-              ? { transform: `translate(${markerStart.x - 1}px, ${markerStart.y}px)`, width: 2, height: marker.length * camera.zoom }
-              : { transform: `translate(${markerStart.x}px, ${markerStart.y - 1}px)`, width: marker.length * camera.zoom, height: 2 }
+              ? {
+                  transform: `translate(${markerStart.x - 1}px, ${markerStart.y}px)`,
+                  width: 2,
+                  height: marker.length * camera.zoom,
+                }
+              : {
+                  transform: `translate(${markerStart.x}px, ${markerStart.y - 1}px)`,
+                  width: marker.length * camera.zoom,
+                  height: 2,
+                }
           }
         />
       )}

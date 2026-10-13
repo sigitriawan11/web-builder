@@ -10,7 +10,9 @@ const DURATION_MS = 3000;
 for (const zoom of [0.5, 1]) {
   test(`resize grid wrap 100 anak · zoom ${zoom * 100}%`, async ({ page }) => {
     await page.goto(`?fixture=wrap100&zoom=${zoom}&x=0&y=0`);
-    await page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.selection.getState().select(["n_wggrid0001"]));
+    await page.evaluate(() =>
+      (window as unknown as { __spike: Spike }).__spike.selection.getState().select(["n_wggrid0001"]),
+    );
     const handle = page.locator('.overlay-handle[data-handle="e"]');
     await expect(handle).toBeVisible();
     await page.waitForTimeout(500);

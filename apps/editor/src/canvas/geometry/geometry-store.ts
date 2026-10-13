@@ -41,9 +41,7 @@ interface Entry {
 }
 
 function sameRect(a: WorldRect | null, b: WorldRect | null): boolean {
-  return (
-    a !== null && b !== null && a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height
-  );
+  return a !== null && b !== null && a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
 }
 
 export class GeometryStore {

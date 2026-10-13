@@ -27,7 +27,9 @@ const updates = (page: Page) => page.evaluate(() => (window as unknown as { __up
 const undoSteps = (page: Page) =>
   page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.undoManager.undoStack.length);
 const docSnapshot = (page: Page) =>
-  page.evaluate(() => JSON.stringify((window as unknown as { __spike: { doc: { toJSON(): unknown } } }).__spike.doc.toJSON()));
+  page.evaluate(() =>
+    JSON.stringify((window as unknown as { __spike: { doc: { toJSON(): unknown } } }).__spike.doc.toJSON()),
+  );
 
 async function startResize(page: Page) {
   const handle = await boxOf(page.locator('.overlay-handle[data-handle="se"]'));
@@ -44,7 +46,9 @@ test("selama drag: preview terlihat tanpa update Yjs; dilepas: tepat 1 update & 
   const handle = await startResize(page);
   await page.mouse.move(handle.x + 5 - 100, handle.y + 5 + 50, { steps: 8 });
   // Zoom 50%: geser -100/+50 px screen = -200/+100 px world.
-  await expect.poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height)).toBe(Math.round(before.height + 50));
+  await expect
+    .poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height))
+    .toBe(Math.round(before.height + 50));
   expect(await updates(page)).toBe(0);
 
   await page.mouse.up();
@@ -54,7 +58,9 @@ test("selama drag: preview terlihat tanpa update Yjs; dilepas: tepat 1 update & 
 
   await page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.undoManager.undo());
   expect(await docSnapshot(page)).toBe(original);
-  await expect.poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height)).toBe(Math.round(before.height));
+  await expect
+    .poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height))
+    .toBe(Math.round(before.height));
 });
 
 test("drag 2 detik menghasilkan tepat 1 update Yjs dan 1 langkah undo (AC ED-024)", async ({ page }) => {
@@ -78,11 +84,15 @@ test("Esc saat drag: dokumen identik & preview hilang (AC ED-024)", async ({ pag
 
   const handle = await startResize(page);
   await page.mouse.move(handle.x + 5 + 80, handle.y + 5 + 80, { steps: 6 });
-  await expect.poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height)).not.toBe(Math.round(before.height));
+  await expect
+    .poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height))
+    .not.toBe(Math.round(before.height));
   await page.keyboard.press("Escape");
   await page.mouse.up();
 
   expect(await updates(page)).toBe(0);
   expect(await docSnapshot(page)).toBe(original);
-  await expect.poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height)).toBe(Math.round(before.height));
+  await expect
+    .poll(async () => Math.round((await boxOf(nodeLocator(page, IMAGE))).height))
+    .toBe(Math.round(before.height));
 });

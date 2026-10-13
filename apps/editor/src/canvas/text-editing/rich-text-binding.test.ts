@@ -1,4 +1,9 @@
-import { type RichTextDoc, RichTextDocSchema, richTextToYXmlFragment, yXmlFragmentToRichText } from "@platform/document-model";
+import {
+  type RichTextDoc,
+  RichTextDocSchema,
+  richTextToYXmlFragment,
+  yXmlFragmentToRichText,
+} from "@platform/document-model";
 import { getSchema } from "@tiptap/react";
 import { prosemirrorJSONToYXmlFragment, yXmlFragmentToProsemirrorJSON } from "@tiptap/y-tiptap";
 import { describe, expect, it } from "vitest";
@@ -38,7 +43,9 @@ function attach(fragment: Y.XmlFragment): Y.XmlFragment {
 describe("kompatibilitas encoding rich text dengan y-tiptap", () => {
   it("fragment buatan document-model dibaca y-tiptap sebagai dokumen ProseMirror yang sama", () => {
     const fragment = attach(richTextToYXmlFragment(SAMPLE));
-    expect(schema.nodeFromJSON(yXmlFragmentToProsemirrorJSON(fragment)).toJSON()).toEqual(schema.nodeFromJSON(SAMPLE).toJSON());
+    expect(schema.nodeFromJSON(yXmlFragmentToProsemirrorJSON(fragment)).toJSON()).toEqual(
+      schema.nodeFromJSON(SAMPLE).toJSON(),
+    );
   });
 
   it("fragment tulisan y-tiptap dibaca document-model tanpa kehilangan isi", () => {

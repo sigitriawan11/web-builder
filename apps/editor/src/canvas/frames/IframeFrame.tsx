@@ -60,7 +60,15 @@ export function IframeFrame({ frame, siteFont, children }: IframeFrameProps) {
         ref={iframeRef}
         title={frame.label}
         className={`bp-frame bp-iframe bp-${frame.breakpoint}`}
-        style={{ position: "absolute", left: frame.x, top: 0, width: frame.width, height, border: 0, pointerEvents: "none" }}
+        style={{
+          position: "absolute",
+          left: frame.x,
+          top: 0,
+          width: frame.width,
+          height,
+          border: 0,
+          pointerEvents: "none",
+        }}
       />
       {body && createPortal(children, body)}
     </>

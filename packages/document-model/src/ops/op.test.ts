@@ -19,10 +19,24 @@ describe("runOp", () => {
   });
 
   it.each([
-    { name: "createNode", run: (ctx: Parameters<typeof runOp>[0]) => runOp(ctx, createNode, { parentId: "n_herottl001", type: "frame" }) },
-    { name: "moveNode", run: (ctx: Parameters<typeof runOp>[0]) => runOp(ctx, moveNode, { id: "n_hero000001", newParentId: "n_herottl001", index: 0 }) },
-    { name: "updateStyle", run: (ctx: Parameters<typeof runOp>[0]) => runOp(ctx, updateStyle, { ids: ["n_hero000001", "n_ghost00001"], patch: { radius: null } }) },
-    { name: "deleteNodes", run: (ctx: Parameters<typeof runOp>[0]) => runOp(ctx, deleteNodes, { ids: ["n_hero000001", "n_ghost00001"] }) },
+    {
+      name: "createNode",
+      run: (ctx: Parameters<typeof runOp>[0]) => runOp(ctx, createNode, { parentId: "n_herottl001", type: "frame" }),
+    },
+    {
+      name: "moveNode",
+      run: (ctx: Parameters<typeof runOp>[0]) =>
+        runOp(ctx, moveNode, { id: "n_hero000001", newParentId: "n_herottl001", index: 0 }),
+    },
+    {
+      name: "updateStyle",
+      run: (ctx: Parameters<typeof runOp>[0]) =>
+        runOp(ctx, updateStyle, { ids: ["n_hero000001", "n_ghost00001"], patch: { radius: null } }),
+    },
+    {
+      name: "deleteNodes",
+      run: (ctx: Parameters<typeof runOp>[0]) => runOp(ctx, deleteNodes, { ids: ["n_hero000001", "n_ghost00001"] }),
+    },
   ])("$name yang gagal tidak menghasilkan update Yjs sama sekali", ({ run }) => {
     const { ctx, doc } = setupDoc(heroDocument());
     let updates = 0;

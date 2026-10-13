@@ -69,7 +69,11 @@ describe("resolvePressTarget (ED-053)", () => {
   });
 
   it("latar frame biasa atau node lain → node (drag = pindah)", () => {
-    expect(resolvePressTarget(hit("hero", "page"), [], lookup)).toEqual({ kind: "node", nodeId: "hero", path: ["hero", "page"] });
+    expect(resolvePressTarget(hit("hero", "page"), [], lookup)).toEqual({
+      kind: "node",
+      nodeId: "hero",
+      path: ["hero", "page"],
+    });
     expect(resolvePressTarget(hit("hero", "page"), ["hero"], lookup).kind).toBe("node");
     expect(resolvePressTarget(hit("title", "hero", "page"), [], lookup).kind).toBe("node");
   });

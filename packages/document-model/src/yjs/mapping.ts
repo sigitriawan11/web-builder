@@ -37,7 +37,8 @@ export function nodeToYMap(node: Node): Y.Map<unknown> {
       const yProps = new Y.Map<unknown>();
       for (const [propKey, propValue] of Object.entries(node.props)) {
         if (propValue === undefined) continue;
-        if (node.type === "text" && propKey === RICH_TEXT_PROP) yProps.set(propKey, richTextToYXmlFragment(node.props.content));
+        if (node.type === "text" && propKey === RICH_TEXT_PROP)
+          yProps.set(propKey, richTextToYXmlFragment(node.props.content));
         else yProps.set(propKey, cloneJson(propValue));
       }
       yNode.set(key, yProps);

@@ -316,7 +316,9 @@ export function freeformDocument(): SiteDocument {
         parentId: "n_board00001",
         visible: true,
         locked: false,
-        style: { base: { position: { type: "absolute", x: 420, y: 120 }, size: { width: fixed(320), height: fixed(200) } } },
+        style: {
+          base: { position: { type: "absolute", x: 420, y: 120 }, size: { width: fixed(320), height: fixed(200) } },
+        },
         props: { fit: "cover", image: { assetId: "ast_ph0000001", alt: "Foto produk" } },
       },
       n_ftext00001: {
@@ -327,8 +329,15 @@ export function freeformDocument(): SiteDocument {
         visible: true,
         locked: false,
         tag: "p",
-        style: { base: { position: { type: "absolute", x: 80, y: 320 }, size: { width: fixed(400), height: { mode: "hug" } } } },
-        props: { content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Seret aku ke mana saja" }] }] } },
+        style: {
+          base: { position: { type: "absolute", x: 80, y: 320 }, size: { width: fixed(400), height: { mode: "hug" } } },
+        },
+        props: {
+          content: {
+            type: "doc",
+            content: [{ type: "paragraph", content: [{ type: "text", text: "Seret aku ke mana saja" }] }],
+          },
+        },
       },
     },
   };
@@ -341,7 +350,13 @@ export function autolayoutDocument(): SiteDocument {
   const fixed = (value: number) => ({ mode: "fixed" as const, value, unit: "px" as const });
   const pad = (value: number) => ({ top: px(value), right: px(value), bottom: px(value), left: px(value) });
   type Node = SiteDocument["nodes"][string];
-  const frame = (id: string, parentId: string, name: string, children: string[], style: Node["style"]["base"]): Node => ({
+  const frame = (
+    id: string,
+    parentId: string,
+    name: string,
+    children: string[],
+    style: Node["style"]["base"],
+  ): Node => ({
     id,
     type: "frame",
     name,
@@ -354,7 +369,12 @@ export function autolayoutDocument(): SiteDocument {
   });
   const box = (id: string, parentId: string, color: string, size: NonNullable<Node["style"]["base"]["size"]>): Node =>
     frame(id, parentId, `Kotak ${id}`, [], { size, fills: [{ type: "solid", color }] });
-  const text = (id: string, parentId: string, value: string, size: NonNullable<Node["style"]["base"]["size"]>): Node => ({
+  const text = (
+    id: string,
+    parentId: string,
+    value: string,
+    size: NonNullable<Node["style"]["base"]["size"]>,
+  ): Node => ({
     id,
     type: "text",
     name: `Teks ${id}`,
@@ -388,7 +408,14 @@ export function autolayoutDocument(): SiteDocument {
     box("n_alrowfil01", "n_alrow00001", "#7CC4FF", { width: { mode: "fill" }, height: fixed(40) }),
     text("n_alrowhug01", "n_alrow00001", "Label hug", { width: { mode: "hug" }, height: { mode: "hug" } }),
     frame("n_alcol00001", "pg_home000001", "Kolom", ["n_alcoltxt01", "n_alcolbox01", "n_alcolbox02"], {
-      layout: { mode: "flex", direction: "column", gap: px(8), padding: pad(16), justify: "spaceBetween", align: "stretch" },
+      layout: {
+        mode: "flex",
+        direction: "column",
+        gap: px(8),
+        padding: pad(16),
+        justify: "spaceBetween",
+        align: "stretch",
+      },
       size: { width: fixed(400), height: fixed(300) },
       fills: [{ type: "solid", color: "#FFF1E6" }],
     }),
@@ -449,7 +476,9 @@ export function wrapGridDocument(count = 100): SiteDocument {
       locked: false,
       tag: "p",
       style: { base: { size: { width: { mode: "fill" }, height: { mode: "hug" } } } },
-      props: { content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: `Item ${i + 1}` }] }] } },
+      props: {
+        content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: `Item ${i + 1}` }] }] },
+      },
     } satisfies Node,
   ]).flat();
 

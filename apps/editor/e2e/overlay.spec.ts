@@ -6,10 +6,16 @@ import { boxOf, nodeLocator, selectedIds } from "./doc-helpers";
 const IMAGE = "n_heroimg001";
 const HERO = "n_hero000001";
 
-type Spike = { selection: { getState(): { select(ids: string[]): void } }; interaction: { getState(): { state: { type: string } } } };
+type Spike = {
+  selection: { getState(): { select(ids: string[]): void } };
+  interaction: { getState(): { state: { type: string } } };
+};
 
 async function select(page: Page, ids: string[]) {
-  await page.evaluate((selection) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select(selection), ids);
+  await page.evaluate(
+    (selection) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select(selection),
+    ids,
+  );
 }
 
 for (const zoom of [0.5, 1, 4]) {
@@ -90,7 +96,9 @@ test("menekan handle memulai dragResize tanpa mengubah seleksi", async ({ page }
   await page.mouse.move(se.x + 5, se.y + 5);
   await page.mouse.down();
   await page.mouse.move(se.x + 40, se.y + 30, { steps: 4 });
-  expect(await page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.interaction.getState().state.type)).toBe("dragResize");
+  expect(
+    await page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.interaction.getState().state.type),
+  ).toBe("dragResize");
   await page.mouse.up();
 
   expect(await selectedIds(page)).toEqual([IMAGE]);

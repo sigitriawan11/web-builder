@@ -50,7 +50,8 @@ function record(scenario: ScenarioKey, variant: Variant, measurement: Measuremen
 }
 
 const round = (value: number) => Math.round(value * 10) / 10;
-const percentile = (sorted: number[], p: number) => sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))] ?? 0;
+const percentile = (sorted: number[], p: number) =>
+  sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))] ?? 0;
 
 function frameStats(deltas: number[]): FrameStats {
   const sorted = [...deltas].sort((a, b) => a - b);
@@ -65,17 +66,37 @@ function frameStats(deltas: number[]): FrameStats {
 
 function latencyStats(samples: number[]): LatencyStats {
   const sorted = [...samples].sort((a, b) => a - b);
-  return { p50Ms: round(percentile(sorted, 0.5)), p95Ms: round(percentile(sorted, 0.95)), maxMs: round(sorted.at(-1) ?? 0), samples: samples.length };
+  return {
+    p50Ms: round(percentile(sorted, 0.5)),
+    p95Ms: round(percentile(sorted, 0.95)),
+    maxMs: round(sorted.at(-1) ?? 0),
+    samples: samples.length,
+  };
 }
 
 type BenchWindow = {
   __bench: { deltas: number[]; recording: boolean; label: string; probe: string | null; probeHits: number };
   __spike: {
-    camera: { getState(): { x: number; y: number; zoom: number; setCamera(next: { x?: number; y?: number; zoom?: number }): void } };
-    selection: { getState(): { selectedIds: readonly string[]; select(ids: string[]): void }; subscribe(listener: () => void): () => void };
+    camera: {
+      getState(): {
+        x: number;
+        y: number;
+        zoom: number;
+        setCamera(next: { x?: number; y?: number; zoom?: number }): void;
+      };
+    };
+    selection: {
+      getState(): { selectedIds: readonly string[]; select(ids: string[]): void };
+      subscribe(listener: () => void): () => void;
+    };
     run(op: unknown, input: unknown): { ok: true; value: string } | { ok: false; error: { message: string } };
     ops: { createNode: unknown };
-    doc: { getMap(name: string): { get(id: string): { toJSON(): Record<string, unknown> } | undefined; entries(): IterableIterator<[string, { toJSON(): Record<string, unknown> }]> } };
+    doc: {
+      getMap(name: string): {
+        get(id: string): { toJSON(): Record<string, unknown> } | undefined;
+        entries(): IterableIterator<[string, { toJSON(): Record<string, unknown> }]>;
+      };
+    };
   };
 };
 
@@ -84,17 +105,17 @@ type BenchWindow = {
 async function startFrames(page: Page, label: string, probe: string | null = null) {
   await page.evaluate(
     ({ name, probe }) => {
-    const w = window as unknown as BenchWindow;
-    w.__bench = { deltas: [], recording: true, label: name, probe, probeHits: 0 };
-    performance.mark(`${name}:start`);
-    let last = performance.now();
-    const tick = (now: number) => {
-      w.__bench.deltas.push(now - last);
-      last = now;
-      if (w.__bench.probe && document.querySelector(w.__bench.probe)) w.__bench.probeHits++;
-      if (w.__bench.recording) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
+      const w = window as unknown as BenchWindow;
+      w.__bench = { deltas: [], recording: true, label: name, probe, probeHits: 0 };
+      performance.mark(`${name}:start`);
+      let last = performance.now();
+      const tick = (now: number) => {
+        w.__bench.deltas.push(now - last);
+        last = now;
+        if (w.__bench.probe && document.querySelector(w.__bench.probe)) w.__bench.probeHits++;
+        if (w.__bench.recording) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
     },
     { name: label, probe },
   );
@@ -178,7 +199,10 @@ async function boxOf(page: Page, id: string) {
   return box;
 }
 
-const center = (box: { x: number; y: number; width: number; height: number }) => ({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
+const center = (box: { x: number; y: number; width: number; height: number }) => ({
+  x: box.x + box.width / 2,
+  y: box.y + box.height / 2,
+});
 
 // Geser kamera agar node berada di sekitar y layar 300 (fixture landing lebih tinggi dari viewport).
 async function scrollIntoView(page: Page, id: string) {
@@ -194,7 +218,11 @@ const RUNNERS: Record<ScenarioKey, (page: Page, variant: Variant) => Promise<voi
   async panZoom200(page, variant) {
     await open(page, variant, "fixture=landing200&zoom=0.4&x=20&y=20");
     record("panZoom200", variant, { kind: "frames", motion: "pan", stats: await cameraMotion(page, "pan", "pan200") });
-    record("panZoom200", variant, { kind: "frames", motion: "zoom", stats: await cameraMotion(page, "zoom", "zoom200") });
+    record("panZoom200", variant, {
+      kind: "frames",
+      motion: "zoom",
+      stats: await cameraMotion(page, "zoom", "zoom200"),
+    });
   },
 
   // Landing 200 node + satu frame absolute di atasnya: drag menggeser preview di atas halaman penuh.
@@ -209,7 +237,10 @@ const RUNNERS: Record<ScenarioKey, (page: Page, variant: Variant) => Promise<voi
         style: {
           base: {
             position: { type: "absolute", x: 200, y: 200 },
-            size: { width: { mode: "fixed", value: 240, unit: "px" }, height: { mode: "fixed", value: 160, unit: "px" } },
+            size: {
+              width: { mode: "fixed", value: 240, unit: "px" },
+              height: { mode: "fixed", value: 160, unit: "px" },
+            },
             fills: [{ type: "solid", color: "#3366FF" }],
           },
         },
@@ -225,7 +256,9 @@ const RUNNERS: Record<ScenarioKey, (page: Page, variant: Variant) => Promise<voi
     }));
     // Bukti preview benar-benar bergerak selama drag (bukan halaman diam).
     const moved = await page.evaluate((nodeId) => {
-      const element = document.querySelector(`[data-node-id="${nodeId}"]`) ?? document.getElementById("world")?.shadowRoot?.querySelector(`[data-node-id="${nodeId}"]`);
+      const element =
+        document.querySelector(`[data-node-id="${nodeId}"]`) ??
+        document.getElementById("world")?.shadowRoot?.querySelector(`[data-node-id="${nodeId}"]`);
       return element instanceof HTMLElement && element.style.translate !== "";
     }, id);
     await page.mouse.up();
@@ -273,7 +306,10 @@ const RUNNERS: Record<ScenarioKey, (page: Page, variant: Variant) => Promise<voi
     const handleBox = await handle.boundingBox();
     if (!handleBox) throw new Error("handle tidak terlihat");
     const from = center(handleBox);
-    const { stats, moves } = await mouseDrag(page, "resize100", from, (t) => ({ x: from.x - 700 * Math.abs(Math.sin(t * Math.PI * 2)), y: from.y }));
+    const { stats, moves } = await mouseDrag(page, "resize100", from, (t) => ({
+      x: from.x - 700 * Math.abs(Math.sin(t * Math.PI * 2)),
+      y: from.y,
+    }));
     const width = (await boxOf(page, "n_wggrid0001")).width;
     await page.keyboard.press("Escape");
     await page.mouse.up();
@@ -366,10 +402,16 @@ test.afterAll(async ({ browser }) => {
     ...ACTIVE.map((variant) => cell(results.get(scenario.key)?.get(variant.key))),
   ]);
   const table = [header, header.map(() => "---"), ...rows].map((row) => `| ${row.join(" | ")} |`).join("\n");
-  console.log(`\nBenchmark canvas (${DURATION_MS} ms/gerak, ${browser.browserType().name()} ${browser.version()})\n\n${table}\n`);
+  console.log(
+    `\nBenchmark canvas (${DURATION_MS} ms/gerak, ${browser.browserType().name()} ${browser.version()})\n\n${table}\n`,
+  );
 
   if (process.env.BENCH_RAW === "1") {
-    const raw = Object.fromEntries([...results].map(([scenario, byVariant]) => [scenario, Object.fromEntries(byVariant)]));
-    console.log(`\n\`\`\`json\n${JSON.stringify({ date: new Date().toISOString(), durationMs: DURATION_MS, machine, results: raw }, null, 2)}\n\`\`\``);
+    const raw = Object.fromEntries(
+      [...results].map(([scenario, byVariant]) => [scenario, Object.fromEntries(byVariant)]),
+    );
+    console.log(
+      `\n\`\`\`json\n${JSON.stringify({ date: new Date().toISOString(), durationMs: DURATION_MS, machine, results: raw }, null, 2)}\n\`\`\``,
+    );
   }
 });

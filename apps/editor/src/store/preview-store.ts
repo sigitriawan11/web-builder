@@ -1,6 +1,6 @@
 import type { StylePatch } from "@platform/document-model";
-import type { InsertionMarker, Rect } from "../canvas/drag/reorder";
 import { createStore } from "zustand/vanilla";
+import type { InsertionMarker, Rect } from "../canvas/drag/reorder";
 
 // ED-024: override style SEMENTARA selama drag (mis. resize di auto-layout perlu reflow nyata).
 // Dibaca renderer di atas style dokumen; tidak pernah masuk Yjs sampai commit.

@@ -17,8 +17,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { NodeStore } from "../../document/node-store";
 import { NodeStoreContext } from "../../document/use-node";
 import { RenderRoot, RenderScope } from "./RenderRoot";
-import { renderProbe } from "./render-probe";
 import { renderNode } from "./render-node";
+import { renderProbe } from "./render-probe";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -82,7 +82,9 @@ function structureOf(root: ParentNode): string[] {
 
 function descendantsOf(doc: SiteDocument, id: string): string[] {
   const node = doc.nodes[id];
-  return node && "children" in node ? node.children.flatMap((childId) => [childId, ...descendantsOf(doc, childId)]) : [];
+  return node && "children" in node
+    ? node.children.flatMap((childId) => [childId, ...descendantsOf(doc, childId)])
+    : [];
 }
 
 function firstCard(doc: SiteDocument) {

@@ -1,5 +1,5 @@
-import { clampZoom } from "../zoom-limits";
 import { type CameraState, screenPoint, screenToWorld } from "../geometry/coordinates";
+import { clampZoom } from "../zoom-limits";
 import { LINE_HEIGHT_PX } from "./pan";
 
 // Logika murni zoom (ED-027); event DOM ditangani di use-zoom-interactions.ts.

@@ -19,10 +19,7 @@ export const TokenRefSchema = z.strictObject({
 export const UnitSchema = z.enum(["px", "%", "vw", "vh", "rem", "em", "fr"]);
 
 // Angka tanpa unit tidak diizinkan untuk panjang (DM-025).
-export const LengthSchema = z.union([
-  z.strictObject({ value: z.number(), unit: UnitSchema }),
-  TokenRefSchema,
-]);
+export const LengthSchema = z.union([z.strictObject({ value: z.number(), unit: UnitSchema }), TokenRefSchema]);
 
 // Warna literal hanya hex agar diff & output AI konsisten (DM-025).
 export const HexColorSchema = z.string().regex(/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/);

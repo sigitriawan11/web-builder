@@ -59,9 +59,11 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
       const before = interactionStore.getState().state.type;
       dispatch({ type: "pointerMove", pointerId: event.pointerId, point: point(event), shiftKey: event.shiftKey });
       const after = interactionStore.getState().state.type;
-      if (before === "pressing" && after !== "pressing" && after !== "idle") viewport.setPointerCapture(event.pointerId);
+      if (before === "pressing" && after !== "pressing" && after !== "idle")
+        viewport.setPointerCapture(event.pointerId);
     };
-    const onPointerUp = (event: PointerEvent) => dispatch({ type: "pointerUp", pointerId: event.pointerId, point: point(event) });
+    const onPointerUp = (event: PointerEvent) =>
+      dispatch({ type: "pointerUp", pointerId: event.pointerId, point: point(event) });
     const onPointerCancel = (event: PointerEvent) => dispatch({ type: "pointerCancel", pointerId: event.pointerId });
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !isEditableEvent(event)) dispatch({ type: "escape" });

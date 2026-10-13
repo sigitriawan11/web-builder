@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { MAX_ZOOM, MIN_ZOOM } from "../zoom-limits";
 import { screenPoint, screenToWorld, worldToScreen } from "../geometry/coordinates";
+import { MAX_ZOOM, MIN_ZOOM } from "../zoom-limits";
 import { nextZoomStep, wheelZoomFactor, ZOOM_STEPS, zoomAtPoint, zoomKeyDirection } from "./zoom";
 
 const ORIGIN = { left: 0, top: 0 };

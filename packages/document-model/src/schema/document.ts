@@ -128,10 +128,7 @@ function checkNoHug(
   for (const [breakpoint, style] of layers) {
     for (const axis of ["width", "height"] as const) {
       if (style?.size?.[axis]?.mode === "hug") {
-        report(
-          ["nodes", node.id, "style", breakpoint, "size", axis],
-          `Image tidak boleh memakai ukuran "hug"`,
-        );
+        report(["nodes", node.id, "style", breakpoint, "size", axis], `Image tidak boleh memakai ukuran "hug"`);
       }
     }
   }

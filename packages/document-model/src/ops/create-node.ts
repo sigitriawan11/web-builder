@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createId } from "../ids";
-import { NodeIdSchema, NodeSchema, StylePatchSchema, StyleSchema, type Style } from "../schema";
+import { NodeIdSchema, NodeSchema, type Style, StylePatchSchema, StyleSchema } from "../schema";
 import { nodeToYMap } from "../yjs/mapping";
 import { defineOp, fail } from "./op";
 import { childrenOf, nodesMap } from "./y-access";

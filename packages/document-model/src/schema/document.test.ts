@@ -38,7 +38,10 @@ function issuePaths(input: unknown): string[] {
 function expectIssueAt(input: unknown, expectedPath: string) {
   const paths = issuePaths(input);
   expect(paths.length, "dokumen seharusnya tidak valid").toBeGreaterThan(0);
-  expect(paths.some((path) => path.startsWith(expectedPath)), `issue di: ${paths.join(", ")}`).toBe(true);
+  expect(
+    paths.some((path) => path.startsWith(expectedPath)),
+    `issue di: ${paths.join(", ")}`,
+  ).toBe(true);
 }
 
 describe("SiteDocumentSchema — fixture valid", () => {
@@ -205,10 +208,7 @@ describe("SiteDocumentSchema — invariant flat map", () => {
   });
 
   it("menolak child yang parentId-nya menunjuk node lain", () => {
-    expectIssueAt(
-      heroWith(["nodes", "n_heroimg001", "parentId"], "pg_home000001"),
-      "nodes.n_hero000001.children.1",
-    );
+    expectIssueAt(heroWith(["nodes", "n_heroimg001", "parentId"], "pg_home000001"), "nodes.n_hero000001.children.1");
   });
 
   it("menolak image yang asset-nya tidak terdaftar (DM-014)", () => {

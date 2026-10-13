@@ -42,7 +42,12 @@ export function resolveClickSelection(
     const index = path.indexOf(selectedId);
     const child = index > 0 ? path[index - 1] : undefined;
     const selected = lookup(selectedId);
-    if (child && selected?.type === "frame" && selected.role !== "section" && DIRECT_LEAF_TYPES.has(lookup(child)?.type ?? "")) {
+    if (
+      child &&
+      selected?.type === "frame" &&
+      selected.role !== "section" &&
+      DIRECT_LEAF_TYPES.has(lookup(child)?.type ?? "")
+    ) {
       return child;
     }
   }
@@ -69,7 +74,11 @@ export type DoubleClickAction =
  * Double-click (ED-038): pada node terseleksi → masuk ke anak di bawah pointer; pada teks yang sudah
  * terseleksi → mode edit teks. Image (crop/replace) & instance menyusul di fase berikutnya.
  */
-export function resolveDoubleClick(path: readonly string[], selection: readonly string[], lookup: NodeLookup): DoubleClickAction {
+export function resolveDoubleClick(
+  path: readonly string[],
+  selection: readonly string[],
+  lookup: NodeLookup,
+): DoubleClickAction {
   for (const selectedId of selection) {
     const index = path.indexOf(selectedId);
     if (index > 0) {

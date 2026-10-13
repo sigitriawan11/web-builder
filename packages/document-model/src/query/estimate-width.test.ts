@@ -17,8 +17,12 @@ function context(breakpoint: WidthEstimateContext["breakpoint"] = "mobile"): Wid
     nodes: document.nodes,
     assets: document.assets,
     breakpoint,
-    lengthPx: (value: LengthValue) => ("$token" in value ? null : value.unit === "px" ? value.value : value.unit === "rem" ? value.value * 16 : null),
-    text: { fontSizePx: (node) => (node.tag === "h1" ? 32 : node.tag === "h2" ? 24 : 16), charWidthEm: (bold) => (bold ? 0.6 : 0.5) },
+    lengthPx: (value: LengthValue) =>
+      "$token" in value ? null : value.unit === "px" ? value.value : value.unit === "rem" ? value.value * 16 : null,
+    text: {
+      fontSizePx: (node) => (node.tag === "h1" ? 32 : node.tag === "h2" ? 24 : 16),
+      charWidthEm: (bold) => (bold ? 0.6 : 0.5),
+    },
   };
 }
 
@@ -55,13 +59,20 @@ describe("estimateMaxContentWidth (prototipe OPEN-DM-5)", () => {
 
   it("padding mengikuti breakpoint (cascade DM-036)", () => {
     const nav = byName("1 Navbar");
-    expect(estimateMaxContentWidth(nav, context("base")) - estimateMaxContentWidth(nav, context("mobile"))).toBe(2 * (64 - 16));
+    expect(estimateMaxContentWidth(nav, context("base")) - estimateMaxContentWidth(nav, context("mobile"))).toBe(
+      2 * (64 - 16),
+    );
   });
 
   it("anak tersembunyi & absolute tidak dihitung", () => {
     const links = byName("Tautan");
-    const hidden = { ...document.nodes, [byName("Tautan / Kontak").id]: { ...byName("Tautan / Kontak"), visible: false } };
-    expect(estimateMaxContentWidth(links, { ...context(), nodes: hidden as typeof document.nodes })).toBe(18 * 8 + 2 * 24);
+    const hidden = {
+      ...document.nodes,
+      [byName("Tautan / Kontak").id]: { ...byName("Tautan / Kontak"), visible: false },
+    };
+    expect(estimateMaxContentWidth(links, { ...context(), nodes: hidden as typeof document.nodes })).toBe(
+      18 * 8 + 2 * 24,
+    );
   });
 
   it("maxWidth membatasi, minWidth menaikkan", () => {

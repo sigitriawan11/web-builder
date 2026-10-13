@@ -52,7 +52,12 @@ describe("insertionMarker (ED-063)", () => {
   const container = { x: -10, y: -10, width: 400, height: 200 };
 
   it("baris: garis vertikal di tengah celah, atau di tepi luar anak pertama/terakhir", () => {
-    expect(insertionMarker(row, 1, "row", false, container)).toEqual({ x: 110, y: -10, length: 200, orientation: "vertical" });
+    expect(insertionMarker(row, 1, "row", false, container)).toEqual({
+      x: 110,
+      y: -10,
+      length: 200,
+      orientation: "vertical",
+    });
     expect(insertionMarker(row, 0, "row", false, container)).toMatchObject({ x: 0 });
     expect(insertionMarker(row, 3, "row", false, container)).toMatchObject({ x: 340 });
   });
@@ -67,8 +72,18 @@ describe("insertionMarker (ED-063)", () => {
   });
 
   it("wrap: garis setinggi baris tujuan; di akhir baris memakai baris anak sebelumnya", () => {
-    expect(insertionMarker(wrap, 4, "row", true, container)).toEqual({ x: 106, y: 70, length: 50, orientation: "vertical" });
-    expect(insertionMarker(wrap, 3, "row", true, container)).toEqual({ x: 324, y: 0, length: 50, orientation: "vertical" });
+    expect(insertionMarker(wrap, 4, "row", true, container)).toEqual({
+      x: 106,
+      y: 70,
+      length: 50,
+      orientation: "vertical",
+    });
+    expect(insertionMarker(wrap, 3, "row", true, container)).toEqual({
+      x: 324,
+      y: 0,
+      length: 50,
+      orientation: "vertical",
+    });
   });
 
   it("container kosong: di awal area container", () => {
@@ -85,10 +100,20 @@ describe("insertionMarker — ujung awal & akhir", () => {
   });
 
   it("baris tanpa wrap: penanda setinggi container", () => {
-    expect(insertionMarker(row, 2, "row", false, container)).toEqual({ x: 230, y: 0, length: 300, orientation: "vertical" });
+    expect(insertionMarker(row, 2, "row", false, container)).toEqual({
+      x: 230,
+      y: 0,
+      length: 300,
+      orientation: "vertical",
+    });
   });
 
   it("wrap kosong: di awal container", () => {
-    expect(insertionMarker([], 0, "row", true, container)).toEqual({ x: 0, y: 0, length: 300, orientation: "vertical" });
+    expect(insertionMarker([], 0, "row", true, container)).toEqual({
+      x: 0,
+      y: 0,
+      length: 300,
+      orientation: "vertical",
+    });
   });
 });

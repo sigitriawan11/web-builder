@@ -55,7 +55,9 @@ describe("renderNode (T0.4.1)", () => {
     const html = renderToStaticMarkup(renderNode(doc, "pg_home000001", "block", { breakpoint: "mobile", width: 390 }));
 
     expect(html).toMatch(/<main data-node-id="pg_home000001" style="[^"]*width:390px/);
-    expect(html).toMatch(/<section data-node-id="n_hero000001" style="[^"]*padding:var\(--space-10\) var\(--space-8\) var\(--space-10\)/);
+    expect(html).toMatch(
+      /<section data-node-id="n_hero000001" style="[^"]*padding:var\(--space-10\) var\(--space-8\) var\(--space-10\)/,
+    );
     expect(html).toMatch(/<section data-node-id="n_hero000001" style="[^"]*min-height:420px/);
   });
 

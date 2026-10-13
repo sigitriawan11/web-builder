@@ -11,7 +11,9 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator("[data-node-id]").first()).toBeVisible();
 });
 
-test("AC ED-051: klik judul hero → section Hero; double-click turun ke container sampai teks; lalu edit", async ({ page }) => {
+test("AC ED-051: klik judul hero → section Hero; double-click turun ke container sampai teks; lalu edit", async ({
+  page,
+}) => {
   const id = await idsByName(page, ["Hero", "Hero / Row", "Hero / Copy", "Hero / Title"]);
   const [hero, row, copy, title] = [id.Hero, id["Hero / Row"], id["Hero / Copy"], id["Hero / Title"]];
 
@@ -31,7 +33,13 @@ test("AC ED-051: klik judul hero → section Hero; double-click turun ke contain
 
 test("setelah masuk, klik saudara memilih saudara; klik section lain memilih section itu", async ({ page }) => {
   const id = await idsByName(page, ["Hero", "Hero / Row", "Hero / Copy", "Hero / Photo", "Fitur 1"]);
-  const [hero, row, copy, photo, feature] = [id.Hero, id["Hero / Row"], id["Hero / Copy"], id["Hero / Photo"], id["Fitur 1"]];
+  const [hero, row, copy, photo, feature] = [
+    id.Hero,
+    id["Hero / Row"],
+    id["Hero / Copy"],
+    id["Hero / Photo"],
+    id["Fitur 1"],
+  ];
 
   await node(page, photo).dblclick();
   expect(await selected(page)).toEqual([row]);

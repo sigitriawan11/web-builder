@@ -1,6 +1,5 @@
 import { test } from "vitest";
 import * as Y from "yjs";
-import { generateLandingDocument } from "../test/fixtures";
 import {
   jsonToYDoc,
   moveNode,
@@ -11,6 +10,7 @@ import {
   updateStyle,
   yDocToJson,
 } from "../src";
+import { generateLandingDocument } from "../test/fixtures";
 
 // T0.7.5 / DM-061, DM-062, DM-077: biaya Yjs — ukuran (dicetak sebagai tabel) & waktu (Vitest bench).
 // Jalankan: `pnpm --filter @platform/document-model bench`. Angka WSL2 = indikatif; resmi di laptop referensi.
@@ -72,15 +72,23 @@ function measureSizes() {
     const parentOf = json.nodes[target]?.parentId ?? "";
 
     // Commit drag (ED-062): satu updateStyle posisi di akhir drag.
-    const dragCommit = updateBytes(ydoc, () => mustRun(ctx, updateStyle, { ids: [target], patch: { position: { type: "absolute", x: 120, y: 80 } } }));
+    const dragCommit = updateBytes(ydoc, () =>
+      mustRun(ctx, updateStyle, { ids: [target], patch: { position: { type: "absolute", x: 120, y: 80 } } }),
+    );
     // Pembanding: jika preview ditulis ke Yjs tiap frame (yang sengaja dihindari, ED-024) — 60 frame ≈ 1 detik drag.
     const dragPerFrame = updateBytes(ydoc, () => {
-      for (let frame = 0; frame < 60; frame++) mustRun(ctx, updateStyle, { ids: [target], patch: { position: { type: "absolute", x: 120 + frame, y: 80 } } });
+      for (let frame = 0; frame < 60; frame++)
+        mustRun(ctx, updateStyle, { ids: [target], patch: { position: { type: "absolute", x: 120 + frame, y: 80 } } });
     });
     const resizeCommit = updateBytes(ydoc, () =>
-      mustRun(ctx, updateStyle, { ids: [target], patch: { size: { width: { mode: "fixed", value: 320, unit: "px" } } } }),
+      mustRun(ctx, updateStyle, {
+        ids: [target],
+        patch: { size: { width: { mode: "fixed", value: 320, unit: "px" } } },
+      }),
     );
-    const reorderCommit = updateBytes(ydoc, () => mustRun(ctx, moveNode, { id: target, newParentId: parentOf, index: 0 }));
+    const reorderCommit = updateBytes(ydoc, () =>
+      mustRun(ctx, moveNode, { id: target, newParentId: parentOf, index: 0 }),
+    );
 
     const jsonBytes = encoder.encode(JSON.stringify(json)).byteLength;
     const stateBytes = Y.encodeStateAsUpdate(jsonToYDoc(json)).byteLength;
@@ -102,16 +110,28 @@ function measureAfterEdits(nodeCount: number, edits: number) {
   const ydoc = jsonToYDoc(fixture(nodeCount));
   const ctx = { doc: ydoc, origin: ORIGIN };
   const json = fixture(nodeCount);
-  const frames = nodeIds(json, (node) => node.type === "frame" && node.parentId !== null && node.parentId !== json.pageOrder[0]);
+  const frames = nodeIds(
+    json,
+    (node) => node.type === "frame" && node.parentId !== null && node.parentId !== json.pageOrder[0],
+  );
   const all = nodeIds(json, (node) => node.parentId !== null);
   const random = rng(7);
   const pick = (ids: string[]) => ids[Math.floor(random() * ids.length)] ?? "";
   for (let i = 0; i < edits; i++) {
     const roll = random();
     const id = pick(all);
-    if (roll < 0.4) mustRun(ctx, updateStyle, { ids: [id], patch: { position: { type: "absolute", x: i % 500, y: i % 300 } } });
-    else if (roll < 0.7) mustRun(ctx, updateStyle, { ids: [id], patch: { fills: [{ type: "solid", color: `#${(i * 2654435761 % 0xffffff).toString(16).padStart(6, "0")}` }] } });
-    else if (roll < 0.85) mustRun(ctx, updateStyle, { ids: [id], patch: { size: { width: { mode: "fixed", value: 100 + (i % 400), unit: "px" } } } });
+    if (roll < 0.4)
+      mustRun(ctx, updateStyle, { ids: [id], patch: { position: { type: "absolute", x: i % 500, y: i % 300 } } });
+    else if (roll < 0.7)
+      mustRun(ctx, updateStyle, {
+        ids: [id],
+        patch: { fills: [{ type: "solid", color: `#${((i * 2654435761) % 0xffffff).toString(16).padStart(6, "0")}` }] },
+      });
+    else if (roll < 0.85)
+      mustRun(ctx, updateStyle, {
+        ids: [id],
+        patch: { size: { width: { mode: "fixed", value: 100 + (i % 400), unit: "px" } } },
+      });
     else {
       // Pindah ke frame lain; gagal (mis. ke turunannya sendiri) dilewati — op tidak menulis apa pun saat gagal.
       runOp(ctx, moveNode, { id, newParentId: pick(frames), index: 0 });
@@ -120,7 +140,12 @@ function measureAfterEdits(nodeCount: number, edits: number) {
   // Compaction = state ter-merge dari Y.Doc (gc aktif), seperti document_snapshots.state.
   const stateBytes = Y.encodeStateAsUpdate(ydoc).byteLength;
   const jsonBytes = encoder.encode(JSON.stringify(yDocToJson(ydoc))).byteLength;
-  return { edits, "JSON KB": kb(jsonBytes), "state Yjs KB": kb(stateBytes), "state/JSON": Math.round((stateBytes / jsonBytes) * 100) / 100 };
+  return {
+    edits,
+    "JSON KB": kb(jsonBytes),
+    "state Yjs KB": kb(stateBytes),
+    "state/JSON": Math.round((stateBytes / jsonBytes) * 100) / 100,
+  };
 }
 
 console.log("\nUkuran Yjs per fixture landing (DM-061):");

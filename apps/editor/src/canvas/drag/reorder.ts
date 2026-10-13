@@ -104,7 +104,10 @@ export function insertionMarker(
   // Wrap: penanda di baris anak tujuan (atau baris anak sebelumnya bila sisip di akhir baris).
   const sameRow = previous && next && Math.abs(previous.rect.y - next.rect.y) <= ROW_TOLERANCE;
   const reference = next && (!previous || sameRow || !wrap) ? next : previous;
-  const span = wrap && reference ? rowSpan(children.filter((child) => Math.abs(child.rect.y - reference.rect.y) <= ROW_TOLERANCE)) : null;
+  const span =
+    wrap && reference
+      ? rowSpan(children.filter((child) => Math.abs(child.rect.y - reference.rect.y) <= ROW_TOLERANCE))
+      : null;
   const x =
     previous && next && sameRow
       ? (previous.rect.x + previous.rect.width + next.rect.x) / 2

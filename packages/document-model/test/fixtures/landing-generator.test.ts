@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type Node, type SiteDocument, SiteDocumentSchema, jsonToYDoc, yDocToJson } from "../../src";
+import { jsonToYDoc, type Node, type SiteDocument, SiteDocumentSchema, yDocToJson } from "../../src";
 import { generateLandingDocument, landing200, landing2000 } from "./landing-generator";
 
 function depthOf(doc: SiteDocument, node: Node): number {

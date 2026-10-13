@@ -46,7 +46,10 @@ for (const mode of ["class", "iframe"]) {
     test("edit konten tampil di semua frame; patch mobile tidak mengubah Desktop (AC ED-034)", async ({ page }) => {
       await page.goto(`?fixture=hero&frames=all&bpMode=${mode}`);
 
-      await runOp(page, "updateStyle", { ids: ["n_hero000001"], patch: { fills: [{ type: "solid", color: "#FF0000" }] } });
+      await runOp(page, "updateStyle", {
+        ids: ["n_hero000001"],
+        patch: { fills: [{ type: "solid", color: "#FF0000" }] },
+      });
       for (const bp of ["base", "tablet", "mobile"]) {
         await expect(nodeIn(page, mode, bp, "n_hero000001")).toHaveCSS("background-color", "rgb(255, 0, 0)");
       }

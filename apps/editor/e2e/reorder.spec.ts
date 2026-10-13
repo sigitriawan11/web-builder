@@ -25,10 +25,17 @@ async function open(page: Page) {
 }
 
 const childrenOf = (page: Page, id: string) =>
-  page.evaluate((nodeId) => (window as unknown as { __spike: Spike }).__spike.doc.getMap("nodes").get(nodeId).get("children").toJSON(), id);
+  page.evaluate(
+    (nodeId) =>
+      (window as unknown as { __spike: Spike }).__spike.doc.getMap("nodes").get(nodeId).get("children").toJSON(),
+    id,
+  );
 const updates = (page: Page) => page.evaluate(() => (window as unknown as { __updates: number }).__updates);
 const select = (page: Page, id: string) =>
-  page.evaluate((nodeId) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select([nodeId]), id);
+  page.evaluate(
+    (nodeId) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select([nodeId]),
+    id,
+  );
 
 async function center(page: Page, id: string) {
   const box = await boxOf(nodeLocator(page, id));
@@ -45,7 +52,9 @@ async function dragTo(page: Page, id: string, to: { x: number; y: number }, befo
   await page.mouse.up();
 }
 
-test("AC ED-063: penanda & ghost tampil sebelum dilepas; node asli redup; lepas = pindah ke akhir", async ({ page }) => {
+test("AC ED-063: penanda & ghost tampil sebelum dilepas; node asli redup; lepas = pindah ke akhir", async ({
+  page,
+}) => {
   await open(page);
   await select(page, FIX);
   const hug = await boxOf(nodeLocator(page, HUG));
@@ -118,10 +127,16 @@ test("frame non-section di root page: drop di area padding page mengubah urutan"
   expect(await childrenOf(page, "pg_home000001")).toEqual([COLUMN, ROW, "n_alwrap0001"]);
 });
 
-test("section hanya bisa di-drop ke page: drag Fitur 1 ke atas Hero mengurutkan ulang section (edge ED-063)", async ({ page }) => {
+test("section hanya bisa di-drop ke page: drag Fitur 1 ke atas Hero mengurutkan ulang section (edge ED-063)", async ({
+  page,
+}) => {
   await page.goto("?fixture=landing200&zoom=0.25&x=20&y=20");
   const ids = await page.evaluate(() => {
-    const nodes = (window as unknown as { __spike: { doc: { getMap(n: string): { entries(): IterableIterator<[string, { get(k: string): unknown }]> } } } }).__spike.doc.getMap("nodes");
+    const nodes = (
+      window as unknown as {
+        __spike: { doc: { getMap(n: string): { entries(): IterableIterator<[string, { get(k: string): unknown }]> } } };
+      }
+    ).__spike.doc.getMap("nodes");
     const byName: Record<string, string> = {};
     for (const [id, node] of nodes.entries()) byName[String(node.get("name"))] = id;
     return { hero: byName.Hero ?? "", feature: byName["Fitur 1"] ?? "", page: "pg_bench00001" };

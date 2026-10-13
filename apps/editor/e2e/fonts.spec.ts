@@ -36,7 +36,9 @@ async function addChromeProbe(page: Page): Promise<Locator> {
 }
 
 for (const isolation of ["shadow", "prefix"]) {
-  test(`isolation=${isolation}: teks canvas memakai font situs, UI editor bernama font sama tidak berubah`, async ({ page }) => {
+  test(`isolation=${isolation}: teks canvas memakai font situs, UI editor bernama font sama tidak berubah`, async ({
+    page,
+  }) => {
     // Baseline diukur di halaman tanpa font situs (font termuat sangat cepat, jadi "sebelum load" tidak bisa diandalkan).
     await page.goto(`?fixture=hero&isolation=${isolation}`);
     const title = page.locator(`[data-node-id="${TITLE_ID}"]`);
@@ -76,7 +78,8 @@ test("font gagal dimuat: teks tetap tampil dengan fallback dan ada peringatan", 
   await expect.poll(() => warnings.join("\n")).toContain('Font situs "Poppins" gagal dimuat');
   // Bukan document.fonts.check(): nilainya true bila tidak ada face yang cocok sama sekali.
   const loadedFaces = await page.evaluate(
-    () => [...document.fonts].filter((face) => face.family.includes("pf-site Poppins") && face.status === "loaded").length,
+    () =>
+      [...document.fonts].filter((face) => face.family.includes("pf-site Poppins") && face.status === "loaded").length,
   );
   expect(loadedFaces).toBe(0);
 });

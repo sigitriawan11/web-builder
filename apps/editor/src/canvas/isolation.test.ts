@@ -30,7 +30,9 @@ describe("siteCssFromSearch", () => {
 
 describe("scopeCss (Opsi B)", () => {
   it("membatasi selector ke scope, termasuk selector universal & daftar selector", () => {
-    expect(scopeCss("* { box-sizing: content-box; }", ".pf-root")).toBe(".pf-root, .pf-root * { box-sizing: content-box; }");
+    expect(scopeCss("* { box-sizing: content-box; }", ".pf-root")).toBe(
+      ".pf-root, .pf-root * { box-sizing: content-box; }",
+    );
     expect(scopeCss("h1, .title { color: red; } p{margin:0}", ".pf-root")).toBe(
       ".pf-root h1, .pf-root .title { color: red; } .pf-root p {margin:0}",
     );

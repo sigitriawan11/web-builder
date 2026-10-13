@@ -1,5 +1,5 @@
 import * as Y from "yjs";
-import { type OpContext, type SiteDocument, SiteDocumentSchema, YDOC_KEYS, jsonToYDoc, yDocToJson } from "../src";
+import { jsonToYDoc, type OpContext, type SiteDocument, SiteDocumentSchema, YDOC_KEYS, yDocToJson } from "../src";
 
 // Y.Doc dari fixture + UndoManager yang hanya melacak origin lokal (DM-060).
 export function setupDoc(fixture: SiteDocument) {

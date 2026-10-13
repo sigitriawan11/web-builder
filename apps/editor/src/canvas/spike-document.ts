@@ -7,12 +7,12 @@ import { selectionStore } from "../store/selection-store";
 import { resolvePressTarget } from "../tools/select/marquee";
 import { type MarqueeContext, marqueeSelection } from "../tools/select/marquee-selection";
 import { nodeLookupFrom } from "../tools/select/node-lookup";
-import type { PressTarget } from "./interactions/interaction-machine";
 import { cameraStore } from "./camera-store";
 import { fixtureFromSearch } from "./dev-fixture";
 import { spikeGeometry } from "./geometry/spike-geometry";
 import { isSelectablePath } from "./hit-test/hit-test";
 import { hitTestCanvas } from "./hit-test/spike-hit-test";
+import type { PressTarget } from "./interactions/interaction-machine";
 
 // SEMENTARA (spike M0): satu Y.Doc dari fixture untuk seluruh editor. Lifecycle Y.Doc sungguhan
 // (IndexedDB → Hocuspocus) menyusul di M1 (T1.15.7).
@@ -65,7 +65,8 @@ if (import.meta.env.DEV) {
     __spike: {
       doc: spikeDoc,
       ops: { createNode, moveNode, updateStyle, deleteNodes },
-      run: (op: Parameters<typeof runOp>[1], input: unknown) => runOp({ doc: spikeDoc, origin: LOCAL_ORIGIN }, op, input),
+      run: (op: Parameters<typeof runOp>[1], input: unknown) =>
+        runOp({ doc: spikeDoc, origin: LOCAL_ORIGIN }, op, input),
       // Dipakai E2E & benchmark spike (T0.4.6, T0.7.3).
       camera: cameraStore,
       geometry: spikeGeometry,

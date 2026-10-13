@@ -1,4 +1,11 @@
-import { moveNode, type OpContext, type PositionStyle, resolveStyle, runOp, updateStyle } from "@platform/document-model";
+import {
+  moveNode,
+  type OpContext,
+  type PositionStyle,
+  resolveStyle,
+  runOp,
+  updateStyle,
+} from "@platform/document-model";
 import { useEffect } from "react";
 import type { NodeStore } from "../../document/node-store";
 import { interactionStore } from "../../store/interaction-store";
@@ -59,7 +66,8 @@ export function useDragSessions(deps: DragSessionDeps): void {
       if (!resizing || resizing.nodeId !== state.nodeId) {
         const start = deps.geometry.getRect(state.nodeId);
         const node = deps.nodeStore.getNode(state.nodeId);
-        resizing = start && node ? { nodeId: state.nodeId, start, position: resolveStyle(node.style, "base").position } : null;
+        resizing =
+          start && node ? { nodeId: state.nodeId, start, position: resolveStyle(node.style, "base").position } : null;
       }
       if (!resizing) return null;
       const delta = screenDeltaToWorld(
@@ -173,7 +181,8 @@ export function useDragSessions(deps: DragSessionDeps): void {
       });
     };
 
-    const deltaFor = (state: MoveState) => moveDelta(state.origin, state.current, cameraStore.getState().zoom, state.shiftKey);
+    const deltaFor = (state: MoveState) =>
+      moveDelta(state.origin, state.current, cameraStore.getState().zoom, state.shiftKey);
 
     const endMove = () => {
       for (const item of moving ?? []) if (item.element) clearPreviewTranslate(item.element);
@@ -213,7 +222,10 @@ export function useDragSessions(deps: DragSessionDeps): void {
         // Indeks akhir moveNode = indeks semula bila parent sama → drop di tempat asal tidak membuat
         // update Yjs maupun langkah undo kosong.
         const unchanged =
-          target?.parentId === node?.parentId && parent && "children" in parent && parent.children.indexOf(id) === target?.index;
+          target?.parentId === node?.parentId &&
+          parent &&
+          "children" in parent &&
+          parent.children.indexOf(id) === target?.index;
         // Satu moveNode = satu transaksi (ED-024); indeks = posisi akhir di parent tujuan.
         if (effect.type === "commit" && target && !unchanged) {
           deps.undoBoundary();
@@ -233,7 +245,10 @@ export function useDragSessions(deps: DragSessionDeps): void {
           deps.undoBoundary();
           deps.opContext.doc.transact(() => {
             for (const item of items) {
-              runOp(deps.opContext, updateStyle, { ids: [item.id], patch: { position: movedPosition(item.start, delta) } });
+              runOp(deps.opContext, updateStyle, {
+                ids: [item.id],
+                patch: { position: movedPosition(item.start, delta) },
+              });
             }
           }, deps.opContext.origin);
           deps.undoBoundary();

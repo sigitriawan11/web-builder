@@ -83,7 +83,11 @@ function distance(a: Point, b: Point): number {
 }
 
 // Jenis drag ditentukan oleh yang ditekan: node → pindah, handle → resize, area kosong → marquee.
-function startDrag(pressing: Extract<InteractionState, { type: "pressing" }>, point: Point, shiftKey: boolean): DragState {
+function startDrag(
+  pressing: Extract<InteractionState, { type: "pressing" }>,
+  point: Point,
+  shiftKey: boolean,
+): DragState {
   const track = { pointerId: pressing.pointerId, origin: pressing.origin, current: point, shiftKey };
   switch (pressing.target.kind) {
     case "node":
@@ -127,7 +131,8 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
     }
 
     case "pointerMove": {
-      if (state.type === "idle" || state.type === "panning" || state.pointerId !== event.pointerId) return unchanged(state);
+      if (state.type === "idle" || state.type === "panning" || state.pointerId !== event.pointerId)
+        return unchanged(state);
       const shiftKey = event.shiftKey ?? state.shiftKey;
       if (state.type === "pressing") {
         if (distance(state.origin, event.point) < DRAG_THRESHOLD_PX) {
@@ -141,7 +146,8 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
     case "pointerUp": {
       if (state.type === "idle" || state.pointerId !== event.pointerId) return unchanged(state);
       if (state.type === "panning") return { state: IDLE, effects: [] };
-      if (state.type === "pressing") return { state: IDLE, effects: [{ type: "click", target: state.target, point: event.point }] };
+      if (state.type === "pressing")
+        return { state: IDLE, effects: [{ type: "click", target: state.target, point: event.point }] };
       return { state: IDLE, effects: [{ type: "commit", drag: { ...state, current: event.point } }] };
     }
 

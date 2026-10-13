@@ -10,10 +10,15 @@ type Spike = {
   undoManager: { undoStack: unknown[] };
 };
 
-const docJson = (page: Page) => page.evaluate(() => JSON.stringify((window as unknown as { __spike: Spike }).__spike.doc.toJSON()));
-const undoSteps = (page: Page) => page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.undoManager.undoStack.length);
+const docJson = (page: Page) =>
+  page.evaluate(() => JSON.stringify((window as unknown as { __spike: Spike }).__spike.doc.toJSON()));
+const undoSteps = (page: Page) =>
+  page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.undoManager.undoStack.length);
 const select = (page: Page, ids: string[]) =>
-  page.evaluate((selection) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select(selection), ids);
+  page.evaluate(
+    (selection) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select(selection),
+    ids,
+  );
 
 async function dragNode(page: Page, id: string, dx: number, dy: number) {
   const box = await boxOf(nodeLocator(page, id));
@@ -36,7 +41,9 @@ test.beforeEach(async ({ page }) => {
   await expect(nodeLocator(page, CARD)).toBeVisible();
 });
 
-test("drag lalu resize → Ctrl+Z dua kali memulihkan dokumen & seleksi; Ctrl+Shift+Z / Ctrl+Y redo", async ({ page }) => {
+test("drag lalu resize → Ctrl+Z dua kali memulihkan dokumen & seleksi; Ctrl+Shift+Z / Ctrl+Y redo", async ({
+  page,
+}) => {
   const initial = await docJson(page);
   await select(page, [CARD]);
   await dragNode(page, CARD, 40, 30);
@@ -74,7 +81,15 @@ const TEXT = "n_ftext00001";
 const ORIGINAL_TEXT = "Seret aku ke mana saja";
 const cardX = (page: Page) =>
   page.evaluate(() => {
-    const spike = (window as unknown as { __spike: { doc: { getMap(name: string): { get(id: string): { toJSON(): { style: { base: { position: { x: number } } } } } } } } }).__spike;
+    const spike = (
+      window as unknown as {
+        __spike: {
+          doc: {
+            getMap(name: string): { get(id: string): { toJSON(): { style: { base: { position: { x: number } } } } } };
+          };
+        };
+      }
+    ).__spike;
     return spike.doc.getMap("nodes").get("n_fcard00001").toJSON().style.base.position.x;
   });
 
@@ -104,7 +119,9 @@ test("Ctrl+Z saat mengedit teks membatalkan ketikan, bukan aksi canvas sebelumny
   expect(errors).toEqual([]);
 });
 
-test("Ctrl+Z di dalam sesi edit granular per jeda ketik; setelah keluar, satu sesi = satu langkah undo", async ({ page }) => {
+test("Ctrl+Z di dalam sesi edit granular per jeda ketik; setelah keluar, satu sesi = satu langkah undo", async ({
+  page,
+}) => {
   await editText(page, "abc");
   // Jeda > captureTimeout (500 ms) memisahkan langkah selama sesi masih terbuka.
   await page.waitForTimeout(700);

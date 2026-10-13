@@ -7,7 +7,11 @@ const CARD = "n_fcard00001";
 const IMAGE = "n_fimage0001";
 type YMapLike = { get(key: string): unknown; toJSON(): unknown };
 type Spike = {
-  doc: { on(event: "update", listener: () => void): void; getMap(name: string): { get(id: string): YMapLike }; toJSON(): unknown };
+  doc: {
+    on(event: "update", listener: () => void): void;
+    getMap(name: string): { get(id: string): YMapLike };
+    toJSON(): unknown;
+  };
   selection: { getState(): { select(ids: string[]): void } };
   undoManager: { undo(): void; undoStack: unknown[] };
 };
@@ -31,11 +35,21 @@ const positionOf = (page: Page, id: string) =>
     const style = (node.get("style") as YMapLike).get("base") as YMapLike;
     return (style.get("position") as { x: number; y: number } | undefined) ?? null;
   }, id);
-const docJson = (page: Page) => page.evaluate(() => JSON.stringify((window as unknown as { __spike: Spike }).__spike.doc.toJSON()));
+const docJson = (page: Page) =>
+  page.evaluate(() => JSON.stringify((window as unknown as { __spike: Spike }).__spike.doc.toJSON()));
 const select = (page: Page, ids: string[]) =>
-  page.evaluate((selection) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select(selection), ids);
+  page.evaluate(
+    (selection) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select(selection),
+    ids,
+  );
 
-async function dragBy(page: Page, id: string, dx: number, dy: number, options: { shift?: boolean; escape?: boolean } = {}) {
+async function dragBy(
+  page: Page,
+  id: string,
+  dx: number,
+  dy: number,
+  options: { shift?: boolean; escape?: boolean } = {},
+) {
   const box = await boxOf(nodeLocator(page, id));
   const start = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   await page.mouse.move(start.x, start.y);
@@ -59,7 +73,10 @@ for (const zoom of [0.5, 1, 2]) {
 
     await dragBy(page, CARD, 60, 30);
 
-    expect(await positionOf(page, CARD)).toMatchObject({ x: 80 + Math.round(60 / zoom), y: 80 + Math.round(30 / zoom) });
+    expect(await positionOf(page, CARD)).toMatchObject({
+      x: 80 + Math.round(60 / zoom),
+      y: 80 + Math.round(30 / zoom),
+    });
     expect((await updates(page)) - baseUpdates).toBe(1);
     const after = await boxOf(nodeLocator(page, CARD));
     expect(Math.abs(after.x - before.x - 60)).toBeLessThanOrEqual(1);
@@ -98,7 +115,9 @@ test("kotak seleksi ikut bergeser selama drag; Esc mengembalikan semuanya tanpa 
   await page.mouse.move(card.x + 20, card.y + 20);
   await page.mouse.down();
   await page.mouse.move(card.x + 120, card.y + 20, { steps: 8 });
-  await expect.poll(async () => Math.round((await boxOf(page.locator(".overlay-selection-outline"))).x)).toBe(Math.round(card.x + 100));
+  await expect
+    .poll(async () => Math.round((await boxOf(page.locator(".overlay-selection-outline"))).x))
+    .toBe(Math.round(card.x + 100));
   await expect.poll(async () => Math.round((await boxOf(nodeLocator(page, CARD))).x)).toBe(Math.round(card.x + 100));
   await page.keyboard.press("Escape");
   await page.mouse.up();

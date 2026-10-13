@@ -39,7 +39,8 @@ export function InlineTextEditor({ nodeId }: { nodeId: string }) {
   const nodeStore = useContext(NodeStoreContext);
   const undo = useContext(UndoContext);
   const fragment = nodeStore?.getRichTextFragment(nodeId) ?? null;
-  if (!fragment || !undo) throw new Error(`InlineTextEditor: node "${nodeId}" tanpa rich text atau di luar UndoContext`);
+  if (!fragment || !undo)
+    throw new Error(`InlineTextEditor: node "${nodeId}" tanpa rich text atau di luar UndoContext`);
   const extensions = useMemo(() => [...richTextExtensions, yjsBinding(fragment, undo)], [fragment, undo]);
   // ED-115: satu sesi edit = satu langkah undo setelah editor ditutup.
   useEffect(() => {

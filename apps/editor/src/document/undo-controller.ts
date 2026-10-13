@@ -37,7 +37,11 @@ export interface UndoController {
  * `localOrigins`: semua origin milik user ini — command canvas dan binding teks Tiptap (`ySyncPluginKey`),
  * sehingga ketikan dan aksi canvas berbagi satu stack undo.
  */
-export function createUndoController(doc: Y.Doc, localOrigins: readonly unknown[], selection: SelectionAccess): UndoController {
+export function createUndoController(
+  doc: Y.Doc,
+  localOrigins: readonly unknown[],
+  selection: SelectionAccess,
+): UndoController {
   const tracked = new Set(localOrigins);
   const manager = new Y.UndoManager(
     [
@@ -88,7 +92,8 @@ export function createUndoController(doc: Y.Doc, localOrigins: readonly unknown[
     }
     const ids = meta.get(event.type === "undo" ? SELECTION_BEFORE : SELECTION_AFTER);
     /* v8 ignore next */
-    if (Array.isArray(ids)) selection.restore(ids.filter((id): id is string => typeof id === "string" && selection.exists(id)));
+    if (Array.isArray(ids))
+      selection.restore(ids.filter((id): id is string => typeof id === "string" && selection.exists(id)));
   });
 
   type Item = (typeof manager.undoStack)[number];

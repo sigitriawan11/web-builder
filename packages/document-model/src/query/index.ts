@@ -1,4 +1,3 @@
-export { applyStylePatch, type Breakpoint, BREAKPOINTS, resolveStyle } from "./resolve-style";
 export {
   estimateAvailableWidth,
   estimateMaxContentWidth,
@@ -7,3 +6,4 @@ export {
   type TextMetrics,
   type WidthEstimateContext,
 } from "./estimate-width";
+export { applyStylePatch, BREAKPOINTS, type Breakpoint, resolveStyle } from "./resolve-style";

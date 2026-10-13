@@ -110,7 +110,13 @@ describe("sizeToCss (DM-027)", () => {
   it("hug menjadi fit-content; min/max & aspect ratio diteruskan", () => {
     expect(
       sizeToCss(
-        { width: { mode: "hug" }, height: { mode: "hug" }, minHeight: px(560), maxWidth: { $token: "size.container" }, aspectRatio: 1.5 },
+        {
+          width: { mode: "hug" },
+          height: { mode: "hug" },
+          minHeight: px(560),
+          maxWidth: { $token: "size.container" },
+          aspectRatio: 1.5,
+        },
         "block",
       ),
     ).toEqual({
@@ -188,16 +194,22 @@ describe("styleToCss & childLayoutOf", () => {
 
 describe("positionToCss (DM-028)", () => {
   it("absolute → left/top px; flow tanpa CSS", () => {
-    expect(positionToCss({ type: "absolute", x: 80, y: -12.5 })).toEqual({ position: "absolute", left: "80px", top: "-12.5px" });
+    expect(positionToCss({ type: "absolute", x: 80, y: -12.5 })).toEqual({
+      position: "absolute",
+      left: "80px",
+      top: "-12.5px",
+    });
     expect(positionToCss({ type: "flow" })).toEqual({});
   });
 
   it("absolute menang atas position relative dari layout none", () => {
-    expect(styleToCss({ layout: { mode: "none" }, position: { type: "absolute", x: 1, y: 2 } }, "block")).toMatchObject({
-      position: "absolute",
-      left: "1px",
-      top: "2px",
-    });
+    expect(styleToCss({ layout: { mode: "none" }, position: { type: "absolute", x: 1, y: 2 } }, "block")).toMatchObject(
+      {
+        position: "absolute",
+        left: "1px",
+        top: "2px",
+      },
+    );
   });
 });
 

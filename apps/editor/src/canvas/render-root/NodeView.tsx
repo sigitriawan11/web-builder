@@ -7,8 +7,8 @@ import { textEditingStore } from "../../store/text-editing-store";
 import { GeometryContext } from "../geometry/geometry-context";
 import { InlineTextEditor } from "../text-editing/InlineTextEditor";
 import { FrameContext } from "./breakpoint-context";
-import { renderProbe } from "./render-probe";
 import { renderNodeElement } from "./render-node";
+import { renderProbe } from "./render-probe";
 import { childLayoutOf, type ParentLayout } from "./style-to-css";
 
 interface NodeViewProps {
@@ -53,6 +53,8 @@ export const NodeView = memo(function NodeViewRender({ id, parent }: NodeViewPro
   }
   const childLayout = childLayoutOf(style);
   const children =
-    "children" in node ? node.children.map((childId) => <NodeView key={childId} id={childId} parent={childLayout} />) : null;
+    "children" in node
+      ? node.children.map((childId) => <NodeView key={childId} id={childId} parent={childLayout} />)
+      : null;
   return renderNodeElement(node, context, children);
 });

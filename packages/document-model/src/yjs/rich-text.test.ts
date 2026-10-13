@@ -42,11 +42,9 @@ describe("rich text ↔ Y.XmlFragment (DM-058, T0.8.5)", () => {
     const paragraph = fragment.get(1);
     if (!(paragraph instanceof Y.XmlElement)) throw new Error("bukan elemen");
     expect(paragraph.nodeName).toBe("paragraph");
-    expect(paragraph.toArray().map((child) => (child instanceof Y.XmlText ? "text" : (child as Y.XmlElement).nodeName))).toEqual([
-      "text",
-      "hardBreak",
-      "text",
-    ]);
+    expect(
+      paragraph.toArray().map((child) => (child instanceof Y.XmlText ? "text" : (child as Y.XmlElement).nodeName)),
+    ).toEqual(["text", "hardBreak", "text"]);
     const first = paragraph.get(0);
     if (!(first instanceof Y.XmlText)) throw new Error("bukan teks");
     expect(first.toDelta()).toEqual([{ insert: "Kue " }, { insert: "lembut", attributes: { bold: {}, italic: {} } }]);

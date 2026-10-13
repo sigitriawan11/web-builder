@@ -12,7 +12,11 @@ const NODE_SELECTOR = "[data-node-id]";
 // Rantai node lewat DOM: elemen node bersarang sama persis dengan tree dokumen.
 function nodePath(element: Element): string[] {
   const path: string[] = [];
-  for (let current = element.closest(NODE_SELECTOR); current; current = current.parentElement?.closest(NODE_SELECTOR) ?? null) {
+  for (
+    let current = element.closest(NODE_SELECTOR);
+    current;
+    current = current.parentElement?.closest(NODE_SELECTOR) ?? null
+  ) {
     const id = current.getAttribute("data-node-id");
     if (id) path.push(id);
   }

@@ -52,7 +52,11 @@ function formatLength(value: number): string {
  * Label `W × H` (ED-060). Untuk anak auto-layout, sumbu ber-mode Hug/Fill ditampilkan sebagai kata,
  * mis. `Fill × 48`. `size` dalam px world (bukan screen) agar tidak berubah saat zoom.
  */
-export function sizeLabel(size: { width: number; height: number }, modes: { width: AxisMode; height: AxisMode }, inAutoLayout: boolean): string {
+export function sizeLabel(
+  size: { width: number; height: number },
+  modes: { width: AxisMode; height: AxisMode },
+  inAutoLayout: boolean,
+): string {
   const axis = (value: number, mode: AxisMode) => {
     if (inAutoLayout && mode === "hug") return "Hug";
     if (inAutoLayout && mode === "fill") return "Fill";

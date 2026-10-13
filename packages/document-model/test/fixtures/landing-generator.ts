@@ -87,7 +87,10 @@ class LandingBuilder {
     parentId: string,
     name: string,
     style: ResponsiveStyle,
-    extra: { tag?: "section" | "header" | "nav" | "div"; role?: "section" | "container" | "card" | "button" | "list" } = {},
+    extra: {
+      tag?: "section" | "header" | "nav" | "div";
+      role?: "section" | "container" | "card" | "button" | "list";
+    } = {},
   ): string {
     return this.add({
       id: this.nextId(),
@@ -204,17 +207,24 @@ class LandingBuilder {
       },
       { tag: "nav" },
     );
-    for (const label of ["Beranda", "Menu", "Tentang", "Kontak"]) this.text(links, `Link / ${label}`, "span", label, "hug");
+    for (const label of ["Beranda", "Menu", "Tentang", "Kontak"])
+      this.text(links, `Link / ${label}`, "span", label, "hug");
   }
 
   hero(pageId: string): void {
     const section = this.frame(pageId, "Hero", this.sectionStyle("#FFF8F0"), { tag: "section", role: "section" });
     const row = this.frame(section, "Hero / Row", {
-      base: { layout: { mode: "flex", direction: "row", gap: { $token: "space.10" }, align: "center" }, size: { width: { mode: "fill" } } },
+      base: {
+        layout: { mode: "flex", direction: "row", gap: { $token: "space.10" }, align: "center" },
+        size: { width: { mode: "fill" } },
+      },
       mobile: { layout: { direction: "column" } },
     });
     const copy = this.frame(row, "Hero / Copy", {
-      base: { layout: { mode: "flex", direction: "column", gap: { $token: "space.4" } }, size: { width: { mode: "fill" } } },
+      base: {
+        layout: { mode: "flex", direction: "column", gap: { $token: "space.4" } },
+        size: { width: { mode: "fill" } },
+      },
     });
     this.text(copy, "Hero / Title", "h1", this.sentence(4, 8));
     this.text(copy, "Hero / Subtitle", "p", this.sentence(12, 24));

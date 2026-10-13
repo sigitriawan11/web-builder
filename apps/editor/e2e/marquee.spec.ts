@@ -3,7 +3,12 @@ import { boxOf, idsByName, nodeLocator, selectedIds } from "./doc-helpers";
 
 // T0.5.5 / ED-053: marquee selection di fixture landing.
 
-async function drag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }, options: { shift?: boolean; escape?: boolean } = {}) {
+async function drag(
+  page: Page,
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  options: { shift?: boolean; escape?: boolean } = {},
+) {
   if (options.shift) await page.keyboard.down("Shift");
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
@@ -47,7 +52,12 @@ test.describe("marquee top-level (dari luar page)", () => {
     const hero = await boxOf(nodeLocator(page, id.Hero));
     await nodeLocator(page, id.Hero).click({ position: { x: 4, y: 4 } });
 
-    await drag(page, { x: hero.x + hero.width + 40, y: hero.y + 10 }, { x: hero.x + 40, y: hero.y + hero.height + 60 }, { escape: true });
+    await drag(
+      page,
+      { x: hero.x + hero.width + 40, y: hero.y + 10 },
+      { x: hero.x + 40, y: hero.y + hero.height + 60 },
+      { escape: true },
+    );
 
     expect(await selectedIds(page)).toEqual([id.Hero]);
   });
@@ -76,7 +86,9 @@ test("marquee di dalam frame yang dimasuki memilih anak-anaknya (ED-053)", async
   // Canvas memakai transform (bukan scroll): geser kamera agar Kartu 1 berada di atas layar.
   const before = await boxOf(nodeLocator(page, id["Kartu 1"]));
   await page.evaluate((shift) => {
-    const camera = (window as unknown as { __spike: { camera: { getState(): { y: number; setCamera(next: { y: number }): void } } } }).__spike.camera.getState();
+    const camera = (
+      window as unknown as { __spike: { camera: { getState(): { y: number; setCamera(next: { y: number }): void } } } }
+    ).__spike.camera.getState();
     camera.setCamera({ y: camera.y + shift });
   }, 150 - before.y);
   await expect.poll(async () => Math.round((await boxOf(nodeLocator(page, id["Kartu 1"]))).y)).toBe(150);

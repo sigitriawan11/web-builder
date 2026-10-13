@@ -47,7 +47,9 @@ test.describe("Opsi A: Shadow DOM", () => {
 });
 
 test.describe("Opsi B: prefix class", () => {
-  test("CSS situs agresif (di-scope ke .pf-root) berlaku di canvas tapi tidak menyentuh UI editor", async ({ page }) => {
+  test("CSS situs agresif (di-scope ke .pf-root) berlaku di canvas tapi tidak menyentuh UI editor", async ({
+    page,
+  }) => {
     await page.goto("?fixture=hero&isolation=prefix");
     const chromeFontBefore = await computed(page, CHROME_ELEMENT, "font-family");
     await page.goto("?fixture=hero&siteCss=aggressive&isolation=prefix");

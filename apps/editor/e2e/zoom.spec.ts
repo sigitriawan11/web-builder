@@ -38,7 +38,9 @@ test("Ctrl + = dan Ctrl + - melompat ke preset berikutnya di tengah viewport", a
   const center = { x: size.width / 2, y: size.height / 2 };
 
   await page.keyboard.press("Control+Equal");
-  await expect.poll(() => readCamera(page)).toEqual({ x: center.x - center.x * 1.5, y: center.y - center.y * 1.5, zoom: 1.5 });
+  await expect
+    .poll(() => readCamera(page))
+    .toEqual({ x: center.x - center.x * 1.5, y: center.y - center.y * 1.5, zoom: 1.5 });
 
   await page.keyboard.press("Control+Minus");
   await page.keyboard.press("Minus");

@@ -120,10 +120,12 @@ describe("updateStyle — position (DM-028)", () => {
   it("absolute tanpa x/y ditolak", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    expect(runOp(ctx, updateStyle, { ids: ["n_heroimg001"], patch: { position: { type: "absolute" } } })).toMatchObject({
-      ok: false,
-      error: { code: "INVALID_RESULT" },
-    });
+    expect(runOp(ctx, updateStyle, { ids: ["n_heroimg001"], patch: { position: { type: "absolute" } } })).toMatchObject(
+      {
+        ok: false,
+        error: { code: "INVALID_RESULT" },
+      },
+    );
     expect(read()).toEqual(heroDocument());
   });
 });

@@ -28,7 +28,11 @@ const down = (target: PressTarget, button = 0, panTool = false, pointerId = ID):
   panTool,
   additive: false,
 });
-const move = (point: { x: number; y: number }, pointerId = ID): InteractionEvent => ({ type: "pointerMove", pointerId, point });
+const move = (point: { x: number; y: number }, pointerId = ID): InteractionEvent => ({
+  type: "pointerMove",
+  pointerId,
+  point,
+});
 const up = (point = end, pointerId = ID): InteractionEvent => ({ type: "pointerUp", pointerId, point });
 const cancel = (pointerId = ID): InteractionEvent => ({ type: "pointerCancel", pointerId });
 
@@ -94,7 +98,11 @@ describe("reduceInteraction — pressing", () => {
   });
 
   it("dragResize membawa node & handle", () => {
-    expect(run(down(handle), move(far)).state).toMatchObject({ type: "dragResize", nodeId: "n_card000001", handle: "se" });
+    expect(run(down(handle), move(far)).state).toMatchObject({
+      type: "dragResize",
+      nodeId: "n_card000001",
+      handle: "se",
+    });
   });
 
   it.each([
@@ -117,7 +125,11 @@ describe("reduceInteraction — drag", () => {
 
   it("Shift saat bergerak dicatat di state drag (kunci sumbu ED-062)", () => {
     const shifted = { type: "pointerMove", pointerId: ID, point: end, shiftKey: true } as const;
-    expect(run(down(node), move(far), shifted).state).toMatchObject({ type: "dragMove", shiftKey: true, path: node.kind === "node" ? node.path : [] });
+    expect(run(down(node), move(far), shifted).state).toMatchObject({
+      type: "dragMove",
+      shiftKey: true,
+      path: node.kind === "node" ? node.path : [],
+    });
   });
 
   it("pointermove memperbarui posisi terkini", () => {

@@ -12,7 +12,10 @@ type Spike = {
 
 async function open(page: Page, fixture: string, id: string, zoom = 1) {
   await page.goto(`?fixture=${fixture}&zoom=${zoom}&x=20&y=20`);
-  await page.evaluate((nodeId) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select([nodeId]), id);
+  await page.evaluate(
+    (nodeId) => (window as unknown as { __spike: Spike }).__spike.selection.getState().select([nodeId]),
+    id,
+  );
   await expect(page.locator(".overlay-handle").first()).toBeVisible();
 }
 

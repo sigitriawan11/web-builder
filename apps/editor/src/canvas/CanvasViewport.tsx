@@ -1,17 +1,22 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { UndoContext } from "../document/undo-context";
+import { NodeStoreContext } from "../document/use-node";
+import { useUndoShortcuts } from "../document/use-undo-shortcuts";
 import { useHoverHighlight } from "../tools/select/use-hover-highlight";
 import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-tool";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
-import { useUndoShortcuts } from "../document/use-undo-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
-import { setAppliedZoom, spikeGeometry } from "./geometry/spike-geometry";
-import { UndoContext } from "../document/undo-context";
-import { NodeStoreContext } from "../document/use-node";
+import { type DragSessionDeps, useDragSessions } from "./drag/use-drag-sessions";
+import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
-import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
+import { setAppliedZoom, spikeGeometry } from "./geometry/spike-geometry";
+import { useBrowserGuards } from "./interactions/use-browser-guards";
+import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
+import { usePanInteractions } from "./interactions/use-pan-interactions";
+import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import {
   LOCAL_ORIGIN,
@@ -25,11 +30,6 @@ import {
 } from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
-import { type DragSessionDeps, useDragSessions } from "./drag/use-drag-sessions";
-import { useBrowserGuards } from "./interactions/use-browser-guards";
-import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
-import { usePanInteractions } from "./interactions/use-pan-interactions";
-import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 
 // Setelah kamera diam selama ini, `will-change` dilepas agar teks dirasterisasi ulang dengan tajam (ED-013).
 const WILL_CHANGE_IDLE_MS = 150;
@@ -47,7 +47,11 @@ const dragSessionDeps: DragSessionDeps = {
   viewportOffset: spikeMarqueeContext.viewportOffset,
   undoBoundary: () => spikeUndo.stopCapturing(),
 };
-const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest, marquee: spikeMarqueeContext };
+const selectToolDeps: SelectToolDeps = {
+  nodeStore: spikeNodeStore,
+  hitTest: spikeHitTest,
+  marquee: spikeMarqueeContext,
+};
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);

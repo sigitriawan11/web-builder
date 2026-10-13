@@ -29,22 +29,27 @@ const { document: fixture, sections } = responsiveSectionsDocument();
 type Metrics = { regular: number; bold: number };
 
 async function calibrate(page: Page): Promise<Metrics> {
-  return page.evaluate(({ sample, pageId }) => {
-    // Di dalam elemen page agar mewarisi font situs yang sama dengan teks yang diukur.
-    const frame = document.getElementById("world")?.shadowRoot?.querySelector(`.bp-mobile [data-node-id="${pageId}"]`);
-    if (!frame) throw new Error("page di frame mobile tidak ada");
-    const measure = (weight: number) => {
-      const span = document.createElement("span");
-      span.textContent = sample;
-      span.style.cssText = `position:absolute;white-space:nowrap;font-size:100px;font-weight:${weight}`;
-      frame.appendChild(span);
-      const width = span.getBoundingClientRect().width;
-      span.remove();
-      return width;
-    };
-    // Zoom kamera 1 → px layar = px CSS.
-    return { regular: measure(400) / (sample.length * 100), bold: measure(700) / (sample.length * 100) };
-  }, { sample: CALIBRATION, pageId: fixture.pageOrder[0] });
+  return page.evaluate(
+    ({ sample, pageId }) => {
+      // Di dalam elemen page agar mewarisi font situs yang sama dengan teks yang diukur.
+      const frame = document
+        .getElementById("world")
+        ?.shadowRoot?.querySelector(`.bp-mobile [data-node-id="${pageId}"]`);
+      if (!frame) throw new Error("page di frame mobile tidak ada");
+      const measure = (weight: number) => {
+        const span = document.createElement("span");
+        span.textContent = sample;
+        span.style.cssText = `position:absolute;white-space:nowrap;font-size:100px;font-weight:${weight}`;
+        frame.appendChild(span);
+        const width = span.getBoundingClientRect().width;
+        span.remove();
+        return width;
+      };
+      // Zoom kamera 1 → px layar = px CSS.
+      return { regular: measure(400) / (sample.length * 100), bold: measure(700) / (sample.length * 100) };
+    },
+    { sample: CALIBRATION, pageId: fixture.pageOrder[0] },
+  );
 }
 
 async function measureMaxContent(page: Page, ids: string[]): Promise<Record<string, number>> {
@@ -70,7 +75,8 @@ function context(metrics: Metrics): WidthEstimateContext {
     nodes: fixture.nodes,
     assets: fixture.assets,
     breakpoint: "mobile",
-    lengthPx: (value: LengthValue) => ("$token" in value ? null : value.unit === "px" ? value.value : value.unit === "rem" ? value.value * 16 : null),
+    lengthPx: (value: LengthValue) =>
+      "$token" in value ? null : value.unit === "px" ? value.value : value.unit === "rem" ? value.value * 16 : null,
     text: {
       fontSizePx: (node: TextNode) => TAG_FONT_SIZE[node.tag ?? "p"] ?? 16,
       charWidthEm: (bold) => (bold ? metrics.bold : metrics.regular),
@@ -81,7 +87,8 @@ function context(metrics: Metrics): WidthEstimateContext {
 // Section pemilik node (ancestor langsung di bawah page).
 function sectionOf(node: Node): string {
   let current: Node | undefined = node;
-  while (current?.parentId && fixture.nodes[current.parentId]?.type !== "page") current = fixture.nodes[current.parentId];
+  while (current?.parentId && fixture.nodes[current.parentId]?.type !== "page")
+    current = fixture.nodes[current.parentId];
   return sections.find((section) => section.id === current?.id)?.name ?? "?";
 }
 
@@ -97,7 +104,10 @@ test("akurasi deteksi overflow stackRows: statis vs DOM (10 section × 3 font)",
     const metrics = await calibrate(page);
     const ctx = context(metrics);
     const rows = Object.values(fixture.nodes).filter((node) => isStackRowsCandidate(node, ctx));
-    const dom = await measureMaxContent(page, rows.map((row) => row.id));
+    const dom = await measureMaxContent(
+      page,
+      rows.map((row) => row.id),
+    );
 
     const perSection = new Map<string, boolean>(sections.map((section) => [section.name, true]));
     let correct = 0;

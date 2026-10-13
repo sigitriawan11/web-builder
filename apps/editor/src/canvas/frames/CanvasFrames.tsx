@@ -1,10 +1,10 @@
+import { siteFontStack } from "../fonts/site-fonts";
 import { GeometryContext } from "../geometry/geometry-context";
 import { spikeGeometry } from "../geometry/spike-geometry";
+import { FrameContext } from "../render-root/breakpoint-context";
 import { NodeView } from "../render-root/NodeView";
 import { RenderScope } from "../render-root/RenderRoot";
-import { FrameContext } from "../render-root/breakpoint-context";
 import { type FrameMode, type FrameSpec, layoutFrames } from "./frame-layout";
-import { siteFontStack } from "../fonts/site-fonts";
 import { IframeFrame } from "./IframeFrame";
 
 interface CanvasFramesProps {
@@ -22,7 +22,13 @@ interface FrameContentProps {
   siteFont: string | null;
 }
 
-function FrameContent({ frame, pageId, scopeClassName, siteFont, measured }: FrameContentProps & { measured: boolean }) {
+function FrameContent({
+  frame,
+  pageId,
+  scopeClassName,
+  siteFont,
+  measured,
+}: FrameContentProps & { measured: boolean }) {
   return (
     <GeometryContext.Provider value={measured ? spikeGeometry : null}>
       <FrameContext.Provider value={{ breakpoint: frame.breakpoint, width: frame.width }}>

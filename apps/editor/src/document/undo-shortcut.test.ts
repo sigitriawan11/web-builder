@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { undoShortcut } from "./undo-shortcut";
 
-const key = (code: string, mods: Partial<{ ctrlKey: boolean; metaKey: boolean; shiftKey: boolean; altKey: boolean }> = {}) => ({
+const key = (
+  code: string,
+  mods: Partial<{ ctrlKey: boolean; metaKey: boolean; shiftKey: boolean; altKey: boolean }> = {},
+) => ({
   code,
   ctrlKey: false,
   metaKey: false,

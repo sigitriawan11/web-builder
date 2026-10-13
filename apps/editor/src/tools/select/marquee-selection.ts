@@ -1,7 +1,7 @@
-import type { NodeStore } from "../../document/node-store";
 import { type CameraState, screenPoint, screenToWorld } from "../../canvas/geometry/coordinates";
 import type { GeometryStore } from "../../canvas/geometry/geometry-store";
 import type { Point } from "../../canvas/interactions/interaction-machine";
+import type { NodeStore } from "../../document/node-store";
 import { marqueeHits, rectFromPoints } from "./marquee";
 
 export interface MarqueeContext {

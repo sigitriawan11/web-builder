@@ -7,7 +7,12 @@ import type { LengthValue, Node, ResponsiveStyle, SiteDocument, Style } from "..
 const PAGE_ID = "pg_resp000001";
 const IMAGE_ASSET = "ast_resp00001";
 const px = (value: number): LengthValue => ({ value, unit: "px" });
-const pad = (vertical: number, horizontal: number) => ({ top: px(vertical), right: px(horizontal), bottom: px(vertical), left: px(horizontal) });
+const pad = (vertical: number, horizontal: number) => ({
+  top: px(vertical),
+  right: px(horizontal),
+  bottom: px(vertical),
+  left: px(horizontal),
+});
 
 class SectionBuilder {
   readonly nodes: Record<string, Node> = {};
@@ -40,7 +45,12 @@ class SectionBuilder {
     };
   }
 
-  frame(parentId: string, name: string, base: Style, extra: { mobile?: ResponsiveStyle["mobile"]; role?: "section" | "card" | "button" | "container" } = {}): string {
+  frame(
+    parentId: string,
+    name: string,
+    base: Style,
+    extra: { mobile?: ResponsiveStyle["mobile"]; role?: "section" | "card" | "button" | "container" } = {},
+  ): string {
     return this.attach(parentId, {
       id: this.id(),
       type: "frame",
@@ -56,12 +66,22 @@ class SectionBuilder {
   }
 
   section(name: string, base: Style, mobile?: ResponsiveStyle["mobile"]): string {
-    const id = this.frame(PAGE_ID, name, { size: { width: { mode: "fill" } }, ...base }, { role: "section", ...(mobile ? { mobile } : {}) });
+    const id = this.frame(
+      PAGE_ID,
+      name,
+      { size: { width: { mode: "fill" } }, ...base },
+      { role: "section", ...(mobile ? { mobile } : {}) },
+    );
     this.sections.push({ id, name });
     return id;
   }
 
-  row(parentId: string, name: string, layout: { gap?: number; justify?: "start" | "spaceBetween" | "spaceAround"; padding?: [number, number] } = {}, width: "fill" | "hug" = "hug"): string {
+  row(
+    parentId: string,
+    name: string,
+    layout: { gap?: number; justify?: "start" | "spaceBetween" | "spaceAround"; padding?: [number, number] } = {},
+    width: "fill" | "hug" = "hug",
+  ): string {
     return this.frame(parentId, name, {
       layout: {
         mode: "flex",
@@ -75,11 +95,28 @@ class SectionBuilder {
     });
   }
 
-  column(parentId: string, name: string, gap: number, width: Style["size"] = { width: { mode: "hug" } }, role?: "card" | "container"): string {
-    return this.frame(parentId, name, { layout: { mode: "flex", direction: "column", gap: px(gap) }, size: width }, role ? { role } : {});
+  column(
+    parentId: string,
+    name: string,
+    gap: number,
+    width: Style["size"] = { width: { mode: "hug" } },
+    role?: "card" | "container",
+  ): string {
+    return this.frame(
+      parentId,
+      name,
+      { layout: { mode: "flex", direction: "column", gap: px(gap) }, size: width },
+      role ? { role } : {},
+    );
   }
 
-  text(parentId: string, name: string, tag: "h1" | "h2" | "h3" | "p" | "span", text: string, options: { bold?: boolean; width?: "fill" | "hug" } = {}): string {
+  text(
+    parentId: string,
+    name: string,
+    tag: "h1" | "h2" | "h3" | "p" | "span",
+    text: string,
+    options: { bold?: boolean; width?: "fill" | "hug" } = {},
+  ): string {
     return this.attach(parentId, {
       id: this.id(),
       type: "text",
@@ -92,7 +129,12 @@ class SectionBuilder {
       props: {
         content: {
           type: "doc",
-          content: [{ type: "paragraph", content: [{ type: "text", text, ...(options.bold ? { marks: [{ type: "bold" as const }] } : {}) }] }],
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text, ...(options.bold ? { marks: [{ type: "bold" as const }] } : {}) }],
+            },
+          ],
         },
       },
     });
@@ -106,7 +148,14 @@ class SectionBuilder {
       parentId,
       visible: true,
       locked: false,
-      style: { base: { size: { width: { mode: "fixed", value: width, unit: "px" }, height: { mode: "fixed", value: height, unit: "px" } } } },
+      style: {
+        base: {
+          size: {
+            width: { mode: "fixed", value: width, unit: "px" },
+            height: { mode: "fixed", value: height, unit: "px" },
+          },
+        },
+      },
       props: { image: { assetId: IMAGE_ASSET, alt: name }, fit: "cover" },
     });
   }
@@ -115,7 +164,11 @@ class SectionBuilder {
     const button = this.frame(
       parentId,
       `Tombol / ${label}`,
-      { layout: { mode: "flex", direction: "row", padding: pad(12, 20) }, size: { width: { mode: "hug" } }, fills: [{ type: "solid", color: "#E85D2A" }] },
+      {
+        layout: { mode: "flex", direction: "row", padding: pad(12, 20) },
+        size: { width: { mode: "hug" } },
+        fills: [{ type: "solid", color: "#E85D2A" }],
+      },
       { role: "button" },
     );
     this.text(button, `Tombol / ${label} / Label`, "span", label, { bold: true });
@@ -125,7 +178,14 @@ class SectionBuilder {
 
 // Padding horizontal section: 64 px desktop, 16 px mobile (pola umum template).
 const sectionLayout = (direction: "row" | "column", gap: number, justify?: "spaceBetween" | "spaceAround"): Style => ({
-  layout: { mode: "flex", direction, align: "center", gap: px(gap), padding: pad(48, 64), ...(justify ? { justify } : {}) },
+  layout: {
+    mode: "flex",
+    direction,
+    align: "center",
+    gap: px(gap),
+    padding: pad(48, 64),
+    ...(justify ? { justify } : {}),
+  },
 });
 const MOBILE_PADDING: ResponsiveStyle["mobile"] = { layout: { padding: { left: px(16), right: px(16) } } };
 
@@ -144,7 +204,13 @@ export function responsiveSectionsDocument(): { document: SiteDocument; sections
   const hero = b.section("2 Hero", sectionLayout("row", 48), MOBILE_PADDING);
   const copy = b.column(hero, "Hero / Teks", 16, { width: { mode: "fill" } });
   b.text(copy, "Hero / Judul", "h1", "Kue Rumahan Segar Setiap Hari");
-  b.text(copy, "Hero / Deskripsi", "p", "Dibuat dari bahan pilihan tanpa pengawet, dikirim hangat ke rumah Anda di seluruh Bandung.", { width: "fill" });
+  b.text(
+    copy,
+    "Hero / Deskripsi",
+    "p",
+    "Dibuat dari bahan pilihan tanpa pengawet, dikirim hangat ke rumah Anda di seluruh Bandung.",
+    { width: "fill" },
+  );
   const ctas = b.row(copy, "Hero / Tombol", { gap: 12 });
   b.button(ctas, "Pesan via WhatsApp");
   b.button(ctas, "Lihat Menu");
@@ -164,7 +230,12 @@ export function responsiveSectionsDocument(): { document: SiteDocument; sections
 
   // 4. Statistik empat angka pendek (dekat ambang).
   const stats = b.section("4 Statistik", sectionLayout("row", 32, "spaceAround"), MOBILE_PADDING);
-  for (const [value, label] of [["10K+", "Pelanggan"], ["45", "Varian"], ["3", "Kota"], ["8", "Tahun"]] as const) {
+  for (const [value, label] of [
+    ["10K+", "Pelanggan"],
+    ["45", "Varian"],
+    ["3", "Kota"],
+    ["8", "Tahun"],
+  ] as const) {
     const stat = b.column(stats, `Statistik / ${label}`, 4);
     b.text(stat, `Statistik / ${label} / Angka`, "h2", value);
     b.text(stat, `Statistik / ${label} / Label`, "span", label);
@@ -192,7 +263,11 @@ export function responsiveSectionsDocument(): { document: SiteDocument; sections
 
   // 8. Harga: tiga kartu lebar tetap; baris harga kecil di tiap kartu.
   const pricing = b.section("8 Harga", sectionLayout("row", 24), MOBILE_PADDING);
-  for (const [plan, price] of [["Hemat", "Rp150rb"], ["Keluarga", "Rp275rb"], ["Acara", "Rp600rb"]] as const) {
+  for (const [plan, price] of [
+    ["Hemat", "Rp150rb"],
+    ["Keluarga", "Rp275rb"],
+    ["Acara", "Rp600rb"],
+  ] as const) {
     const card = b.column(pricing, `Harga / ${plan}`, 12, { width: { mode: "fixed", value: 320, unit: "px" } }, "card");
     b.text(card, `Harga / ${plan} / Nama`, "h3", plan);
     const priceRow = b.row(card, `Harga / ${plan} / Baris harga`, { gap: 4 });

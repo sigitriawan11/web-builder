@@ -127,7 +127,9 @@ export function estimateAvailableWidth(node: Node, previewWidth: number, ctx: Wi
 export function isStackRowsCandidate(node: Node, ctx: WidthEstimateContext): boolean {
   if (node.type !== "frame" || node.props.role === "button") return false;
   const layout = styleOf(node, ctx).layout;
-  return layout?.mode === "flex" && layout.direction === "row" && layout.wrap !== true && flowChildren(node, ctx).length >= 2;
+  return (
+    layout?.mode === "flex" && layout.direction === "row" && layout.wrap !== true && flowChildren(node, ctx).length >= 2
+  );
 }
 
 // Prediksi statis: konten row tidak muat di lebar breakpoint → rule `stackRows` berlaku.

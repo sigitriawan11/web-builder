@@ -40,10 +40,13 @@ const flexShape = {
 
 export const LayoutSchema = z.discriminatedUnion("mode", [
   z.strictObject({ mode: z.literal("none") }),
-  z.strictObject({ mode: z.literal("flex"), ...flexShape }).partial().required({
-    mode: true,
-    direction: true,
-  }),
+  z
+    .strictObject({ mode: z.literal("flex"), ...flexShape })
+    .partial()
+    .required({
+      mode: true,
+      direction: true,
+    }),
 ]);
 
 // Layout di-merge per field; `padding` ikut deep merge (DM-036 aturan 1).

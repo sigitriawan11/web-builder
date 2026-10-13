@@ -5,7 +5,13 @@ import { spikeGeometry } from "./geometry/spike-geometry";
 
 // Outline 1px dari geometry store: debug `?outline=<nodeId>` (T0.5.1) & seleksi dasar (T0.5.4).
 // Handle, label ukuran & hover menyusul di T0.5.6.
-export function GeometryOutline({ nodeId, className = "overlay-geometry-outline" }: { nodeId: string; className?: string }) {
+export function GeometryOutline({
+  nodeId,
+  className = "overlay-geometry-outline",
+}: {
+  nodeId: string;
+  className?: string;
+}) {
   const subscribe = useCallback((listener: () => void) => spikeGeometry.subscribe(nodeId, listener), [nodeId]);
   // peekRect: baca cache tanpa memaksa layout (AC ED-019).
   const rect = useSyncExternalStore(subscribe, () => spikeGeometry.peekRect(nodeId));

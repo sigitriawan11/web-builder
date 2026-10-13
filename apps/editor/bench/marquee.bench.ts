@@ -16,7 +16,11 @@ test("marquee landing2000: biaya hitung & frame time saat drag", async ({ page }
     let hits = 0;
     const start = performance.now();
     for (let i = 0; i < runs; i++) {
-      hits = spike.marqueeSelection({ origin: { x: 300, y: 10 }, current: { x: 100, y: 10 + (i % 700) }, scopeId: null }).length;
+      hits = spike.marqueeSelection({
+        origin: { x: 300, y: 10 },
+        current: { x: 100, y: 10 + (i % 700) },
+        scopeId: null,
+      }).length;
     }
     return { averageMs: (performance.now() - start) / runs, lastHits: hits };
   });

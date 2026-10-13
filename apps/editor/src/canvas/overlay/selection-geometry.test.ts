@@ -30,7 +30,12 @@ describe("handlePositions (ED-060)", () => {
   });
 
   it(`node lebih kecil dari ${MIN_SIZE_FOR_EDGE_HANDLES}px screen hanya menampilkan sudut`, () => {
-    expect(handlePositions({ x: 0, y: 0, width: 20, height: 100 }).map(({ handle }) => handle)).toEqual(["nw", "ne", "se", "sw"]);
+    expect(handlePositions({ x: 0, y: 0, width: 20, height: 100 }).map(({ handle }) => handle)).toEqual([
+      "nw",
+      "ne",
+      "se",
+      "sw",
+    ]);
     expect(handlePositions({ x: 0, y: 0, width: 100, height: 23 })).toHaveLength(4);
     expect(handlePositions({ x: 0, y: 0, width: 24, height: 24 })).toHaveLength(8);
   });

@@ -51,7 +51,9 @@ export function SelectionOverlay({ nodeStore, geometry }: SelectionOverlayProps)
   const offset = useStore(previewStore, (state) => state.offset);
   // Node yang sedang dipindah digeser sementara (ED-024): kotak seleksi ikut tanpa menunggu ukur ulang.
   const rects = useWorldRects(geometry, selectedIds).map((rect, index) =>
-    rect && offset?.ids.includes(selectedIds[index] ?? "") ? { ...rect, x: rect.x + offset.dx, y: rect.y + offset.dy } : rect,
+    rect && offset?.ids.includes(selectedIds[index] ?? "")
+      ? { ...rect, x: rect.x + offset.dx, y: rect.y + offset.dy }
+      : rect,
   );
 
   const measured = rects.filter((rect) => rect !== null);
@@ -106,7 +108,9 @@ export function SelectionOverlay({ nodeStore, geometry }: SelectionOverlayProps)
       {!editing && (
         <div
           className="overlay-size-label"
-          style={{ transform: `translate(${screen.x + screen.width / 2}px, ${screen.y + screen.height + 8}px) translateX(-50%)` }}
+          style={{
+            transform: `translate(${screen.x + screen.width / 2}px, ${screen.y + screen.height + 8}px) translateX(-50%)`,
+          }}
         >
           {label}
         </div>
