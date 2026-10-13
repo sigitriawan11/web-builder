@@ -9,5 +9,27 @@
   },
   "files": {
     "includes": ["**", "!**/node_modules", "!**/.turbo", "!**/dist", "!**/coverage"]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/workflow-blocks/**", "packages/ai-tools/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "fetch": "workflow-blocks & ai-tools tidak boleh melakukan network langsung; pakai port yang di-inject (ARCHITECTURE \u00a74.3).",
+                  "XMLHttpRequest": "workflow-blocks & ai-tools tidak boleh melakukan network langsung; pakai port yang di-inject (ARCHITECTURE \u00a74.3).",
+                  "WebSocket": "workflow-blocks & ai-tools tidak boleh melakukan network langsung; pakai port yang di-inject (ARCHITECTURE \u00a74.3).",
+                  "EventSource": "workflow-blocks & ai-tools tidak boleh melakukan network langsung; pakai port yang di-inject (ARCHITECTURE \u00a74.3)."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
