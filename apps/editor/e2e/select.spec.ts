@@ -1,33 +1,10 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { idByName, idsByName, nodeLocator, selectedIds } from "./doc-helpers";
 
 // T0.5.4 / ED-038, ED-051: select tool & aturan kedalaman klik di fixture landing.
 
-type NodeEntry = [string, { get(key: string): unknown }];
-type Spike = {
-  doc: { getMap(name: string): { entries(): IterableIterator<NodeEntry> } };
-  selection: { getState(): { selectedIds: readonly string[] } };
-};
-
-// ID node berdasarkan nama layer di fixture landing.
-async function idByName(page: Page, name: string): Promise<string> {
-  const id = await page.evaluate((layerName) => {
-    const nodes = (window as unknown as { __spike: Spike }).__spike.doc.getMap("nodes");
-    for (const [id, node] of nodes.entries()) if (node.get("name") === layerName) return id;
-    return null;
-  }, name);
-  if (!id) throw new Error(`node "${name}" tidak ada`);
-  return id;
-}
-
-// Beberapa ID sekaligus, dipetakan per nama layer.
-async function idsByName<const N extends string>(page: Page, names: readonly N[]): Promise<Record<N, string>> {
-  const entries = await Promise.all(names.map(async (name) => [name, await idByName(page, name)] as const));
-  return Object.fromEntries(entries) as Record<N, string>;
-}
-
-const selected = (page: Page) =>
-  page.evaluate(() => [...(window as unknown as { __spike: Spike }).__spike.selection.getState().selectedIds]);
-const node = (page: Page, id: string) => page.locator(`[data-node-id="${id}"]`);
+const selected = selectedIds;
+const node = nodeLocator;
 
 test.beforeEach(async ({ page }) => {
   await page.goto("?fixture=landing200&zoom=0.5&x=20&y=20");

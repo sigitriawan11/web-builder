@@ -2,6 +2,7 @@ import { useStore } from "zustand";
 import { selectionStore } from "../store/selection-store";
 import { cameraStore } from "./camera-store";
 import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
+import { MarqueeOverlay } from "./MarqueeOverlay";
 
 const outlineNodeId = outlineNodeFromSearch(window.location.search);
 
@@ -17,6 +18,7 @@ export function CanvasOverlay() {
       {selectedIds.map((id) => (
         <GeometryOutline key={id} nodeId={id} className="overlay-selection-outline" />
       ))}
+      <MarqueeOverlay />
       <div className="overlay-zoom-indicator">{Math.round(zoom * 100)}%</div>
     </div>
   );

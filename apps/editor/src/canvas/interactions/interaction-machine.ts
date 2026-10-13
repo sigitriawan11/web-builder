@@ -16,7 +16,10 @@ export type PressTarget =
   // `path`: rantai node hasil hit-test (terdalam → page), untuk aturan kedalaman seleksi (ED-051).
   | { kind: "node"; nodeId: string; path: readonly string[] }
   | { kind: "handle"; nodeId: string; handle: ResizeHandle }
-  | { kind: "empty" };
+  // Area kosong: latar page, latar frame yang sedang "dimasuki", atau di luar page. `scopeId` = frame yang
+  // anak-anaknya menjadi kandidat marquee (ED-053); null = top-level page aktif. `path` = hit-test di titik
+  // itu (kosong di luar page), agar klik di latar frame yang dimasuki tetap memilih frame itu.
+  | { kind: "empty"; scopeId: string | null; path: readonly string[] };
 
 interface PointerTrack {
   pointerId: number;
@@ -27,16 +30,25 @@ interface PointerTrack {
 
 export type InteractionState =
   | { type: "idle" }
-  | ({ type: "pressing"; target: PressTarget } & PointerTrack)
+  | ({ type: "pressing"; target: PressTarget; additive: boolean } & PointerTrack)
   | ({ type: "dragMove"; nodeId: string } & PointerTrack)
   | ({ type: "dragResize"; nodeId: string; handle: ResizeHandle } & PointerTrack)
-  | ({ type: "marquee" } & PointerTrack)
+  | ({ type: "marquee"; scopeId: string | null; additive: boolean } & PointerTrack)
   | { type: "panning"; pointerId: number };
 
 export type DragState = Extract<InteractionState, { type: "dragMove" | "dragResize" | "marquee" }>;
 
 export type InteractionEvent =
-  | { type: "pointerDown"; pointerId: number; button: number; point: Point; target: PressTarget; panTool: boolean }
+  | {
+      type: "pointerDown";
+      pointerId: number;
+      button: number;
+      point: Point;
+      target: PressTarget;
+      panTool: boolean;
+      // Shift: marquee menambah ke seleksi (ED-053).
+      additive: boolean;
+    }
   | { type: "pointerMove"; pointerId: number; point: Point }
   | { type: "pointerUp"; pointerId: number; point: Point }
   | { type: "pointerCancel"; pointerId: number }
@@ -76,7 +88,7 @@ function startDrag(pressing: Extract<InteractionState, { type: "pressing" }>, po
     case "handle":
       return { type: "dragResize", nodeId: pressing.target.nodeId, handle: pressing.target.handle, ...track };
     case "empty":
-      return { type: "marquee", ...track };
+      return { type: "marquee", scopeId: pressing.target.scopeId, additive: pressing.additive, ...track };
   }
 }
 
@@ -98,7 +110,14 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
       // Tombol kanan dll. dibiarkan untuk context menu.
       if (event.button !== PRIMARY_BUTTON) return unchanged(state);
       return {
-        state: { type: "pressing", pointerId: event.pointerId, origin: event.point, current: event.point, target: event.target },
+        state: {
+          type: "pressing",
+          pointerId: event.pointerId,
+          origin: event.point,
+          current: event.point,
+          target: event.target,
+          additive: event.additive,
+        },
         effects: [],
       };
     }

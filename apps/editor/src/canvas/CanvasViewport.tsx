@@ -10,7 +10,13 @@ import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
 import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
-import { spikeHitTest, spikeNodeStore, spikePageId } from "./spike-document";
+import {
+  resolveSpikeTarget,
+  spikeHitTest,
+  spikeMarqueeContext,
+  spikeNodeStore,
+  spikePageId,
+} from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
@@ -25,8 +31,8 @@ const isolation = isolationFromSearch(window.location.search);
 const siteCss = siteCssFromSearch(window.location.search);
 const frameOptions = frameOptionsFromSearch(window.location.search);
 const siteFont = siteFontFromSearch(window.location.search);
-const interactionDeps: InteractionAdapterDeps = { hitTest: spikeHitTest };
-const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest };
+const interactionDeps: InteractionAdapterDeps = { hitTest: spikeHitTest, resolveTarget: resolveSpikeTarget };
+const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest, marquee: spikeMarqueeContext };
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);

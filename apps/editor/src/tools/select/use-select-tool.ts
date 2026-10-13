@@ -4,16 +4,20 @@ import { interactionStore } from "../../store/interaction-store";
 import { selectionStore } from "../../store/selection-store";
 import { textEditingStore } from "../../store/text-editing-store";
 import { effectiveTool, toolStore } from "../tool-store";
-import { type NodeLookup, resolveClickSelection, resolveDoubleClick } from "./selection-depth";
+import { type MarqueeContext, marqueeSelection } from "./marquee-selection";
+import { nodeLookupFrom } from "./node-lookup";
+import { resolveClickSelection, resolveDoubleClick } from "./selection-depth";
 
 export interface SelectToolDeps {
   nodeStore: NodeStore;
   hitTest(clientX: number, clientY: number): { nodeId: string; path: readonly string[] } | null;
+  marquee: MarqueeContext;
 }
 
 /**
  * Move/Select tool (ED-038): klik memilih dengan aturan kedalaman (ED-051), klik di area kosong
- * mengosongkan seleksi, double-click masuk ke anak atau mengedit teks yang sudah terseleksi.
+ * mengosongkan seleksi, double-click masuk ke anak atau mengedit teks yang sudah terseleksi,
+ * marquee memilih node yang tersentuh (ED-053; Shift menambah).
  * Klik datang dari efek `click` state machine interaksi (T0.5.3); hand tool tidak menghasilkan klik.
  */
 export function useSelectTool(viewportRef: RefObject<HTMLElement | null>, deps: SelectToolDeps): void {
@@ -21,19 +25,21 @@ export function useSelectTool(viewportRef: RefObject<HTMLElement | null>, deps: 
     const viewport = viewportRef.current;
     if (!viewport) return;
     const { nodeStore, hitTest } = deps;
-    const lookup: NodeLookup = (id) => {
-      const node = nodeStore.getNode(id);
-      if (!node) return null;
-      return { type: node.type, parentId: node.parentId, role: node.type === "frame" ? node.props.role : undefined };
-    };
+    const lookup = nodeLookupFrom(nodeStore);
     const isSelectTool = () => effectiveTool(toolStore.getState()) === "select";
 
     const unsubscribe = interactionStore.getState().onEffect((effect) => {
-      if (effect.type !== "click" || !isSelectTool()) return;
-      const { target } = effect;
-      if (target.kind === "handle") return;
+      if (!isSelectTool()) return;
       const { selectedIds, select, clear } = selectionStore.getState();
-      const next = target.kind === "node" ? resolveClickSelection(target.path, selectedIds, lookup) : null;
+
+      if (effect.type === "commit" && effect.drag.type === "marquee") {
+        const hits = marqueeSelection(effect.drag, deps.marquee);
+        select(effect.drag.additive ? [...selectedIds, ...hits.filter((id) => !selectedIds.includes(id))] : hits);
+        return;
+      }
+      if (effect.type !== "click" || effect.target.kind === "handle") return;
+      // Latar frame yang dimasuki tetap membawa path, sehingga klik di sana memilih frame itu (ED-051).
+      const next = resolveClickSelection(effect.target.path, selectedIds, lookup);
       if (next) select([next]);
       else clear();
     });

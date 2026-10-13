@@ -50,6 +50,20 @@ body,
   border: 1px solid #0d99ff;
 }
 
+/* ED-053: kotak marquee (biru transparan) dan node yang akan terpilih. */
+.overlay-marquee {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  border: 1px solid #0d99ff;
+  background: rgb(13 153 255 / 8%);
+}
+
+.overlay-marquee-hit {
+  border-style: dashed;
+}
+
 .overlay-zoom-indicator {
   position: absolute;
   right: 12px;

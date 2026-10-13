@@ -17,7 +17,7 @@ const end = { x: 160, y: 140 };
 
 const node: PressTarget = { kind: "node", nodeId: "n_card000001", path: ["n_card000001", "pg_home000001"] };
 const handle: PressTarget = { kind: "handle", nodeId: "n_card000001", handle: "se" };
-const empty: PressTarget = { kind: "empty" };
+const empty: PressTarget = { kind: "empty", scopeId: null, path: [] };
 
 const down = (target: PressTarget, button = 0, panTool = false, pointerId = ID): InteractionEvent => ({
   type: "pointerDown",
@@ -26,6 +26,7 @@ const down = (target: PressTarget, button = 0, panTool = false, pointerId = ID):
   point: origin,
   target,
   panTool,
+  additive: false,
 });
 const move = (point: { x: number; y: number }, pointerId = ID): InteractionEvent => ({ type: "pointerMove", pointerId, point });
 const up = (point = end, pointerId = ID): InteractionEvent => ({ type: "pointerUp", pointerId, point });
@@ -45,7 +46,14 @@ function run(...events: InteractionEvent[]) {
 
 describe("reduceInteraction — dari idle (ED-023)", () => {
   it("tombol kiri → pressing dengan target", () => {
-    expect(run(down(node)).state).toEqual({ type: "pressing", pointerId: ID, origin, current: origin, target: node });
+    expect(run(down(node)).state).toEqual({
+      type: "pressing",
+      pointerId: ID,
+      origin,
+      current: origin,
+      target: node,
+      additive: false,
+    });
   });
 
   it("tombol tengah atau hand tool → panning", () => {
@@ -75,6 +83,13 @@ describe("reduceInteraction — pressing", () => {
 
     expect(state.type).toBe(expected);
     expect(state).toMatchObject({ pointerId: ID, origin, current: far });
+  });
+
+  it("marquee membawa scope frame awal & mode tambah (Shift)", () => {
+    const scoped: PressTarget = { kind: "empty", scopeId: "n_hero000001", path: ["n_hero000001", "pg_home000001"] };
+    const shiftDown: InteractionEvent = { ...down(scoped), additive: true } as InteractionEvent;
+
+    expect(run(shiftDown, move(far)).state).toMatchObject({ type: "marquee", scopeId: "n_hero000001", additive: true });
   });
 
   it("dragResize membawa node & handle", () => {

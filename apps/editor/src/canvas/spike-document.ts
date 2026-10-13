@@ -2,6 +2,10 @@ import { createNode, deleteNodes, jsonToYDoc, moveNode, runOp, updateStyle } fro
 import { NodeStore } from "../document/node-store";
 import { interactionStore } from "../store/interaction-store";
 import { selectionStore } from "../store/selection-store";
+import { resolvePressTarget } from "../tools/select/marquee";
+import { type MarqueeContext, marqueeSelection } from "../tools/select/marquee-selection";
+import { nodeLookupFrom } from "../tools/select/node-lookup";
+import type { PressTarget } from "./interactions/interaction-machine";
 import { cameraStore } from "./camera-store";
 import { fixtureFromSearch } from "./dev-fixture";
 import { spikeGeometry } from "./geometry/spike-geometry";
@@ -28,6 +32,21 @@ export function spikeHitTest(clientX: number, clientY: number) {
   return world ? hitTestCanvas(world, clientX, clientY, isSelectable) : null;
 }
 
+const spikeLookup = nodeLookupFrom(spikeNodeStore);
+
+// ED-053: node vs area kosong (marquee) bergantung pada seleksi saat ditekan.
+export function resolveSpikeTarget(hit: { nodeId: string; path: readonly string[] } | null): PressTarget {
+  return resolvePressTarget(hit, selectionStore.getState().selectedIds, spikeLookup);
+}
+
+export const spikeMarqueeContext: MarqueeContext = {
+  nodeStore: spikeNodeStore,
+  geometry: spikeGeometry,
+  pageId: spikePageId,
+  camera: () => cameraStore.getState(),
+  viewportOffset: () => document.getElementById("editor-viewport")?.getBoundingClientRect() ?? { left: 0, top: 0 },
+};
+
 // Origin lokal untuk UndoManager (T0.7.1).
 export const LOCAL_ORIGIN = { kind: "user", sessionId: "local" } as const;
 
@@ -46,6 +65,7 @@ if (import.meta.env.DEV) {
       hit: spikeHitTest,
       interaction: interactionStore,
       selection: selectionStore,
+      marqueeSelection: (drag: Parameters<typeof marqueeSelection>[0]) => marqueeSelection(drag, spikeMarqueeContext),
     },
   });
 }

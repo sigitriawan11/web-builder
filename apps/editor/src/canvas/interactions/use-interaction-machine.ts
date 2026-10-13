@@ -8,6 +8,8 @@ import type { PressTarget, ResizeHandle } from "./interaction-machine";
 export interface InteractionAdapterDeps {
   // Node di bawah pointer beserta rantai ancestor-nya (hit-test ED-020), atau null.
   hitTest(clientX: number, clientY: number): { nodeId: string; path: readonly string[] } | null;
+  // Node vs area kosong (marquee) untuk hasil hit-test, bergantung pada seleksi (ED-053).
+  resolveTarget(hit: { nodeId: string; path: readonly string[] } | null): PressTarget;
 }
 
 // Handle resize di overlay (T0.5.6) ditandai `data-handle` + `data-node-id`.
@@ -38,7 +40,7 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
       const { editingId } = textEditingStore.getState();
       if (editingId && hit?.path.includes(editingId)) return;
 
-      const target: PressTarget = handleTarget(event) ?? (hit ? { kind: "node", nodeId: hit.nodeId, path: hit.path } : { kind: "empty" });
+      const target: PressTarget = handleTarget(event) ?? deps.resolveTarget(hit);
       dispatch({
         type: "pointerDown",
         pointerId: event.pointerId,
@@ -46,6 +48,7 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
         point: point(event),
         target,
         panTool: effectiveTool(toolStore.getState()) === "hand",
+        additive: event.shiftKey,
       });
     };
     // ED-023: pointer capture dipasang saat tekan BERUBAH menjadi drag, bukan saat ditekan. Capture sejak
