@@ -1741,7 +1741,7 @@ Konvensi: PK mengikuti [ARCHITECTURE §6](../ARCHITECTURE.md#6-data-architecture
 **`users`**
 | Kolom | Tipe | Catatan |
 |---|---|---|
-| id | text PK | *(BA)* |
+| id | uuid PK | *(BA)* — UUIDv7 lewat `generateId` Better Auth (ARCHITECTURE §6.1; diputuskan T1.3.2) |
 | name | text | *(BA)* |
 | email | text unique | lowercase *(BA)* |
 | email_verified | boolean | *(BA)* |

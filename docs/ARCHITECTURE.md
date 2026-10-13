@@ -597,7 +597,7 @@ export async function findPage(db: Db, t: SiteTenant, pageId: string) {
 
 | Tabel | Kolom kunci | Index penting |
 |---|---|---|
-| `users` | id, email, email_verified, name, image, locale, staff_role (null/`super_admin`/`staff`/`library_admin`/`designer`, spec 08), two_factor_enabled, banned_at | unique(lower(email)) |
+| `users` | id (uuid, UUIDv7 via Better Auth `generateId`), email, email_verified, name, image, locale, timezone, staff_role (null/`super_admin`/`staff`/`library_admin`/`designer`, spec 08), status (`active`/`pending_deletion`/`suspended`/`banned`), last_active_at; kolom fase lanjut (two_factor_enabled, telepon, risk_score, …) ditambah saat fiturnya dibangun | unique(lower(email)) |
 | `sessions` | id, user_id, token, expires_at, ip, user_agent | unique(token), (user_id) |
 | `accounts` | id, user_id, provider_id, account_id, password (hash) | unique(provider_id, account_id) |
 | `verifications` | id, identifier, value, expires_at | (identifier) |
