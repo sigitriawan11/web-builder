@@ -7,6 +7,7 @@ import {
   landing2000,
   minimalDocument,
   nestedDocument,
+  wrapGridDocument,
 } from "@platform/document-model/fixtures";
 
 // SEMENTARA (spike M0): dokumen canvas dipilih lewat `?fixture=` sampai editor memuat dokumen
@@ -15,6 +16,7 @@ const FIXTURES: Record<string, () => SiteDocument> = {
   hero: heroDocument,
   freeform: freeformDocument,
   autolayout: autolayoutDocument,
+  wrap100: () => wrapGridDocument(100),
   nested: nestedDocument,
   minimal: minimalDocument,
   landing200,

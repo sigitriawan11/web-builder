@@ -411,3 +411,85 @@ export function autolayoutDocument(): SiteDocument {
     nodes: Object.fromEntries(nodes.map((node) => [node.id, node])),
   };
 }
+
+// Grid flex-wrap berisi `count` kartu (frame + teks) untuk mengukur fps resize auto-layout (ED-022, T0.6.6).
+export function wrapGridDocument(count = 100): SiteDocument {
+  const px = (value: number) => ({ value, unit: "px" as const });
+  const fixed = (value: number) => ({ mode: "fixed" as const, value, unit: "px" as const });
+  type Node = SiteDocument["nodes"][string];
+  const pad = (value: number) => ({ top: px(value), right: px(value), bottom: px(value), left: px(value) });
+  const cardId = (i: number) => `n_wgcard${String(i).padStart(4, "0")}`;
+  const textId = (i: number) => `n_wgtext${String(i).padStart(4, "0")}`;
+
+  const cards: Node[] = Array.from({ length: count }, (_, i) => [
+    {
+      id: cardId(i),
+      type: "frame",
+      name: `Kartu ${i + 1}`,
+      parentId: "n_wggrid0001",
+      children: [textId(i)],
+      visible: true,
+      locked: false,
+      style: {
+        base: {
+          layout: { mode: "flex", direction: "column", padding: pad(8), justify: "center" },
+          size: { width: fixed(140), height: fixed(80) },
+          fills: [{ type: "solid", color: i % 2 === 0 ? "#D6E8FF" : "#FFE3CC" }],
+          radius: px(8),
+        },
+      },
+      props: { role: "card" },
+    } satisfies Node,
+    {
+      id: textId(i),
+      type: "text",
+      name: `Kartu ${i + 1} / Label`,
+      parentId: cardId(i),
+      visible: true,
+      locked: false,
+      tag: "p",
+      style: { base: { size: { width: { mode: "fill" }, height: { mode: "hug" } } } },
+      props: { content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: `Item ${i + 1}` }] }] } },
+    } satisfies Node,
+  ]).flat();
+
+  const nodes: Node[] = [
+    {
+      id: "pg_home000001",
+      type: "page",
+      name: "Home",
+      parentId: null,
+      children: ["n_wggrid0001"],
+      visible: true,
+      locked: false,
+      style: { base: { layout: { mode: "flex", direction: "column", padding: pad(40), align: "start" } } },
+      props: { path: "/", title: "Home", isHome: true },
+    },
+    {
+      id: "n_wggrid0001",
+      type: "frame",
+      name: "Grid",
+      parentId: "pg_home000001",
+      children: Array.from({ length: count }, (_, i) => cardId(i)),
+      visible: true,
+      locked: false,
+      style: {
+        base: {
+          layout: { mode: "flex", direction: "row", wrap: true, gap: px(12), crossGap: px(12), padding: pad(16) },
+          size: { width: fixed(1200), height: { mode: "hug" } },
+          fills: [{ type: "solid", color: "#FFFFFF" }],
+        },
+      },
+      props: { role: "list" },
+    },
+    ...cards,
+  ];
+
+  return {
+    schemaVersion: 1,
+    meta: { title: `Grid wrap ${count}` },
+    assets: {},
+    pageOrder: ["pg_home000001"],
+    nodes: Object.fromEntries(nodes.map((node) => [node.id, node])),
+  };
+}

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { autolayoutDocument, freeformDocument, heroDocument, minimalDocument } from "../../test/fixtures/basic-documents";
+import {
+  autolayoutDocument,
+  freeformDocument,
+  heroDocument,
+  minimalDocument,
+  wrapGridDocument,
+} from "../../test/fixtures/basic-documents";
 import { SiteDocumentSchema } from "./document";
 
 type Path = (string | number)[];
@@ -42,6 +48,12 @@ describe("SiteDocumentSchema — fixture valid", () => {
 
   it("menerima fixture tiga kombinasi auto-layout (DM-026, DM-027)", () => {
     expect(issuePaths(autolayoutDocument())).toEqual([]);
+  });
+
+  it("menerima grid wrap 100 kartu (T0.6.6): page + grid + 100 kartu + 100 teks", () => {
+    const doc = wrapGridDocument(100);
+    expect(issuePaths(doc)).toEqual([]);
+    expect(Object.keys(doc.nodes)).toHaveLength(202);
   });
 
   it("menerima papan freeform dengan node absolute (DM-028)", () => {
