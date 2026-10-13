@@ -1,8 +1,9 @@
 import { resolveStyle } from "@platform/document-model";
-import { memo, useContext, useMemo } from "react";
+import { memo, useCallback, useContext, useMemo } from "react";
 import { useStore } from "zustand";
 import { useNode } from "../../document/use-node";
 import { textEditingStore } from "../../store/text-editing-store";
+import { GeometryContext } from "../geometry/geometry-context";
 import { InlineTextEditor } from "../text-editing/InlineTextEditor";
 import { FrameContext } from "./breakpoint-context";
 import { renderProbe } from "./render-probe";
@@ -26,10 +27,20 @@ export const NodeView = memo(function NodeViewRender({ id, parent }: NodeViewPro
   // Selector boolean: hanya node yang mulai/selesai diedit yang render ulang.
   const editing = useStore(textEditingStore, (state) => state.editingId === id);
   const style = useMemo(() => (node ? resolveStyle(node.style, frame.breakpoint) : null), [node, frame.breakpoint]);
+  const geometry = useContext(GeometryContext);
+  // ED-019: elemen didaftarkan ke geometry store selama ter-mount (cleanup ref callback React 19).
+  const ref = useCallback(
+    (element: Element | null) => {
+      if (!geometry || !element) return;
+      geometry.register(id, element);
+      return () => geometry.unregister(id);
+    },
+    [geometry, id],
+  );
   renderProbe.onNodeRender?.(id);
   if (!node || !style) return null;
 
-  const context = { style, parent, frameWidth: frame.width };
+  const context = { style, parent, frameWidth: frame.width, ref: geometry ? ref : undefined };
   if (node.type === "text") {
     return renderNodeElement(node, context, editing ? <InlineTextEditor content={node.props.content} /> : null);
   }

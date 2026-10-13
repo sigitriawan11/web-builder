@@ -1,3 +1,5 @@
+import { GeometryContext } from "../geometry/geometry-context";
+import { spikeGeometry } from "../geometry/spike-geometry";
 import { NodeView } from "../render-root/NodeView";
 import { RenderScope } from "../render-root/RenderRoot";
 import { FrameContext } from "../render-root/breakpoint-context";
@@ -20,13 +22,15 @@ interface FrameContentProps {
   siteFont: string | null;
 }
 
-function FrameContent({ frame, pageId, scopeClassName, siteFont }: FrameContentProps) {
+function FrameContent({ frame, pageId, scopeClassName, siteFont, measured }: FrameContentProps & { measured: boolean }) {
   return (
-    <FrameContext.Provider value={{ breakpoint: frame.breakpoint, width: frame.width }}>
-      <RenderScope className={scopeClassName} fontStack={siteFontStack(siteFont)}>
-        <NodeView id={pageId} parent="block" />
-      </RenderScope>
-    </FrameContext.Provider>
+    <GeometryContext.Provider value={measured ? spikeGeometry : null}>
+      <FrameContext.Provider value={{ breakpoint: frame.breakpoint, width: frame.width }}>
+        <RenderScope className={scopeClassName} fontStack={siteFontStack(siteFont)}>
+          <NodeView id={pageId} parent="block" />
+        </RenderScope>
+      </FrameContext.Provider>
+    </GeometryContext.Provider>
   );
 }
 
@@ -35,7 +39,7 @@ export function CanvasFrames({ pageId, showAll, mode, scopeClassName, siteFont }
   return layoutFrames(showAll).map((frame) =>
     mode === "iframe" ? (
       <IframeFrame key={frame.breakpoint} frame={frame} siteFont={siteFont}>
-        <FrameContent frame={frame} pageId={pageId} siteFont={siteFont} />
+        <FrameContent frame={frame} pageId={pageId} siteFont={siteFont} measured={false} />
       </IframeFrame>
     ) : (
       <div
@@ -43,7 +47,14 @@ export function CanvasFrames({ pageId, showAll, mode, scopeClassName, siteFont }
         className={`bp-frame bp-${frame.breakpoint}`}
         style={{ position: "absolute", left: frame.x, top: 0, width: frame.width }}
       >
-        <FrameContent frame={frame} pageId={pageId} scopeClassName={scopeClassName} siteFont={siteFont} />
+        {/* ED-019: geometry diukur untuk frame aktif saja (spike: Desktop). */}
+        <FrameContent
+          frame={frame}
+          pageId={pageId}
+          scopeClassName={scopeClassName}
+          siteFont={siteFont}
+          measured={frame.breakpoint === "base"}
+        />
       </div>
     ),
   );

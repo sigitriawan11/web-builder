@@ -1,5 +1,5 @@
 import { type Breakpoint, type Node, resolveStyle, type SiteDocument, type Style } from "@platform/document-model";
-import { type CSSProperties, createElement, Fragment, type ReactElement, type ReactNode } from "react";
+import { type CSSProperties, createElement, Fragment, type ReactElement, type ReactNode, type Ref } from "react";
 import { assetUrl } from "./asset-url";
 import { renderRichText } from "./rich-text";
 import { childLayoutOf, type ParentLayout, styleToCss } from "./style-to-css";
@@ -18,6 +18,8 @@ export interface RenderNodeContext {
   parent: ParentLayout;
   // Lebar artboard frame; dipakai node page.
   frameWidth: number;
+  // Elemen DOM node untuk geometry store (ED-019); tidak ada di render statis.
+  ref?: Ref<Element> | undefined;
 }
 
 /**
@@ -33,7 +35,7 @@ export function renderNodeElement(node: Node, context: RenderNodeContext, childr
     // Hide global (mata di layer panel) menang atas display dari layout.
     ...(node.visible ? {} : { display: "none" }),
   };
-  const common = { "data-node-id": node.id };
+  const common = { "data-node-id": node.id, ...(context.ref ? { ref: context.ref } : {}) };
 
   switch (node.type) {
     case "page":

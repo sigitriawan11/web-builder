@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
+import { setAppliedZoom } from "./geometry/spike-geometry";
 import { NodeStoreContext } from "../document/use-node";
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
@@ -46,7 +47,9 @@ export function CanvasViewport() {
     let idleTimer: ReturnType<typeof setTimeout> | undefined;
     const apply = () => {
       frame = 0;
-      world.style.transform = cameraTransform(cameraStore.getState());
+      const camera = cameraStore.getState();
+      world.style.transform = cameraTransform(camera);
+      setAppliedZoom(camera.zoom);
     };
     apply();
 
