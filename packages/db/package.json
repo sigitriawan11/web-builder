@@ -8,11 +8,12 @@
     "./testing": "./test/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc -b",
+    "typecheck": "tsc -b tsconfig.json seed/tsconfig.json",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "db:seed": "tsx seed/index.ts"
   },
   "devDependencies": {
     "@faker-js/faker": "10.6.0",
@@ -20,7 +21,9 @@
     "@types/node": "22.20.5",
     "@types/pg": "8.23.1",
     "drizzle-kit": "0.31.11",
-    "vitest": "5.0.4"
+    "tsx": "4.23.15",
+    "vitest": "5.0.4",
+    "yjs": "13.6.33"
   },
   "dependencies": {
     "@platform/document-model": "workspace:*",

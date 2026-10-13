@@ -20,7 +20,7 @@ pnpm dev
 
 Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 
-> **Status M1:** fondasi sedang dibangun. Saat ini `pnpm dev` baru menjalankan editor (`http://localhost:5173/editor/`), dan `db:migrate`/`db:seed` belum melakukan apa-apa sampai `packages/db` selesai (Epic 1.3). Bagian ini diperbarui seiring app bertambah.
+> **Status M1:** fondasi sedang dibangun. `db:migrate` membuat tabel inti dan `db:seed` mengisi `owner@platform.test`, `admin@platform.test`, dan 2 situs contoh (login baru bisa setelah auth, T1.5). `pnpm dev` baru menjalankan editor (`http://localhost:5173/editor/`). Bagian ini diperbarui seiring app bertambah.
 
 ## Perintah
 

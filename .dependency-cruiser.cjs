@@ -25,7 +25,8 @@ const allowedInternalRules = Object.entries(ALLOWED_INTERNAL).map(([pkg, allowed
   name: `internal-deps-${pkg}`,
   comment: `${pkg} hanya boleh mengimport paket internal: ${allowed.length ? allowed.join(", ") : "(tidak ada)"} (ARCHITECTURE §4.3).`,
   severity: "error",
-  from: { path: `^packages/${pkg}/` },
+  // packages/db/seed = alat dev (seed data dari fixture/library-seed, ARCHITECTURE §4.2), bukan kode runtime paket.
+  from: { path: `^packages/${pkg}/`, pathNot: "^packages/db/seed/" },
   to: { path: "^packages/", pathNot: `^packages/(?:${[pkg, "config", ...allowed].join("|")})/` },
 }));
 // db boleh import type-only dari document-model (untuk `$type<>` kolom JSON), bukan import runtime.
@@ -33,7 +34,7 @@ allowedInternalRules.push({
   name: "db-document-model-type-only",
   comment: "db hanya boleh import type-only dari document-model (ARCHITECTURE §4.3).",
   severity: "error",
-  from: { path: "^packages/db/" },
+  from: { path: "^packages/db/", pathNot: "^packages/db/seed/" },
   to: { path: "^packages/document-model/", dependencyTypesNot: ["type-only"] },
 });
 

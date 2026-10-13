@@ -1,0 +1,6 @@
+{
+  // Seed = alat dev (bukan kode runtime paket): boleh memakai document-model & fixture secara runtime.
+  "extends": "@platform/config/tsconfig/node.json",
+  "include": ["."],
+  "references": [{ "path": ".." }, { "path": "../../document-model" }, { "path": "../../shared" }]
+}
