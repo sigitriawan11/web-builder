@@ -1,4 +1,4 @@
-import { heroDocument, landing2000, nestedDocument } from "@platform/document-model/fixtures";
+import { autolayoutDocument, heroDocument, landing2000, nestedDocument } from "@platform/document-model/fixtures";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { RenderScope } from "./RenderRoot";
@@ -14,6 +14,10 @@ function nodeIdsIn(html: string): string[] {
 describe("renderNode (T0.4.1)", () => {
   it("snapshot DOM fixture hero", () => {
     expect(render(heroDocument())).toMatchSnapshot();
+  });
+
+  it("snapshot DOM fixture auto-layout: baris, kolom, wrap (T0.6.4)", () => {
+    expect(render(autolayoutDocument())).toMatchSnapshot();
   });
 
   it("snapshot DOM fixture nested (kasus tepi)", () => {

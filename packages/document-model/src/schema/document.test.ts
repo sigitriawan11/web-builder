@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { freeformDocument, heroDocument, minimalDocument } from "../../test/fixtures/basic-documents";
+import { autolayoutDocument, freeformDocument, heroDocument, minimalDocument } from "../../test/fixtures/basic-documents";
 import { SiteDocumentSchema } from "./document";
 
 type Path = (string | number)[];
@@ -38,6 +38,10 @@ function expectIssueAt(input: unknown, expectedPath: string) {
 describe("SiteDocumentSchema — fixture valid", () => {
   it("menerima dokumen minimal 1 page tanpa child (DM-004)", () => {
     expect(issuePaths(minimalDocument())).toEqual([]);
+  });
+
+  it("menerima fixture tiga kombinasi auto-layout (DM-026, DM-027)", () => {
+    expect(issuePaths(autolayoutDocument())).toEqual([]);
   });
 
   it("menerima papan freeform dengan node absolute (DM-028)", () => {

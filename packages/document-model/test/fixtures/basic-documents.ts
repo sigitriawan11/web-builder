@@ -333,3 +333,81 @@ export function freeformDocument(): SiteDocument {
     },
   };
 }
+
+// Tiga kombinasi auto-layout (DM-026, DM-027) untuk verifikasi render flexbox (T0.6.4):
+// baris (padding, gap, align center, anak fixed/fill/hug), kolom (spaceBetween, stretch), baris wrap (gap & crossGap).
+export function autolayoutDocument(): SiteDocument {
+  const px = (value: number) => ({ value, unit: "px" as const });
+  const fixed = (value: number) => ({ mode: "fixed" as const, value, unit: "px" as const });
+  const pad = (value: number) => ({ top: px(value), right: px(value), bottom: px(value), left: px(value) });
+  type Node = SiteDocument["nodes"][string];
+  const frame = (id: string, parentId: string, name: string, children: string[], style: Node["style"]["base"]): Node => ({
+    id,
+    type: "frame",
+    name,
+    parentId,
+    children,
+    visible: true,
+    locked: false,
+    style: { base: style },
+    props: {},
+  });
+  const box = (id: string, parentId: string, color: string, size: NonNullable<Node["style"]["base"]["size"]>): Node =>
+    frame(id, parentId, `Kotak ${id}`, [], { size, fills: [{ type: "solid", color }] });
+  const text = (id: string, parentId: string, value: string, size: NonNullable<Node["style"]["base"]["size"]>): Node => ({
+    id,
+    type: "text",
+    name: `Teks ${id}`,
+    parentId,
+    visible: true,
+    locked: false,
+    tag: "p",
+    style: { base: { size } },
+    props: { content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: value }] }] } },
+  });
+
+  const wrapItems = ["n_alwrap0a01", "n_alwrap0a02", "n_alwrap0a03", "n_alwrap0a04", "n_alwrap0a05"];
+  const nodes: Node[] = [
+    {
+      id: "pg_home000001",
+      type: "page",
+      name: "Home",
+      parentId: null,
+      children: ["n_alrow00001", "n_alcol00001", "n_alwrap0001"],
+      visible: true,
+      locked: false,
+      style: { base: { layout: { mode: "flex", direction: "column", gap: px(40), padding: pad(40), align: "start" } } },
+      props: { path: "/", title: "Home", isHome: true },
+    },
+    frame("n_alrow00001", "pg_home000001", "Baris", ["n_alrowfix01", "n_alrowfil01", "n_alrowhug01"], {
+      layout: { mode: "flex", direction: "row", gap: px(16), padding: pad(24), align: "center" },
+      size: { width: fixed(800), height: { mode: "hug" } },
+      fills: [{ type: "solid", color: "#E8F1FF" }],
+    }),
+    box("n_alrowfix01", "n_alrow00001", "#0D99FF", { width: fixed(120), height: fixed(80) }),
+    box("n_alrowfil01", "n_alrow00001", "#7CC4FF", { width: { mode: "fill" }, height: fixed(40) }),
+    text("n_alrowhug01", "n_alrow00001", "Label hug", { width: { mode: "hug" }, height: { mode: "hug" } }),
+    frame("n_alcol00001", "pg_home000001", "Kolom", ["n_alcoltxt01", "n_alcolbox01", "n_alcolbox02"], {
+      layout: { mode: "flex", direction: "column", gap: px(8), padding: pad(16), justify: "spaceBetween", align: "stretch" },
+      size: { width: fixed(400), height: fixed(300) },
+      fills: [{ type: "solid", color: "#FFF1E6" }],
+    }),
+    text("n_alcoltxt01", "n_alcol00001", "Judul kolom", { height: { mode: "hug" } }),
+    box("n_alcolbox01", "n_alcol00001", "#FF9F5A", { width: { mode: "fill" }, height: fixed(60) }),
+    box("n_alcolbox02", "n_alcol00001", "#FFC999", { height: fixed(40) }),
+    frame("n_alwrap0001", "pg_home000001", "Wrap", wrapItems, {
+      layout: { mode: "flex", direction: "row", wrap: true, gap: px(12), crossGap: px(20), padding: pad(10) },
+      size: { width: fixed(360), height: { mode: "hug" } },
+      fills: [{ type: "solid", color: "#EAF7EA" }],
+    }),
+    ...wrapItems.map((id) => box(id, "n_alwrap0001", "#5CB85C", { width: fixed(100), height: fixed(50) })),
+  ];
+
+  return {
+    schemaVersion: 1,
+    meta: { title: "Auto-layout" },
+    assets: {},
+    pageOrder: ["pg_home000001"],
+    nodes: Object.fromEntries(nodes.map((node) => [node.id, node])),
+  };
+}

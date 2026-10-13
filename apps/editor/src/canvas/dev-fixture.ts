@@ -1,5 +1,6 @@
 import type { SiteDocument } from "@platform/document-model";
 import {
+  autolayoutDocument,
   freeformDocument,
   heroDocument,
   landing200,
@@ -13,6 +14,7 @@ import {
 const FIXTURES: Record<string, () => SiteDocument> = {
   hero: heroDocument,
   freeform: freeformDocument,
+  autolayout: autolayoutDocument,
   nested: nestedDocument,
   minimal: minimalDocument,
   landing200,
