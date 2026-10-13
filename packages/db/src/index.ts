@@ -1,6 +1,6 @@
 // @platform/db: Drizzle schema & migration (satu-satunya tempat), client, TenantContext, seed, test factories
 // (ARCHITECTURE §4.2, §6). Hanya untuk api, worker, realtime — dilarang di editor/web/site-host (§4.3).
-export { type CreateDbOptions, createDb, type Db } from "./client";
+export { type CreateDbOptions, createDb, type Db, type DbExecutor, type DbTransaction } from "./client";
 export { id, identityId, softDelete, timestamps } from "./columns";
 export * as schema from "./schema";
 export {

@@ -20,6 +20,11 @@ export const CreateSiteBodySchema = z.object({
   name: z.string().trim().min(1).max(80),
 });
 
+export const UpdateSiteBodySchema = z.object({
+  name: z.string().trim().min(1).max(80),
+});
+
 export type SiteStatus = z.infer<typeof SiteStatusSchema>;
 export type Site = z.infer<typeof SiteSchema>;
 export type CreateSiteBody = z.infer<typeof CreateSiteBodySchema>;
+export type UpdateSiteBody = z.infer<typeof UpdateSiteBodySchema>;

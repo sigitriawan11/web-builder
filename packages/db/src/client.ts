@@ -3,6 +3,10 @@ import pg from "pg";
 import * as schema from "./schema";
 
 export type Db = NodePgDatabase<typeof schema>;
+/** Transaksi Drizzle (`db.transaction(async (tx) => …)`). */
+export type DbTransaction = Parameters<Parameters<Db["transaction"]>[0]>[0];
+/** Repository menerima db atau transaksi, agar service bisa menggabungkan beberapa operasi dalam satu transaksi. */
+export type DbExecutor = Db | DbTransaction;
 
 export interface CreateDbOptions {
   connectionString: string;

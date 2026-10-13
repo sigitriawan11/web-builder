@@ -18,6 +18,9 @@ export const AssetEntrySchema = z.strictObject({
   libraryShared: z.boolean().optional(),
 });
 
+// Versi schema dokumen yang dihasilkan kode ini (spec 01 §19). Naik bersama fungsi migrasi + fixture test.
+export const CURRENT_SCHEMA_VERSION = 1;
+
 // Prototipe M0 (DM-004): `settings`, `theme`, `componentDeps` menyusul di M1.
 const SiteDocumentShapeSchema = z.strictObject({
   schemaVersion: z.number().int().positive(),

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@platform/db": "workspace:*",
+    "@platform/document-model": "workspace:*",
     "@platform/i18n": "workspace:*",
     "@platform/shared": "workspace:*",
     "cors": "2.8.6",

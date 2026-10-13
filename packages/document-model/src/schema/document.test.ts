@@ -248,3 +248,18 @@ describe("SiteDocumentSchema — invariant flat map", () => {
     expectIssueAt({ ...doc, nodes }, "nodes.n_loopa00001");
   });
 });
+
+describe("CURRENT_SCHEMA_VERSION (spec 01 §19)", () => {
+  it("semua fixture memakai versi schema terbaru", async () => {
+    const { CURRENT_SCHEMA_VERSION } = await import("./document");
+    const fixtures = await import("../../test/fixtures");
+    for (const make of [
+      fixtures.heroDocument,
+      fixtures.minimalDocument,
+      fixtures.nestedDocument,
+      fixtures.landing200,
+    ]) {
+      expect(make().schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    }
+  });
+});

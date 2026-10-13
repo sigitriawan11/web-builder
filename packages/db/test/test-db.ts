@@ -6,8 +6,11 @@ import { createDb, type Db } from "../src/client";
 // Database untuk integration test (ARCHITECTURE §14): migration sekali ke template, lalu setiap file test
 // mendapat database salinan sendiri (`CREATE DATABASE … TEMPLATE`) — cepat dan terisolasi walau berjalan paralel.
 
-export const TEMPLATE_DB = "platform_test_template";
-const TEST_DB_PREFIX = "platform_test_f";
+// Template per paket (env `PLATFORM_TEST_TEMPLATE`, diset globalSetup paket): turbo menjalankan integration test
+// beberapa paket paralel, dan setup satu paket tidak boleh menghapus template/DB milik paket lain.
+export const DEFAULT_TEMPLATE_DB = "platform_test_db";
+const templateName = () => process.env.PLATFORM_TEST_TEMPLATE ?? DEFAULT_TEMPLATE_DB;
+const filePrefix = (template: string) => `${template}_f`;
 const MIGRATIONS_FOLDER = new URL("../migrations", import.meta.url).pathname;
 
 function adminUrl(): string {
@@ -42,18 +45,18 @@ async function withAdmin<T>(fn: (client: pg.Client) => Promise<T>): Promise<T> {
 const quote = (identifier: string) => `"${identifier.replaceAll('"', '""')}"`;
 
 /** Global setup: buat ulang template dari migration terbaru (dijalankan sekali per `pnpm test:integration`). */
-export async function prepareTemplate(): Promise<void> {
+export async function prepareTemplate(template: string = templateName()): Promise<void> {
   await withAdmin(async (admin) => {
-    // Sisa database test dari run yang terhenti.
+    // Sisa database test paket ini dari run yang terhenti (paket lain tidak disentuh).
     const leftovers = await admin.query<{ datname: string }>(
       "SELECT datname FROM pg_database WHERE datname = $1 OR datname LIKE $2",
-      [TEMPLATE_DB, `${TEST_DB_PREFIX}%`],
+      [template, `${filePrefix(template)}%`],
     );
     for (const { datname } of leftovers.rows)
       await admin.query(`DROP DATABASE IF EXISTS ${quote(datname)} WITH (FORCE)`);
-    await admin.query(`CREATE DATABASE ${quote(TEMPLATE_DB)}`);
+    await admin.query(`CREATE DATABASE ${quote(template)}`);
   });
-  const { db, close } = createDb({ connectionString: urlForDatabase(TEMPLATE_DB), maxConnections: 1 });
+  const { db, close } = createDb({ connectionString: urlForDatabase(template), maxConnections: 1 });
   try {
     await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
   } finally {
@@ -70,12 +73,13 @@ export interface TestDb {
 
 /** Database baru untuk satu file test (panggil di `beforeAll`, `drop()` di `afterAll`). */
 export async function createTestDb(): Promise<TestDb> {
-  const name = `${TEST_DB_PREFIX}${process.env.VITEST_POOL_ID ?? "0"}_${randomBytes(4).toString("hex")}`;
+  const template = templateName();
+  const name = `${filePrefix(template)}${process.env.VITEST_POOL_ID ?? "0"}_${randomBytes(4).toString("hex")}`;
   await withAdmin(async (admin) => {
     // Postgres menolak penyalinan template yang sedang disalin worker lain → coba ulang singkat.
     for (let attempt = 1; ; attempt++) {
       try {
-        await admin.query(`CREATE DATABASE ${quote(name)} TEMPLATE ${quote(TEMPLATE_DB)}`);
+        await admin.query(`CREATE DATABASE ${quote(name)} TEMPLATE ${quote(template)}`);
         return;
       } catch (error) {
         const busy = error instanceof Error && /being accessed by other users/.test(error.message);

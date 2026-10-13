@@ -30,6 +30,26 @@
           }
         }
       }
+    },
+    {
+      "includes": ["apps/**/*.ts", "!**/*.repository.ts", "!**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@platform/db": {
+                    "importNames": ["schema"],
+                    "message": "Tabel Drizzle hanya boleh dipakai di *.repository.ts (ARCHITECTURE \u00a76.2, CLAUDE.md)."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }
