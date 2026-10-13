@@ -20,6 +20,66 @@ export const QUEUE_NAMES = [
 export const QueueNameSchema = z.enum(QUEUE_NAMES);
 export type QueueName = z.infer<typeof QueueNameSchema>;
 
+/**
+ * Kebijakan per queue (ARCHITECTURE §5.4). `attempts`/`backoff` dipasang producer saat enqueue (opsi job BullMQ);
+ * `concurrency`/`timeoutMs` dipakai worker. Satu sumber agar api & worker tidak berbeda pendapat.
+ */
+export interface QueuePolicy {
+  concurrency: number;
+  attempts: number;
+  backoff?: { type: "exponential" | "fixed"; delayMs: number };
+  timeoutMs: number;
+}
+
+const SECOND = 1_000;
+const MINUTE = 60 * SECOND;
+
+export const QUEUE_POLICIES: Readonly<Record<QueueName, QueuePolicy>> = {
+  publish: {
+    concurrency: 2,
+    attempts: 3,
+    backoff: { type: "exponential", delayMs: 10 * SECOND },
+    timeoutMs: 2 * MINUTE,
+  },
+  thumbnails: {
+    concurrency: 2,
+    attempts: 2,
+    backoff: { type: "exponential", delayMs: 30 * SECOND },
+    timeoutMs: MINUTE,
+  },
+  // Tanpa auto-retry: retry hanya di level panggilan Claude API.
+  "ai-runs": { concurrency: 5, attempts: 1, timeoutMs: 10 * MINUTE },
+  // Default; policy per step workflow menimpa (spec 05).
+  "workflow-exec": {
+    concurrency: 10,
+    attempts: 3,
+    backoff: { type: "exponential", delayMs: 5 * SECOND },
+    timeoutMs: MINUTE,
+  },
+  email: {
+    concurrency: 10,
+    attempts: 5,
+    backoff: { type: "exponential", delayMs: 30 * SECOND },
+    timeoutMs: 30 * SECOND,
+  },
+  whatsapp: { concurrency: 5, attempts: 5, backoff: { type: "exponential", delayMs: MINUTE }, timeoutMs: 30 * SECOND },
+  "image-processing": {
+    concurrency: 4,
+    attempts: 3,
+    backoff: { type: "exponential", delayMs: 10 * SECOND },
+    timeoutMs: MINUTE,
+  },
+  domains: { concurrency: 2, attempts: 20, backoff: { type: "fixed", delayMs: 5 * MINUTE }, timeoutMs: 30 * SECOND },
+  payments: {
+    concurrency: 5,
+    attempts: 8,
+    backoff: { type: "exponential", delayMs: 10 * SECOND },
+    timeoutMs: 30 * SECOND,
+  },
+  cleanup: { concurrency: 1, attempts: 3, timeoutMs: 10 * MINUTE },
+  "dead-letter": { concurrency: 1, attempts: 1, timeoutMs: 30 * SECOND },
+};
+
 const jobBase = { requestId: z.string().min(1) };
 
 // Payload per queue; queue lain ditambahkan saat processor-nya dibangun.

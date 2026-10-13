@@ -1,4 +1,4 @@
-import { type JOB_PAYLOADS, type JobPayload, parseJobPayload } from "@platform/shared/contracts";
+import { type JOB_PAYLOADS, type JobPayload, parseJobPayload, QUEUE_POLICIES } from "@platform/shared/contracts";
 import { type JobsOptions, Queue } from "bullmq";
 import { Redis } from "ioredis";
 
@@ -16,6 +16,12 @@ const DEFAULT_JOB_OPTIONS: JobsOptions = {
   removeOnComplete: { age: 86_400, count: 1_000 },
   removeOnFail: { age: 7 * 86_400 },
 };
+
+/** Attempts & backoff per queue (ARCHITECTURE §5.4); opsi pemanggil menimpa. */
+export function retryOptions(queue: ProducibleQueue): JobsOptions {
+  const { attempts, backoff } = QUEUE_POLICIES[queue];
+  return { attempts, ...(backoff ? { backoff: { type: backoff.type, delay: backoff.delayMs } } : {}) };
+}
 
 export interface QueueProducer {
   enqueue<Q extends ProducibleQueue>(queue: Q, payload: JobPayload<Q>, options?: JobsOptions): Promise<string>;
@@ -57,7 +63,10 @@ export function createQueueProducer(
         );
       });
       try {
-        const job = await Promise.race([queueFor(queue).add(queue, data, jobOptions), timeout]);
+        const job = await Promise.race([
+          queueFor(queue).add(queue, data, { ...retryOptions(queue), ...jobOptions }),
+          timeout,
+        ]);
         return job.id ?? "";
       } finally {
         clearTimeout(timer);

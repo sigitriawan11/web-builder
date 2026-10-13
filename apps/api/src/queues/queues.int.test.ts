@@ -48,6 +48,8 @@ describe("enqueue setelah commit (ARCHITECTURE §18)", () => {
     const [job] = await jobsFor(payload.deploymentId);
     expect(job?.data).toEqual(payload);
     expect(job?.opts.removeOnComplete).toEqual({ age: 86_400, count: 1_000 });
+    // Kebijakan queue publish (ARCHITECTURE §5.4): 3 percobaan, backoff eksponensial 10 s.
+    expect(job?.opts).toMatchObject({ attempts: 3, backoff: { type: "exponential", delay: 10_000 } });
   });
 
   it("transaksi rollback → data tidak tersimpan & job TIDAK masuk antrean", async () => {

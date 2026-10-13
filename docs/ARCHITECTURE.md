@@ -507,6 +507,7 @@ Satu proses Node mendaftarkan semua processor; dapat dipecah per queue via env `
 Konvensi:
 
 - Payload job tervalidasi Zod (`@platform/shared/contracts/jobs.ts`); job hanya membawa **ID**, bukan data besar.
+- Tabel di atas = `QUEUE_POLICIES` di file yang sama (satu sumber): producer memasang attempts/backoff saat enqueue, worker memakai concurrency & timeout. Payload yang tidak sesuai kontrak gagal final tanpa retry.
 - Setiap job membawa `requestId` asal untuk propagasi log.
 - `removeOnComplete: { age: 86400, count: 1000 }`, `removeOnFail: { age: 7 * 86400 }`.
 - Graceful shutdown: `SIGTERM` → `worker.close()` menunggu job aktif (max 30 s).
