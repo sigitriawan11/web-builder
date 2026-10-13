@@ -252,3 +252,84 @@ export function nestedDocument(): SiteDocument {
     },
   };
 }
+
+// Papan freeform (layout none) berisi node absolute (DM-011, DM-028) untuk drag move (T0.6.2).
+export function freeformDocument(): SiteDocument {
+  const fixed = (value: number) => ({ mode: "fixed" as const, value, unit: "px" as const });
+  return {
+    schemaVersion: 1,
+    meta: { title: "Papan Bebas" },
+    assets: { ast_ph0000001: { kind: "image", width: 1200, height: 800, mime: "image/jpeg" } },
+    pageOrder: ["pg_home000001"],
+    nodes: {
+      pg_home000001: {
+        id: "pg_home000001",
+        type: "page",
+        name: "Home",
+        parentId: null,
+        children: ["n_board00001"],
+        visible: true,
+        locked: false,
+        style: { base: { layout: { mode: "flex", direction: "column" } } },
+        props: { path: "/", title: "Home", isHome: true },
+      },
+      n_board00001: {
+        id: "n_board00001",
+        type: "frame",
+        name: "Papan",
+        parentId: "pg_home000001",
+        children: ["n_fcard00001", "n_fimage0001", "n_ftext00001"],
+        visible: true,
+        locked: false,
+        tag: "section",
+        style: {
+          base: {
+            layout: { mode: "none" },
+            size: { width: { mode: "fill" }, height: fixed(800) },
+            fills: [{ type: "solid", color: "#F7F3EE" }],
+          },
+        },
+        props: { role: "section" },
+      },
+      n_fcard00001: {
+        id: "n_fcard00001",
+        type: "frame",
+        name: "Kartu",
+        parentId: "n_board00001",
+        children: [],
+        visible: true,
+        locked: false,
+        style: {
+          base: {
+            position: { type: "absolute", x: 80, y: 80 },
+            size: { width: fixed(240), height: fixed(160) },
+            fills: [{ type: "solid", color: "#FFE3CC" }],
+            radius: { value: 12, unit: "px" },
+          },
+        },
+        props: { role: "card" },
+      },
+      n_fimage0001: {
+        id: "n_fimage0001",
+        type: "image",
+        name: "Foto",
+        parentId: "n_board00001",
+        visible: true,
+        locked: false,
+        style: { base: { position: { type: "absolute", x: 420, y: 120 }, size: { width: fixed(320), height: fixed(200) } } },
+        props: { fit: "cover", image: { assetId: "ast_ph0000001", alt: "Foto produk" } },
+      },
+      n_ftext00001: {
+        id: "n_ftext00001",
+        type: "text",
+        name: "Catatan",
+        parentId: "n_board00001",
+        visible: true,
+        locked: false,
+        tag: "p",
+        style: { base: { position: { type: "absolute", x: 80, y: 320 }, size: { width: fixed(400), height: { mode: "hug" } } } },
+        props: { content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Seret aku ke mana saja" }] }] } },
+      },
+    },
+  };
+}

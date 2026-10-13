@@ -36,7 +36,11 @@ const siteCss = siteCssFromSearch(window.location.search);
 const frameOptions = frameOptionsFromSearch(window.location.search);
 const siteFont = siteFontFromSearch(window.location.search);
 const interactionDeps: InteractionAdapterDeps = { hitTest: spikeHitTest, resolveTarget: resolveSpikeTarget };
-const dragSessionDeps: DragSessionDeps = { opContext: { doc: spikeDoc, origin: LOCAL_ORIGIN }, geometry: spikeGeometry };
+const dragSessionDeps: DragSessionDeps = {
+  opContext: { doc: spikeDoc, origin: LOCAL_ORIGIN },
+  geometry: spikeGeometry,
+  nodeStore: spikeNodeStore,
+};
 const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest, marquee: spikeMarqueeContext };
 
 export function CanvasViewport() {

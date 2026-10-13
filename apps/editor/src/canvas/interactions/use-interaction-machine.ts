@@ -57,7 +57,7 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
     // ke node (temuan T0.5.3).
     const onPointerMove = (event: PointerEvent) => {
       const before = interactionStore.getState().state.type;
-      dispatch({ type: "pointerMove", pointerId: event.pointerId, point: point(event) });
+      dispatch({ type: "pointerMove", pointerId: event.pointerId, point: point(event), shiftKey: event.shiftKey });
       const after = interactionStore.getState().state.type;
       if (before === "pressing" && after !== "pressing" && after !== "idle") viewport.setPointerCapture(event.pointerId);
     };

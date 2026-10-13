@@ -5,6 +5,7 @@ import {
   fillsToCss,
   layoutToCss,
   lengthToCss,
+  positionToCss,
   radiusToCss,
   sizeToCss,
   styleToCss,
@@ -182,5 +183,20 @@ describe("styleToCss & childLayoutOf", () => {
     expect(childLayoutOf({ layout: { mode: "flex", direction: "column" } })).toBe("column");
     expect(childLayoutOf({ layout: { mode: "none" } })).toBe("block");
     expect(childLayoutOf({})).toBe("block");
+  });
+});
+
+describe("positionToCss (DM-028)", () => {
+  it("absolute → left/top px; flow tanpa CSS", () => {
+    expect(positionToCss({ type: "absolute", x: 80, y: -12.5 })).toEqual({ position: "absolute", left: "80px", top: "-12.5px" });
+    expect(positionToCss({ type: "flow" })).toEqual({});
+  });
+
+  it("absolute menang atas position relative dari layout none", () => {
+    expect(styleToCss({ layout: { mode: "none" }, position: { type: "absolute", x: 1, y: 2 } }, "block")).toMatchObject({
+      position: "absolute",
+      left: "1px",
+      top: "2px",
+    });
   });
 });

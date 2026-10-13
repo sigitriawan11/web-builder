@@ -37,12 +37,15 @@ export function renderNodeElement(node: Node, context: RenderNodeContext, childr
   };
   const common = { "data-node-id": node.id, ...(context.ref ? { ref: context.ref } : {}) };
 
+  // Frame & page adalah containing block bagi anak absolute (seperti frame Figma), termasuk di auto-layout.
+  const containerCss: CSSProperties = css.position ? css : { ...css, position: "relative" };
+
   switch (node.type) {
     case "page":
-      return createElement(node.tag ?? "main", { ...common, style: { ...css, width: frameWidth } }, children);
+      return createElement(node.tag ?? "main", { ...common, style: { ...containerCss, width: frameWidth } }, children);
     case "frame": {
       // DM-011: clipContent = alias editor untuk overflow hidden; anak yang terpotong juga tidak bisa diklik (ED-020).
-      const frameCss = node.props.clipContent ? { ...css, overflow: "hidden" } : css;
+      const frameCss = node.props.clipContent ? { ...containerCss, overflow: "hidden" } : containerCss;
       return createElement(node.tag ?? "div", { ...common, style: frameCss }, children);
     }
     case "text": {

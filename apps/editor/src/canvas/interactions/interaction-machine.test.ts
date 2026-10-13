@@ -51,6 +51,7 @@ describe("reduceInteraction — dari idle (ED-023)", () => {
       pointerId: ID,
       origin,
       current: origin,
+      shiftKey: false,
       target: node,
       additive: false,
     });
@@ -112,6 +113,11 @@ describe("reduceInteraction — drag", () => {
     expect(state).toBe(IDLE);
     expect(effects).toHaveLength(1);
     expect(effects[0]).toMatchObject({ type: "commit", drag: { origin, current: end } });
+  });
+
+  it("Shift saat bergerak dicatat di state drag (kunci sumbu ED-062)", () => {
+    const shifted = { type: "pointerMove", pointerId: ID, point: end, shiftKey: true } as const;
+    expect(run(down(node), move(far), shifted).state).toMatchObject({ type: "dragMove", shiftKey: true, path: node.kind === "node" ? node.path : [] });
   });
 
   it("pointermove memperbarui posisi terkini", () => {

@@ -1,4 +1,14 @@
-import type { ColorValue, Dimension, Fill, LayoutStyle, LengthValue, RadiusValue, SizeStyle, Style } from "@platform/document-model";
+import type {
+  ColorValue,
+  Dimension,
+  Fill,
+  LayoutStyle,
+  LengthValue,
+  PositionStyle,
+  RadiusValue,
+  SizeStyle,
+  Style,
+} from "@platform/document-model";
 import type { CSSProperties } from "react";
 import { tokenVar } from "./tokens";
 
@@ -128,12 +138,19 @@ export function radiusToCss(radius: RadiusValue): CSSProperties {
   return css;
 }
 
+// DM-028: absolute = px relatif ke parent (constraints belum diterapkan di prototipe: selalu kiri/atas).
+export function positionToCss(position: PositionStyle): CSSProperties {
+  return position.type === "absolute" ? { position: "absolute", left: `${position.x}px`, top: `${position.y}px` } : {};
+}
+
 export function styleToCss(style: Style, parent: ParentLayout): CSSProperties {
   return {
     ...(style.layout ? layoutToCss(style.layout) : {}),
     ...(style.size ? sizeToCss(style.size, parent) : {}),
     ...(style.fills ? fillsToCss(style.fills) : {}),
     ...(style.radius ? radiusToCss(style.radius) : {}),
+    // Terakhir: `position: absolute` milik node menang atas `relative` dari layout none.
+    ...(style.position ? positionToCss(style.position) : {}),
   };
 }
 

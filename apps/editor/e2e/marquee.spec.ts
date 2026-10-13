@@ -83,13 +83,14 @@ test("marquee di dalam frame yang dimasuki memilih anak-anaknya (ED-053)", async
   const card1 = await boxOf(nodeLocator(page, id["Kartu 1"]));
   const card2 = await boxOf(nodeLocator(page, id["Kartu 2"]));
 
-  // Masuk sampai kartu terseleksi: section → container → grid → kartu.
-  for (let i = 0; i < 3; i++) await nodeLocator(page, id["Kartu 1"]).dblclick({ position: { x: 4, y: 4 } });
+  // Masuk sampai kartu terseleksi: section → container → grid → kartu (di tengah kartu, jauh dari handle).
+  for (let i = 0; i < 3; i++) await nodeLocator(page, id["Kartu 1"]).dblclick();
   expect(await selectedIds(page)).toEqual([id["Kartu 1"]]);
 
-  // Mulai di celah antara Kartu 1 & 2 (latar grid yang dimasuki), sapu melewati keduanya.
+  // Mulai di celah antara Kartu 1 & 2 (latar grid yang dimasuki). Titik harus di DALAM grid: tepat di atas
+  // kartu sudah latar Container, dan drag di sana = pilih Container lalu pindah (ED-038).
   const gapX = (card1.x + card1.width + card2.x) / 2;
-  await drag(page, { x: gapX, y: card1.y - 2 }, { x: card1.x + 20, y: card1.y + 40 });
+  await drag(page, { x: gapX, y: card1.y + 10 }, { x: card1.x + 20, y: card1.y + 40 });
   expect(await selectedIds(page)).toEqual([id["Kartu 1"]]);
 
   await drag(page, { x: gapX, y: card1.y + 10 }, { x: card2.x + card2.width - 20, y: card1.y + 40 });

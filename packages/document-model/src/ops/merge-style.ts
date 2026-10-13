@@ -43,11 +43,17 @@ function mergeLayout(current: unknown, patch: JsonRecord): JsonRecord | undefine
   return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
+// DM-036: position di-merge per field bila `type` sama; type berbeda → patch dianggap lengkap.
+function mergePosition(current: unknown, patch: JsonRecord): JsonRecord | undefined {
+  if (patch.type !== undefined && (!isRecord(current) || current.type !== patch.type)) return withoutNulls(patch);
+  return mergeShallow(current, patch);
+}
+
 /**
  * Menerapkan patch ke style satu breakpoint (DM-036):
  * 1. objek (`layout`, `size`, `padding`) → merge per key;
  * 2. array (`fills`) → replace utuh; 3. nilai atomik (`radius`, token, dimensi) → replace;
- * 4. `layout` dengan mode berbeda → replace; 5. `null` → hapus.
+ * 4. `layout`/`position` dengan mode/type berbeda → replace; 5. `null` → hapus.
  * Mengembalikan objek baru; `current` tidak diubah.
  */
 export function mergeStyle(current: JsonRecord, patch: StylePatch): JsonRecord {
@@ -59,6 +65,7 @@ export function mergeStyle(current: JsonRecord, patch: StylePatch): JsonRecord {
     if (value === null) next = undefined;
     else if (group === "layout" && isRecord(value)) next = mergeLayout(merged.layout, value);
     else if (group === "size" && isRecord(value)) next = mergeShallow(merged.size, value);
+    else if (group === "position" && isRecord(value)) next = mergePosition(merged.position, value);
     else next = value;
 
     if (next === undefined) delete merged[group];

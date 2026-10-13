@@ -77,6 +77,33 @@ const sizeShape = {
 export const SizeSchema = z.strictObject(sizeShape).partial();
 const SizePatchSchema = z.strictObject(patchShape(sizeShape));
 
+// ── Position (DM-028, subset M0: flow | absolute; fixed/sticky P1) ──────────
+
+const ConstraintsSchema = z.strictObject({
+  horizontal: z.enum(["left", "right", "leftRight", "center", "scale"]),
+  vertical: z.enum(["top", "bottom", "topBottom", "center", "scale"]),
+});
+
+export const PositionSchema = z.discriminatedUnion("type", [
+  // Default: ikut layout parent.
+  z.strictObject({ type: z.literal("flow") }),
+  // Parent layout none (freeform), atau "absolute di dalam auto-layout" seperti Figma. x/y = px relatif parent.
+  z.strictObject({
+    type: z.literal("absolute"),
+    x: z.number(),
+    y: z.number(),
+    constraints: ConstraintsSchema.optional(),
+  }),
+]);
+
+// Position di-merge per field selama `type` sama; type berbeda → diganti utuh (DM-036 aturan 4).
+const PositionPatchSchema = z.strictObject({
+  type: z.enum(["flow", "absolute"]).optional(),
+  x: z.number().nullable().optional(),
+  y: z.number().nullable().optional(),
+  constraints: ConstraintsSchema.nullable().optional(),
+});
+
 // ── Fills (DM-029, subset M0: solid) ───────────────────────────────────────
 
 export const FillSchema = z.discriminatedUnion("type", [
@@ -110,6 +137,7 @@ export const RadiusSchema = z.union([
 const styleShape = {
   layout: LayoutSchema,
   size: SizeSchema,
+  position: PositionSchema,
   fills: FillsSchema,
   radius: RadiusSchema,
 };
@@ -118,7 +146,7 @@ export const StyleSchema = z.strictObject(styleShape).partial();
 
 // Array & nilai atomik di-replace utuh; objek (layout, size) di-merge per key.
 export const StylePatchSchema = z.strictObject(
-  patchShape({ ...styleShape, layout: LayoutPatchSchema, size: SizePatchSchema }),
+  patchShape({ ...styleShape, layout: LayoutPatchSchema, size: SizePatchSchema, position: PositionPatchSchema }),
 );
 
 export const ResponsiveStyleSchema = z.strictObject({
@@ -131,6 +159,7 @@ export type Padding = z.infer<typeof PaddingSchema>;
 export type LayoutStyle = z.infer<typeof LayoutSchema>;
 export type Dimension = z.infer<typeof DimensionSchema>;
 export type SizeStyle = z.infer<typeof SizeSchema>;
+export type PositionStyle = z.infer<typeof PositionSchema>;
 export type Fill = z.infer<typeof FillSchema>;
 export type RadiusValue = z.infer<typeof RadiusSchema>;
 export type Style = z.infer<typeof StyleSchema>;

@@ -99,6 +99,35 @@ describe("updateStyle — aturan merge DM-036", () => {
   });
 });
 
+describe("updateStyle — position (DM-028)", () => {
+  it("type sama: merge per field; type berbeda: ganti utuh; null menghapus", () => {
+    const { ctx, read } = setupDoc(heroDocument());
+    const position = () => read().nodes.n_heroimg001?.style.base.position;
+
+    runOp(ctx, updateStyle, { ids: ["n_heroimg001"], patch: { position: { type: "absolute", x: 10, y: 20 } } });
+    expect(position()).toEqual({ type: "absolute", x: 10, y: 20 });
+
+    runOp(ctx, updateStyle, { ids: ["n_heroimg001"], patch: { position: { x: 35 } } });
+    expect(position()).toEqual({ type: "absolute", x: 35, y: 20 });
+
+    runOp(ctx, updateStyle, { ids: ["n_heroimg001"], patch: { position: { type: "flow" } } });
+    expect(position()).toEqual({ type: "flow" });
+
+    runOp(ctx, updateStyle, { ids: ["n_heroimg001"], patch: { position: null } });
+    expect(read().nodes.n_heroimg001?.style.base).not.toHaveProperty("position");
+  });
+
+  it("absolute tanpa x/y ditolak", () => {
+    const { ctx, read } = setupDoc(heroDocument());
+
+    expect(runOp(ctx, updateStyle, { ids: ["n_heroimg001"], patch: { position: { type: "absolute" } } })).toMatchObject({
+      ok: false,
+      error: { code: "INVALID_RESULT" },
+    });
+    expect(read()).toEqual(heroDocument());
+  });
+});
+
 describe("updateStyle — gagal tanpa perubahan", () => {
   it.each([
     {

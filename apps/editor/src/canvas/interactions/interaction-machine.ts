@@ -26,12 +26,15 @@ interface PointerTrack {
   // Titik screen saat ditekan & posisi terakhir.
   origin: Point;
   current: Point;
+  // Shift saat gerakan terakhir: kunci sumbu saat pindah (ED-062).
+  shiftKey: boolean;
 }
 
 export type InteractionState =
   | { type: "idle" }
   | ({ type: "pressing"; target: PressTarget; additive: boolean } & PointerTrack)
-  | ({ type: "dragMove"; nodeId: string } & PointerTrack)
+  // `path`: rantai hit-test node yang ditekan, untuk menentukan node yang dipindah (ED-038/ED-051).
+  | ({ type: "dragMove"; nodeId: string; path: readonly string[] } & PointerTrack)
   | ({ type: "dragResize"; nodeId: string; handle: ResizeHandle } & PointerTrack)
   | ({ type: "marquee"; scopeId: string | null; additive: boolean } & PointerTrack)
   | { type: "panning"; pointerId: number };
@@ -49,7 +52,7 @@ export type InteractionEvent =
       // Shift: marquee menambah ke seleksi (ED-053).
       additive: boolean;
     }
-  | { type: "pointerMove"; pointerId: number; point: Point }
+  | { type: "pointerMove"; pointerId: number; point: Point; shiftKey?: boolean }
   | { type: "pointerUp"; pointerId: number; point: Point }
   | { type: "pointerCancel"; pointerId: number }
   | { type: "escape" }
@@ -80,11 +83,11 @@ function distance(a: Point, b: Point): number {
 }
 
 // Jenis drag ditentukan oleh yang ditekan: node → pindah, handle → resize, area kosong → marquee.
-function startDrag(pressing: Extract<InteractionState, { type: "pressing" }>, point: Point): DragState {
-  const track = { pointerId: pressing.pointerId, origin: pressing.origin, current: point };
+function startDrag(pressing: Extract<InteractionState, { type: "pressing" }>, point: Point, shiftKey: boolean): DragState {
+  const track = { pointerId: pressing.pointerId, origin: pressing.origin, current: point, shiftKey };
   switch (pressing.target.kind) {
     case "node":
-      return { type: "dragMove", nodeId: pressing.target.nodeId, ...track };
+      return { type: "dragMove", nodeId: pressing.target.nodeId, path: pressing.target.path, ...track };
     case "handle":
       return { type: "dragResize", nodeId: pressing.target.nodeId, handle: pressing.target.handle, ...track };
     case "empty":
@@ -115,6 +118,7 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
           pointerId: event.pointerId,
           origin: event.point,
           current: event.point,
+          shiftKey: event.additive,
           target: event.target,
           additive: event.additive,
         },
@@ -124,11 +128,14 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
 
     case "pointerMove": {
       if (state.type === "idle" || state.type === "panning" || state.pointerId !== event.pointerId) return unchanged(state);
+      const shiftKey = event.shiftKey ?? state.shiftKey;
       if (state.type === "pressing") {
-        if (distance(state.origin, event.point) < DRAG_THRESHOLD_PX) return { state: { ...state, current: event.point }, effects: [] };
-        return { state: startDrag(state, event.point), effects: [] };
+        if (distance(state.origin, event.point) < DRAG_THRESHOLD_PX) {
+          return { state: { ...state, current: event.point, shiftKey }, effects: [] };
+        }
+        return { state: startDrag(state, event.point, shiftKey), effects: [] };
       }
-      return { state: { ...state, current: event.point }, effects: [] };
+      return { state: { ...state, current: event.point, shiftKey }, effects: [] };
     }
 
     case "pointerUp": {

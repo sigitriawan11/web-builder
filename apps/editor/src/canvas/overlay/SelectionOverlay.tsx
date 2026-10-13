@@ -1,6 +1,7 @@
 import { resolveStyle } from "@platform/document-model";
 import { useStore } from "zustand";
 import type { NodeStore } from "../../document/node-store";
+import { previewStore } from "../../store/preview-store";
 import { selectionStore } from "../../store/selection-store";
 import { textEditingStore } from "../../store/text-editing-store";
 import { cameraStore } from "../camera-store";
@@ -47,7 +48,11 @@ export function SelectionOverlay({ nodeStore, geometry }: SelectionOverlayProps)
   const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
   const editing = useStore(textEditingStore, (state) => state.editingId !== null);
   const camera = useStore(cameraStore);
-  const rects = useWorldRects(geometry, selectedIds);
+  const offset = useStore(previewStore, (state) => state.offset);
+  // Node yang sedang dipindah digeser sementara (ED-024): kotak seleksi ikut tanpa menunggu ukur ulang.
+  const rects = useWorldRects(geometry, selectedIds).map((rect, index) =>
+    rect && offset?.ids.includes(selectedIds[index] ?? "") ? { ...rect, x: rect.x + offset.dx, y: rect.y + offset.dy } : rect,
+  );
 
   const measured = rects.filter((rect) => rect !== null);
   const world = unionRect(measured);
