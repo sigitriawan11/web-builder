@@ -1543,3 +1543,28 @@ Detail & contoh di [CLAUDE.md](../CLAUDE.md).
 - **Keputusan:** `apps/editor` = Vite + React SPA di `app.<domain>/editor/*` lewat rewrite Next.js; dashboard tetap di Next.js.
 - **Alternatif:** Route editor di dalam Next.js App Router (`'use client'` penuh).
 - **Konsekuensi:** Dev server & HMR lebih cepat, build editor independen, tidak ada friksi RSC/hydration. Biaya: dua aplikasi frontend (dibagi lewat `@platform/ui`, `@platform/sdk`, `@platform/i18n`), konfigurasi rewrite & auth gate di perbatasan, deploy static terpisah.
+
+### ADR-012: Isolasi style canvas dengan Shadow DOM
+
+- **Status:** Diterima 2026-10-13 (T0.8.1, disetujui owner). Angka fps laptop referensi (T0.7.4) & uji manual Safari menyusul sebagai konfirmasi.
+- **Konteks:** CSS situs user (reset, token, custom CSS) tidak boleh merusak chrome editor dan CSS editor (Tailwind preflight, shadcn/Radix) tidak boleh mengubah konten canvas (ED-016). Spike M0 membangun kedua opsi berdampingan (`?isolation=shadow|prefix`) dan mengujinya dengan E2E, Tiptap, hit-test, dan benchmark (T0.4.3–T0.4.5, T0.5.2, T0.7.3).
+- **Keputusan:** Konten canvas dirender di dalam **shadow root** `#world` (Opsi A) dengan `:host { all: initial }`, stylesheet renderer + token di dalam shadow root, font situs via `FontFace` (document-wide).
+- **Alternatif:** Opsi B prefix class (`.pf-*` + preflight editor di-scope ke chrome). Ditolak karena isolasinya bergantung disiplin, bukan dijamin browser: semua CSS situs harus ditulis ulang selector-nya (termasuk `@media`, `@keyframes`, `:is()`, kombinator) dan **setiap** CSS editor — termasuk library pihak ketiga — wajib di-scope; preflight global terbukti menembus canvas di spike. Keunggulan Opsi B (DOM biasa untuk `querySelector`/selection API) ternyata kecil: Tiptap berjalan setara di kedua opsi pada Chromium & Firefox.
+- **Bukti spike:** E2E CSS agresif dua arah lulus; fps pan/zoom/drag/reorder/resize & latensi klik → seleksi setara (headless); hit-test 2.000 node ≈ 0,011–0,013 ms/hit di kedua opsi; seleksi, IME (CDP), copy/paste ProseMirror lulus di shadow.
+- **Konsekuensi (aturan wajib):**
+  - Handler keyboard global membaca target lewat `isEditableEvent` (`composedPath()[0]`) — event dari dalam shadow root di-retarget ke host.
+  - Hit-test & query DOM canvas lewat `shadowRoot` (`shadowRoot.elementsFromPoint`, `shadowRoot.querySelector`), bukan `document`.
+  - Tiptap/ProseMirror memakai `injectCSS: false`; CSS dasar editor teks ikut stylesheet canvas.
+  - Overlay (`#overlay`) tetap di light DOM (chrome editor).
+  - Risiko terbuka: Safari (selection di shadow root) belum diuji — wajib uji manual sebelum M2 (T2 teks inline); jika gagal, Opsi B tetap tersedia karena renderer tidak bergantung pada mekanisme isolasi. Mode `?isolation=prefix` dipertahankan sampai uji Safari lulus, lalu dihapus (T0.8.7).
+
+### ADR-013: Breakpoint frame canvas tanpa iframe (class-scope)
+
+- **Status:** Diterima 2026-10-13 (T0.8.2, disetujui owner — mengikuti model Figma: semua breakpoint frame di satu canvas).
+- **Konteks:** Canvas menampilkan beberapa breakpoint frame (Desktop/Tablet/Mobile) berdampingan (ED-034). Opsi: (a) satu dokumen, style breakpoint diterapkan per frame lewat class/context; (b) iframe per frame agar media query asli bekerja. Diuji di spike T0.4.6 (`?frames=all&bpMode=class|iframe`).
+- **Keputusan:** Canvas memakai **(a) tanpa iframe**: setiap breakpoint frame dirender di dokumen yang sama (di dalam shadow root ADR-012) dengan style hasil cascade `resolveStyle(style, bp)` (DM-036). **Preview & publish** tetap memakai media query asli.
+- **Alternatif:** (b) iframe per frame. Ditolak: fps tidak lebih baik (setara di 3 × 200 node), sementara kompleksitasnya tinggi — event pointer tidak sampai ke viewport (harus `pointer-events: none` + hit-test manual), jebakan cross-realm (`instanceof` & `ResizeObserver` per window), teks inline/dblclick butuh penerusan event, dan isolasi style harus diulang per dokumen.
+- **Konsekuensi:**
+  - Renderer punya dua jalur keluaran style responsif: **mode editor** = style ter-resolve per breakpoint frame (tanpa media query), **mode publish** = CSS dengan media query. Keduanya harus diturunkan dari fungsi cascade yang sama dan dijaga oleh visual regression editor vs static (ED-240).
+  - Hal yang bergantung pada viewport nyata (unit `vw/vh`, `position: fixed`, media query di custom CSS) tidak akurat di canvas; ditampilkan benar di mode Preview. Dokumentasikan di UI bila fitur tersebut dipakai.
+  - Hit-test, seleksi, drag, dan Tiptap bekerja seragam di semua frame tanpa kode khusus per frame.

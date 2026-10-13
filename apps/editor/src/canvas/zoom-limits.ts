@@ -1,4 +1,4 @@
-// ED-013 P0: 5%–1600%. Rentang final diputuskan di spike (❓ OPEN 02#1, T0.8.3).
+// ED-013: 5%–1600% (diputuskan T0.8.3; 3200% bisa ditambah cukup dengan menaikkan konstanta ini).
 export const MIN_ZOOM = 0.05;
 export const MAX_ZOOM = 16;
 

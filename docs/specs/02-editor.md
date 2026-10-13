@@ -350,7 +350,7 @@ Prinsip: **world** berisi DOM yang sama dengan yang akan dipublish (dirender ole
   - [ ] Teks tajam (tidak blur) 200 ms setelah zoom berhenti.
   - [ ] Fungsi `screenToWorld`/`worldToScreen` saling invers (unit test dengan property-based test, error < 1e-6).
 
-> ❓ OPEN: Rentang zoom final. Usulan P0 5%–1600%; evaluasi kemungkinan 3200% setelah M0 spike jika rendering DOM tetap stabil.
+> ✅ Diputuskan (M0 spike, T0.8.3, 2026-10-13): rentang zoom **5%–1600%**. 3200% lolos uji Chromium (60 fps, teks tajam) tetapi tidak dibutuhkan; bisa dinaikkan nanti lewat konstanta `MAX_ZOOM`.
 
 ### ED-014 Overlay layer
 - Prioritas: P0 · Fase: M0
@@ -387,7 +387,7 @@ Prinsip: **world** berisi DOM yang sama dengan yang akan dipublish (dirender ole
 - Acceptance criteria:
   - [ ] Website dengan `* { box-sizing: content-box; font-family: serif }` di custom CSS (jika ada) tidak merusak UI editor.
 
-> ❓ OPEN: Shadow DOM vs prefix class. Shadow DOM lebih bersih tapi menyulitkan Tiptap (selection API di shadow root berbeda antar browser). Putuskan di M0 spike.
+> ✅ Diputuskan (M0 spike, T0.8.1, 2026-10-13): **Opsi A Shadow DOM** — [ADR-012](../ARCHITECTURE.md#adr-012-isolasi-style-canvas-dengan-shadow-dom). Tiptap berjalan setara di shadow & prefix (Chromium/Firefox); uji manual Safari menyusul.
 
 ### ED-017 Renderer mode "editor"
 - Prioritas: P0 · Fase: M1
@@ -2623,7 +2623,7 @@ Versi web dari "Prototype" Figma: fokus pada link, state, dan animasi ringan. Ou
   - [ ] Media query tablet & mobile aktif sesuai lebar iframe.
   - [ ] Navigasi antar page di preview tidak meninggalkan editor.
 
-> ❓ OPEN: Apakah canvas sendiri juga perlu memakai iframe per breakpoint frame agar media query asli bekerja (alih-alih renderer menyuntikkan style breakpoint secara langsung)? Usulan: canvas tanpa iframe (renderer menerapkan style breakpoint secara eksplisit via class per breakpoint frame, mis. `.bp-mobile` scope) demi performa dan hit-testing; preview & publish memakai media query nyata. Putuskan di M0 spike — lihat [ARCHITECTURE](../ARCHITECTURE.md).
+> ✅ Diputuskan (M0 spike, T0.8.2, 2026-10-13): canvas **tanpa iframe** — setiap breakpoint frame dirender di dokumen yang sama dengan style ter-resolve per breakpoint (`resolveStyle`, DM-036); preview & publish memakai media query nyata. Lihat [ADR-013](../ARCHITECTURE.md#adr-013-breakpoint-frame-canvas-tanpa-iframe-class-scope).
 
 ### ED-208 Publish entry point & checklist pra-publish
 - Prioritas: P0 · Fase: M4
@@ -3184,8 +3184,8 @@ Legenda: **✅ P0** = ada di rilis fase terkait · **P1** = menyusul · **P2** =
 
 | # | Bagian | Pertanyaan terbuka |
 |---|---|---|
-| 1 | §4 | Rentang zoom final. Usulan P0 5%–1600%; evaluasi kemungkinan 3200% setelah M0 spike jika rendering DOM tetap stabil. |
-| 2 | §4 | Shadow DOM vs prefix class. Shadow DOM lebih bersih tapi menyulitkan Tiptap (selection API di shadow root berbeda antar browser). Putuskan di M0 spike. |
+| 1 | §4 | ~~Rentang zoom final~~ — **diputuskan T0.8.3**: 5%–1600%. |
+| 2 | §4 | ~~Shadow DOM vs prefix class~~ — **diputuskan T0.8.1**: Shadow DOM (ADR-012). |
 | 3 | §6 | Apakah preview width custom disimpan per website (dokumen) atau per user (UI state)? Usulan: per user (UI state). |
 | 4 | §11 | Urutan layer panel — "DOM order (atas = pertama)" vs "Figma order (atas = paling depan)". Usulan: DOM order untuk semua, karena output adalah HTML dan mayoritas user bukan pengguna Figma. Z-order untuk node absolute dikendalikan via `z-index` eksplisit (Bring forward/Send backward). |
 | 5 | §14 | ~~`y-prosemirror` vs JSON utuh~~ — **sudah diputuskan di 01**: `Y.XmlFragment` + `y-prosemirror` sejak M2. |
@@ -3194,7 +3194,7 @@ Legenda: **✅ P0** = ada di rilis fase terkait · **P1** = menyusul · **P2** =
 | 8 | §21 | Daftar final auto-responsive rules dan nilai skala (0.75/0.5) perlu divalidasi dengan template nyata di M4. |
 | 9 | §24 | Retensi version history per paket (jumlah & durasi). |
 | 10 | §25 | Shortcut layout grid. Figma memakai `Ctrl+G` (Mac: `⌃G`), yang di Windows bentrok dengan Group (`Ctrl+G`). Usulan: Windows `Ctrl+Shift+4`, Mac `⌃G`. Konfirmasi setelah uji pengguna. |
-| 11 | §27 | Apakah canvas sendiri juga perlu memakai iframe per breakpoint frame agar media query asli bekerja (alih-alih renderer menyuntikkan style breakpoint secara langsung)? Usulan: canvas tanpa iframe (renderer menerapkan style breakpoint secara eksplisit via class per breakpoint frame, mis. `.bp-mobile` scope) demi performa dan hit-testing; preview & publish memakai media query nyata. Putuskan di M0 spike — lihat [ARCHITECTURE](../ARCHITECTURE.md). |
+| 11 | §27 | ~~Iframe per breakpoint frame di canvas~~ — **diputuskan T0.8.2**: tanpa iframe (ADR-013). |
 | 12 | §30 | Model data konten multi-bahasa (map per field vs dokumen terpisah per locale) dan paket mana yang mendapatkannya. Harus diputuskan sebelum M7 agar binding data dinamis kompatibel. |
 | 13 | §31 | Angka final batas (node per page, ukuran state) setelah benchmark M0/M2. |
 
