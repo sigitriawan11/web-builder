@@ -9,9 +9,11 @@ import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
 import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
-import { spikeNodeStore, spikePageId } from "./spike-document";
+import { spikeHitTest, spikeNodeStore, spikePageId } from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
+import { useBrowserGuards } from "./interactions/use-browser-guards";
+import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 
@@ -22,6 +24,7 @@ const isolation = isolationFromSearch(window.location.search);
 const siteCss = siteCssFromSearch(window.location.search);
 const frameOptions = frameOptionsFromSearch(window.location.search);
 const siteFont = siteFontFromSearch(window.location.search);
+const interactionDeps: InteractionAdapterDeps = { hitTest: spikeHitTest };
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
@@ -30,6 +33,8 @@ export function CanvasViewport() {
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
   useTextEditingInteractions(viewportRef, spikeNodeStore);
+  useInteractionMachine(viewportRef, interactionDeps);
+  useBrowserGuards(viewportRef);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");
 
   // T0.4.7: FontFace di document.fonts juga berlaku di dalam shadow root canvas.

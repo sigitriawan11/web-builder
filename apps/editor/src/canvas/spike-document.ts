@@ -1,5 +1,6 @@
 import { createNode, deleteNodes, jsonToYDoc, moveNode, runOp, updateStyle } from "@platform/document-model";
 import { NodeStore } from "../document/node-store";
+import { interactionStore } from "../store/interaction-store";
 import { cameraStore } from "./camera-store";
 import { fixtureFromSearch } from "./dev-fixture";
 import { spikeGeometry } from "./geometry/spike-geometry";
@@ -42,6 +43,7 @@ if (import.meta.env.DEV) {
       geometry: spikeGeometry,
       hitTest: (clientX: number, clientY: number) => spikeHitTest(clientX, clientY)?.nodeId ?? null,
       hit: spikeHitTest,
+      interaction: interactionStore,
     },
   });
 }
