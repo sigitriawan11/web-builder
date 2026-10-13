@@ -38,7 +38,7 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
       const { editingId } = textEditingStore.getState();
       if (editingId && hit?.path.includes(editingId)) return;
 
-      const target: PressTarget = handleTarget(event) ?? (hit ? { kind: "node", nodeId: hit.nodeId } : { kind: "empty" });
+      const target: PressTarget = handleTarget(event) ?? (hit ? { kind: "node", nodeId: hit.nodeId, path: hit.path } : { kind: "empty" });
       dispatch({
         type: "pointerDown",
         pointerId: event.pointerId,

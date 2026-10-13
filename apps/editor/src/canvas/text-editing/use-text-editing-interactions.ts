@@ -1,5 +1,4 @@
 import { type RefObject, useEffect } from "react";
-import type { NodeStore } from "../../document/node-store";
 import { textEditingStore } from "../../store/text-editing-store";
 
 // Elemen node terdalam di jalur event. composedPath menembus shadow root (Opsi A), event.target tidak.
@@ -10,30 +9,20 @@ function nodeIdInPath(event: Event): string | null {
   return null;
 }
 
-// ED-115 (spike): double-click node teks → edit inline; klik di luar node itu → selesai.
-export function useTextEditingInteractions(viewportRef: RefObject<HTMLElement | null>, nodeStore: NodeStore): void {
+// ED-115 (spike): klik di luar node yang sedang diedit → selesai. Masuk mode edit lewat double-click
+// select tool (ED-038: teks yang sudah terseleksi), lihat tools/select/use-select-tool.ts.
+export function useTextEditingInteractions(viewportRef: RefObject<HTMLElement | null>): void {
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    const { startEditing, stopEditing } = textEditingStore.getState();
-
-    const onDoubleClick = (event: MouseEvent) => {
-      const id = nodeIdInPath(event);
-      // Double-click di dalam teks yang sedang diedit = pilih kata (ditangani ProseMirror).
-      if (!id || id === textEditingStore.getState().editingId) return;
-      if (nodeStore.getNode(id)?.type === "text") startEditing(id);
-    };
+    const { stopEditing } = textEditingStore.getState();
 
     const onPointerDown = (event: PointerEvent) => {
       const { editingId } = textEditingStore.getState();
       if (editingId && nodeIdInPath(event) !== editingId) stopEditing();
     };
 
-    viewport.addEventListener("dblclick", onDoubleClick);
     viewport.addEventListener("pointerdown", onPointerDown, { capture: true });
-    return () => {
-      viewport.removeEventListener("dblclick", onDoubleClick);
-      viewport.removeEventListener("pointerdown", onPointerDown, { capture: true });
-    };
-  }, [viewportRef, nodeStore]);
+    return () => viewport.removeEventListener("pointerdown", onPointerDown, { capture: true });
+  }, [viewportRef]);
 }

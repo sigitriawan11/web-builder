@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-tool";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
@@ -25,6 +26,7 @@ const siteCss = siteCssFromSearch(window.location.search);
 const frameOptions = frameOptionsFromSearch(window.location.search);
 const siteFont = siteFontFromSearch(window.location.search);
 const interactionDeps: InteractionAdapterDeps = { hitTest: spikeHitTest };
+const selectToolDeps: SelectToolDeps = { nodeStore: spikeNodeStore, hitTest: spikeHitTest };
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
@@ -32,7 +34,8 @@ export function CanvasViewport() {
   useToolShortcuts();
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
-  useTextEditingInteractions(viewportRef, spikeNodeStore);
+  useTextEditingInteractions(viewportRef);
+  useSelectTool(viewportRef, selectToolDeps);
   useInteractionMachine(viewportRef, interactionDeps);
   useBrowserGuards(viewportRef);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");

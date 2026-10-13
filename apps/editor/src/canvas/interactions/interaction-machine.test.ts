@@ -15,7 +15,7 @@ const near = { x: 100 + DRAG_THRESHOLD_PX - 1, y: 100 };
 const far = { x: 100 + DRAG_THRESHOLD_PX, y: 100 };
 const end = { x: 160, y: 140 };
 
-const node: PressTarget = { kind: "node", nodeId: "n_card000001" };
+const node: PressTarget = { kind: "node", nodeId: "n_card000001", path: ["n_card000001", "pg_home000001"] };
 const handle: PressTarget = { kind: "handle", nodeId: "n_card000001", handle: "se" };
 const empty: PressTarget = { kind: "empty" };
 

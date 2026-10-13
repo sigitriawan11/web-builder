@@ -13,7 +13,8 @@ export type ResizeHandle = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 
 // Yang berada di bawah pointer saat ditekan.
 export type PressTarget =
-  | { kind: "node"; nodeId: string }
+  // `path`: rantai node hasil hit-test (terdalam → page), untuk aturan kedalaman seleksi (ED-051).
+  | { kind: "node"; nodeId: string; path: readonly string[] }
   | { kind: "handle"; nodeId: string; handle: ResizeHandle }
   | { kind: "empty" };
 

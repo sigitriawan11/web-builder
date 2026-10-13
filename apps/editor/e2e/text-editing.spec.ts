@@ -6,8 +6,10 @@ import { expect, type Page, test } from "@playwright/test";
 const TITLE = '[data-node-id="n_herottl001"]';
 const EDITOR = `${TITLE} .ProseMirror`;
 
+// ED-038/ED-051: double-click pertama masuk dari section hero ke judul, double-click kedua mengedit teks.
 async function startEditing(page: Page, isolation: string) {
   await page.goto(`?fixture=hero&isolation=${isolation}`);
+  await page.locator(TITLE).dblclick();
   await page.locator(TITLE).dblclick();
   await expect(page.locator(EDITOR)).toBeFocused();
 }

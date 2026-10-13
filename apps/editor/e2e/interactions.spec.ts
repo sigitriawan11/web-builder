@@ -91,6 +91,8 @@ test("pan (tombol tengah) tidak memulai drag maupun klik", async ({ page }) => {
 });
 
 test("drag di dalam teks yang sedang diedit = seleksi teks, bukan drag node", async ({ page }) => {
+  // Double-click pertama masuk ke judul (ED-051), kedua mengedit teks.
+  await page.locator('[data-node-id="n_herottl001"]').dblclick();
   await page.locator('[data-node-id="n_herottl001"]').dblclick();
   await expect(page.locator('[data-node-id="n_herottl001"] .ProseMirror')).toBeFocused();
   await page.evaluate(() => (window as unknown as { __effects: string[] }).__effects.splice(0));

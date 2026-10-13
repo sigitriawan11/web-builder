@@ -3,9 +3,9 @@ import { useStore } from "zustand";
 import { cameraStore } from "./camera-store";
 import { spikeGeometry } from "./geometry/spike-geometry";
 
-// SPIKE T0.5.1 (`?outline=<nodeId>`): outline dari geometry store untuk memverifikasi rect world
-// menempel pada elemen DOM di semua zoom. Selection overlay sungguhan dibuat di T0.5.6.
-export function GeometryOutline({ nodeId }: { nodeId: string }) {
+// Outline 1px dari geometry store: debug `?outline=<nodeId>` (T0.5.1) & seleksi dasar (T0.5.4).
+// Handle, label ukuran & hover menyusul di T0.5.6.
+export function GeometryOutline({ nodeId, className = "overlay-geometry-outline" }: { nodeId: string; className?: string }) {
   const subscribe = useCallback((listener: () => void) => spikeGeometry.subscribe(nodeId, listener), [nodeId]);
   // peekRect: baca cache tanpa memaksa layout (AC ED-019).
   const rect = useSyncExternalStore(subscribe, () => spikeGeometry.peekRect(nodeId));
@@ -14,7 +14,7 @@ export function GeometryOutline({ nodeId }: { nodeId: string }) {
 
   return (
     <div
-      className="overlay-outline overlay-geometry-outline"
+      className={`overlay-outline ${className}`}
       style={{
         transform: `translate(${rect.x * camera.zoom + camera.x}px, ${rect.y * camera.zoom + camera.y}px)`,
         width: rect.width * camera.zoom,
