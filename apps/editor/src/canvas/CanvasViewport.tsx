@@ -6,6 +6,7 @@ import { cameraStore, cameraTransform } from "./camera-store";
 import { NodeStoreContext } from "../document/use-node";
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
+import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import { spikeNodeStore, spikePageId } from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
@@ -19,6 +20,7 @@ const WILL_CHANGE_IDLE_MS = 150;
 const isolation = isolationFromSearch(window.location.search);
 const siteCss = siteCssFromSearch(window.location.search);
 const frameOptions = frameOptionsFromSearch(window.location.search);
+const siteFont = siteFontFromSearch(window.location.search);
 
 export function CanvasViewport() {
   const viewportRef = useRef<HTMLElement>(null);
@@ -28,6 +30,11 @@ export function CanvasViewport() {
   useZoomInteractions(viewportRef);
   useTextEditingInteractions(viewportRef, spikeNodeStore);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");
+
+  // T0.4.7: FontFace di document.fonts juga berlaku di dalam shadow root canvas.
+  useEffect(() => {
+    if (siteFont) void loadSiteFont(document.fonts, siteFont, SITE_FONT_WEIGHTS);
+  }, []);
 
   // ED-013: kamera diterapkan langsung ke DOM di requestAnimationFrame, tanpa render React,
   // sehingga node di dalam world tidak pernah di-render ulang karena pan/zoom.
@@ -68,6 +75,7 @@ export function CanvasViewport() {
           showAll={frameOptions.showAll}
           mode={frameOptions.mode}
           scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
+          siteFont={siteFont}
         />
       </NodeStoreContext.Provider>
     </>

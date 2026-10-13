@@ -23,6 +23,7 @@ const PROTOTYPE_TOKENS: Record<string, string> = {
   "radius.lg": "16px",
   "radius.xl": "24px",
   "radius.full": "9999px",
+  "fontFamily.body": "system-ui, sans-serif",
   "size.container": "1200px",
   "size.content-narrow": "720px",
 };
