@@ -1,14 +1,16 @@
 import type { Db } from "@platform/db";
-import { uuidv7 } from "@platform/shared";
+import { APP_PATHS, uuidv7 } from "@platform/shared";
+import type { JobPayload } from "@platform/shared/contracts";
 import { getContext, type Logger } from "@platform/shared/node";
 import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { setSessionCookie } from "better-auth/cookies";
+import { emailOTP } from "better-auth/plugins";
 import type { Redis } from "ioredis";
 import type { QueueProducer } from "../queues/producer";
 import { AUTH_TABLES, insertConsents } from "./auth.repository";
-import { currentAuthTransaction, trackTransactions } from "./auth-transaction";
+import { afterAuthCommit, currentAuthTransaction, trackTransactions } from "./auth-transaction";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
 import { signUpConsents } from "./sign-up";
 import { currentSignUp } from "./sign-up-context";
@@ -25,6 +27,24 @@ export const SESSION_EXPIRES_IN = 30 * DAY;
 // paling lama berlaku 5 menit (sumber kebenaran tetap Postgres).
 export const SESSION_CACHE_TTL_SECONDS = 300;
 const REDIS_PREFIX = "auth:";
+// Verifikasi email (ACC-003): link & kode 6 digit berlaku 24 jam; kode gagal 3× → harus kirim ulang.
+export const EMAIL_VERIFICATION_EXPIRES_IN = DAY;
+const OTP_ALLOWED_ATTEMPTS = 3;
+// Endpoint plugin emailOTP yang TIDAK dipakai (login/reset/ganti email via OTP, kirim OTP terpisah): hanya
+// `/email-otp/verify-email` yang aktif; kode dikirim bersama link oleh `sendVerificationEmail`.
+const DISABLED_OTP_PATHS = [
+  "/email-otp/send-verification-otp",
+  "/email-otp/check-verification-otp",
+  "/sign-in/email-otp",
+  "/email-otp/request-password-reset",
+  "/forget-password/email-otp",
+  "/email-otp/reset-password",
+  "/email-otp/request-email-change",
+  "/email-otp/change-email",
+];
+
+type EmailJobInput =
+  JobPayload<"email"> extends infer Job ? (Job extends unknown ? Omit<Job, "requestId"> : never) : never;
 
 export interface AuthConfig {
   secret: string;
@@ -125,8 +145,20 @@ export function createAuth(deps: {
   queues?: QueueProducer;
 }) {
   const { config, logger } = deps;
+  /**
+   * Antrekan email setelah transaksi auth commit (rollback → tidak terkirim) dan tanpa ditunggu: waktu respons tidak
+   * boleh bergantung pada Redis (enumerasi email, ACC-001) dan kegagalan enqueue tidak menggagalkan request.
+   */
+  const enqueueEmail = (job: EmailJobInput) =>
+    afterAuthCommit(() => {
+      deps.queues
+        ?.enqueue("email", { requestId: getContext()?.requestId ?? uuidv7(), ...job })
+        .catch((error: unknown) => logger.warn({ err: error, template: job.template }, "enqueue email gagal"));
+    });
+  // Diisi setelah instance dibuat (callback BA butuh API plugin emailOTP milik instance yang sama).
+  let createVerificationCode: ((email: string) => Promise<string>) | undefined;
   const publicUrl = new URL(config.publicAuthUrl);
-  return betterAuth({
+  const auth = betterAuth({
     secret: config.secret,
     // Link (verifikasi, reset, OAuth callback) = baseURL + basePath = URL publik `/api/auth`.
     baseURL: `${publicUrl.origin}${publicUrl.pathname.replace(/\/auth\/?$/, "")}`,
@@ -149,14 +181,20 @@ export function createAuth(deps: {
       minPasswordLength: PASSWORD_MIN_LENGTH,
       maxPasswordLength: PASSWORD_MAX_LENGTH,
       onExistingUserSignUp: async ({ user }) => {
-        // Tidak ditunggu: waktu respons tidak boleh membedakan email terdaftar (enqueue bisa lambat saat Redis mati).
-        deps.queues
-          ?.enqueue("email", {
-            requestId: getContext()?.requestId ?? uuidv7(),
-            template: "auth.account_exists",
-            userId: user.id,
-          })
-          .catch((error: unknown) => logger.warn({ err: error }, "enqueue email auth.account_exists gagal"));
+        enqueueEmail({ template: "auth.account_exists", userId: user.id });
+      },
+    },
+    emailVerification: {
+      // Belum terverifikasi tetap boleh login & mengedit; publish/undang/beli/AI diblokir (ACC-003, ACC-256).
+      sendOnSignUp: true,
+      expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
+      autoSignInAfterVerification: false,
+      sendVerificationEmail: async ({ user, token }) => {
+        if (!createVerificationCode) throw new Error("auth belum siap: createVerificationCode kosong");
+        const code = await createVerificationCode(user.email);
+        // Link publik (lewat proxy web); setelah diproses BA mengarahkan ke halaman hasil di web.
+        const verifyUrl = `${config.publicAuthUrl.replace(/\/$/, "")}/verify-email?token=${encodeURIComponent(token)}&callbackURL=${encodeURIComponent(APP_PATHS.verifyEmail)}`;
+        enqueueEmail({ template: "auth.verify_email", userId: user.id, verifyUrl, code });
       },
     },
     user: {
@@ -195,7 +233,19 @@ export function createAuth(deps: {
         },
       },
     },
-    plugins: [signUpAutoSignIn],
+    plugins: [
+      signUpAutoSignIn,
+      emailOTP({
+        expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
+        allowedAttempts: OTP_ALLOWED_ATTEMPTS,
+        storeOTP: "hashed",
+        // Wajib diisi plugin, tetapi endpoint pengirimnya dimatikan (DISABLED_OTP_PATHS).
+        sendVerificationOTP: async () => {
+          throw new Error("kirim OTP terpisah tidak dipakai; kode dikirim bersama link verifikasi");
+        },
+      }),
+    ],
+    disabledPaths: DISABLED_OTP_PATHS,
     // Rate limit memakai limiter API sendiri (Redis, 429 + Retry-After, ACC-255) di auth.routes.ts.
     rateLimit: { enabled: false },
     session: {
@@ -216,6 +266,8 @@ export function createAuth(deps: {
     },
     telemetry: { enabled: false },
   });
+  createVerificationCode = (email) => auth.api.createVerificationOTP({ body: { email, type: "email-verification" } });
+  return auth;
 }
 
 export type Auth = ReturnType<typeof createAuth>;

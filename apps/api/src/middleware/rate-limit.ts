@@ -31,6 +31,11 @@ export const RATE_LIMITS = {
     { points: 3, durationSeconds: 3600 },
     { points: 10, durationSeconds: 86_400 },
   ],
+  // Kirim ulang email verifikasi per alamat: cooldown 60 detik, maks 5/jam (ACC-003).
+  verificationEmail: [
+    { points: 1, durationSeconds: 60 },
+    { points: 5, durationSeconds: 3600 },
+  ],
   publishFree: [{ points: 10, durationSeconds: 3600 }],
   runtimeFormSubmit: [{ points: 10, durationSeconds: 60 }],
   memberLogin: [

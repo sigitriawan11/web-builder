@@ -1,5 +1,5 @@
 import { toNodeHandler } from "better-auth/node";
-import express, { type Request, type Router } from "express";
+import express, { type Request, type RequestHandler, type Router } from "express";
 import type { Redis } from "../lib/redis";
 import { JSON_LIMIT } from "../middleware/body-parsers";
 import { RATE_LIMITS, rateLimit } from "../middleware/rate-limit";
@@ -10,6 +10,24 @@ import { signUpGuard } from "./sign-up";
 // parser global; hanya rute registrasi yang mem-parse JSON sendiri (Better Auth membaca stream untuk rute lain).
 
 const byIp = (req: Request) => `ip:${req.ip ?? "unknown"}`;
+
+/** Kunci per alamat email di body (sudah di-parse); body tanpa email → per IP. */
+const byBodyEmail = (req: Request) => {
+  const email: unknown = (req.body as { email?: unknown } | undefined)?.email;
+  return typeof email === "string" ? `email:${email.trim().toLowerCase()}` : byIp(req);
+};
+
+/**
+ * Parse JSON untuk rute yang perlu membaca body sebelum Better Auth. BA lalu membaca `req.body` yang sudah di-parse
+ * (stream habis) dan menyusun ulang body-nya, sehingga `content-length` asli tidak berlaku lagi.
+ */
+const jsonForBetterAuth = (): RequestHandler[] => [
+  express.json({ limit: JSON_LIMIT }),
+  (req, _res, next) => {
+    delete req.headers["content-length"];
+    next();
+  },
+];
 
 export function createAuthRouter(deps: { auth: Auth; redis?: Redis; rateLimitPrefix?: string }): Router {
   const router = express.Router();
@@ -29,9 +47,20 @@ export function createAuthRouter(deps: { auth: Auth; redis?: Redis; rateLimitPre
     ...(deps.redis
       ? [rateLimit(deps.redis, { name: "sign-up", windows: RATE_LIMITS.signUp, key: byIp }, limiterOptions)]
       : []),
-    express.json({ limit: JSON_LIMIT }),
+    ...jsonForBetterAuth(),
     signUpGuard(),
   );
+  if (deps.redis) {
+    router.post(
+      "/send-verification-email",
+      ...jsonForBetterAuth(),
+      rateLimit(
+        deps.redis,
+        { name: "verification-email", windows: RATE_LIMITS.verificationEmail, key: byBodyEmail },
+        limiterOptions,
+      ),
+    );
+  }
   router.all("/*splat", toNodeHandler(authRequestHandler(deps.auth)));
   return router;
 }

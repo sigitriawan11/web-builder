@@ -55,9 +55,8 @@ export function signUpGuard(): RequestHandler {
     const problem = checkPassword(body.password);
     if (problem) throw new AppError("WEAK_PASSWORD", undefined, { reason: problem });
 
-    // Better Auth membaca `req.body` yang sudah di-parse (stream sudah habis); panjang body lama tidak berlaku lagi.
+    // Better Auth membaca `req.body` yang sudah di-parse (lihat jsonForBetterAuth di auth.routes.ts).
     req.body = toBetterAuthBody(body);
-    delete req.headers["content-length"];
     const userAgent = req.get("user-agent");
     runWithSignUpContext(
       {

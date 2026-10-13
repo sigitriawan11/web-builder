@@ -3,7 +3,7 @@ import { createTestDb, type TestDb } from "@platform/db/testing";
 import { Redis } from "ioredis";
 import request from "supertest";
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
-import { authTestApp, signUpBody, TEST_ORIGIN, uniqueEmail } from "./auth.test-harness";
+import { authTestApp, recordingQueues, signUpBody, TEST_ORIGIN, uniqueEmail } from "./auth.test-harness";
 
 // ACC-001: consent ditulis dalam transaksi yang sama dengan user → gagal menulis consent = user tidak tersimpan.
 vi.mock("./auth.repository", async (importOriginal) => ({
@@ -26,7 +26,8 @@ afterAll(async () => {
 
 it("gagal menulis consent → seluruh registrasi di-rollback (tanpa user, akun, sesi)", async () => {
   const email = uniqueEmail();
-  const response = await request(authTestApp(testDb, redis))
+  const queues = recordingQueues();
+  const response = await request(authTestApp(testDb, redis, queues))
     .post("/auth/sign-up/email")
     .set("origin", TEST_ORIGIN)
     .send(signUpBody(email));
@@ -37,4 +38,7 @@ it("gagal menulis consent → seluruh registrasi di-rollback (tanpa user, akun, 
   expect(await testDb.db.select().from(schema.users).where(eq(schema.users.email, email))).toHaveLength(0);
   expect(await testDb.db.select().from(schema.accounts)).toHaveLength(0);
   expect(await testDb.db.select().from(schema.sessions)).toHaveLength(0);
+  // Email verifikasi diantrekan setelah commit → rollback = tidak ada email.
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  expect(queues.jobs).toHaveLength(0);
 });

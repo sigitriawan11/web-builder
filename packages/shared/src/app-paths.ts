@@ -4,4 +4,6 @@ export const APP_PATHS = {
   dashboard: "/",
   login: "/login",
   forgotPassword: "/forgot-password",
+  // Hasil klik link verifikasi (sukses / `?error=token_expired` + kirim ulang) dan form kode 6 digit (ACC-003).
+  verifyEmail: "/verify-email",
 } as const;

@@ -222,11 +222,15 @@ describe("registrasi email + password (ACC-001)", () => {
     expect(sessionCookie(first.headers["set-cookie"])).toBeDefined();
     expect(sessionCookie(second.headers["set-cookie"])).toBeUndefined();
 
+    const sent = (template: string) =>
+      queues.jobs.filter((job) => (job.payload as { template?: string }).template === template);
     await expect
-      .poll(() => queues.jobs)
+      .poll(() => sent("auth.account_exists"))
       .toEqual([
         { queue: "email", payload: expect.objectContaining({ template: "auth.account_exists", userId: existing?.id }) },
       ]);
+    // Email verifikasi hanya untuk pendaftaran pertama (user baru), bukan percobaan dengan email terdaftar.
+    expect(sent("auth.verify_email")).toHaveLength(1);
     const users = await testDb.db.select().from(schema.users).where(eq(schema.users.email, email));
     expect(users).toHaveLength(1);
     const consents = await testDb.db
