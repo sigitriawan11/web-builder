@@ -1,5 +1,7 @@
 import type { Logger } from "@platform/shared/node";
+import { toNodeHandler } from "better-auth/node";
 import express, { type Express } from "express";
+import { AUTH_BASE_PATH, type Auth, authRequestHandler } from "./auth/auth";
 import { type ReadinessCheck, readinessHandler } from "./health/readiness";
 import { createInternalRouter } from "./internal/internal.routes";
 import type { Redis } from "./lib/redis";
@@ -17,6 +19,8 @@ export interface AppDeps {
   logger: Logger;
   // Redis untuk rate limit per router (T1.4.5); router publik memasangnya saat dibuat.
   redis?: Redis;
+  // Better Auth (T1.5.1); bila ada, handler dipasang di `/auth/*`.
+  auth?: Auth;
   // Secret JWT internal; bila ada, router `/internal/v1` dipasang (dilindungi service token).
   internalJwtSecret?: string;
   // Producer job untuk service (enqueue lewat `withTransaction` + afterCommit).
@@ -39,6 +43,8 @@ export function createApp(deps: AppDeps): Express {
   app.use(httpLogger(deps.logger)); // 2
   app.use(securityHeaders()); // 3
   // 4 — CORS dipasang per router publik (`corsFor`), bukan global.
+  // Auth sebelum body parser: Better Auth membaca body request sendiri.
+  if (deps.auth) app.all(`${AUTH_BASE_PATH}/*splat`, toNodeHandler(authRequestHandler(deps.auth)));
   app.use(bodyParsers()); // 5
 
   // Liveness: proses hidup & event loop merespons; tidak menyentuh dependensi (readiness = T1.4.6).

@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { schema } from "@platform/db";
+import { eq, schema } from "@platform/db";
 import { createTestDb, type TestDb } from "@platform/db/testing";
 import { uuidv7 } from "@platform/shared";
 import { createLogger } from "@platform/shared/node";
@@ -35,8 +35,7 @@ afterAll(async () => {
 const publishPayload = () => ({ requestId: "req-1", siteId: uuidv7(), deploymentId: uuidv7() });
 const jobsFor = async (deploymentId: string) =>
   (await inspector.getJobs(["waiting", "delayed", "active"])).filter((job) => job.data.deploymentId === deploymentId);
-const auditCount = async (action: string) =>
-  testDb.db.$count(schema.auditLogs, (await import("drizzle-orm")).eq(schema.auditLogs.action, action));
+const auditCount = async (action: string) => testDb.db.$count(schema.auditLogs, eq(schema.auditLogs.action, action));
 
 describe("enqueue setelah commit (ARCHITECTURE §18)", () => {
   it("transaksi commit → data tersimpan & job masuk antrean dengan payload tervalidasi + retensi", async () => {

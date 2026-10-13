@@ -947,7 +947,7 @@ User(dashboard)   api /v1/billing        Gateway platform        api /webhooks/b
 
 - Better Auth di-mount di `apps/api` pada `/auth/*` (diakses browser sebagai `app.platformmu.com/api/auth/*`). `baseURL = PUBLIC_APP_URL + '/api/auth'`, `trustedOrigins = [PUBLIC_APP_URL]`.
 - Metode: email + password (hash scrypt/argon2 bawaan), verifikasi email, reset password, Google OAuth (P1), 2FA TOTP (wajib untuk semua user dengan `staff_role`).
-- Session cookie: host-only, `Secure`, `HttpOnly`, `SameSite=Lax`, rolling 30 hari; session disimpan di Postgres (`sessions`) + cache Redis (secondary storage) untuk lookup cepat.
+- Session cookie: host-only, `Secure`, `HttpOnly`, `SameSite=Lax`, rolling 30 hari; session disimpan di Postgres (`sessions`) + cache Redis (secondary storage) untuk lookup cepat. Cache Redis berprefix `auth:` dengan TTL maksimal 5 menit (sesi yang dicabut cepat hilang dari cache); Redis mati → lookup jatuh ke Postgres.
 - **CSRF:** semua mutasi via same-origin `/api`. Pertahanan berlapis: (1) `SameSite=Lax`, (2) Better Auth memeriksa `Origin` untuk endpoint auth, (3) middleware `originCheck` di Platform API menolak request non-GET jika `Origin`/`Sec-Fetch-Site` bukan `same-origin`.
 - Better Auth boleh diganti (brief); karena itu seluruh kode membaca user lewat `req.ctx.user` yang diisi satu middleware adapter.
 

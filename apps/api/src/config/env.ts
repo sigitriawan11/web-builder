@@ -14,6 +14,10 @@ export const apiEnvSchema = {
   S3_ENDPOINT: envField.url(),
   // JWT service-to-service (ARCHITECTURE §9.3).
   INTERNAL_JWT_SECRET: envField.secret(32),
+  // Better Auth (ARCHITECTURE §9.1): URL publik auth = PUBLIC_APP_URL + /api/auth.
+  BETTER_AUTH_SECRET: envField.secret(32),
+  BETTER_AUTH_URL: envField.url(),
+  PUBLIC_APP_URL: envField.url(),
 };
 
 export type ApiEnv = ReturnType<typeof loadApiEnv>;

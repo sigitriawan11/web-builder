@@ -1,8 +1,8 @@
 import type { Server } from "node:http";
-import { createDb } from "@platform/db";
+import { createDb, sql } from "@platform/db";
 import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
-import { sql } from "drizzle-orm";
 import { createApp } from "./app";
+import { createAuth } from "./auth/auth";
 import type { ApiEnv } from "./config/env";
 import { storageCheck } from "./health/readiness";
 import { createRedis, waitForRedis } from "./lib/redis";
@@ -64,8 +64,21 @@ export async function startServer(
       queueErrorLogged = true;
     },
   });
+  const auth = createAuth({
+    db,
+    redis,
+    logger,
+    config: {
+      secret: env.BETTER_AUTH_SECRET,
+      publicAuthUrl: env.BETTER_AUTH_URL,
+      trustedOrigins: [env.PUBLIC_APP_URL],
+      // Lokal memakai http; cookie `Secure` hanya di staging/production.
+      secureCookies: env.APP_ENV !== "local",
+    },
+  });
   const app = createApp({
     logger,
+    auth,
     redis,
     queues,
     internalJwtSecret: env.INTERNAL_JWT_SECRET,

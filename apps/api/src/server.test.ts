@@ -14,6 +14,9 @@ const baseEnv = {
   REDIS_URL: "redis://127.0.0.1:1",
   S3_ENDPOINT: "http://127.0.0.1:1",
   INTERNAL_JWT_SECRET: "test-internal-secret-0123456789abcdef",
+  BETTER_AUTH_SECRET: "test-better-auth-secret-0123456789abcdef",
+  BETTER_AUTH_URL: "http://app.localhost:3000/api/auth",
+  PUBLIC_APP_URL: "http://app.localhost:3000",
 };
 
 describe("server & graceful shutdown (T1.4.1)", () => {
