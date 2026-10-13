@@ -3,5 +3,6 @@
   // agar document-model tidak bergantung pada API lingkungan.
   "extends": "@platform/config/tsconfig/base.json",
   "compilerOptions": { "lib": ["ES2022", "DOM"] },
-  "include": ["."]
+  "include": ["."],
+  "references": [{ "path": ".." }]
 }

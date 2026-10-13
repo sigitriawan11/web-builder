@@ -8,7 +8,7 @@
     "./fixtures": "./test/fixtures/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json && tsc -p bench/tsconfig.json",
+    "typecheck": "tsc -b tsconfig.json bench/tsconfig.json",
     "test": "vitest run",
     "bench": "vitest bench --run --reporter=verbose"
   },

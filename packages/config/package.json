@@ -5,6 +5,19 @@
   "type": "module",
   "exports": {
     "./tsconfig/base.json": "./tsconfig/base.json",
-    "./biome": "./biome.json"
+    "./tsconfig/react.json": "./tsconfig/react.json",
+    "./tsconfig/node.json": "./tsconfig/node.json",
+    "./biome": "./biome.json",
+    "./vitest": "./vitest/preset.ts",
+    "./tailwind/preset.css": "./tailwind/preset.css"
+  },
+  "scripts": {
+    "typecheck": "tsc -b"
+  },
+  "peerDependencies": {
+    "vitest": "5.0.4"
+  },
+  "devDependencies": {
+    "vitest": "5.0.4"
   }
 }

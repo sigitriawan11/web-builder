@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsc -b",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "bench:frames": "playwright test --config playwright.bench.config.ts",

@@ -1,4 +1,5 @@
-import { defineConfig } from "vitest/config";
+import { vitestPreset } from "@platform/config/vitest";
+import { defineConfig, mergeConfig } from "vitest/config";
 
 // ED-238: logika murni canvas (tanpa DOM/React) wajib ber-coverage ≥ 90%. Struktur folder mengikuti
 // ARCHITECTURE §5.2 (canvas/, tools/, document/), bukan `src/core/**` seperti teks ED-238.
@@ -24,15 +25,15 @@ const PURE_LOGIC = [
   "src/commands/is-editable-target.ts",
 ];
 
-export default defineConfig({
-  test: {
-    include: ["src/**/*.test.{ts,tsx}"],
-    coverage: {
-      provider: "v8",
-      include: PURE_LOGIC,
-      reporter: ["text", "json-summary"],
-      // Per file: modul yang kurang teruji tidak bisa bersembunyi di balik rata-rata.
-      thresholds: { lines: 90, branches: 90, functions: 90, statements: 90, perFile: true },
+export default mergeConfig(
+  vitestPreset,
+  defineConfig({
+    test: {
+      coverage: {
+        include: PURE_LOGIC,
+        // Per file: modul yang kurang teruji tidak bisa bersembunyi di balik rata-rata.
+        thresholds: { lines: 90, branches: 90, functions: 90, statements: 90, perFile: true },
+      },
     },
-  },
-});
+  }),
+);

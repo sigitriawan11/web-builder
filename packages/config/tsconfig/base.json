@@ -9,7 +9,13 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "noEmit": true,
+    // Project references (`tsc -b`): composite wajib emit; hanya deklarasi, ke node_modules/.tsc per paket
+    // (tidak masuk git, tidak dipakai runtime — paket internal tetap diekspor sebagai source TS).
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "${configDir}/node_modules/.tsc",
+    // Tipe global hanya bila diminta (mis. tsconfig/node.json); mencegah @types/node bocor ke paket isomorfik.
+    "types": [],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
 

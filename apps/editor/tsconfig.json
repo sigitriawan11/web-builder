@@ -1,9 +1,25 @@
 {
-  "extends": "@platform/config/tsconfig/base.json",
+  "extends": "@platform/config/tsconfig/react.json",
   "compilerOptions": {
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": [
+      "vite/client"
+    ]
   },
-  "include": ["src", "e2e", "bench", "vite.config.ts", "vitest.config.ts", "playwright.config.ts", "playwright.bench.config.ts"]
+  "include": [
+    "src",
+    "e2e",
+    "bench",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "playwright.bench.config.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/document-model"
+    },
+    {
+      "path": "../../packages/config"
+    }
+  ]
 }

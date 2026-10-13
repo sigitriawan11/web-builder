@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  // Proses Node 22 (api, worker, realtime, db). Paket pemakai wajib memasang devDependency `@types/node` 22.x.
+  "extends": "./base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}
