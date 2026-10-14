@@ -1,6 +1,6 @@
+import { type Node, resolveStyle, SiteDocumentSchema } from "@platform/document-model";
+import { responsiveSectionsDocument } from "@platform/document-model/fixtures";
 import { describe, expect, it } from "vitest";
-import { responsiveSectionsDocument } from "../../test/fixtures";
-import { type LengthValue, type Node, SiteDocumentSchema } from "../schema";
 import {
   estimateAvailableWidth,
   estimateMaxContentWidth,
@@ -11,18 +11,13 @@ import {
 
 const { document, sections } = responsiveSectionsDocument();
 
-// Metrik sederhana agar angka mudah dihitung: 16 px, 0,5 em/karakter (tebal 0,6), h1 32 px.
+// Metrik sederhana agar angka mudah dihitung: 0,5 em/karakter (tebal 0,6); ukuran font dari tag (h1 32, h2 24, p 16).
 function context(breakpoint: WidthEstimateContext["breakpoint"] = "mobile"): WidthEstimateContext {
   return {
-    nodes: document.nodes,
-    assets: document.assets,
+    doc: document,
     breakpoint,
-    lengthPx: (value: LengthValue) =>
-      "$token" in value ? null : value.unit === "px" ? value.value : value.unit === "rem" ? value.value * 16 : null,
-    text: {
-      fontSizePx: (node) => (node.tag === "h1" ? 32 : node.tag === "h2" ? 24 : 16),
-      charWidthEm: (bold) => (bold ? 0.6 : 0.5),
-    },
+    styleOf: (node) => resolveStyle(node.style, breakpoint),
+    fonts: { charWidthEm: (_family, bold) => (bold ? 0.6 : 0.5) },
   };
 }
 
@@ -39,7 +34,7 @@ describe("fixture responsiveSectionsDocument (T0.8.4)", () => {
   });
 });
 
-describe("estimateMaxContentWidth (prototipe OPEN-DM-5)", () => {
+describe("estimateMaxContentWidth (DM-038, dipindah dari document-model)", () => {
   it("teks = karakter × font × lebar karakter; tebal lebih lebar", () => {
     expect(estimateMaxContentWidth(byName("Tautan / Menu"), context())).toBe(4 * 16 * 0.5);
     expect(estimateMaxContentWidth(byName("Logo"), context())).toBe(13 * 16 * 0.6);
@@ -70,9 +65,9 @@ describe("estimateMaxContentWidth (prototipe OPEN-DM-5)", () => {
       ...document.nodes,
       [byName("Tautan / Kontak").id]: { ...byName("Tautan / Kontak"), visible: false },
     };
-    expect(estimateMaxContentWidth(links, { ...context(), nodes: hidden as typeof document.nodes })).toBe(
-      18 * 8 + 2 * 24,
-    );
+    expect(
+      estimateMaxContentWidth(links, { ...context(), doc: { ...document, nodes: hidden as typeof document.nodes } }),
+    ).toBe(18 * 8 + 2 * 24);
   });
 
   it("maxWidth membatasi, minWidth menaikkan", () => {

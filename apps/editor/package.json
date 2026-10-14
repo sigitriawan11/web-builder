@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@platform/document-model": "workspace:*",
+    "@platform/renderer": "workspace:*",
     "@tiptap/pm": "3.31.4",
     "@tiptap/react": "3.31.4",
     "@tiptap/starter-kit": "3.31.4",

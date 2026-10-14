@@ -1,4 +1,5 @@
-import { type BreakpointDef, resolveStyle, type SiteDocument } from "@platform/document-model";
+import { type AutoRuleId, type BreakpointDef, resolveStyle, type SiteDocument } from "@platform/document-model";
+import { type AutoResponsiveOptions, applyAutoResponsive } from "../responsive/auto-responsive";
 import {
   childLayoutOf,
   type Declaration,
@@ -26,12 +27,16 @@ export interface PageStylesOptions {
   target?: StyleTarget;
   // Selector variabel token dasar (publish `:root`; editor = elemen pembungkus canvas, mis. `:host`).
   rootSelector?: string;
+  // Metrik font untuk estimasi `stackRows` (default sampai katalog font M2).
+  fonts?: AutoResponsiveOptions["fonts"];
 }
 
 export interface PageStyles {
   // Class node (undefined bila node tanpa deklarasi atau tidak dirender).
   classOf: (nodeId: string) => string | undefined;
   css: string;
+  // Aturan auto-responsive (DM-038) yang diterapkan ke node di breakpoint — untuk panel editor.
+  autoApplied: (nodeId: string, breakpoint: "tablet" | "mobile") => AutoRuleId[];
 }
 
 /** Class scope breakpoint frame editor: frame mobile memuat tablet juga (meniru cascade media query desktop-first). */
@@ -108,6 +113,14 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
     classByNode.set(nodeId, className);
   };
 
+  // DM-038: aturan auto-responsive di atas style efektif tablet/mobile — fungsi yang sama untuk editor & publish.
+  const tree = { doc, pageId: options.pageId };
+  const fonts = options.fonts ? { fonts: options.fonts } : {};
+  const auto = {
+    tablet: applyAutoResponsive(tree, "tablet", doc.settings.autoResponsive, fonts),
+    mobile: applyAutoResponsive(tree, "mobile", doc.settings.autoResponsive, fonts),
+  };
+
   // Arti `fill` bergantung arah parent DI BREAKPOINT YANG SAMA (mis. row di desktop, stack di mobile).
   const visit = (nodeId: string, parents: Record<Breakpoint, ParentLayout>) => {
     const node = doc.nodes[nodeId];
@@ -115,9 +128,14 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
     const declarations = {} as Record<Breakpoint, Declaration[]>;
     const childParents = {} as Record<Breakpoint, ParentLayout>;
     for (const bp of BREAKPOINTS) {
-      const style = resolveStyle(node.style, bp, { theme: doc.theme });
+      const style =
+        (bp === "base" ? undefined : auto[bp].styleOf(nodeId)) ?? resolveStyle(node.style, bp, { theme: doc.theme });
       const ctx = { parent: parents[bp], theme: doc.theme, assetUrl: options.assetUrl };
-      declarations[bp] = [...nodeDeclarations(node, style), ...styleDeclarations(style, ctx)];
+      declarations[bp] = [
+        ...nodeDeclarations(node, style),
+        ...styleDeclarations(style, ctx),
+        ...(bp === "base" ? [] : auto[bp].declarationsOf(nodeId)),
+      ];
       childParents[bp] = childLayoutOf(style);
     }
     assign(nodeId, declarations);
@@ -141,5 +159,9 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
     if (!body) continue;
     css += target === "editor" ? body : `${mediaQuery(doc.settings.breakpoints, bp)}{${body}}`;
   }
-  return { classOf: (nodeId) => classByNode.get(nodeId), css };
+  return {
+    classOf: (nodeId) => classByNode.get(nodeId),
+    css,
+    autoApplied: (nodeId, breakpoint) => auto[breakpoint].autoApplied(nodeId),
+  };
 }

@@ -23,4 +23,28 @@ export { colorToCss, cssString, lengthToCss, tokenVar, tokenVarName, typographyV
 export { anchorId, anchorTargets, type LinkAttributes, linkAttributes, linkHref } from "./links";
 export { Box, Image, Link, Text } from "./primitives";
 export { render } from "./render";
+export {
+  type AutoResponsiveOptions,
+  type AutoResponsiveOutput,
+  type AutoResult,
+  applyAutoResponsive,
+  type ResolvedTree,
+  type ResponsiveBreakpoint,
+  SPACING_THRESHOLD_PX,
+  STACK_ROWS_SAFETY,
+  TYPE_MIN_RATIO,
+  TYPE_MOBILE_RATIO,
+  TYPE_THRESHOLD_PX,
+} from "./responsive/auto-responsive";
+export {
+  DEFAULT_FONT_METRICS,
+  estimateAvailableWidth,
+  estimateMaxContentWidth,
+  type FontMetrics,
+  flowChildCount,
+  isStackRowsCandidate,
+  lengthPx,
+  rowOverflowsStatic,
+  type WidthEstimateContext,
+} from "./responsive/estimate-width";
 export { renderRichText } from "./rich-text";

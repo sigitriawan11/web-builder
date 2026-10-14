@@ -1,14 +1,12 @@
+import { type Node, resolveStyle } from "@platform/document-model";
+import { responsiveSectionsDocument } from "@platform/document-model/fixtures";
 import {
   estimateAvailableWidth,
   estimateMaxContentWidth,
   isStackRowsCandidate,
-  type LengthValue,
-  type Node,
   rowOverflowsStatic,
-  type TextNode,
   type WidthEstimateContext,
-} from "@platform/document-model";
-import { responsiveSectionsDocument } from "@platform/document-model/fixtures";
+} from "@platform/renderer";
 import { expect, type Page, test } from "@playwright/test";
 
 // T0.8.4 / OPEN-DM-5 (DM-038): akurasi deteksi overflow `stackRows` statis vs DOM pada 10 section.
@@ -21,8 +19,6 @@ const MOBILE_WIDTH = 390;
 const SAFETY = 0.9;
 const FONTS = [null, "Inter", "Poppins"] as const;
 const CALIBRATION = "Selamat datang di toko kami, pesan sekarang dan nikmati Penawaran Terbaik Minggu Ini";
-// Ukuran default browser per tag (renderer prototipe belum punya typography; DM-0xx di M1).
-const TAG_FONT_SIZE: Record<string, number> = { h1: 32, h2: 24, h3: 18.72, h4: 16, h5: 13.28, h6: 10.72 };
 
 const { document: fixture, sections } = responsiveSectionsDocument();
 
@@ -70,17 +66,14 @@ async function measureMaxContent(page: Page, ids: string[]): Promise<Record<stri
   }, ids);
 }
 
+// Estimator renderer (DM-038, dipindah dari document-model di T1.10.4); ukuran font dari tag (UA default) karena
+// fixture tidak memakai typography eksplisit.
 function context(metrics: Metrics): WidthEstimateContext {
   return {
-    nodes: fixture.nodes,
-    assets: fixture.assets,
+    doc: fixture,
     breakpoint: "mobile",
-    lengthPx: (value: LengthValue) =>
-      "$token" in value ? null : value.unit === "px" ? value.value : value.unit === "rem" ? value.value * 16 : null,
-    text: {
-      fontSizePx: (node: TextNode) => TAG_FONT_SIZE[node.tag ?? "p"] ?? 16,
-      charWidthEm: (bold) => (bold ? metrics.bold : metrics.regular),
-    },
+    styleOf: (node) => resolveStyle(node.style, "mobile"),
+    fonts: { charWidthEm: (_family, bold) => (bold ? metrics.bold : metrics.regular) },
   };
 }
 

@@ -108,6 +108,9 @@ importers:
       '@platform/document-model':
         specifier: workspace:*
         version: link:../../packages/document-model
+      '@platform/renderer':
+        specifier: workspace:*
+        version: link:../../packages/renderer
       '@tiptap/pm':
         specifier: 3.31.4
         version: 3.31.4
