@@ -1,0 +1,401 @@
+{
+  "seedVersion": 1,
+  "categories": [
+    {
+      "slug": "navigation",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Navigasi & Layout",
+        "en": "Navigation & Layout"
+      },
+      "icon": "navigation",
+      "sortOrder": 10
+    },
+    {
+      "slug": "hero",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Hero",
+        "en": "Hero"
+      },
+      "icon": "sparkles",
+      "sortOrder": 20
+    },
+    {
+      "slug": "features",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Fitur & Keunggulan",
+        "en": "Features & Benefits"
+      },
+      "icon": "list-checks",
+      "sortOrder": 30
+    },
+    {
+      "slug": "content",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Konten",
+        "en": "Content"
+      },
+      "icon": "text",
+      "sortOrder": 40
+    },
+    {
+      "slug": "social-proof",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Bukti Sosial",
+        "en": "Social Proof"
+      },
+      "icon": "message-square-quote",
+      "sortOrder": 50
+    },
+    {
+      "slug": "pricing",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Harga",
+        "en": "Pricing"
+      },
+      "icon": "tag",
+      "sortOrder": 60
+    },
+    {
+      "slug": "faq",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "FAQ",
+        "en": "FAQ"
+      },
+      "icon": "circle-help",
+      "sortOrder": 70
+    },
+    {
+      "slug": "cta",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Ajakan Bertindak",
+        "en": "Call to Action"
+      },
+      "icon": "megaphone",
+      "sortOrder": 80
+    },
+    {
+      "slug": "team",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Tim",
+        "en": "Team"
+      },
+      "icon": "users",
+      "sortOrder": 90
+    },
+    {
+      "slug": "contact",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Kontak",
+        "en": "Contact"
+      },
+      "icon": "phone",
+      "sortOrder": 100
+    },
+    {
+      "slug": "blog",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Blog",
+        "en": "Blog"
+      },
+      "icon": "newspaper",
+      "sortOrder": 110
+    },
+    {
+      "slug": "product",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Produk & Kartu",
+        "en": "Products & Cards"
+      },
+      "icon": "package",
+      "sortOrder": 120
+    },
+    {
+      "slug": "elements",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Elemen",
+        "en": "Elements"
+      },
+      "icon": "shapes",
+      "sortOrder": 130
+    },
+    {
+      "slug": "dashboard",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Widget Dashboard",
+        "en": "Dashboard Widgets"
+      },
+      "icon": "layout-dashboard",
+      "sortOrder": 140
+    },
+    {
+      "slug": "auth",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Autentikasi",
+        "en": "Authentication"
+      },
+      "icon": "log-in",
+      "sortOrder": 150
+    },
+    {
+      "slug": "commerce",
+      "scope": "component",
+      "type": "functional",
+      "name": {
+        "id": "Toko",
+        "en": "Commerce"
+      },
+      "icon": "shopping-cart",
+      "sortOrder": 160
+    },
+    {
+      "slug": "kuliner",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Kuliner / F&B",
+        "en": "Food & Beverage"
+      },
+      "icon": "utensils",
+      "sortOrder": 10
+    },
+    {
+      "slug": "restoran",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Menu Restoran",
+        "en": "Restaurant Menu"
+      },
+      "icon": "chef-hat",
+      "sortOrder": 20
+    },
+    {
+      "slug": "fashion",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Fashion",
+        "en": "Fashion"
+      },
+      "icon": "shirt",
+      "sortOrder": 30
+    },
+    {
+      "slug": "umkm-produk",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Produk Rumahan",
+        "en": "Home-made Products"
+      },
+      "icon": "cookie",
+      "sortOrder": 40
+    },
+    {
+      "slug": "jasa",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Jasa & Servis",
+        "en": "Services"
+      },
+      "icon": "wrench",
+      "sortOrder": 50
+    },
+    {
+      "slug": "bengkel",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Bengkel",
+        "en": "Repair Shop"
+      },
+      "icon": "car",
+      "sortOrder": 60
+    },
+    {
+      "slug": "salon",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Salon & Barbershop",
+        "en": "Salon & Barbershop"
+      },
+      "icon": "scissors",
+      "sortOrder": 70
+    },
+    {
+      "slug": "klinik",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Klinik & Kesehatan",
+        "en": "Clinic & Health"
+      },
+      "icon": "stethoscope",
+      "sortOrder": 80
+    },
+    {
+      "slug": "pendidikan",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Pendidikan & Kursus",
+        "en": "Education & Courses"
+      },
+      "icon": "graduation-cap",
+      "sortOrder": 90
+    },
+    {
+      "slug": "properti",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Properti",
+        "en": "Property"
+      },
+      "icon": "house",
+      "sortOrder": 100
+    },
+    {
+      "slug": "kos",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Kos & Kontrakan",
+        "en": "Boarding House"
+      },
+      "icon": "bed",
+      "sortOrder": 110
+    },
+    {
+      "slug": "travel",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Travel",
+        "en": "Travel"
+      },
+      "icon": "plane",
+      "sortOrder": 120
+    },
+    {
+      "slug": "portfolio",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Portofolio",
+        "en": "Portfolio"
+      },
+      "icon": "briefcase",
+      "sortOrder": 130
+    },
+    {
+      "slug": "company-profile",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Profil Perusahaan",
+        "en": "Company Profile"
+      },
+      "icon": "building-2",
+      "sortOrder": 140
+    },
+    {
+      "slug": "event",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Acara & Undangan",
+        "en": "Events & Invitations"
+      },
+      "icon": "calendar-heart",
+      "sortOrder": 150
+    },
+    {
+      "slug": "komunitas",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Komunitas & Organisasi",
+        "en": "Community & Organization"
+      },
+      "icon": "users-round",
+      "sortOrder": 160
+    },
+    {
+      "slug": "toko-online",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Toko Online",
+        "en": "Online Store"
+      },
+      "icon": "store",
+      "sortOrder": 170
+    },
+    {
+      "slug": "landing",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Landing Page",
+        "en": "Landing Page"
+      },
+      "icon": "rocket",
+      "sortOrder": 180
+    },
+    {
+      "slug": "member-area",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Area Member",
+        "en": "Member Area"
+      },
+      "icon": "shield-user",
+      "sortOrder": 190
+    },
+    {
+      "slug": "link-in-bio",
+      "scope": "template",
+      "type": "industry",
+      "name": {
+        "id": "Link-in-bio",
+        "en": "Link in Bio"
+      },
+      "icon": "link",
+      "sortOrder": 200
+    }
+  ]
+}
