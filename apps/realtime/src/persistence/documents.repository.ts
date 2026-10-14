@@ -67,14 +67,15 @@ export interface AppendUpdate {
 /**
  * Tambah update berurutan (seq = last_seq + 1, …) dan majukan `documents.last_seq` dalam SATU transaksi (ARCHITECTURE
  * §7.2). Baris dokumen dikunci (`FOR UPDATE`) agar dua penulis tidak membuat seq bolong/ganda. `schemaVersion` diisi
- * saat migrasi.
+ * saat migrasi;
+ * `sizeBytes` = ukuran state Yjs terkini (dipantau terhadap batas DM-076).
  */
 export async function appendDocumentUpdates(
   db: DbExecutor,
   _tenant: SystemTenant,
   documentId: string,
   updates: readonly AppendUpdate[],
-  options: { schemaVersion?: number } = {},
+  options: { schemaVersion?: number; sizeBytes?: number } = {},
 ): Promise<{ lastSeq: number }> {
   return db.transaction(async (tx) => {
     const [current] = await tx
@@ -97,6 +98,7 @@ export async function appendDocumentUpdates(
       .set({
         lastSeq,
         ...(options.schemaVersion !== undefined ? { schemaVersion: options.schemaVersion } : {}),
+        ...(options.sizeBytes !== undefined ? { sizeBytes: options.sizeBytes } : {}),
         updatedAt: sql`now()`,
       })
       .where(eq(schema.documents.id, documentId));

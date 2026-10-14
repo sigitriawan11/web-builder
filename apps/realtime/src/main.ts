@@ -18,7 +18,14 @@ const server = createRealtimeServer({
   host: env.REALTIME_HOST,
   tokenSecret: env.REALTIME_TOKEN_SECRET,
   logger,
-  extensions: [new PersistenceExtension({ db, logger })],
+  extensions: [
+    new PersistenceExtension({
+      db,
+      logger,
+      flushDebounceMs: env.REALTIME_FLUSH_DEBOUNCE_MS,
+      flushMaxWaitMs: env.REALTIME_FLUSH_MAX_MS,
+    }),
+  ],
 });
 await server.listen();
 logger.info({ url: server.webSocketURL }, "realtime siap");

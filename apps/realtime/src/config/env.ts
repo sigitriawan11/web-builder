@@ -13,6 +13,9 @@ export const realtimeEnvSchema = {
   REALTIME_TOKEN_SECRET: envField.secret(32),
   DATABASE_URL: envField.url(),
   DATABASE_POOL_MAX: envField.int().default(5),
+  // ARCHITECTURE §7.2: update klien di-buffer lalu ditulis sebagai satu baris (debounce, maksimum sejak update pertama).
+  REALTIME_FLUSH_DEBOUNCE_MS: envField.int().default(2000),
+  REALTIME_FLUSH_MAX_MS: envField.int().default(10_000),
 };
 
 export type RealtimeEnv = ReturnType<typeof loadRealtimeEnv>;
