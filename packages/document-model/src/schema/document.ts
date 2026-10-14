@@ -98,6 +98,15 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
       );
     }
 
+    // DM-026: `layout` hanya untuk container (punya `children`).
+    if (!("children" in node)) {
+      for (const breakpoint of ["base", "tablet", "mobile"] as const) {
+        if (node.style[breakpoint]?.layout != null) {
+          report(["nodes", node.id, "style", breakpoint, "layout"], `Node ${node.type} tidak boleh punya layout`);
+        }
+      }
+    }
+
     if (node.type === "image") {
       const { assetId } = node.props.image;
       if (!(assetId in doc.assets)) {

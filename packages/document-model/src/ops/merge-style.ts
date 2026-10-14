@@ -51,7 +51,7 @@ function mergePosition(current: unknown, patch: JsonRecord): JsonRecord | undefi
 
 /**
  * Menerapkan patch ke style satu breakpoint (DM-036):
- * 1. objek (`layout`, `size`, `padding`) → merge per key;
+ * 1. objek (`layout`, `size`, `flexChild`, `padding`) → merge per key;
  * 2. array (`fills`) → replace utuh; 3. nilai atomik (`radius`, token, dimensi) → replace;
  * 4. `layout`/`position` dengan mode/type berbeda → replace; 5. `null` → hapus.
  * Mengembalikan objek baru; `current` tidak diubah.
@@ -64,7 +64,7 @@ export function mergeStyle(current: JsonRecord, patch: StylePatch): JsonRecord {
     let next: unknown;
     if (value === null) next = undefined;
     else if (group === "layout" && isRecord(value)) next = mergeLayout(merged.layout, value);
-    else if (group === "size" && isRecord(value)) next = mergeShallow(merged.size, value);
+    else if ((group === "size" || group === "flexChild") && isRecord(value)) next = mergeShallow(merged[group], value);
     else if (group === "position" && isRecord(value)) next = mergePosition(merged.position, value);
     else next = value;
 

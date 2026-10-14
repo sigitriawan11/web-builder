@@ -15,7 +15,7 @@ function patchShape<S extends z.ZodRawShape>(shape: S): PatchShape<S> {
   return patched as PatchShape<S>;
 }
 
-// ── Layout (DM-026, subset M0: none | flex) ────────────────────────────────
+// ── Layout (DM-026: none | flex; grid P1 · M2 — `mode: "grid"` ditolak sampai fiturnya dibangun) ──────────
 
 const paddingShape = {
   top: LengthSchema,
@@ -54,6 +54,16 @@ const LayoutPatchSchema = z.strictObject({
   mode: z.enum(["none", "flex"]).optional(),
   ...patchShape({ ...flexShape, padding: PaddingPatchSchema }),
 });
+
+// Perilaku anak di parent flex (DM-026 `FlexChildStyle`). `order` (P2) & `gridColumn`/`gridRow` (grid P1 · M2)
+// ditambah bersama fiturnya. `grow`/`shrink` biasanya diturunkan dari size `fill`; manual = advanced.
+const flexChildShape = {
+  alignSelf: z.enum(["auto", "start", "center", "end", "stretch"]),
+  grow: z.number().min(0).max(1000),
+  shrink: z.number().min(0).max(1000),
+};
+export const FlexChildSchema = z.strictObject(flexChildShape).partial();
+const FlexChildPatchSchema = z.strictObject(patchShape(flexChildShape));
 
 // ── Sizing (DM-027) ────────────────────────────────────────────────────────
 
@@ -140,6 +150,7 @@ export const RadiusSchema = z.union([
 const styleShape = {
   layout: LayoutSchema,
   size: SizeSchema,
+  flexChild: FlexChildSchema,
   position: PositionSchema,
   fills: FillsSchema,
   radius: RadiusSchema,
@@ -149,7 +160,13 @@ export const StyleSchema = z.strictObject(styleShape).partial();
 
 // Array & nilai atomik di-replace utuh; objek (layout, size) di-merge per key.
 export const StylePatchSchema = z.strictObject(
-  patchShape({ ...styleShape, layout: LayoutPatchSchema, size: SizePatchSchema, position: PositionPatchSchema }),
+  patchShape({
+    ...styleShape,
+    layout: LayoutPatchSchema,
+    size: SizePatchSchema,
+    flexChild: FlexChildPatchSchema,
+    position: PositionPatchSchema,
+  }),
 );
 
 export const ResponsiveStyleSchema = z.strictObject({
@@ -162,6 +179,7 @@ export type Padding = z.infer<typeof PaddingSchema>;
 export type LayoutStyle = z.infer<typeof LayoutSchema>;
 export type Dimension = z.infer<typeof DimensionSchema>;
 export type SizeStyle = z.infer<typeof SizeSchema>;
+export type FlexChildStyle = z.infer<typeof FlexChildSchema>;
 export type PositionStyle = z.infer<typeof PositionSchema>;
 export type Fill = z.infer<typeof FillSchema>;
 export type RadiusValue = z.infer<typeof RadiusSchema>;
