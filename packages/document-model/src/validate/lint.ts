@@ -1,3 +1,5 @@
+import { ancestors } from "../query/tree";
+import { walkJsonObjects } from "../query/walk-json";
 import type { Node, SiteDocument } from "../schema";
 import type { Issue } from "./issues";
 
@@ -20,6 +22,22 @@ function* inDomOrder(doc: SiteDocument, pageId: string): Generator<Node> {
     yield node;
     if ("children" in node) stack.push(...[...node.children].reverse());
   }
+}
+
+// DM-009: tidak boleh ada elemen interaktif bersarang — link di dalam frame berlink dirender renderer sebagai <span>.
+function hasOwnLink(node: Node): boolean {
+  if (node.type === "frame" || node.type === "image") return node.props.link !== undefined;
+  if (node.type !== "text") return false;
+  let found = false;
+  walkJsonObjects(node.props.content, [], (object) => {
+    if (object.type === "link") found = true;
+    return found;
+  });
+  return found;
+}
+
+function linkedAncestor(doc: SiteDocument, node: Node): boolean {
+  return ancestors(doc, node.id).some((ancestor) => ancestor.type === "frame" && ancestor.props.link !== undefined);
 }
 
 export function lintDocument(doc: SiteDocument): LintWarning[] {
@@ -52,6 +70,18 @@ export function lintDocument(doc: SiteDocument): LintWarning[] {
           });
         }
         previousLevel = level;
+      }
+      if (hasOwnLink(node) && linkedAncestor(doc, node)) {
+        warnings.push({
+          code: "NESTED_LINK",
+          path: ["nodes", node.id],
+          pageId,
+          nodeId: node.id,
+          message: {
+            id: "Link di dalam frame berlink tidak bisa diklik terpisah (dirender sebagai teks biasa)",
+            en: "A link inside a linked frame cannot be clicked separately (rendered as plain content)",
+          },
+        });
       }
       if (node.type === "image" && !node.props.decorative && !node.props.image.alt?.trim()) {
         warnings.push({

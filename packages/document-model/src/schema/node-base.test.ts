@@ -116,3 +116,38 @@ describe("semantic tag (DM-009)", () => {
     expect(lintDocument(doc)).toEqual([]);
   });
 });
+
+// T1.10.5: DM-009 — elemen interaktif bersarang = warning (renderer melepas link dalam).
+describe("lint NESTED_LINK", () => {
+  it("link image/teks di dalam frame berlink → warning; tanpa frame berlink → tidak", () => {
+    const doc = heroDocument();
+    const image = doc.nodes.n_heroimg001;
+    if (image?.type === "image") image.props.link = { type: "url", href: "https://contoh.id" };
+    expect(lintDocument(doc).map((warning) => warning.code)).not.toContain("NESTED_LINK");
+
+    const hero = doc.nodes.n_hero000001;
+    if (hero?.type === "frame") hero.props.link = { type: "page", pageId: "pg_about00001" };
+    const title = doc.nodes.n_herottl001;
+    if (title?.type === "text") {
+      title.props.content = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Lihat",
+                marks: [{ type: "link", attrs: { link: { type: "url", href: "https://a.id" } } }],
+              },
+            ],
+          },
+        ],
+      };
+    }
+    const nested = lintDocument(doc)
+      .filter((warning) => warning.code === "NESTED_LINK")
+      .map((warning) => warning.nodeId);
+    expect(nested.sort()).toEqual(["n_heroimg001", "n_herottl001"]);
+  });
+});

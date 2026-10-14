@@ -1,4 +1,4 @@
-import type { Node, SiteDocument } from "@platform/document-model";
+import type { LinkValue, Node, SiteDocument } from "@platform/document-model";
 import { Fragment, type ReactElement, type ReactNode } from "react";
 import type { RenderContext } from "./context";
 import { anchorId, anchorTargets, linkAttributes } from "./links";
@@ -13,6 +13,8 @@ interface RenderState {
   doc: SiteDocument;
   ctx: RenderContext;
   anchors: Set<string>;
+  // DM-009: di dalam <a> (frame berlink) tidak boleh ada elemen interaktif lain → link dalam dirender <span>.
+  insideLink: boolean;
 }
 
 function baseAttributes(node: Node, state: RenderState): Record<string, unknown> {
@@ -38,13 +40,17 @@ function renderChildren(node: Node, state: RenderState): ReactNode {
   return node.children.map((childId) => <Fragment key={childId}>{renderNode(childId, state)}</Fragment>);
 }
 
+// Atribut <a>; di dalam link lain → null (dirender <span> tanpa tujuan, DM-009).
+function linkOf(value: LinkValue, state: RenderState): Record<string, unknown> | null {
+  return state.insideLink ? null : { ...linkAttributes(value, state.doc, state.ctx) };
+}
+
 function renderNode(id: string, state: RenderState): ReactNode {
   const { doc, ctx } = state;
   const node = doc.nodes[id];
   if (!node) return null;
   if (!node.visible && ctx.mode === "publish") return null;
   const attributes = baseAttributes(node, state);
-  const link = (value: Parameters<typeof linkAttributes>[0]) => linkAttributes(value, doc, ctx);
 
   switch (node.type) {
     case "page":
@@ -54,9 +60,10 @@ function renderNode(id: string, state: RenderState): ReactNode {
         </Box>
       );
     case "frame": {
-      const children = renderChildren(node, state);
-      // DM-011: frame berlink (card/tombol) dirender sebagai <a>.
-      if (node.props.link) return <Link attributes={{ ...attributes, ...link(node.props.link) }}>{children}</Link>;
+      // DM-011: frame berlink (card/tombol) dirender sebagai <a>; anak-anaknya tidak boleh berisi link lagi.
+      const frameLink = node.props.link ? linkOf(node.props.link, state) : null;
+      const children = renderChildren(node, frameLink ? { ...state, insideLink: true } : state);
+      if (frameLink) return <Link attributes={{ ...attributes, ...frameLink }}>{children}</Link>;
       return (
         <Box tag={node.tag ?? DEFAULT_TAG.frame} attributes={attributes}>
           {children}
@@ -64,7 +71,7 @@ function renderNode(id: string, state: RenderState): ReactNode {
       );
     }
     case "text": {
-      const { content, style } = renderRichText(node.props.content, link);
+      const { content, style } = renderRichText(node.props.content, (value) => linkOf(value, state));
       return (
         <Text tag={node.tag ?? DEFAULT_TAG.text} attributes={attributes} style={style}>
           {content}
@@ -75,9 +82,11 @@ function renderNode(id: string, state: RenderState): ReactNode {
       const { image, decorative, loading, link: imageLink } = node.props;
       const entry = doc.assets[image.assetId];
       const focal = image.focalPoint;
+      // Link gambar di dalam link lain → tanpa <a>; atribut node tetap di <img> (DM-009).
+      const imageAttributes = imageLink ? linkOf(imageLink, state) : null;
       const element = (
         <Image
-          attributes={imageLink ? {} : attributes}
+          attributes={imageAttributes ? {} : attributes}
           src={ctx.assetUrl(image.assetId)}
           alt={decorative ? "" : (image.alt ?? "")}
           width={entry?.width}
@@ -86,7 +95,7 @@ function renderNode(id: string, state: RenderState): ReactNode {
           objectPosition={focal ? `${focal.x * 100}% ${focal.y * 100}%` : undefined}
         />
       );
-      return imageLink ? <Link attributes={{ ...attributes, ...link(imageLink) }}>{element}</Link> : element;
+      return imageAttributes ? <Link attributes={{ ...attributes, ...imageAttributes }}>{element}</Link> : element;
     }
   }
 }
@@ -95,5 +104,5 @@ function renderNode(id: string, state: RenderState): ReactNode {
 export function render(doc: SiteDocument, ctx: RenderContext): ReactElement | null {
   const page = doc.nodes[ctx.pageId];
   if (page?.type !== "page") return null;
-  return <>{renderNode(ctx.pageId, { doc, ctx, anchors: anchorTargets(doc) })}</>;
+  return <>{renderNode(ctx.pageId, { doc, ctx, anchors: anchorTargets(doc), insideLink: false })}</>;
 }

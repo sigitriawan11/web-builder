@@ -6,7 +6,8 @@ import type { LinkAttributes } from "./links";
 // DM-013: rich text dari node yang diizinkan saja; teks selalu di-escape React (tanpa dangerouslySetInnerHTML).
 // Sanitasi & uji XSS lengkap di T1.10.6.
 
-export type LinkRenderer = (link: LinkValue) => LinkAttributes;
+// `null` = link tidak boleh dirender sebagai <a> (sudah di dalam link lain, DM-009) → <span>.
+export type LinkRenderer = (link: LinkValue) => LinkAttributes | Record<string, unknown> | null;
 
 function textStyle(attrs: Extract<Mark, { type: "textStyle" }>["attrs"]): CSSProperties {
   return {
@@ -33,8 +34,10 @@ function wrapMark(content: ReactNode, mark: Mark, link: LinkRenderer): ReactNode
       return <u>{content}</u>;
     case "strike":
       return <s>{content}</s>;
-    case "link":
-      return createElement("a", link(mark.attrs.link), content);
+    case "link": {
+      const attributes = link(mark.attrs.link);
+      return attributes ? createElement("a", attributes, content) : <span>{content}</span>;
+    }
     case "textStyle":
       return <span style={textStyle(mark.attrs)}>{content}</span>;
   }

@@ -26,7 +26,14 @@ export const REFERENCE_ISSUE_CODES = ["ASSET_REF", "ASSET_KIND", "TOKEN_REF", "F
 
 // Lint kualitas/a11y (DM-009): selalu warning.
 // `LIMIT_WARNING`: mendekati batas DM-076 (melewati batas soft).
-export const LINT_ISSUE_CODES = ["MULTIPLE_H1", "HEADING_SKIP", "IMAGE_MISSING_ALT", "LIMIT_WARNING"] as const;
+// `NESTED_LINK`: link di dalam frame berlink (DM-009) — renderer melepas link dalam.
+export const LINT_ISSUE_CODES = [
+  "MULTIPLE_H1",
+  "HEADING_SKIP",
+  "IMAGE_MISSING_ALT",
+  "LIMIT_WARNING",
+  "NESTED_LINK",
+] as const;
 
 export const ISSUE_CODES = [...STRUCTURE_ISSUE_CODES, ...REFERENCE_ISSUE_CODES, ...LINT_ISSUE_CODES] as const;
 export type IssueCode = (typeof ISSUE_CODES)[number];

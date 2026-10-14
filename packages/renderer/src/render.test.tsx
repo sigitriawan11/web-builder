@@ -88,20 +88,22 @@ describe("link (DM-056)", () => {
   });
 
   it("frame berlink dirender <a>; anchor target mendapat id; WA membuka tab baru; editor tanpa href", () => {
-    const withLink = heroDocument();
-    const hero = withLink.nodes.n_hero000001;
-    if (hero?.type === "frame") hero.props.link = { type: "anchor", nodeId: "n_heroimg001" };
-    const image = withLink.nodes.n_heroimg001;
-    if (image?.type === "image") image.props.link = { type: "whatsapp", phone: "6281234567890" };
+    const frameLink = heroDocument();
+    const hero = frameLink.nodes.n_hero000001;
+    if (hero?.type === "frame") hero.props.link = { type: "anchor", nodeId: "n_herottl001" };
+    const output = html(frameLink);
+    expect(output).toMatch(/^<main><a href="#n_herottl001">/);
+    expect(output).toMatch(/<h1 id="n_herottl001"/);
 
-    const output = html(withLink);
-    expect(output).toMatch(/^<main><a href="#n_heroimg001">/);
-    expect(output).toContain(
-      '<a id="n_heroimg001" href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer"><img',
+    const imageLink = heroDocument();
+    const image = imageLink.nodes.n_heroimg001;
+    if (image?.type === "image") image.props.link = { type: "whatsapp", phone: "6281234567890" };
+    expect(html(imageLink)).toContain(
+      '<a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer"><img',
     );
-    const editor = html(withLink, { mode: "editor" });
+    const editor = html(frameLink, { mode: "editor" });
     expect(editor).not.toMatch(/\shref=/);
-    expect(editor).toContain('data-href="#n_heroimg001"');
+    expect(editor).toContain('data-href="#n_herottl001"');
   });
 });
 
