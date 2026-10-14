@@ -15,7 +15,9 @@
       "!**/dist",
       "!**/coverage",
       "!**/__snapshots__",
-      "!packages/document-model/test/fixtures/invalid"
+      "!packages/document-model/test/fixtures/invalid",
+      "!packages/document-model/fixtures",
+      "!packages/document-model/schema.lock.json"
     ]
   },
   "overrides": [

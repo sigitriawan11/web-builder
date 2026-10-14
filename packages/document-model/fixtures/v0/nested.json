@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 0,
+  "meta": {
+    "title": "Kasus Tepi"
+  },
+  "assets": {
+    "ast_logo000001": {
+      "kind": "svg",
+      "mime": "image/svg+xml",
+      "libraryShared": true
+    }
+  },
+  "pageOrder": [
+    "pg_home000001"
+  ],
+  "nodes": {
+    "pg_home000001": {
+      "id": "pg_home000001",
+      "type": "page",
+      "name": "Home",
+      "parentId": null,
+      "children": [
+        "n_lvl1000001"
+      ],
+      "visible": true,
+      "locked": false,
+      "tag": "main",
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column"
+          }
+        }
+      },
+      "props": {
+        "path": "/",
+        "title": "Home",
+        "isHome": true,
+        "seo": {
+          "noIndex": true
+        }
+      }
+    },
+    "n_lvl1000001": {
+      "id": "n_lvl1000001",
+      "type": "frame",
+      "name": "Frame n_lvl1000001",
+      "parentId": "pg_home000001",
+      "children": [
+        "n_lvl2000001"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "row",
+            "wrap": true,
+            "gap": {
+              "value": 2,
+              "unit": "rem"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#00000080",
+              "opacity": 0.5
+            },
+            {
+              "type": "solid",
+              "color": {
+                "$token": "color.brand.600",
+                "alpha": 0.2
+              },
+              "visible": false
+            }
+          ]
+        },
+        "tablet": {
+          "layout": {
+            "direction": "column",
+            "gap": null
+          }
+        },
+        "mobile": {
+          "fills": null,
+          "layout": {
+            "padding": {
+              "left": {
+                "value": 8,
+                "unit": "px"
+              }
+            }
+          }
+        }
+      },
+      "props": {}
+    },
+    "n_lvl2000001": {
+      "id": "n_lvl2000001",
+      "type": "frame",
+      "name": "Frame n_lvl2000001",
+      "parentId": "n_lvl1000001",
+      "children": [
+        "n_lvl3000001"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "none"
+          },
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 50,
+              "unit": "%"
+            }
+          }
+        },
+        "mobile": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column"
+          },
+          "size": {
+            "width": null
+          }
+        }
+      },
+      "props": {}
+    },
+    "n_lvl3000001": {
+      "id": "n_lvl3000001",
+      "type": "frame",
+      "name": "Frame n_lvl3000001",
+      "parentId": "n_lvl2000001",
+      "children": [
+        "n_lvl4text001",
+        "n_lvl4img0001"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "radius": {
+            "value": 4,
+            "unit": "px"
+          },
+          "size": {
+            "aspectRatio": 1.7778
+          }
+        }
+      },
+      "props": {}
+    },
+    "n_lvl4text001": {
+      "id": "n_lvl4text001",
+      "type": "text",
+      "name": "Judul",
+      "parentId": "n_lvl3000001",
+      "visible": false,
+      "locked": true,
+      "tag": "h2",
+      "style": {
+        "base": {}
+      },
+      "props": {
+        "truncate": {
+          "lines": 2
+        },
+        "content": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "heading",
+              "attrs": {
+                "level": 2,
+                "align": "right"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Satu",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    },
+                    {
+                      "type": "italic"
+                    }
+                  ]
+                },
+                {
+                  "type": "hardBreak"
+                },
+                {
+                  "type": "text",
+                  "text": "Dua",
+                  "marks": [
+                    {
+                      "type": "underline"
+                    },
+                    {
+                      "type": "strike"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph"
+            }
+          ]
+        }
+      }
+    },
+    "n_lvl4img0001": {
+      "id": "n_lvl4img0001",
+      "type": "image",
+      "name": "Logo",
+      "parentId": "n_lvl3000001",
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 120,
+              "unit": "px"
+            }
+          }
+        }
+      },
+      "props": {
+        "fit": "contain",
+        "decorative": true,
+        "loading": "eager",
+        "image": {
+          "assetId": "ast_logo000001"
+        }
+      }
+    }
+  }
+}

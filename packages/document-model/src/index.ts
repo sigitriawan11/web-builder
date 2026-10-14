@@ -17,6 +17,15 @@ export {
   type LimitCheck,
   type LimitName,
 } from "./limits";
+export {
+  MIGRATIONS,
+  type Migration,
+  MigrationError,
+  type MigrationErrorCode,
+  type MigrationResult,
+  migrateDocument,
+  migrateYDoc,
+} from "./migrations";
 export * from "./query";
 export * from "./schema";
 export { MAX_TREE_DEPTH } from "./validate/invariants";

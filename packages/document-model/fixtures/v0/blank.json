@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 0,
+  "meta": {
+    "title": "Situs Kosong",
+    "createdWith": "blank"
+  },
+  "assets": {},
+  "pageOrder": [
+    "pg_home000001"
+  ],
+  "nodes": {
+    "pg_home000001": {
+      "id": "pg_home000001",
+      "type": "page",
+      "name": "Home",
+      "parentId": null,
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column"
+          },
+          "size": {
+            "width": {
+              "mode": "fill"
+            }
+          }
+        }
+      },
+      "props": {
+        "path": "/",
+        "title": "Home",
+        "isHome": true
+      }
+    }
+  }
+}

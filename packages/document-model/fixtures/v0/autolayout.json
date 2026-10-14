@@ -1,0 +1,603 @@
+{
+  "schemaVersion": 0,
+  "meta": {
+    "title": "Auto-layout"
+  },
+  "assets": {},
+  "pageOrder": [
+    "pg_home000001"
+  ],
+  "nodes": {
+    "pg_home000001": {
+      "id": "pg_home000001",
+      "type": "page",
+      "name": "Home",
+      "parentId": null,
+      "children": [
+        "n_alrow00001",
+        "n_alcol00001",
+        "n_alwrap0001"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column",
+            "gap": {
+              "value": 40,
+              "unit": "px"
+            },
+            "padding": {
+              "top": {
+                "value": 40,
+                "unit": "px"
+              },
+              "right": {
+                "value": 40,
+                "unit": "px"
+              },
+              "bottom": {
+                "value": 40,
+                "unit": "px"
+              },
+              "left": {
+                "value": 40,
+                "unit": "px"
+              }
+            },
+            "align": "start"
+          }
+        }
+      },
+      "props": {
+        "path": "/",
+        "title": "Home",
+        "isHome": true
+      }
+    },
+    "n_alrow00001": {
+      "id": "n_alrow00001",
+      "type": "frame",
+      "name": "Baris",
+      "parentId": "pg_home000001",
+      "children": [
+        "n_alrowfix01",
+        "n_alrowfil01",
+        "n_alrowhug01"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "row",
+            "gap": {
+              "value": 16,
+              "unit": "px"
+            },
+            "padding": {
+              "top": {
+                "value": 24,
+                "unit": "px"
+              },
+              "right": {
+                "value": 24,
+                "unit": "px"
+              },
+              "bottom": {
+                "value": 24,
+                "unit": "px"
+              },
+              "left": {
+                "value": 24,
+                "unit": "px"
+              }
+            },
+            "align": "center"
+          },
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 800,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "hug"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#E8F1FF"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alrowfix01": {
+      "id": "n_alrowfix01",
+      "type": "frame",
+      "name": "Kotak n_alrowfix01",
+      "parentId": "n_alrow00001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 120,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 80,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#0D99FF"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alrowfil01": {
+      "id": "n_alrowfil01",
+      "type": "frame",
+      "name": "Kotak n_alrowfil01",
+      "parentId": "n_alrow00001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 40,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#7CC4FF"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alrowhug01": {
+      "id": "n_alrowhug01",
+      "type": "text",
+      "name": "Teks n_alrowhug01",
+      "parentId": "n_alrow00001",
+      "visible": true,
+      "locked": false,
+      "tag": "p",
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "hug"
+            },
+            "height": {
+              "mode": "hug"
+            }
+          }
+        }
+      },
+      "props": {
+        "content": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Label hug"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "n_alcol00001": {
+      "id": "n_alcol00001",
+      "type": "frame",
+      "name": "Kolom",
+      "parentId": "pg_home000001",
+      "children": [
+        "n_alcoltxt01",
+        "n_alcolbox01",
+        "n_alcolbox02"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column",
+            "gap": {
+              "value": 8,
+              "unit": "px"
+            },
+            "padding": {
+              "top": {
+                "value": 16,
+                "unit": "px"
+              },
+              "right": {
+                "value": 16,
+                "unit": "px"
+              },
+              "bottom": {
+                "value": 16,
+                "unit": "px"
+              },
+              "left": {
+                "value": 16,
+                "unit": "px"
+              }
+            },
+            "justify": "spaceBetween",
+            "align": "stretch"
+          },
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 400,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 300,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#FFF1E6"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alcoltxt01": {
+      "id": "n_alcoltxt01",
+      "type": "text",
+      "name": "Teks n_alcoltxt01",
+      "parentId": "n_alcol00001",
+      "visible": true,
+      "locked": false,
+      "tag": "p",
+      "style": {
+        "base": {
+          "size": {
+            "height": {
+              "mode": "hug"
+            }
+          }
+        }
+      },
+      "props": {
+        "content": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Judul kolom"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "n_alcolbox01": {
+      "id": "n_alcolbox01",
+      "type": "frame",
+      "name": "Kotak n_alcolbox01",
+      "parentId": "n_alcol00001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 60,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#FF9F5A"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alcolbox02": {
+      "id": "n_alcolbox02",
+      "type": "frame",
+      "name": "Kotak n_alcolbox02",
+      "parentId": "n_alcol00001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "height": {
+              "mode": "fixed",
+              "value": 40,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#FFC999"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alwrap0001": {
+      "id": "n_alwrap0001",
+      "type": "frame",
+      "name": "Wrap",
+      "parentId": "pg_home000001",
+      "children": [
+        "n_alwrap0a01",
+        "n_alwrap0a02",
+        "n_alwrap0a03",
+        "n_alwrap0a04",
+        "n_alwrap0a05"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "row",
+            "wrap": true,
+            "gap": {
+              "value": 12,
+              "unit": "px"
+            },
+            "crossGap": {
+              "value": 20,
+              "unit": "px"
+            },
+            "padding": {
+              "top": {
+                "value": 10,
+                "unit": "px"
+              },
+              "right": {
+                "value": 10,
+                "unit": "px"
+              },
+              "bottom": {
+                "value": 10,
+                "unit": "px"
+              },
+              "left": {
+                "value": 10,
+                "unit": "px"
+              }
+            }
+          },
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 360,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "hug"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#EAF7EA"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alwrap0a01": {
+      "id": "n_alwrap0a01",
+      "type": "frame",
+      "name": "Kotak n_alwrap0a01",
+      "parentId": "n_alwrap0001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 100,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 50,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#5CB85C"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alwrap0a02": {
+      "id": "n_alwrap0a02",
+      "type": "frame",
+      "name": "Kotak n_alwrap0a02",
+      "parentId": "n_alwrap0001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 100,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 50,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#5CB85C"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alwrap0a03": {
+      "id": "n_alwrap0a03",
+      "type": "frame",
+      "name": "Kotak n_alwrap0a03",
+      "parentId": "n_alwrap0001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 100,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 50,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#5CB85C"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alwrap0a04": {
+      "id": "n_alwrap0a04",
+      "type": "frame",
+      "name": "Kotak n_alwrap0a04",
+      "parentId": "n_alwrap0001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 100,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 50,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#5CB85C"
+            }
+          ]
+        }
+      },
+      "props": {}
+    },
+    "n_alwrap0a05": {
+      "id": "n_alwrap0a05",
+      "type": "frame",
+      "name": "Kotak n_alwrap0a05",
+      "parentId": "n_alwrap0001",
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fixed",
+              "value": 100,
+              "unit": "px"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 50,
+              "unit": "px"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": "#5CB85C"
+            }
+          ]
+        }
+      },
+      "props": {}
+    }
+  }
+}
