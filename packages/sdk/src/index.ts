@@ -12,3 +12,4 @@ export {
 } from "./client";
 export { createPlatformApi, type PlatformApi } from "./endpoints";
 export { ApiError, CLIENT_ERROR_CODES, type ClientErrorCode, isApiError } from "./errors";
+export { apiServer, FORWARDED_HEADERS, forwardedHeaders, type IncomingHeaders } from "./server";

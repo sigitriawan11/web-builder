@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./react": "./src/react/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -b",
@@ -12,10 +13,25 @@
   },
   "devDependencies": {
     "@platform/config": "workspace:*",
+    "@tanstack/react-query": "5.104.0",
+    "@types/react": "19.3.0",
+    "react": "19.3.0",
     "vitest": "5.0.4"
   },
   "dependencies": {
     "@platform/shared": "workspace:*",
     "zod": "4.6.7"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.104.0",
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   }
 }
