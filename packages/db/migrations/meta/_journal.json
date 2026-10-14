@@ -43,6 +43,13 @@
       "when": 1791906075908,
       "tag": "0005_consents",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791939463654,
+      "tag": "0006_session_activity",
+      "breakpoints": true
     }
   ]
 }

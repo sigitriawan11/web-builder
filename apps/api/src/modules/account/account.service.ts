@@ -1,6 +1,7 @@
 import type { Db } from "@platform/db";
-import { LEGAL_VERSIONS } from "@platform/shared";
-import type { AcceptConsentsBody, ConsentStatus } from "@platform/shared/contracts";
+import { AppError, LEGAL_VERSIONS } from "@platform/shared";
+import type { AcceptConsentsBody, ConsentStatus, SessionInfo } from "@platform/shared/contracts";
+import { recordAudit } from "../../audit/audit.repository";
 import * as repository from "./account.repository";
 
 // Persetujuan legal (ACC-002 layar S&K pertama kali untuk user Google, ACC-313 penerimaan ulang versi baru).
@@ -20,7 +21,33 @@ function legalStatus(rows: repository.ConsentRow[], type: "terms" | "privacy") {
   };
 }
 
-export function createAccountService(db: Db) {
+/** Pengguna & sesi request ini (dari authSession). */
+export interface Actor {
+  userId: string;
+  sessionId: string;
+}
+
+export interface AccountServiceDeps {
+  db: Db;
+  // Port pencabutan sesi (implementasi: Better Auth `deleteSessions` → hapus DB + cache Redis seketika).
+  revokeSessionTokens: (tokens: string[]) => Promise<void>;
+}
+
+function toSessionInfo(row: repository.SessionRow, currentSessionId: string): SessionInfo {
+  return {
+    id: row.id,
+    current: row.id === currentSessionId,
+    userAgent: row.userAgent,
+    ip: row.ipAddress,
+    geo: row.geo ?? null,
+    createdAt: row.createdAt.toISOString(),
+    lastActiveAt: row.lastActiveAt?.toISOString() ?? null,
+    expiresAt: row.expiresAt.toISOString(),
+  };
+}
+
+export function createAccountService(deps: AccountServiceDeps) {
+  const { db } = deps;
   async function consentStatus(userId: string): Promise<ConsentStatus> {
     const rows = await repository.listUserConsents(db, userId);
     return {
@@ -46,7 +73,44 @@ export function createAccountService(db: Db) {
     return consentStatus(userId);
   }
 
-  return { consentStatus, acceptConsents };
+  // --- Sesi & perangkat (ACC-007) ---
+
+  async function listSessions(actor: Actor): Promise<SessionInfo[]> {
+    const rows = await repository.listActiveSessions(db, actor.userId);
+    return rows.map((row) => toSessionInfo(row, actor.sessionId));
+  }
+
+  async function auditRevoke(actor: Actor, evidence: ConsentEvidence, metadata: Record<string, unknown>) {
+    await recordAudit(db, {
+      actorType: "user",
+      actorId: actor.userId,
+      action: "auth.session_revoke",
+      targetType: "user",
+      targetId: actor.userId,
+      ip: evidence.ip ?? null,
+      userAgent: evidence.userAgent ?? null,
+      metadata,
+    });
+  }
+
+  /** Cabut satu sesi milik user. Sesi saat ini tidak bisa (pakai logout); sesi user lain = tidak ditemukan. */
+  async function revokeSession(actor: Actor, sessionId: string, evidence: ConsentEvidence): Promise<void> {
+    if (sessionId === actor.sessionId) throw new AppError("CONFLICT", undefined, { reason: "current_session" });
+    const session = await repository.findActiveSession(db, actor.userId, sessionId);
+    if (!session) throw new AppError("NOT_FOUND");
+    await deps.revokeSessionTokens([session.token]);
+    await auditRevoke(actor, evidence, { sessionId });
+  }
+
+  /** "Keluar dari semua perangkat lain". */
+  async function revokeOtherSessions(actor: Actor, evidence: ConsentEvidence): Promise<{ revoked: number }> {
+    const tokens = await repository.otherSessionTokens(db, actor.userId, actor.sessionId);
+    if (tokens.length > 0) await deps.revokeSessionTokens(tokens);
+    await auditRevoke(actor, evidence, { others: true, revoked: tokens.length });
+    return { revoked: tokens.length };
+  }
+
+  return { consentStatus, acceptConsents, listSessions, revokeSession, revokeOtherSessions };
 }
 
 export type AccountService = ReturnType<typeof createAccountService>;

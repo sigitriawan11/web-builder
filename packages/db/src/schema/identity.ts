@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, index, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { id, timestamps } from "../columns";
 
 // Identitas platform (spec 08 ACC-370, ARCHITECTURE §6.3) dengan bentuk yang diharapkan Better Auth
@@ -45,6 +45,10 @@ export const sessions = pgTable(
     expiresAt: timestamptz().notNull(),
     ipAddress: text(),
     userAgent: text(),
+    // Perkiraan lokasi dari header Cloudflare saat login (ACC-007); null di lokal.
+    geo: jsonb().$type<{ country?: string; city?: string }>(),
+    // Diperbarui authSession, paling sering sekali per 5 menit per sesi (ACC-007).
+    lastActiveAt: timestamptz(),
     ...timestamps,
   },
   (table) => [index("sessions_user_id_idx").on(table.userId)],

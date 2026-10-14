@@ -4,7 +4,13 @@ import { requireAuth } from "../../middleware/auth-session";
 import { byUserOrIp, RATE_LIMITS, rateLimit } from "../../middleware/rate-limit";
 import { validated } from "../../middleware/validate";
 import { createAccountController } from "./account.controller";
-import { acceptConsentsRequest, getConsentsRequest } from "./account.schema";
+import {
+  acceptConsentsRequest,
+  getConsentsRequest,
+  listSessionsRequest,
+  revokeOtherSessionsRequest,
+  revokeSessionRequest,
+} from "./account.schema";
 import type { AccountService } from "./account.service";
 
 // Routing + middleware saja. Dipasang di `/v1/account` (data milik user login, bukan tenant).
@@ -30,5 +36,8 @@ export function createAccountRouter(deps: AccountRouterDeps): Router {
   }
   router.get("/consents", ...validated(getConsentsRequest, controller.getConsents));
   router.post("/consents", ...validated(acceptConsentsRequest, controller.acceptConsents));
+  router.get("/sessions", ...validated(listSessionsRequest, controller.listSessions));
+  router.post("/sessions/revoke-others", ...validated(revokeOtherSessionsRequest, controller.revokeOtherSessions));
+  router.delete("/sessions/:sessionId", ...validated(revokeSessionRequest, controller.revokeSession));
   return router;
 }

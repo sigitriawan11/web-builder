@@ -24,3 +24,17 @@ export const AcceptConsentsBodySchema = z.strictObject({
   marketingOptIn: z.boolean().optional(),
 });
 export type AcceptConsentsBody = z.infer<typeof AcceptConsentsBodySchema>;
+
+// Sesi & perangkat (ACC-007). Token sesi tidak pernah dikirim ke klien; `id` dipakai untuk mencabut.
+export const SessionInfoSchema = z.object({
+  id: z.uuid(),
+  // Sesi request ini ("Perangkat ini") — tidak bisa dicabut dari daftar, pakai logout.
+  current: z.boolean(),
+  userAgent: z.string().nullable(),
+  ip: z.string().nullable(),
+  geo: z.object({ country: z.string().optional(), city: z.string().optional() }).nullable(),
+  createdAt: z.iso.datetime(),
+  lastActiveAt: z.iso.datetime().nullable(),
+  expiresAt: z.iso.datetime(),
+});
+export type SessionInfo = z.infer<typeof SessionInfoSchema>;

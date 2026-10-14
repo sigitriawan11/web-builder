@@ -2,6 +2,7 @@ import type { Db } from "@platform/db";
 import type { Logger } from "@platform/shared/node";
 import express, { type Express } from "express";
 import { AUTH_BASE_PATH, type Auth } from "./auth/auth";
+import { touchSession } from "./auth/auth.repository";
 import { createAuthRouter } from "./auth/auth.routes";
 import type { CaptchaVerifier } from "./auth/captcha";
 import { type ReadinessCheck, readinessHandler } from "./health/readiness";
@@ -76,13 +77,34 @@ export function createApp(deps: AppDeps): Express {
   app.get("/health/ready", readinessHandler(deps.readinessChecks ?? {}, { logger: deps.logger }));
 
   // 6 — sesi pengguna untuk router berikutnya (health di atas tidak menyentuh sesi).
-  if (deps.auth) app.use(authSession(deps.auth));
+  if (deps.auth) {
+    const { db, logger } = deps;
+    app.use(
+      authSession(deps.auth, {
+        ...(db
+          ? {
+              onActive: (sessionId, staleBefore) => {
+                touchSession(db, sessionId, staleBefore).catch((error: unknown) =>
+                  logger.warn({ err: error }, "last_active_at sesi gagal diperbarui"),
+                );
+              },
+            }
+          : {}),
+      }),
+    );
+  }
 
   if (deps.auth && deps.db) {
+    const auth = deps.auth;
     app.use(
       "/v1/account",
       createAccountRouter({
-        service: createAccountService(deps.db),
+        service: createAccountService({
+          db: deps.db,
+          revokeSessionTokens: async (tokens) => {
+            await (await auth.$context).internalAdapter.deleteSessions(tokens);
+          },
+        }),
         ...(deps.redis ? { redis: deps.redis } : {}),
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
       }),

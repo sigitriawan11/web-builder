@@ -48,6 +48,9 @@ const DISABLED_OTP_PATHS = [
   "/email-otp/request-email-change",
   "/email-otp/change-email",
 ];
+// Endpoint sesi bawaan BA membaca daftar sesi dari cache Redis (≤ 5 menit) → tidak lengkap. Pengganti berbasis
+// Postgres: `/v1/account/sessions` (ACC-007). `/sign-out` dan `/revoke-sessions` (semua sesi) tetap aktif.
+const DISABLED_SESSION_PATHS = ["/list-sessions", "/revoke-session", "/revoke-other-sessions"];
 
 type EmailJobInput =
   JobPayload<"email"> extends infer Job ? (Job extends unknown ? Omit<Job, "requestId"> : never) : never;
@@ -372,6 +375,17 @@ export function createAuth(deps: {
           },
         },
       },
+      session: {
+        create: {
+          // Lokasi perkiraan dari header Cloudflare (hanya ada di belakang Cloudflare; lokal → null) — ACC-007.
+          before: async (session, context) => {
+            const country = context?.headers?.get("cf-ipcountry") ?? undefined;
+            const city = context?.headers?.get("cf-ipcity") ?? undefined;
+            const geo = country || city ? { ...(country ? { country } : {}), ...(city ? { city } : {}) } : null;
+            return { data: { ...session, geo, lastActiveAt: new Date() } };
+          },
+        },
+      },
       account: {
         create: {
           // Berjalan di transaksi registrasi tepat setelah insert user → consent ikut commit/rollback bersama user.
@@ -397,10 +411,15 @@ export function createAuth(deps: {
         },
       }),
     ],
-    disabledPaths: DISABLED_OTP_PATHS,
+    disabledPaths: [...DISABLED_OTP_PATHS, ...DISABLED_SESSION_PATHS],
     // Rate limit memakai limiter API sendiri (Redis, 429 + Retry-After, ACC-255) di auth.routes.ts.
     rateLimit: { enabled: false },
     session: {
+      // Kolom platform di `sessions` (ACC-007), diisi hook; tidak bisa diisi klien & tidak ikut respons BA.
+      additionalFields: {
+        geo: { type: "json", required: false, input: false, returned: false },
+        lastActiveAt: { type: "date", required: false, input: false, returned: false },
+      },
       expiresIn: SESSION_EXPIRES_IN,
       updateAge: DAY,
       // Postgres sumber kebenaran (daftar & cabut sesi, ACC-007); Redis hanya cache.

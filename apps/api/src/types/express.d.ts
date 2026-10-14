@@ -10,6 +10,8 @@ declare global {
         requestId: string;
         // Diisi authSession (middleware 6): `null` = tidak login; `undefined` = app tanpa auth (test).
         user?: AuthUser | null;
+        // Sesi request ini (untuk menandai "Perangkat ini", ACC-007).
+        session?: { id: string } | null;
         tenant?: WorkspaceTenant | SiteTenant;
       };
       // Hasil `validate()` (middleware 10); bertipe lewat `validated()`.

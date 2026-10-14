@@ -1,4 +1,4 @@
-import { and, type DbExecutor, eq, gt, ne, schema } from "@platform/db";
+import { and, type DbExecutor, eq, gt, isNull, lt, ne, or, schema } from "@platform/db";
 
 // Tabel yang dikelola Better Auth lewat drizzleAdapter (ARCHITECTURE §6.2: hanya repository yang mengimport tabel).
 // Kunci = nama model Better Auth.
@@ -35,4 +35,17 @@ export async function activeSessionTokens(
       ),
     );
   return rows.map((row) => row.token);
+}
+
+/** Tandai sesi aktif (ACC-007); hanya menulis bila nilai lama lebih tua dari `staleBefore` (hemat tulis). */
+export async function touchSession(executor: DbExecutor, sessionId: string, staleBefore: Date): Promise<void> {
+  await executor
+    .update(schema.sessions)
+    .set({ lastActiveAt: new Date() })
+    .where(
+      and(
+        eq(schema.sessions.id, sessionId),
+        or(isNull(schema.sessions.lastActiveAt), lt(schema.sessions.lastActiveAt, staleBefore)),
+      ),
+    );
 }
