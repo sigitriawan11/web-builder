@@ -1,4 +1,4 @@
-import { mergeStyle } from "../ops/merge-style";
+import { mergeStyle } from "../commands/merge-style";
 import { type ResponsiveStyle, type Style, type StylePatch, StyleSchema, type Theme } from "../schema";
 import { isTokenRef } from "../schema/values";
 import { resolveToken, TokenResolveError } from "./tokens";

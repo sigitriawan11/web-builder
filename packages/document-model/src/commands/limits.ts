@@ -1,16 +1,16 @@
 import type * as Y from "yjs";
 import { checkLimit, type LimitName } from "../limits";
 import { limitMessage } from "../validate/limits";
-import { fail, type OpResult } from "./op";
+import { type CommandFailure, fail } from "./command";
 import { childrenOf, collectSubtree, nodeType, parentIdOf, type YNode } from "./y-access";
 
 // DM-076 AC: command yang melanggar batas hard → `LIMIT_EXCEEDED` + nama batas, diperiksa sebelum menulis apa pun.
 
 /** Gagal bila `value` melewati batas hard; `null` bila aman (batas soft hanya peringatan editor). */
-export function exceeds(limit: LimitName, value: number, path?: (string | number)[]): OpResult<never> | null {
+export function exceeds(limit: LimitName, value: number, path?: (string | number)[]): CommandFailure | null {
   const check = checkLimit(limit, value);
   if (check?.level !== "hard") return null;
-  return fail("LIMIT_EXCEEDED", limitMessage(check).id, path, { limit, value, max: check.max });
+  return fail("LIMIT_EXCEEDED", limitMessage(check), path, { limit, value, max: check.max });
 }
 
 /** Kedalaman node dari page-nya (page = 0) dan ID page tersebut. */

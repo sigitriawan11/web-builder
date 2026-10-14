@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import * as Y from "yjs";
 import { heroDocument } from "../../test/fixtures/basic-documents";
-import { createNode } from "../ops/create-node";
-import { runOp } from "../ops/op";
-import { updateStyle } from "../ops/update-style";
+import { runCommand } from "../commands/command";
+import { createNode } from "../commands/create-node";
+import { updateStyle } from "../commands/update-style";
 import { SiteDocumentSchema } from "../schema";
 import { applyDraft, draftUpdate, forkDocument } from "./draft";
 import { jsonToYDoc, YDOC_KEYS, yDocToJson } from "./mapping";
@@ -14,6 +14,7 @@ import {
   REMOTE_ORIGIN,
   releaseAiOrigin,
   systemOrigin,
+  type TxOrigin,
   TxOriginSchema,
   userOrigin,
 } from "./origin";
@@ -29,8 +30,11 @@ function setup() {
   return { doc, user, undo };
 }
 
-const setGap = (doc: Y.Doc, origin: unknown, value: number) =>
-  runOp({ doc, origin }, updateStyle, { ids: ["n_hero000001"], patch: { layout: { gap: { value, unit: "px" } } } });
+const setGap = (doc: Y.Doc, origin: TxOrigin, value: number) =>
+  runCommand({ doc, origin }, updateStyle, {
+    ids: ["n_hero000001"],
+    patch: { layout: { gap: { value, unit: "px" } } },
+  });
 
 describe("origin (DM-060)", () => {
   it("bentuk origin sesuai schema; instance AI & system stabil per kunci", () => {
@@ -119,7 +123,11 @@ describe("run AI di draft (fork per run)", () => {
     for (let i = 0; i < 25; i++) {
       const result =
         i % 2 === 0
-          ? runOp({ doc: fork.draft, origin }, createNode, { parentId: "n_hero000001", type: "frame", name: `AI ${i}` })
+          ? runCommand({ doc: fork.draft, origin }, createNode, {
+              parentId: "n_hero000001",
+              type: "frame",
+              name: `AI ${i}`,
+            })
           : setGap(fork.draft, origin, i);
       expect(result.ok).toBe(true);
     }

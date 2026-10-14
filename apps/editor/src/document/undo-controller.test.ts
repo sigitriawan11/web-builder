@@ -1,7 +1,7 @@
 import {
   jsonToYDoc,
   moveNode,
-  runOp,
+  runCommand,
   type SiteDocument,
   SiteDocumentSchema,
   updateStyle,
@@ -12,7 +12,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import * as Y from "yjs";
 import { createUndoController, MAX_UNDO_STEPS, type UndoController } from "./undo-controller";
 
-const LOCAL = { kind: "user", sessionId: "test" };
+const LOCAL = { kind: "user", sessionId: "test" } as const;
 const REMOTE = { kind: "remote" };
 const [CARD, IMAGE, TEXT] = ["n_fcard00001", "n_fimage0001", "n_ftext00001"];
 
@@ -42,11 +42,11 @@ function setup(fixture: SiteDocument = freeformDocument()) {
     },
     selected: () => selected,
     // Aksi diskrit seperti commit drag: dibatasi stopCapturing agar tidak digabung captureTimeout.
-    action: (op: Parameters<typeof runOp>[1], input: unknown) => {
+    action: (op: Parameters<typeof runCommand>[1], input: unknown) => {
       undo.stopCapturing();
-      const result = runOp(ctx, op, input);
+      const result = runCommand(ctx, op, input);
       undo.stopCapturing();
-      if (!result.ok) throw new Error(result.error.message);
+      if (!result.ok) throw new Error(result.error.message.id);
     },
   };
 }
@@ -100,8 +100,8 @@ describe("UndoController (ED-197, DM-060)", () => {
     const editor = setup();
     const ctx = { doc: editor.doc, origin: LOCAL };
     // Mis. nudge keyboard berturut-turut: tanpa stopCapturing → satu langkah.
-    runOp(ctx, updateStyle, { ids: [CARD], patch: { position: { x: 81 } } });
-    runOp(ctx, updateStyle, { ids: [CARD], patch: { position: { x: 82 } } });
+    runCommand(ctx, updateStyle, { ids: [CARD], patch: { position: { x: 81 } } });
+    runCommand(ctx, updateStyle, { ids: [CARD], patch: { position: { x: 82 } } });
     expect(editor.undo.manager.undoStack).toHaveLength(1);
 
     editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 90 } } });
@@ -116,7 +116,7 @@ describe("UndoController (ED-197, DM-060)", () => {
     editor.action(updateStyle, { ids: [CARD], patch: { position: { x: 300 } } });
     // Kolaborator memindah gambar; update diterapkan ke dokumen lokal dengan origin remote.
     const before = Y.encodeStateVector(remote);
-    runOp({ doc: remote, origin: LOCAL }, updateStyle, { ids: [IMAGE], patch: { position: { y: 999 } } });
+    runCommand({ doc: remote, origin: LOCAL }, updateStyle, { ids: [IMAGE], patch: { position: { y: 999 } } });
     Y.applyUpdate(editor.doc, Y.encodeStateAsUpdate(remote, before), REMOTE);
 
     editor.undo.undo();

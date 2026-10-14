@@ -1,4 +1,4 @@
-import { createNode, deleteNodes, jsonToYDoc, moveNode, runOp, updateStyle } from "@platform/document-model";
+import { createNode, deleteNodes, jsonToYDoc, moveNode, runCommand, updateStyle } from "@platform/document-model";
 import { ySyncPluginKey } from "@tiptap/y-tiptap";
 import { NodeStore } from "../document/node-store";
 import { createUndoController } from "../document/undo-controller";
@@ -65,8 +65,8 @@ if (import.meta.env.DEV) {
     __spike: {
       doc: spikeDoc,
       ops: { createNode, moveNode, updateStyle, deleteNodes },
-      run: (op: Parameters<typeof runOp>[1], input: unknown) =>
-        runOp({ doc: spikeDoc, origin: LOCAL_ORIGIN }, op, input),
+      run: (op: Parameters<typeof runCommand>[1], input: unknown) =>
+        runCommand({ doc: spikeDoc, origin: LOCAL_ORIGIN }, op, input),
       // Dipakai E2E & benchmark spike (T0.4.6, T0.7.3).
       camera: cameraStore,
       geometry: spikeGeometry,

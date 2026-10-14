@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { setupDoc } from "../../test/command-harness";
 import { heroDocument, nestedDocument } from "../../test/fixtures/basic-documents";
-import { setupDoc } from "../../test/op-harness";
 import type { SiteDocument } from "../schema";
+import { runCommand } from "./command";
 import { moveNode } from "./move-node";
-import { runOp } from "./op";
 
 function childrenOf(doc: SiteDocument, id: string): string[] | undefined {
   const node = doc.nodes[id];
@@ -14,7 +14,7 @@ describe("moveNode", () => {
   it("mengubah urutan di parent yang sama", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    const result = runOp(ctx, moveNode, { id: "n_heroimg001", newParentId: "n_hero000001", index: 0 });
+    const result = runCommand(ctx, moveNode, { id: "n_heroimg001", newParentId: "n_hero000001", index: 0 });
 
     expect(result.ok).toBe(true);
     expect(childrenOf(read(), "n_hero000001")).toEqual(["n_heroimg001", "n_herottl001"]);
@@ -23,7 +23,7 @@ describe("moveNode", () => {
   it("memindah node ke parent lain dan memperbarui parentId", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    const result = runOp(ctx, moveNode, { id: "n_heroimg001", newParentId: "pg_home000001", index: 0 });
+    const result = runCommand(ctx, moveNode, { id: "n_heroimg001", newParentId: "pg_home000001", index: 0 });
 
     expect(result).toMatchObject({ ok: true, affected: ["n_heroimg001", "pg_home000001", "n_hero000001"] });
     const doc = read();
@@ -35,7 +35,7 @@ describe("moveNode", () => {
   it("menaruh node di akhir jika index melebihi jumlah anak", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    runOp(ctx, moveNode, { id: "n_herottl001", newParentId: "n_hero000001", index: 99 });
+    runCommand(ctx, moveNode, { id: "n_herottl001", newParentId: "n_hero000001", index: 99 });
 
     expect(childrenOf(read(), "n_hero000001")).toEqual(["n_heroimg001", "n_herottl001"]);
   });
@@ -58,14 +58,14 @@ describe("moveNode", () => {
   ])("gagal tanpa perubahan saat memindah $name", ({ input, code }) => {
     const { ctx, read } = setupDoc(nestedDocument());
 
-    expect(runOp(ctx, moveNode, input)).toMatchObject({ ok: false, error: { code } });
+    expect(runCommand(ctx, moveNode, input)).toMatchObject({ ok: false, error: { code } });
     expect(read()).toEqual(nestedDocument());
   });
 
   it("bisa di-undo dalam satu langkah", () => {
     const { ctx, read, undoManager } = setupDoc(nestedDocument());
 
-    runOp(ctx, moveNode, { id: "n_lvl4img0001", newParentId: "n_lvl1000001", index: 0 });
+    runCommand(ctx, moveNode, { id: "n_lvl4img0001", newParentId: "n_lvl1000001", index: 0 });
     undoManager.undo();
 
     expect(read()).toEqual(nestedDocument());

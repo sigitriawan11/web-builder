@@ -1,18 +1,28 @@
 import { z } from "zod";
 import { NodeIdSchema } from "../schema";
-import { defineOp, fail } from "./op";
+import { defineCommand, fail } from "./command";
 import { childrenOf, collectSubtree, nodesMap, nodeType, parentIdOf } from "./y-access";
 
 // DM-062: hapus node beserta seluruh turunannya + keluarkan dari children parent, dalam satu transaksi.
-export const deleteNodes = defineOp({
+export const deleteNodes = defineCommand({
   name: "deleteNodes",
+  description: {
+    id: "Hapus node beserta seluruh turunannya (page dihapus lewat deletePage).",
+    en: "Delete nodes together with all their descendants (pages are deleted via deletePage).",
+  },
+  aiExposed: true,
   input: z.strictObject({ ids: z.array(NodeIdSchema).min(1) }),
   run(ctx, input) {
     const nodes = nodesMap(ctx.doc);
     for (const [i, id] of input.ids.entries()) {
       const yNode = nodes.get(id);
-      if (!yNode) return fail("NOT_FOUND", `Node "${id}" tidak ditemukan`, ["ids", i]);
-      if (nodeType(yNode) === "page") return fail("INVALID_TARGET", "Page dihapus lewat deletePage", ["ids", i]);
+      if (!yNode)
+        return fail("NOT_FOUND", { id: `Node "${id}" tidak ditemukan`, en: `Node "${id}" not found` }, ["ids", i]);
+      if (nodeType(yNode) === "page")
+        return fail("INVALID_TARGET", { id: "Page dihapus lewat deletePage", en: "Pages are deleted via deletePage" }, [
+          "ids",
+          i,
+        ]);
     }
 
     const removed = new Set<string>();

@@ -4,7 +4,7 @@ import {
   deleteNodes,
   jsonToYDoc,
   moveNode,
-  runOp,
+  runCommand,
   type SiteDocument,
   SiteDocumentSchema,
   updateStyle,
@@ -59,12 +59,12 @@ function mount(fixture: SiteDocument) {
     container,
     initialRenders: [...renders],
     // Jalankan op dan kembalikan node yang render ulang + jumlah commit React.
-    run(op: Parameters<typeof runOp>[1], input: unknown) {
+    run(op: Parameters<typeof runCommand>[1], input: unknown) {
       renders.length = 0;
       commits = 0;
-      let result: ReturnType<typeof runOp> | undefined;
+      let result: ReturnType<typeof runCommand> | undefined;
       act(() => {
-        result = runOp({ doc }, op, input);
+        result = runCommand({ doc, origin: { kind: "user", sessionId: "test" } }, op, input);
       });
       if (!result?.ok) throw new Error(`op gagal: ${JSON.stringify(result)}`);
       return { value: result.value, renders: [...renders].sort(), commits };

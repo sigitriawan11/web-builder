@@ -26,7 +26,7 @@ async function expectOutlineOn(page: Page, target: Locator) {
     .toBeLessThanOrEqual(0.5);
 }
 
-const runOp = (page: Page, op: string, input: unknown) =>
+const runCommand = (page: Page, op: string, input: unknown) =>
   page.evaluate(
     ({ name, payload }) => {
       const spike = (window as unknown as { __spike: Spike }).__spike;
@@ -46,7 +46,7 @@ test("node di-resize: ResizeObserver memperbarui rect", async ({ page }) => {
   await page.goto("?fixture=hero&outline=n_heroimg001&zoom=0.5&x=20&y=20");
   await expectOutlineOn(page, page.locator(IMAGE));
 
-  await runOp(page, "updateStyle", {
+  await runCommand(page, "updateStyle", {
     ids: ["n_heroimg001"],
     patch: { size: { height: { mode: "fixed", value: 200, unit: "px" } } },
   });
@@ -60,7 +60,7 @@ test("node bergeser tanpa berubah ukuran: transaksi dokumen memicu ukur ulang", 
   await expectOutlineOn(page, page.locator(IMAGE));
   const before = await page.locator(IMAGE).boundingBox();
 
-  await runOp(page, "moveNode", { id: "n_heroimg001", newParentId: "n_hero000001", index: 0 });
+  await runCommand(page, "moveNode", { id: "n_heroimg001", newParentId: "n_hero000001", index: 0 });
 
   await expect.poll(async () => (await page.locator(IMAGE).boundingBox())?.y).not.toBe(before?.y);
   await expectOutlineOn(page, page.locator(IMAGE));

@@ -1,3 +1,4 @@
+export * from "./commands";
 export { type BlankSiteInput, createBlankSiteDocument } from "./defaults/blank-site";
 export { defaultTheme } from "./defaults/theme";
 export {
@@ -16,7 +17,6 @@ export {
   type LimitCheck,
   type LimitName,
 } from "./limits";
-export * from "./ops";
 export * from "./query";
 export * from "./schema";
 export { MAX_TREE_DEPTH } from "./validate/invariants";

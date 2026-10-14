@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { setupDoc } from "../../test/command-harness";
 import { heroDocument } from "../../test/fixtures/basic-documents";
-import { setupDoc } from "../../test/op-harness";
-import { runOp } from "../ops/op";
-import { updateStyle } from "../ops/update-style";
+import { runCommand } from "../commands/command";
+import { updateStyle } from "../commands/update-style";
 import type { ResponsiveStyle } from "../schema";
 import { normalizeOverrides } from "./normalize-overrides";
 import { resolveStyle } from "./resolve-style";
@@ -61,7 +61,7 @@ describe("normalizeOverrides", () => {
 describe("updateStyle menormalisasi override", () => {
   it("set tablet sama dengan base → tidak ada patch tablet", () => {
     const { ctx, read } = setupDoc(heroDocument());
-    runOp(ctx, updateStyle, {
+    runCommand(ctx, updateStyle, {
       ids: ["n_hero000001"],
       breakpoint: "tablet",
       patch: { layout: { direction: "column" } },
@@ -71,14 +71,14 @@ describe("updateStyle menormalisasi override", () => {
 
   it("base berubah menyamai override tablet → override tablet terhapus", () => {
     const { ctx, read } = setupDoc(heroDocument());
-    runOp(ctx, updateStyle, {
+    runCommand(ctx, updateStyle, {
       ids: ["n_hero000001"],
       breakpoint: "tablet",
       patch: { display: "none", layout: { gap: px(4) } },
     });
     expect(read().nodes.n_hero000001?.style.tablet).toEqual({ display: "none", layout: { gap: px(4) } });
 
-    runOp(ctx, updateStyle, { ids: ["n_hero000001"], patch: { layout: { gap: px(4) } } });
+    runCommand(ctx, updateStyle, { ids: ["n_hero000001"], patch: { layout: { gap: px(4) } } });
     expect(read().nodes.n_hero000001?.style.tablet).toEqual({ display: "none" });
   });
 });

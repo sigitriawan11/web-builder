@@ -1,4 +1,4 @@
-import { mergeStyle } from "../ops/merge-style";
+import { mergeStyle } from "../commands/merge-style";
 import type { ResponsiveStyle, StylePatch } from "../schema";
 
 // DM-036: override breakpoint yang tidak mengubah hasil cascade dibuang, agar perubahan base berikutnya tetap

@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import * as Y from "yjs";
 import { heroDocument } from "../../test/fixtures/basic-documents";
 import { generateLandingDocument, landing200 } from "../../test/fixtures/landing-generator";
-import { createNode } from "../ops/create-node";
-import { deleteNodes } from "../ops/delete-nodes";
-import { runOp } from "../ops/op";
-import { updateStyle } from "../ops/update-style";
+import { runCommand } from "../commands/command";
+import { createNode } from "../commands/create-node";
+import { deleteNodes } from "../commands/delete-nodes";
+import { updateStyle } from "../commands/update-style";
 import { SiteDocumentSchema } from "../schema";
 import { jsonToYDoc, YDOC_KEYS, yDocToJson } from "./mapping";
 import { createDocumentUndoManager, systemOrigin, userOrigin } from "./origin";
@@ -22,7 +22,7 @@ function recordUpdates(doc: Y.Doc): Uint8Array[] {
 }
 
 const setGap = (doc: Y.Doc, id: string, value: number) =>
-  runOp({ doc, origin: user }, updateStyle, { ids: [id], patch: { layout: { gap: { value, unit: "px" } } } });
+  runCommand({ doc, origin: user }, updateStyle, { ids: [id], patch: { layout: { gap: { value, unit: "px" } } } });
 
 describe("snapshot + update (DM-061)", () => {
   it("snapshot state + update sesudahnya = state dokumen hidup (termasuk update yang tumpang tindih)", () => {
@@ -31,7 +31,7 @@ describe("snapshot + update (DM-061)", () => {
     setGap(live, "n_hero000001", 4);
     const snapshot = Y.encodeStateAsUpdate(live);
     const coveredCount = updates.length;
-    runOp({ doc: live, origin: user }, createNode, { parentId: "n_hero000001", type: "frame", name: "Baru" });
+    runCommand({ doc: live, origin: user }, createNode, { parentId: "n_hero000001", type: "frame", name: "Baru" });
     setGap(live, "n_hero000001", 8);
 
     const expected = read(live);
@@ -83,14 +83,14 @@ describe("GC (DM-062)", () => {
     for (let i = 0; i < 10_000; i++) {
       const roll = random();
       if (roll < 0.1) {
-        const result = runOp({ doc: live, origin: user }, createNode, {
+        const result = runCommand({ doc: live, origin: user }, createNode, {
           parentId: frames[Math.floor(random() * frames.length)] ?? "pg_bench00001",
           type: "text",
         });
         if (result.ok) created.push(result.value);
       } else if (roll < 0.18 && created.length > 0) {
         const id = created.splice(Math.floor(random() * created.length), 1)[0];
-        if (id) runOp({ doc: live, origin: user }, deleteNodes, { ids: [id] });
+        if (id) runCommand({ doc: live, origin: user }, deleteNodes, { ids: [id] });
       } else {
         const id = frames[Math.floor(random() * frames.length)];
         if (id) setGap(live, id, Math.floor(random() * 64));
@@ -128,8 +128,8 @@ describe("restoreDocument (diff-apply)", () => {
     const undo = createDocumentUndoManager(live, [user], { captureTimeout: 0 });
     const version1 = read(live);
 
-    runOp({ doc: live, origin: user }, createNode, { parentId: "n_hero000001", type: "frame", name: "Baru" });
-    runOp({ doc: live, origin: user }, deleteNodes, { ids: ["n_heroimg001"] });
+    runCommand({ doc: live, origin: user }, createNode, { parentId: "n_hero000001", type: "frame", name: "Baru" });
+    runCommand({ doc: live, origin: user }, deleteNodes, { ids: ["n_heroimg001"] });
     setGap(live, "n_hero000001", 99);
     live.transact(() => live.getMap<unknown>(YDOC_KEYS.settings).set("manualResponsive", true), user);
 

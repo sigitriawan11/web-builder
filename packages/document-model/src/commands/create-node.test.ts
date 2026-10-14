@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { setupDoc } from "../../test/command-harness";
 import { heroDocument } from "../../test/fixtures/basic-documents";
-import { setupDoc } from "../../test/op-harness";
 import { ID_PATTERN } from "../ids";
+import { runCommand } from "./command";
 import { createNode } from "./create-node";
-import { runOp } from "./op";
 
 const imageProps = { fit: "cover", image: { assetId: "ast_cake000001", alt: "Kue" } };
 
@@ -11,9 +11,9 @@ describe("createNode", () => {
   it("membuat frame dengan default DM-027 di akhir children parent", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    const result = runOp(ctx, createNode, { parentId: "n_hero000001", type: "frame" });
+    const result = runCommand(ctx, createNode, { parentId: "n_hero000001", type: "frame" });
 
-    if (!result.ok) throw new Error(result.error.message);
+    if (!result.ok) throw new Error(result.error.message.id);
     expect(result.value).toMatch(ID_PATTERN);
     const doc = read();
     const hero = doc.nodes.n_hero000001;
@@ -30,7 +30,7 @@ describe("createNode", () => {
   it("menyisipkan di index tertentu dan memakai nama & style yang diberikan", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    const result = runOp(ctx, createNode, {
+    const result = runCommand(ctx, createNode, {
       parentId: "n_hero000001",
       index: 0,
       type: "frame",
@@ -38,7 +38,7 @@ describe("createNode", () => {
       style: { base: { fills: [{ type: "solid", color: "#FF5A1F" }] }, mobile: { fills: null } },
     });
 
-    if (!result.ok) throw new Error(result.error.message);
+    if (!result.ok) throw new Error(result.error.message.id);
     const node = read().nodes[result.value];
     expect(read().nodes.n_hero000001).toMatchObject({ children: [result.value, "n_herottl001", "n_heroimg001"] });
     expect(node?.name).toBe("Kartu");
@@ -49,9 +49,9 @@ describe("createNode", () => {
   it("memberi text konten paragraf kosong secara default", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    const result = runOp(ctx, createNode, { parentId: "n_hero000001", type: "text" });
+    const result = runCommand(ctx, createNode, { parentId: "n_hero000001", type: "text" });
 
-    if (!result.ok) throw new Error(result.error.message);
+    if (!result.ok) throw new Error(result.error.message.id);
     expect(read().nodes[result.value]).toMatchObject({
       props: { content: { type: "doc", content: [{ type: "paragraph" }] } },
     });
@@ -60,11 +60,11 @@ describe("createNode", () => {
   it("membuat image hanya jika props asset diberikan", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    const withoutProps = runOp(ctx, createNode, { parentId: "n_hero000001", type: "image" });
-    const withProps = runOp(ctx, createNode, { parentId: "n_hero000001", type: "image", props: imageProps });
+    const withoutProps = runCommand(ctx, createNode, { parentId: "n_hero000001", type: "image" });
+    const withProps = runCommand(ctx, createNode, { parentId: "n_hero000001", type: "image", props: imageProps });
 
     expect(withoutProps).toMatchObject({ ok: false, error: { code: "INVALID_RESULT" } });
-    if (!withProps.ok) throw new Error(withProps.error.message);
+    if (!withProps.ok) throw new Error(withProps.error.message.id);
     expect(read().nodes[withProps.value]).toMatchObject({
       style: { base: { size: { height: { mode: "fixed", value: 240, unit: "px" } } } },
     });
@@ -75,7 +75,7 @@ describe("createNode", () => {
     const ids = ["n_hero000001", "n_fresh00001"];
     ctx.idGen = () => ids.shift() ?? "n_fallback001";
 
-    const result = runOp(ctx, createNode, { parentId: "n_hero000001", type: "frame" });
+    const result = runCommand(ctx, createNode, { parentId: "n_hero000001", type: "frame" });
 
     expect(result).toMatchObject({ ok: true, value: "n_fresh00001" });
   });
@@ -92,14 +92,14 @@ describe("createNode", () => {
   ])("gagal tanpa perubahan saat $name", ({ input, code }) => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    expect(runOp(ctx, createNode, input)).toMatchObject({ ok: false, error: { code } });
+    expect(runCommand(ctx, createNode, input)).toMatchObject({ ok: false, error: { code } });
     expect(read()).toEqual(heroDocument());
   });
 
   it("bisa di-undo dalam satu langkah", () => {
     const { ctx, read, undoManager } = setupDoc(heroDocument());
 
-    runOp(ctx, createNode, { parentId: "n_hero000001", type: "text" });
+    runCommand(ctx, createNode, { parentId: "n_hero000001", type: "text" });
     undoManager.undo();
 
     expect(read()).toEqual(heroDocument());

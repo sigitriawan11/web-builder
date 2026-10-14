@@ -1,10 +1,10 @@
 import { test } from "vitest";
 import * as Y from "yjs";
 import {
+  type CommandContext,
   jsonToYDoc,
   moveNode,
-  type OpContext,
-  runOp,
+  runCommand,
   type SiteDocument,
   SiteDocumentSchema,
   updateStyle,
@@ -16,7 +16,7 @@ import { generateLandingDocument } from "../test/fixtures";
 // Jalankan: `pnpm --filter @platform/document-model bench`. Angka WSL2 = indikatif; resmi di laptop referensi.
 
 const SIZES = [200, 2000, 5000] as const;
-const ORIGIN = { kind: "user", sessionId: "bench" };
+const ORIGIN = { kind: "user", sessionId: "bench" } as const;
 const encoder = new TextEncoder();
 const kb = (bytes: number) => Math.round((bytes / 1024) * 10) / 10;
 
@@ -44,9 +44,9 @@ function updateBytes(ydoc: Y.Doc, run: () => void): number {
   return bytes;
 }
 
-function mustRun(ctx: OpContext, op: Parameters<typeof runOp>[1], input: unknown) {
-  const result = runOp(ctx, op, input);
-  if (!result.ok) throw new Error(result.error.message);
+function mustRun(ctx: CommandContext, op: Parameters<typeof runCommand>[1], input: unknown) {
+  const result = runCommand(ctx, op, input);
+  if (!result.ok) throw new Error(result.error.message.id);
 }
 
 // mulberry32 agar urutan edit acak (DM-062) sama tiap run.
@@ -134,7 +134,7 @@ function measureAfterEdits(nodeCount: number, edits: number) {
       });
     else {
       // Pindah ke frame lain; gagal (mis. ke turunannya sendiri) dilewati — op tidak menulis apa pun saat gagal.
-      runOp(ctx, moveNode, { id, newParentId: pick(frames), index: 0 });
+      runCommand(ctx, moveNode, { id, newParentId: pick(frames), index: 0 });
     }
   }
   // Compaction = state ter-merge dari Y.Doc (gc aktif), seperti document_snapshots.state.

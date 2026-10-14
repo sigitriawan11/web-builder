@@ -1,9 +1,9 @@
 import {
+  type CommandContext,
   moveNode,
-  type OpContext,
   type PositionStyle,
   resolveStyle,
-  runOp,
+  runCommand,
   updateStyle,
 } from "@platform/document-model";
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ import { clearPreviewTranslate, setPreviewTranslate } from "./transform-preview"
 
 export interface DragSessionDeps {
   // Konteks op dengan origin lokal: commit masuk UndoManager sebagai satu langkah.
-  opContext: OpContext;
+  opContext: CommandContext;
   geometry: GeometryStore;
   nodeStore: NodeStore;
   // Untuk reorder (ED-063): node di bawah pointer & posisi viewport (konversi screen → world).
@@ -229,7 +229,7 @@ export function useDragSessions(deps: DragSessionDeps): void {
         // Satu moveNode = satu transaksi (ED-024); indeks = posisi akhir di parent tujuan.
         if (effect.type === "commit" && target && !unchanged) {
           deps.undoBoundary();
-          runOp(deps.opContext, moveNode, { id, newParentId: target.parentId, index: target.index });
+          runCommand(deps.opContext, moveNode, { id, newParentId: target.parentId, index: target.index });
           deps.undoBoundary();
         }
         endReorder();
@@ -245,7 +245,7 @@ export function useDragSessions(deps: DragSessionDeps): void {
           deps.undoBoundary();
           deps.opContext.doc.transact(() => {
             for (const item of items) {
-              runOp(deps.opContext, updateStyle, {
+              runCommand(deps.opContext, updateStyle, {
                 ids: [item.id],
                 patch: { position: movedPosition(item.start, delta) },
               });
@@ -263,7 +263,7 @@ export function useDragSessions(deps: DragSessionDeps): void {
       // Commit dulu, baru buang preview: keduanya di-batch React, jadi tidak ada kedipan ukuran lama.
       if (patch) {
         deps.undoBoundary();
-        runOp(deps.opContext, updateStyle, { ids: [drag.nodeId], patch });
+        runCommand(deps.opContext, updateStyle, { ids: [drag.nodeId], patch });
         deps.undoBoundary();
       }
       previewStore.getState().clear([drag.nodeId]);

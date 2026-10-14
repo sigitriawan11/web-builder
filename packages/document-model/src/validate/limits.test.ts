@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { setupDoc } from "../../test/command-harness";
 import { heroDocument, minimalDocument } from "../../test/fixtures/basic-documents";
-import { setupDoc } from "../../test/op-harness";
+import { runCommand } from "../commands/command";
+import { createNode } from "../commands/create-node";
+import { moveNode } from "../commands/move-node";
 import { checkByteLimit, checkLimit, DOCUMENT_LIMITS } from "../limits";
-import { createNode } from "../ops/create-node";
-import { moveNode } from "../ops/move-node";
-import { runOp } from "../ops/op";
 import type { Node, SiteDocument } from "../schema";
 import { validateDocument } from "./validate-document";
 
@@ -148,7 +148,7 @@ describe("command → LIMIT_EXCEEDED tanpa penulisan parsial (AC DM-076)", () =>
   it("createNode: container penuh (500 anak)", () => {
     const { ctx, read } = setupDoc(bulkDocument(1, 500));
     const before = read();
-    const result = runOp(ctx, createNode, { parentId: "n_f00000000", type: "frame" });
+    const result = runCommand(ctx, createNode, { parentId: "n_f00000000", type: "frame" });
     expect(result).toMatchObject({
       ok: false,
       error: { code: "LIMIT_EXCEEDED", details: { limit: "childrenPerContainer", value: 501, max: 500 } },
@@ -158,7 +158,7 @@ describe("command → LIMIT_EXCEEDED tanpa penulisan parsial (AC DM-076)", () =>
 
   it("createNode: kedalaman 32 & teks terlalu panjang", () => {
     const { ctx } = setupDoc(deepDocument(32).doc);
-    expect(runOp(ctx, createNode, { parentId: deepDocument(32).deepest, type: "frame" })).toMatchObject({
+    expect(runCommand(ctx, createNode, { parentId: deepDocument(32).deepest, type: "frame" })).toMatchObject({
       error: { code: "LIMIT_EXCEEDED", details: { limit: "treeDepth" } },
     });
     const hero = setupDoc(heroDocument());
@@ -166,7 +166,9 @@ describe("command → LIMIT_EXCEEDED tanpa penulisan parsial (AC DM-076)", () =>
       type: "doc",
       content: [{ type: "paragraph", content: [{ type: "text", text: "a".repeat(20_001) }] }],
     };
-    expect(runOp(hero.ctx, createNode, { parentId: "n_hero000001", type: "text", props: { content } })).toMatchObject({
+    expect(
+      runCommand(hero.ctx, createNode, { parentId: "n_hero000001", type: "text", props: { content } }),
+    ).toMatchObject({
       error: { code: "LIMIT_EXCEEDED", details: { limit: "textCharsPerNode" } },
     });
   });
@@ -177,9 +179,9 @@ describe("command → LIMIT_EXCEEDED tanpa penulisan parsial (AC DM-076)", () =>
     expect(Object.keys(doc.nodes)).toHaveLength(4_991);
     const { ctx } = setupDoc(doc);
     for (let f = 0; f < 9; f++) {
-      expect(runOp(ctx, createNode, { parentId: `n_f${pad(f)}`, type: "frame" }).ok).toBe(true);
+      expect(runCommand(ctx, createNode, { parentId: `n_f${pad(f)}`, type: "frame" }).ok).toBe(true);
     }
-    expect(runOp(ctx, createNode, { parentId: "n_f00000009", type: "frame" })).toMatchObject({
+    expect(runCommand(ctx, createNode, { parentId: "n_f00000009", type: "frame" })).toMatchObject({
       error: { code: "LIMIT_EXCEEDED", details: { limit: "nodesPerPage", value: 5_001 } },
     });
   });
@@ -188,12 +190,12 @@ describe("command → LIMIT_EXCEEDED tanpa penulisan parsial (AC DM-076)", () =>
     const doc = bulkDocument(2, 500);
     const { ctx, read } = setupDoc(doc);
     const before = read();
-    expect(runOp(ctx, moveNode, { id: "n_t00000000", newParentId: "n_f00000001", index: 0 })).toMatchObject({
+    expect(runCommand(ctx, moveNode, { id: "n_t00000000", newParentId: "n_f00000001", index: 0 })).toMatchObject({
       error: { code: "LIMIT_EXCEEDED", details: { limit: "childrenPerContainer" } },
     });
     expect(read()).toEqual(before);
     // Reorder di parent yang sama tetap boleh meski penuh.
-    expect(runOp(ctx, moveNode, { id: "n_t00000000", newParentId: "n_f00000000", index: 3 }).ok).toBe(true);
+    expect(runCommand(ctx, moveNode, { id: "n_t00000000", newParentId: "n_f00000000", index: 3 }).ok).toBe(true);
 
     const deep = deepDocument(30);
     deep.doc.nodes.n_sub0000001 = frameNode("n_sub0000001", HOME, ["n_sub0000002"]);
@@ -203,9 +205,11 @@ describe("command → LIMIT_EXCEEDED tanpa penulisan parsial (AC DM-076)", () =>
     if (home && "children" in home) home.children.push("n_sub0000001");
     const moving = setupDoc(deep.doc);
     // Tujuan depth 30 → subtree (tinggi 2) di level 31..33 > 32.
-    expect(runOp(moving.ctx, moveNode, { id: "n_sub0000001", newParentId: deep.deepest, index: 0 })).toMatchObject({
-      error: { code: "LIMIT_EXCEEDED", details: { limit: "treeDepth", value: 33 } },
-    });
+    expect(runCommand(moving.ctx, moveNode, { id: "n_sub0000001", newParentId: deep.deepest, index: 0 })).toMatchObject(
+      {
+        error: { code: "LIMIT_EXCEEDED", details: { limit: "treeDepth", value: 33 } },
+      },
+    );
   });
 
   it("angka batas sesuai DM-076", () => {

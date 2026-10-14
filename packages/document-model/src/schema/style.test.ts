@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { heroDocument, styledDocument } from "../../test/fixtures/basic-documents";
 import { publishIssues } from "../../test/validation";
-import { mergeStyle } from "../ops/merge-style";
+import { mergeStyle } from "../commands/merge-style";
 import { gcAssets } from "../query/assets";
 import { resolveStyle } from "../query/resolve-style";
 import type { SiteDocument } from "./index";

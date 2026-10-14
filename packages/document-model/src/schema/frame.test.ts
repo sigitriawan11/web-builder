@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import * as Y from "yjs";
 import { heroDocument } from "../../test/fixtures/basic-documents";
-import { mergeStyle } from "../ops/merge-style";
+import { mergeStyle } from "../commands/merge-style";
 import { jsonToYDoc, yDocToJson } from "../yjs/mapping";
 import { SiteDocumentSchema } from "./document";
 import type { Node, SiteDocument } from "./index";

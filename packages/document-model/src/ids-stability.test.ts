@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { setupDoc } from "../test/command-harness";
 import { heroDocument } from "../test/fixtures/basic-documents";
-import { setupDoc } from "../test/op-harness";
+import { moveNode, runCommand, updateStyle } from "./commands";
 import { createId, ID_PREFIXES } from "./ids";
-import { moveNode, runOp, updateStyle } from "./ops";
 import {
   AssetIdSchema,
   CollectionIdSchema,
@@ -51,12 +51,12 @@ describe("ID stabil (AC DM-007)", () => {
     const { ctx, read } = setupDoc(heroDocument());
     const before = snapshotIds(read());
 
-    expect(runOp(ctx, moveNode, { id: "n_heroimg001", newParentId: "pg_home000001", index: 0 }).ok).toBe(true);
+    expect(runCommand(ctx, moveNode, { id: "n_heroimg001", newParentId: "pg_home000001", index: 0 }).ok).toBe(true);
     expect(
-      runOp(ctx, updateStyle, { ids: ["n_hero000001"], patch: { layout: { gap: { value: 8, unit: "px" } } } }).ok,
+      runCommand(ctx, updateStyle, { ids: ["n_hero000001"], patch: { layout: { gap: { value: 8, unit: "px" } } } }).ok,
     ).toBe(true);
     expect(
-      runOp(ctx, updateStyle, {
+      runCommand(ctx, updateStyle, {
         ids: ["n_hero000001"],
         breakpoint: "mobile",
         patch: { layout: { gap: { value: 4, unit: "px" } } },

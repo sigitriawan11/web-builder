@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
+import { setupDoc } from "../../test/command-harness";
 import { heroDocument, nestedDocument } from "../../test/fixtures/basic-documents";
-import { setupDoc } from "../../test/op-harness";
+import { runCommand } from "./command";
 import { deleteNodes } from "./delete-nodes";
-import { runOp } from "./op";
 
 describe("deleteNodes", () => {
   it("menghapus node beserta seluruh turunannya dan melepasnya dari parent", () => {
     const { ctx, read } = setupDoc(heroDocument());
 
-    const result = runOp(ctx, deleteNodes, { ids: ["n_hero000001"] });
+    const result = runCommand(ctx, deleteNodes, { ids: ["n_hero000001"] });
 
-    if (!result.ok) throw new Error(result.error.message);
+    if (!result.ok) throw new Error(result.error.message.id);
     expect(result.value.removedIds.sort()).toEqual(["n_hero000001", "n_heroimg001", "n_herottl001"]);
     const doc = read();
     expect(Object.keys(doc.nodes).sort()).toEqual(["pg_about00001", "pg_home000001"]);
@@ -20,7 +20,7 @@ describe("deleteNodes", () => {
   it("menerima id yang tumpang tindih (node dan turunannya)", () => {
     const { ctx, read } = setupDoc(nestedDocument());
 
-    const result = runOp(ctx, deleteNodes, { ids: ["n_lvl4text001", "n_lvl2000001", "n_lvl4text001"] });
+    const result = runCommand(ctx, deleteNodes, { ids: ["n_lvl4text001", "n_lvl2000001", "n_lvl4text001"] });
 
     expect(result.ok).toBe(true);
     const doc = read();
@@ -35,14 +35,14 @@ describe("deleteNodes", () => {
   ])("gagal tanpa perubahan saat menghapus $name", ({ ids, code }) => {
     const { ctx, read } = setupDoc(nestedDocument());
 
-    expect(runOp(ctx, deleteNodes, { ids })).toMatchObject({ ok: false, error: { code } });
+    expect(runCommand(ctx, deleteNodes, { ids })).toMatchObject({ ok: false, error: { code } });
     expect(read()).toEqual(nestedDocument());
   });
 
   it("bisa di-undo dalam satu langkah, mengembalikan seluruh subtree", () => {
     const { ctx, read, undoManager } = setupDoc(nestedDocument());
 
-    runOp(ctx, deleteNodes, { ids: ["n_lvl1000001"] });
+    runCommand(ctx, deleteNodes, { ids: ["n_lvl1000001"] });
     undoManager.undo();
 
     expect(read()).toEqual(nestedDocument());

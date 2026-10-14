@@ -25,6 +25,11 @@ export function draftUpdate(fork: DocumentFork): Uint8Array {
  * Terapkan update draft run AI ke dokumen utama sebagai satu langkah undo. `stopCapturing` sebelum & sesudah
  * mencegah langkah AI tergabung dengan edit user yang berdekatan (captureTimeout).
  */
+/** Terapkan update draft sebagai satu transaksi ber-`origin` (dipakai `runCommands` & `applyDraft`). */
+export function applyDraftUpdate(doc: Y.Doc, update: Uint8Array, origin: unknown): void {
+  Y.applyUpdate(doc, update, origin);
+}
+
 export function applyDraft(
   doc: Y.Doc,
   update: Uint8Array,
@@ -34,6 +39,6 @@ export function applyDraft(
   const origin = aiOrigin(runId);
   undoManager?.addTrackedOrigin(origin);
   undoManager?.stopCapturing();
-  Y.applyUpdate(doc, update, origin);
+  applyDraftUpdate(doc, update, origin);
   undoManager?.stopCapturing();
 }

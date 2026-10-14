@@ -21,7 +21,7 @@ async function center(locator: Locator): Promise<{ x: number; y: number }> {
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 }
 
-const runOp = (page: Page, op: string, input: unknown) =>
+const runCommand = (page: Page, op: string, input: unknown) =>
   page.evaluate(
     ([name, payload]) => {
       const spike = (window as unknown as { __spike: Spike }).__spike;
@@ -46,7 +46,7 @@ for (const mode of ["class", "iframe"]) {
     test("edit konten tampil di semua frame; patch mobile tidak mengubah Desktop (AC ED-034)", async ({ page }) => {
       await page.goto(`?fixture=hero&frames=all&bpMode=${mode}`);
 
-      await runOp(page, "updateStyle", {
+      await runCommand(page, "updateStyle", {
         ids: ["n_hero000001"],
         patch: { fills: [{ type: "solid", color: "#FF0000" }] },
       });
@@ -54,7 +54,7 @@ for (const mode of ["class", "iframe"]) {
         await expect(nodeIn(page, mode, bp, "n_hero000001")).toHaveCSS("background-color", "rgb(255, 0, 0)");
       }
 
-      await runOp(page, "updateStyle", {
+      await runCommand(page, "updateStyle", {
         ids: ["n_hero000001"],
         breakpoint: "mobile",
         patch: { fills: [{ type: "solid", color: "#0000FF" }] },
