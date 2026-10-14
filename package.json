@@ -27,7 +27,7 @@
     "bench:canvas": "pnpm --filter @platform/editor bench:canvas",
     "db:generate": "dotenv -e .env -- turbo run db:generate",
     "db:migrate": "dotenv -e .env -- turbo run db:migrate",
-    "db:seed": "dotenv -e .env -- turbo run db:seed",
+    "db:seed": "dotenv -e .env -- turbo run db:seed --",
     "db:reset": "dotenv -e .env -- turbo run db:reset",
     "db:check": "turbo run db:check"
   },

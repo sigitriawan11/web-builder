@@ -12,6 +12,14 @@ export {
   SeedComponentVersionSchema,
   type SeedFile,
 } from "./component";
+export {
+  contentHash,
+  formatImportPlan,
+  type LibraryImportPlan,
+  planLibraryImport,
+  SEED_UUID_NAMESPACE,
+  uuidV5,
+} from "./import";
 export { SEED_JSON_SCHEMAS, seedJsonSchema } from "./json-schema";
 export { SEED_DATA_DIR, SEED_DIRS } from "./paths";
 export { formatSeedIssues, jsonPath, type SeedIssue, type SeedLibraryReport, validateSeedLibrary } from "./validate";

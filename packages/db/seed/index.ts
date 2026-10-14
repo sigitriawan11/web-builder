@@ -2,8 +2,16 @@ import { envField, parseEnv } from "@platform/shared/env";
 import { z } from "zod";
 import { createDb } from "../src/client";
 import { seedDevData } from "./dev-data";
+import { seedLibrary } from "./library";
 
-// `pnpm db:seed` (root, memuat .env). Data dev hanya untuk lingkungan lokal; plan & library seed menyusul.
+// `pnpm db:seed` (root, memuat .env): data dev lokal. `pnpm db:seed --library [--dry-run]`: library platform dari
+// `@platform/library-seed` (CMP-142).
+const args = new Set(process.argv.slice(2));
+
+if (args.has("--library")) {
+  process.exit(seedLibrary({ dryRun: args.has("--dry-run") }));
+}
+
 const env = parseEnv(
   "db:seed",
   { DATABASE_URL: envField.url(), APP_ENV: z.enum(["local", "staging", "production"]) },

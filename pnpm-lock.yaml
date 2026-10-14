@@ -275,6 +275,9 @@ importers:
       '@platform/document-model':
         specifier: workspace:*
         version: link:../document-model
+      '@platform/library-seed':
+        specifier: workspace:*
+        version: link:../library-seed
       '@platform/shared':
         specifier: workspace:*
         version: link:../shared
