@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { ResponsiveStyleSchema } from "./style";
-import { AssetIdSchema, NodeIdSchema, PageIdSchema } from "./values";
+import {
+  AssetIdSchema,
+  ComponentIdSchema,
+  JsonValueSchema,
+  NodeIdSchema,
+  PageIdSchema,
+  TemplateIdSchema,
+} from "./values";
 
 const ChildIdSchema = z.string().regex(/^n_[0-9a-z]{6,24}$/);
 
@@ -88,11 +95,41 @@ export const ImagePropsSchema = z.strictObject({
 
 // ── Node (DM-008, DM-009) ──────────────────────────────────────────────────
 
+// Anchor publik (`#tentang-kami`): slug diawali huruf, unik per page (invariant di document.ts).
+export const HtmlIdSchema = z.string().regex(/^[a-z][a-z0-9-]{0,63}$/, "htmlId harus slug [a-z0-9-] diawali huruf");
+
+export const A11ySchema = z.strictObject({
+  label: z.string().min(1).max(200).optional(),
+  role: z
+    .string()
+    .regex(/^[a-z]+$/)
+    .max(30)
+    .optional(),
+  hiddenFromScreenReader: z.boolean().optional(),
+});
+
+// Editor/AI-only, di-strip saat publish (DM-008). `ext` = namespace eksperimen: tidak divalidasi ketat (DM-004),
+// tetapi tetap JSON murni (DM-002) agar aman di Yjs.
+export const NodeMetadataSchema = z.strictObject({
+  createdBy: z.enum(["user", "ai", "system", "template"]).optional(),
+  aiNote: z.string().max(200).optional(),
+  fromTemplate: z
+    .strictObject({ templateId: TemplateIdSchema, version: z.number().int().positive(), nodeId: NodeIdSchema })
+    .optional(),
+  detachedFrom: z.strictObject({ componentId: ComponentIdSchema, version: z.number().int().positive() }).optional(),
+  editor: z.strictObject({ collapsed: z.boolean().optional(), colorLabel: z.string().max(20).optional() }).optional(),
+  ext: z.record(z.string(), JsonValueSchema).optional(),
+});
+
+// `states` (DM-040, P0 · M2), `interactions` (§12), `bindings`/`visibleWhen` (M7) ditambah bersama fiturnya.
 const baseShape = {
   name: z.string().min(1).max(80),
   visible: z.boolean(),
   locked: z.boolean(),
   style: ResponsiveStyleSchema,
+  htmlId: HtmlIdSchema.optional(),
+  a11y: A11ySchema.optional(),
+  metadata: NodeMetadataSchema.optional(),
 };
 
 const childrenShape = { children: z.array(ChildIdSchema).max(500) };
@@ -152,5 +189,7 @@ export type FrameNode = z.infer<typeof FrameNodeSchema>;
 export type TextNode = z.infer<typeof TextNodeSchema>;
 export type ImageNode = z.infer<typeof ImageNodeSchema>;
 export type Node = z.infer<typeof NodeSchema>;
+export type NodeMetadata = z.infer<typeof NodeMetadataSchema>;
+export type A11y = z.infer<typeof A11ySchema>;
 export type NodeType = Node["type"];
 export type ContainerNode = Extract<Node, { children: unknown }>;

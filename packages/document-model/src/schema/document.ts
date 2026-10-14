@@ -137,6 +137,27 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
     });
   }
 
+  // DM-008: htmlId (anchor publik) unik per page.
+  for (const pageId of doc.pageOrder) {
+    const seen = new Map<string, string>();
+    const stack = [pageId];
+    const visited = new Set<string>();
+    while (stack.length > 0) {
+      const id = stack.pop();
+      if (id === undefined || visited.has(id)) continue;
+      visited.add(id);
+      const node = nodes[id];
+      if (!node) continue;
+      if (node.htmlId !== undefined) {
+        const owner = seen.get(node.htmlId);
+        if (owner)
+          report(["nodes", id, "htmlId"], `htmlId "${node.htmlId}" sudah dipakai "${owner}" di page yang sama`);
+        else seen.set(node.htmlId, id);
+      }
+      if ("children" in node) stack.push(...node.children);
+    }
+  }
+
   // Siklus parent-child bisa lolos cek di atas, jadi pastikan semua node terjangkau dari page.
   const reachable = new Set<string>();
   const stack = doc.pageOrder.filter((pageId) => nodes[pageId]);
