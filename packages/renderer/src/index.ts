@@ -9,7 +9,15 @@ export {
   type ParentLayout,
   styleDeclarations,
 } from "./css/declarations";
-export { BASE_CSS, buildPageStyles, declarationsToCss, type PageStyles } from "./css/stylesheet";
+export {
+  BASE_CSS,
+  breakpointScopeClasses,
+  buildPageStyles,
+  declarationsToCss,
+  type PageStyles,
+  type PageStylesOptions,
+  type StyleTarget,
+} from "./css/stylesheet";
 export { type TokenDeclarations, tokenDeclarations, usedTokens } from "./css/tokens";
 export { colorToCss, cssString, lengthToCss, tokenVar, tokenVarName, typographyVarName } from "./css/values";
 export { anchorId, anchorTargets, type LinkAttributes, linkAttributes, linkHref } from "./links";
