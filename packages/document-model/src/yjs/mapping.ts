@@ -18,6 +18,11 @@ export const YDOC_KEYS = {
   nodes: "nodes",
 } as const;
 
+/** Y.Doc kosong untuk satu website (DM-058: satu Y.Doc per website, `guid = siteId`). */
+export function createSiteYDoc(siteId: string): Y.Doc {
+  return new Y.Doc({ guid: siteId });
+}
+
 export function nodeToYMap(node: Node): Y.Map<unknown> {
   const yNode = new Y.Map<unknown>();
   for (const [key, value] of Object.entries(node)) {
