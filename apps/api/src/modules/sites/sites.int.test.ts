@@ -1,61 +1,71 @@
-import { type Actor, eq, schema, workspaceScope } from "@platform/db";
-import { createTestDb, createUser, type TestDb } from "@platform/db/testing";
+import { eq, schema } from "@platform/db";
+import { createTestDb, createWorkspace, type TestDb } from "@platform/db/testing";
+import type { WorkspaceRole } from "@platform/shared/contracts";
 import { dataEnvelope, ErrorBodySchema, listEnvelope, SiteSchema } from "@platform/shared/contracts";
-import type { RequestHandler } from "express";
+import type { Express } from "express";
+import { Redis } from "ioredis";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createApp } from "../../app";
-import { silentLogger } from "../../test-utils";
-import { createSitesRouter } from "./sites.routes";
-import { createSitesService } from "./sites.service";
+import { authTestApp, sessionCookie, signUpBody, TEST_ORIGIN, uniqueEmail } from "../../auth/auth.test-harness";
 
-// Modul contoh (T1.4.7): CRUD minimal + isolasi tenant dengan Postgres asli. Middleware tenant di sini MENIRU
-// tenantResolver (T1.5): user hanya mendapat tenant untuk workspace miliknya; role dari header khusus test.
+// Modul sites (T1.4.7) lewat jalur produksi penuh: sesi Better Auth → tenantResolver (keanggotaan & role dari
+// `workspace_members`, T1.5.12) → izin ACC-033 → repository ber-scope tenant. Postgres & Redis asli.
+
+interface TestUser {
+  cookie: string;
+  user: { id: string };
+  workspace: { id: string };
+}
 
 let testDb: TestDb;
-let alice: Awaited<ReturnType<typeof createUser>>;
-let bob: Awaited<ReturnType<typeof createUser>>;
+let redis: Redis;
+let target: Express;
+let alice: TestUser;
+let bob: TestUser;
+let ipCounter = 0;
+
+/** Registrasi lewat API → sesi + personal workspace otomatis (ACC-030). */
+async function register(): Promise<TestUser> {
+  const email = uniqueEmail();
+  const response = await request(target)
+    .post("/auth/sign-up/email")
+    .set("origin", TEST_ORIGIN)
+    .set("x-forwarded-for", `198.18.0.${(ipCounter++ % 250) + 1}`)
+    .send(signUpBody(email));
+  const [user] = await testDb.db.select().from(schema.users).where(eq(schema.users.email, email));
+  const [workspace] = await testDb.db
+    .select()
+    .from(schema.workspaces)
+    .where(eq(schema.workspaces.ownerUserId, user?.id ?? ""));
+  if (!user || !workspace) throw new Error("registrasi test gagal");
+  return { cookie: sessionCookie(response.headers["set-cookie"]) ?? "", user, workspace };
+}
 
 beforeAll(async () => {
   testDb = await createTestDb();
-  alice = await createUser(testDb.db);
-  bob = await createUser(testDb.db);
+  redis = new Redis(process.env.REDIS_URL ?? "redis://localhost:6379");
+  target = authTestApp(testDb, redis);
+  alice = await register();
+  bob = await register();
 });
 afterAll(async () => {
+  redis.disconnect();
   await testDb.drop();
 });
 
-/** Request atas nama `user` dengan role tertentu di workspace pribadinya. */
-function app() {
-  const memberships = new Map([
-    [alice.user.id, alice.workspace.id],
-    [bob.user.id, bob.workspace.id],
-  ]);
-  const testTenant: RequestHandler = (req, _res, next) => {
-    const userId = req.get("x-test-user") ?? "";
-    const workspaceId = String(req.params.workspaceId);
-    // Bukan anggota → 404 seperti tenantResolver (keberadaan workspace tidak bocor).
-    if (memberships.get(userId) !== workspaceId) {
-      next(Object.assign(new Error("not member"), { name: "AppError", code: "NOT_FOUND", status: 404 }));
-      return;
-    }
-    const actor: Actor = { type: "user", userId, role: (req.get("x-test-role") ?? "owner") as "owner" };
-    req.ctx.tenant = workspaceScope({ workspaceId, actor });
-    next();
-  };
-  return createApp({
-    logger: silentLogger(),
-    mountRoutes: (app) => {
-      app.use(
-        "/v1/workspaces/:workspaceId/sites",
-        createSitesRouter({ service: createSitesService({ db: testDb.db }), tenant: testTenant }),
-      );
-    },
-  });
-}
-
-const as = (who: { user: { id: string } }) => ({ "x-test-user": who.user.id });
+const app = () => target;
+const as = (who: TestUser) => ({ cookie: who.cookie, origin: TEST_ORIGIN });
 const sitesOf = (who: { workspace: { id: string } }) => `/v1/workspaces/${who.workspace.id}/sites`;
+
+/** Team workspace milik Alice dengan anggota baru ber-role `role` (role dari keanggotaan, bukan header). */
+async function teamMember(role: WorkspaceRole) {
+  const [aliceRow] = await testDb.db.select().from(schema.users).where(eq(schema.users.id, alice.user.id));
+  if (!aliceRow) throw new Error("alice hilang");
+  const team = await createWorkspace(testDb.db, { owner: aliceRow });
+  const member = await register();
+  await testDb.db.insert(schema.workspaceMembers).values({ workspaceId: team.id, userId: member.user.id, role });
+  return { member, team: { workspace: team }, owner: alice };
+}
 
 describe("modul sites — CRUD (T1.4.7)", () => {
   it("create → get → rename → list → delete", async () => {
@@ -163,42 +173,44 @@ describe("modul sites — isolasi tenant (CLAUDE.md § Testing)", () => {
   });
 
   it("role viewer tidak boleh menulis (403), tetap boleh membaca", async () => {
-    const viewer = { ...as(alice), "x-test-role": "viewer" };
-    expect((await request(app()).post(sitesOf(alice)).set(viewer).send({ name: "x" })).status).toBe(403);
-    expect((await request(app()).get(sitesOf(alice)).set(viewer)).status).toBe(200);
+    const { member, team } = await teamMember("viewer");
+    expect((await request(app()).post(sitesOf(team)).set(as(member)).send({ name: "x" })).status).toBe(403);
+    expect((await request(app()).get(sitesOf(team)).set(as(member))).status).toBe(200);
   });
 
   it("billing tidak boleh melihat situs (403) — matriks ACC-033", async () => {
-    const billing = { ...as(alice), "x-test-role": "billing" };
-    expect((await request(app()).get(sitesOf(alice)).set(billing)).status).toBe(403);
+    const { member, team } = await teamMember("billing");
+    expect((await request(app()).get(sitesOf(team)).set(as(member))).status).toBe(403);
   });
 
   it("editor: hapus situs buatannya boleh, buatan orang lain tidak (403); admin boleh", async () => {
-    const editor = { ...as(alice), "x-test-role": "editor" };
-    // Situs buatan "orang lain": dibuat lalu pembuatnya dikosongkan (pembuat tidak diketahui).
-    const own = (await request(app()).post(sitesOf(alice)).set(editor).send({ name: "Punya Editor" })).body.data;
-    const other = (await request(app()).post(sitesOf(alice)).set(as(alice)).send({ name: "Bukan Punya Editor" })).body
+    const { member: editor, team, owner } = await teamMember("editor");
+    const own = (await request(app()).post(sitesOf(team)).set(as(editor)).send({ name: "Punya Editor" })).body.data;
+    const other = (await request(app()).post(sitesOf(team)).set(as(owner)).send({ name: "Bukan Punya Editor" })).body
       .data;
-    await testDb.db.update(schema.sites).set({ createdBy: null }).where(eq(schema.sites.id, other.id));
 
     expect(
       (
         await request(app())
-          .delete(`${sitesOf(alice)}/${own.id}`)
-          .set(editor)
+          .delete(`${sitesOf(team)}/${own.id}`)
+          .set(as(editor))
       ).status,
     ).toBe(204);
     const denied = await request(app())
-      .delete(`${sitesOf(alice)}/${other.id}`)
-      .set(editor);
+      .delete(`${sitesOf(team)}/${other.id}`)
+      .set(as(editor));
     expect(denied.status).toBe(403);
     expect(denied.body.error.details).toEqual({ action: "site.delete" });
-    const admin = { ...as(alice), "x-test-role": "admin" };
+
+    const admin = await register();
+    await testDb.db
+      .insert(schema.workspaceMembers)
+      .values({ workspaceId: team.workspace.id, userId: admin.user.id, role: "admin" });
     expect(
       (
         await request(app())
-          .delete(`${sitesOf(alice)}/${other.id}`)
-          .set(admin)
+          .delete(`${sitesOf(team)}/${other.id}`)
+          .set(as(admin))
       ).status,
     ).toBe(204);
   });

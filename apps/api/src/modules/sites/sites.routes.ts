@@ -1,4 +1,4 @@
-import express, { type RequestHandler, type Router } from "express";
+import express, { type Router } from "express";
 import type { Redis } from "../../lib/redis";
 import { RATE_LIMITS, rateLimit } from "../../middleware/rate-limit";
 import { validated } from "../../middleware/validate";
@@ -13,19 +13,17 @@ import {
 } from "./sites.schema";
 import type { SitesService } from "./sites.service";
 
-// Routing + middleware saja (CLAUDE.md § Struktur modul API). Dipasang di `/v1/workspaces/:workspaceId/sites`.
-// `tenant` = middleware yang memverifikasi akses lalu mengisi `req.ctx.tenant` (tenantResolver, T1.5).
+// Routing + middleware saja (CLAUDE.md § Struktur modul API). Dipasang router workspace di
+// `/v1/workspaces/:workspaceId/sites` SETELAH tenantResolver (req.ctx.tenant sudah terverifikasi).
 
 export interface SitesRouterDeps {
   service: SitesService;
-  tenant: RequestHandler;
   redis?: Redis;
 }
 
 export function createSitesRouter(deps: SitesRouterDeps): Router {
   const controller = createSitesController(deps.service);
   const router = express.Router({ mergeParams: true });
-  router.use(deps.tenant);
   if (deps.redis) {
     router.use(
       rateLimit(deps.redis, { name: "platform-api", windows: RATE_LIMITS.platformApi, key: tenantRateLimitKey }),

@@ -16,6 +16,7 @@ import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
 import { createAccountRouter } from "./modules/account/account.routes";
 import { createAccountService } from "./modules/account/account.service";
+import { createWorkspaceRouter } from "./modules/workspaces/workspaces.routes";
 import type { QueueProducer } from "./queues/producer";
 
 // createApp(): susunan middleware + router (ARCHITECTURE §5.3). Tanpa `listen` agar bisa diuji dengan supertest.
@@ -115,6 +116,13 @@ export function createApp(deps: AppDeps): Express {
         ...(deps.redis ? { redis: deps.redis } : {}),
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
       }),
+    );
+  }
+
+  if (deps.auth && deps.db) {
+    app.use(
+      "/v1/workspaces/:workspaceId",
+      createWorkspaceRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }),
     );
   }
 
