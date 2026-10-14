@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "seedVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "categories": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "component",
+              "template",
+              "both"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "functional",
+              "industry"
+            ]
+          },
+          "parentSlug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "en": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            },
+            "required": [
+              "id",
+              "en"
+            ],
+            "additionalProperties": false
+          },
+          "description": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "maxLength": 300
+              },
+              "en": {
+                "type": "string",
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "id",
+              "en"
+            ],
+            "additionalProperties": false
+          },
+          "icon": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "slug",
+          "scope",
+          "type",
+          "name",
+          "sortOrder"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "seedVersion",
+    "categories"
+  ],
+  "additionalProperties": false
+}
