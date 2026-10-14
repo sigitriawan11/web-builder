@@ -109,8 +109,9 @@ export function jsonToYDoc(doc: SiteDocument, target: Y.Doc = new Y.Doc(), origi
 }
 
 // JSON mentah satu node (rich text dikonversi dari Y.XmlFragment). Validasi dengan NodeSchema sebelum dipakai.
+// Salinan dalam: `toJSON` mengembalikan nilai daun Yjs per referensi — memutasinya diam-diam mengubah dokumen.
 export function yNodeToJson(yNode: Y.Map<unknown>): Record<string, unknown> {
-  const json = yNode.toJSON() as Record<string, unknown>;
+  const json = cloneJson(yNode.toJSON()) as Record<string, unknown>;
   const yProps = yNode.get("props");
   const content = yProps instanceof Y.Map ? yProps.get(RICH_TEXT_PROP) : undefined;
   if (content instanceof Y.XmlFragment) {
@@ -127,7 +128,8 @@ export function yDocToJson(ydoc: Y.Doc): unknown {
   });
   const { schemaVersion, ...meta } = ydoc.getMap<unknown>(YDOC_KEYS.meta).toJSON();
   const dataSources = ydoc.getMap<unknown>(YDOC_KEYS.dataSources);
-  return cloneJson({
+  // `nodes` sudah salinan (yNodeToJson); sisanya disalin di sini.
+  const rest = cloneJson({
     schemaVersion,
     meta,
     settings: ydoc.getMap<unknown>(YDOC_KEYS.settings).toJSON(),
@@ -137,6 +139,6 @@ export function yDocToJson(ydoc: Y.Doc): unknown {
     componentDeps: ydoc.getMap<unknown>(YDOC_KEYS.componentDeps).toJSON(),
     ...(dataSources.size > 0 ? { dataSources: dataSources.toJSON() } : {}),
     pageOrder: ydoc.getArray<string>(YDOC_KEYS.pageOrder).toJSON(),
-    nodes,
   });
+  return { ...rest, nodes };
 }

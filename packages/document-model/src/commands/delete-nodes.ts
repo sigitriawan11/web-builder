@@ -41,6 +41,7 @@ export const deleteNodes = defineCommand({
     for (const id of removed) nodes.delete(id);
 
     const removedIds = [...removed];
-    return { ok: true, value: { removedIds }, affected: removedIds };
+    // `removedInteractions` (DM-074) terisi setelah interactions ada (§12).
+    return { ok: true, value: { removedIds, removedInteractions: [] as string[] }, affected: removedIds };
   },
 });
