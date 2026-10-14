@@ -1,0 +1,82 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_buttonprimary",
+  "slug": "button-primary",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "ButtonPrimary",
+    "displayName": { "id": "Tombol Utama", "en": "Primary Button" },
+    "description": {
+      "id": "Tombol aksi utama berwarna primer untuk ajakan seperti pesan, daftar, atau hubungi.",
+      "en": "Primary-coloured main action button for calls like order, sign up, or contact."
+    },
+    "tags": ["button", "cta", "primary"],
+    "keywords": { "id": ["tombol", "ajakan", "pesan sekarang"], "en": ["button", "call to action"] },
+    "aiHints": "Pakai untuk satu aksi utama per section. Isi teks dengan kata kerja singkat (mis. \"Pesan Sekarang\"); pasang link WhatsApp atau halaman tujuan."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": { "id": "Rilis awal.", "en": "Initial release." },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_button"],
+          "nodes": {
+            "tmp_button": {
+              "type": "frame",
+              "name": "Button",
+              "parentId": "tmp_parent",
+              "children": ["tmp_label"],
+              "visible": true,
+              "locked": false,
+              "props": { "role": "button" },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "padding": {
+                      "top": { "$token": "space.3" },
+                      "right": { "$token": "space.6" },
+                      "bottom": { "$token": "space.3" },
+                      "left": { "$token": "space.6" }
+                    }
+                  },
+                  "size": { "width": { "mode": "hug" }, "height": { "mode": "hug" } },
+                  "fills": [{ "type": "solid", "color": { "$token": "color.primary" } }],
+                  "radius": { "$token": "radius.md" }
+                }
+              }
+            },
+            "tmp_label": {
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_button",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Pesan Sekarang" }] }]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": { "width": { "mode": "hug" }, "height": { "mode": "hug" } },
+                  "typography": { "$token": "typography.button" },
+                  "color": { "$token": "color.onPrimary" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
