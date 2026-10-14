@@ -13,3 +13,12 @@ export {
 export { createPlatformApi, type PlatformApi } from "./endpoints";
 export { ApiError, CLIENT_ERROR_CODES, type ClientErrorCode, isApiError } from "./errors";
 export { apiServer, FORWARDED_HEADERS, forwardedHeaders, type IncomingHeaders } from "./server";
+export {
+  DEFAULT_MAX_RECONNECTS,
+  DEFAULT_RECONNECT_DELAY_MS,
+  readSseEvents,
+  type SseMessage,
+  type SseSubscription,
+  type SubscribeSseOptions,
+  subscribeSse,
+} from "./sse";
