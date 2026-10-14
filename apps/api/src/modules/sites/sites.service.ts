@@ -61,9 +61,9 @@ export function createSitesService(deps: { db: Db }) {
       return { items: page.map(toDto), nextCursor: nextPosition ? encodeCursor(nextPosition) : null };
     },
 
-    async get(tenant: Tenant, siteId: string): Promise<Site> {
+    async get(tenant: SiteTenant): Promise<Site> {
       assertCan(tenant, "site.read");
-      const row = await repository.findSite(db, tenant, siteId);
+      const row = await repository.findSite(db, tenant, tenant.siteId);
       if (!row) throw new AppError("NOT_FOUND");
       return toDto(row);
     },
@@ -91,19 +91,19 @@ export function createSitesService(deps: { db: Db }) {
       return toDto(site);
     },
 
-    async rename(tenant: Tenant, siteId: string, body: UpdateSiteBody): Promise<Site> {
+    async rename(tenant: SiteTenant, body: UpdateSiteBody): Promise<Site> {
       assertCan(tenant, "site.edit");
-      const row = await repository.updateSiteName(db, tenant, siteId, body.name);
+      const row = await repository.updateSiteName(db, tenant, tenant.siteId, body.name);
       if (!row) throw new AppError("NOT_FOUND");
       return toDto(row);
     },
 
-    async remove(tenant: Tenant, siteId: string): Promise<void> {
-      // Editor hanya boleh situs buatannya (ACC-033) → perlu baris situs dulu; tenant lain/terhapus = 404.
-      const site = await repository.findSite(db, tenant, siteId);
+    async remove(tenant: SiteTenant): Promise<void> {
+      // Editor hanya boleh situs buatannya (ACC-033) → perlu baris situs dulu; terhapus = 404.
+      const site = await repository.findSite(db, tenant, tenant.siteId);
       if (!site) throw new AppError("NOT_FOUND");
       assertCan(tenant, "site.delete", { createdBy: site.createdBy });
-      if (!(await repository.softDeleteSite(db, tenant, siteId))) throw new AppError("NOT_FOUND");
+      if (!(await repository.softDeleteSite(db, tenant, tenant.siteId))) throw new AppError("NOT_FOUND");
     },
   };
 }

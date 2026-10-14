@@ -5,7 +5,8 @@ import { z } from "zod";
 // (dipakai juga sdk); di sini hanya params & penggabungan per endpoint.
 
 const WorkspaceParams = z.object({ workspaceId: z.uuid() });
-const SiteParams = WorkspaceParams.extend({ siteId: z.uuid() });
+// `/v1/sites/:siteId` — siteId sudah diverifikasi tenantResolver; tetap divalidasi di boundary.
+const SiteParams = z.object({ siteId: z.uuid() });
 
 export const listSitesRequest = { params: WorkspaceParams, query: ListSitesQuerySchema };
 export const createSiteRequest = { params: WorkspaceParams, body: CreateSiteBodySchema };

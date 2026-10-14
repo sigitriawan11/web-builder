@@ -11,6 +11,15 @@ export function requireWorkspaceTenant(req: Request): WorkspaceTenant | SiteTena
   return tenant;
 }
 
+/** Tenant situs (rute `/v1/sites/:siteId/*`, tenantResolver cakupan `site`). Tidak ada → bug susunan router. */
+export function requireSiteTenant(req: Request): SiteTenant {
+  const tenant = req.ctx.tenant;
+  if (tenant?.kind !== "site") {
+    throw new Error(`Rute ${req.method} ${req.baseUrl}${req.path} butuh tenant situs (tenantResolver scope "site")`);
+  }
+  return tenant;
+}
+
 /** Kunci rate limit platform API: user yang login (§9.6), selain itu IP. */
 export function tenantRateLimitKey(req: Request): string {
   const tenant = req.ctx.tenant;

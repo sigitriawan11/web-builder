@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import type { ValidatedHandler } from "../../middleware/validate";
-import { requireWorkspaceTenant } from "../../tenant";
+import { requireSiteTenant, requireWorkspaceTenant } from "../../tenant";
 import type {
   createSiteRequest,
   deleteSiteRequest,
@@ -20,17 +20,16 @@ export function createSitesController(service: SitesService) {
     res.json({ data: result.items, meta: { ...meta(res), nextCursor: result.nextCursor } });
   };
   const get: ValidatedHandler<typeof getSiteRequest> = async (req, res) => {
-    res.json({ data: await service.get(requireWorkspaceTenant(req), req.valid.params.siteId), meta: meta(res) });
+    res.json({ data: await service.get(requireSiteTenant(req)), meta: meta(res) });
   };
   const create: ValidatedHandler<typeof createSiteRequest> = async (req, res) => {
     res.status(201).json({ data: await service.create(requireWorkspaceTenant(req), req.valid.body), meta: meta(res) });
   };
   const update: ValidatedHandler<typeof updateSiteRequest> = async (req, res) => {
-    const { params, body } = req.valid;
-    res.json({ data: await service.rename(requireWorkspaceTenant(req), params.siteId, body), meta: meta(res) });
+    res.json({ data: await service.rename(requireSiteTenant(req), req.valid.body), meta: meta(res) });
   };
   const remove: ValidatedHandler<typeof deleteSiteRequest> = async (req, res) => {
-    await service.remove(requireWorkspaceTenant(req), req.valid.params.siteId);
+    await service.remove(requireSiteTenant(req));
     res.status(204).end();
   };
   return { list, get, create, update, remove };

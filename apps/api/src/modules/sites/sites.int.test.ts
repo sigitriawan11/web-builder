@@ -57,6 +57,7 @@ afterAll(async () => {
 const app = () => target;
 const as = (who: TestUser) => ({ cookie: who.cookie, origin: TEST_ORIGIN });
 const sitesOf = (who: { workspace: { id: string } }) => `/v1/workspaces/${who.workspace.id}/sites`;
+const siteUrl = (siteId: string | undefined) => `/v1/sites/${siteId}`;
 
 /** Team workspace milik Alice dengan anggota baru ber-role `role` (role dari keanggotaan, bukan header). */
 async function teamMember(role: WorkspaceRole) {
@@ -75,34 +76,17 @@ describe("modul sites — CRUD (T1.4.7)", () => {
     const site = dataEnvelope(SiteSchema).parse(created.body).data;
     expect(site).toMatchObject({ name: "Toko Kue Alice", status: "draft", workspaceId: alice.workspace.id });
 
-    const fetched = await request(app())
-      .get(`${sitesOf(alice)}/${site.id}`)
-      .set(as(alice));
+    const fetched = await request(app()).get(siteUrl(site.id)).set(as(alice));
     expect(fetched.body.data).toEqual(site);
 
-    const renamed = await request(app())
-      .patch(`${sitesOf(alice)}/${site.id}`)
-      .set(as(alice))
-      .send({ name: "Kue Alice" });
+    const renamed = await request(app()).patch(siteUrl(site.id)).set(as(alice)).send({ name: "Kue Alice" });
     expect(renamed.body.data.name).toBe("Kue Alice");
 
     const listed = listEnvelope(SiteSchema).parse((await request(app()).get(sitesOf(alice)).set(as(alice))).body);
     expect(listed.data.map((item) => item.id)).toContain(site.id);
 
-    expect(
-      (
-        await request(app())
-          .delete(`${sitesOf(alice)}/${site.id}`)
-          .set(as(alice))
-      ).status,
-    ).toBe(204);
-    expect(
-      (
-        await request(app())
-          .get(`${sitesOf(alice)}/${site.id}`)
-          .set(as(alice))
-      ).status,
-    ).toBe(404);
+    expect((await request(app()).delete(siteUrl(site.id)).set(as(alice))).status).toBe(204);
+    expect((await request(app()).get(siteUrl(site.id)).set(as(alice))).status).toBe(404);
     const afterDelete = (await request(app()).get(sitesOf(alice)).set(as(alice))).body.data as { id: string }[];
     expect(afterDelete.map((item) => item.id)).not.toContain(site.id);
   });
@@ -141,36 +125,20 @@ describe("modul sites — CRUD (T1.4.7)", () => {
 describe("modul sites — isolasi tenant (CLAUDE.md § Testing)", () => {
   it("Bob tidak bisa membaca/mengubah/menghapus situs Alice walau tahu ID-nya → 404", async () => {
     const site = (await request(app()).post(sitesOf(alice)).set(as(alice)).send({ name: "Rahasia Alice" })).body.data;
-    // Lewat workspace Bob (tenant Bob, ID situs Alice): repository memfilter workspace_id.
+    // Rute level situs: tenantResolver (cakupan situs) menolak karena Bob bukan anggota workspace Alice.
     for (const call of [
-      request(app()).get(`${sitesOf(bob)}/${site.id}`),
-      request(app())
-        .patch(`${sitesOf(bob)}/${site.id}`)
-        .send({ name: "Dibajak" }),
-      request(app()).delete(`${sitesOf(bob)}/${site.id}`),
+      request(app()).get(siteUrl(site.id)),
+      request(app()).patch(siteUrl(site.id)).send({ name: "Dibajak" }),
+      request(app()).delete(siteUrl(site.id)),
     ]) {
       const response = await call.set(as(bob));
       expect(response.status).toBe(404);
       expect(ErrorBodySchema.parse(response.body).error.code).toBe("NOT_FOUND");
     }
-    // Lewat workspace Alice dengan identitas Bob: ditolak middleware tenant.
-    expect(
-      (
-        await request(app())
-          .get(`${sitesOf(alice)}/${site.id}`)
-          .set(as(bob))
-      ).status,
-    ).toBe(404);
     // Daftar Bob tidak memuat situs Alice; situs Alice tetap utuh.
     const bobList = (await request(app()).get(sitesOf(bob)).set(as(bob))).body.data as { id: string }[];
     expect(bobList.map((item) => item.id)).not.toContain(site.id);
-    expect(
-      (
-        await request(app())
-          .get(`${sitesOf(alice)}/${site.id}`)
-          .set(as(alice))
-      ).body.data.name,
-    ).toBe("Rahasia Alice");
+    expect((await request(app()).get(siteUrl(site.id)).set(as(alice))).body.data.name).toBe("Rahasia Alice");
   });
 
   it("role viewer tidak boleh menulis (403), tetap boleh membaca", async () => {
@@ -190,16 +158,8 @@ describe("modul sites — isolasi tenant (CLAUDE.md § Testing)", () => {
     const other = (await request(app()).post(sitesOf(team)).set(as(owner)).send({ name: "Bukan Punya Editor" })).body
       .data;
 
-    expect(
-      (
-        await request(app())
-          .delete(`${sitesOf(team)}/${own.id}`)
-          .set(as(editor))
-      ).status,
-    ).toBe(204);
-    const denied = await request(app())
-      .delete(`${sitesOf(team)}/${other.id}`)
-      .set(as(editor));
+    expect((await request(app()).delete(siteUrl(own.id)).set(as(editor))).status).toBe(204);
+    const denied = await request(app()).delete(siteUrl(other.id)).set(as(editor));
     expect(denied.status).toBe(403);
     expect(denied.body.error.details).toEqual({ action: "site.delete" });
 
@@ -207,24 +167,12 @@ describe("modul sites — isolasi tenant (CLAUDE.md § Testing)", () => {
     await testDb.db
       .insert(schema.workspaceMembers)
       .values({ workspaceId: team.workspace.id, userId: admin.user.id, role: "admin" });
-    expect(
-      (
-        await request(app())
-          .delete(`${sitesOf(team)}/${other.id}`)
-          .set(as(admin))
-      ).status,
-    ).toBe(204);
+    expect((await request(app()).delete(siteUrl(other.id)).set(as(admin))).status).toBe(204);
   });
 
-  it("validasi: nama kosong / siteId bukan UUID → 422", async () => {
+  it("validasi: nama kosong → 422; siteId bukan UUID → 404 (tenantResolver, tidak bocor)", async () => {
     expect((await request(app()).post(sitesOf(alice)).set(as(alice)).send({ name: "   " })).status).toBe(422);
-    expect(
-      (
-        await request(app())
-          .get(`${sitesOf(alice)}/bukan-uuid`)
-          .set(as(alice))
-      ).status,
-    ).toBe(422);
+    expect((await request(app()).get(siteUrl("bukan-uuid")).set(as(alice))).status).toBe(404);
   });
 });
 
@@ -299,10 +247,7 @@ describe("daftar situs dashboard (T1.6.1, ACC-050)", () => {
     expect(await allPages(owner, "sort=name")).toEqual(["Alfa", "beta", "Charlie", "delta", "echo"]);
     expect(await allPages(owner, "sort=created")).toEqual(["echo", "Charlie", "delta", "Alfa", "beta"]);
     // Situs tertua diedit → paling atas di "terakhir diedit".
-    await request(app())
-      .patch(`${sitesOf(owner)}/${ids[0]}`)
-      .set(as(owner))
-      .send({ name: "beta baru" });
+    await request(app()).patch(siteUrl(ids[0])).set(as(owner)).send({ name: "beta baru" });
     const updated = await allPages(owner, "sort=updated");
     expect(updated[0]).toBe("beta baru");
     expect(updated).toHaveLength(5);
@@ -406,5 +351,37 @@ describe("buat situs kosong (T1.6.2, ACC-051)", () => {
         sortOrder: 0,
       }),
     ]);
+  });
+});
+
+describe("rute level situs /v1/sites/:siteId (T1.6.3)", () => {
+  it("tanpa sesi → 401", async () => {
+    const site = (await request(app()).post(sitesOf(alice)).set(as(alice)).send({ name: "Publik?" })).body.data;
+    expect((await request(app()).get(siteUrl(site.id))).status).toBe(401);
+  });
+
+  it("viewer: lihat boleh, ganti nama & hapus 403", async () => {
+    const { member, team, owner } = await teamMember("viewer");
+    const site = (await request(app()).post(sitesOf(team)).set(as(owner)).send({ name: "Situs Tim" })).body.data;
+    expect((await request(app()).get(siteUrl(site.id)).set(as(member))).body.data.name).toBe("Situs Tim");
+    expect((await request(app()).patch(siteUrl(site.id)).set(as(member)).send({ name: "x" })).status).toBe(403);
+    expect((await request(app()).delete(siteUrl(site.id)).set(as(member))).status).toBe(403);
+  });
+
+  it("situs dihapus → semua operasi 404; jalur lama bersarang di workspace tidak ada", async () => {
+    const site = (await request(app()).post(sitesOf(alice)).set(as(alice)).send({ name: "Dihapus" })).body.data;
+    expect((await request(app()).delete(siteUrl(site.id)).set(as(alice))).status).toBe(204);
+    expect((await request(app()).get(siteUrl(site.id)).set(as(alice))).status).toBe(404);
+    expect((await request(app()).patch(siteUrl(site.id)).set(as(alice)).send({ name: "Hidup lagi" })).status).toBe(404);
+    expect((await request(app()).delete(siteUrl(site.id)).set(as(alice))).status).toBe(404);
+
+    const live = (await request(app()).post(sitesOf(alice)).set(as(alice)).send({ name: "Masih ada" })).body.data;
+    expect(
+      (
+        await request(app())
+          .get(`${sitesOf(alice)}/${live.id}`)
+          .set(as(alice))
+      ).status,
+    ).toBe(404);
   });
 });

@@ -16,6 +16,7 @@ import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
 import { createAccountRouter } from "./modules/account/account.routes";
 import { createAccountService } from "./modules/account/account.service";
+import { createSiteScopeRouter } from "./modules/sites/site-scope.routes";
 import { createWorkspaceRouter } from "./modules/workspaces/workspaces.routes";
 import type { QueueProducer } from "./queues/producer";
 
@@ -124,6 +125,7 @@ export function createApp(deps: AppDeps): Express {
       "/v1/workspaces/:workspaceId",
       createWorkspaceRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }),
     );
+    app.use("/v1/sites/:siteId", createSiteScopeRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }));
   }
 
   if (deps.internalJwtSecret)
