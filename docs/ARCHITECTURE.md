@@ -283,7 +283,7 @@ web-builder/
 │       └── wrangler.toml
 ├── packages/
 │   ├── document-model/              # JANTUNG: Zod schema + Yjs binding + ops
-│   │   └── src/{schema/, yjs/, ops/, migrations/, query/, ids.ts, index.ts}
+│   │   └── src/{schema/, yjs/, commands/, migrations/, query/, validate/, ids.ts, index.ts}
 │   ├── renderer/
 │   │   └── src/{react/, static/, css/, islands/, primitives/, index.ts}
 │   ├── library-seed/
@@ -319,7 +319,7 @@ web-builder/
 
 | Package | Tanggung jawab | Dipakai oleh |
 |---|---|---|
-| `@platform/document-model` | Zod schema node/style/breakpoint/token/instance; konversi JSON ↔ Y.Doc; **ops** (insertNode, moveNode, setStyle, …) yang bekerja di Y.Doc dalam satu transaksi; migrasi `schemaVersion`; query helper (findNode, walk). Sumber kebenaran: [spec 01](./specs/01-document-model.md). | semua |
+| `@platform/document-model` | Zod schema node/style/breakpoint/token/instance; konversi JSON ↔ Y.Doc; **commands** (DM-073: createNode, moveNode, updateStyle, …) yang bekerja di Y.Doc dalam satu transaksi; migrasi `schemaVersion`; validasi (`validateDocument`); query helper (findNode, walk, ancestors, pageOf). Sumber kebenaran: [spec 01](./specs/01-document-model.md). | semua |
 | `@platform/renderer` | Document → React tree (editor & SSR) dan → HTML+CSS statis (publish); generator CSS breakpoint; primitives (Box, Text, Image, Link, Form…); runtime islands (bundle kecil yang di-hydrate di situs; rekomendasi **Preact** + `preact/compat`, ❓ OPEN — spike M7, lihat [spec 07 PUB-029](./specs/07-publishing-hosting.md)). | editor, worker, api (preview) |
 | `@platform/library-seed` | Definisi component/template/theme awal dalam bentuk kode TS yang tervalidasi document-model; diimport oleh seed script. | db/seed, tests |
 | `@platform/workflow-blocks` | Definisi blok workflow (schema Zod + executor murni), interpreter, expression evaluator aman. Efek samping lewat **ports** yang di-inject. | api (sync), worker (async), editor (UI config) |

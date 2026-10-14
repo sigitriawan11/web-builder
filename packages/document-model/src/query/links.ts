@@ -1,4 +1,5 @@
 import type { SiteDocument } from "../schema";
+import { pageOf } from "./tree";
 import { walkJsonObjects } from "./walk-json";
 
 // Rujukan link internal (DM-056): link `page` (+ `anchorNodeId`) dan `anchor` di props node — termasuk mark link
@@ -32,16 +33,6 @@ export function collectLinkRefs(doc: Pick<SiteDocument, "nodes">): LinkRefLocati
     });
   }
   return found;
-}
-
-/** Page tempat node berada (naik mengikuti `parentId`); `undefined` bila yatim. */
-export function pageOf(doc: Pick<SiteDocument, "nodes">, nodeId: string): string | undefined {
-  let current = doc.nodes[nodeId];
-  for (let steps = 0; current && steps <= 64; steps++) {
-    if (current.type === "page") return current.id;
-    current = current.parentId === null ? undefined : doc.nodes[current.parentId];
-  }
-  return undefined;
 }
 
 /**
