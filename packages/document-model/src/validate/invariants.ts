@@ -197,6 +197,25 @@ export function checkStructure(doc: DocShape, report: IssueReporter): void {
   }
 }
 
+/**
+ * Invariant style satu node (dipakai command style sebelum menulis): `layout` hanya untuk container (DM-026),
+ * image tidak `hug` (DM-027), layout page tetap flex kolom & lebar fill (DM-010).
+ */
+export function checkNodeStyle(node: Node, report: IssueReporter): void {
+  if (!("children" in node)) {
+    for (const breakpoint of BREAKPOINTS) {
+      if (node.style[breakpoint]?.layout != null) {
+        report("CONTAINER_TYPE", ["nodes", node.id, "style", breakpoint, "layout"], {
+          id: `Node ${node.type} tidak boleh punya layout`,
+          en: `A ${node.type} node cannot have a layout`,
+        });
+      }
+    }
+  }
+  if (node.type === "image") checkNoHug(node, report);
+  if (node.type === "page") checkPageLayout(node, report);
+}
+
 // DM-010: page = tumpukan section vertikal; layout tidak boleh diubah (juga di override breakpoint).
 // Field yang tidak diisi = default renderer (flex kolom, lebar fill).
 function checkPageLayout(page: Extract<Node, { type: "page" }>, report: IssueReporter): void {

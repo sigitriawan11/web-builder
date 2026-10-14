@@ -1,18 +1,18 @@
 import { z } from "zod";
-import { normalizeOverrides } from "../query/normalize-overrides";
-import { NodeIdSchema, type ResponsiveStyle, StylePatchSchema, StyleSchema } from "../schema";
-import { cloneJson } from "../yjs/clone-json";
-import { defineCommand, fail } from "./command";
+import { NodeIdSchema, type ResponsiveStyle, type StylePatch, StylePatchSchema } from "../schema";
+import { defineCommand } from "./command";
 import { mergeStyle } from "./merge-style";
-import { writeStyle } from "./post-check";
-import { nodesMap, nodeType, styleOf, type YNode } from "./y-access";
+import { BreakpointSchema, planStyles, writePlannedStyles } from "./style-plan";
 
-const BREAKPOINT_IDS = ["base", "tablet", "mobile"] as const;
-const BreakpointSchema = z.enum(BREAKPOINT_IDS);
-
-function hasHug(style: Record<string, unknown>): boolean {
-  const size = style.size as { width?: { mode?: unknown }; height?: { mode?: unknown } } | undefined;
-  return size?.width?.mode === "hug" || size?.height?.mode === "hug";
+/** Terapkan patch sparse ke satu breakpoint style dengan aturan merge DM-036 (`null` = hapus override). */
+export function patchBreakpoint(
+  style: ResponsiveStyle,
+  breakpoint: "base" | "tablet" | "mobile",
+  patch: StylePatch,
+): ResponsiveStyle {
+  const current = (style[breakpoint] ?? {}) as Record<string, unknown>;
+  // Hasil merge divalidasi `planStyles`; tipe dilonggarkan di sini karena merge bekerja pada JSON.
+  return { ...style, [breakpoint]: mergeStyle(current, patch) } as ResponsiveStyle;
 }
 
 export const updateStyle = defineCommand({
@@ -25,48 +25,13 @@ export const updateStyle = defineCommand({
   input: z.strictObject({
     ids: z.array(NodeIdSchema).min(1),
     breakpoint: BreakpointSchema.default("base"),
+    // `state` (hover/pressed, DM-040) ditambah bersama fiturnya (M2).
     patch: StylePatchSchema,
   }),
   run(ctx, input) {
-    const nodes = nodesMap(ctx.doc);
-    const { breakpoint, patch } = input;
-    const resultSchema = breakpoint === "base" ? StyleSchema : StylePatchSchema;
-
-    // Hitung & validasi hasil untuk semua node dulu; baru tulis jika semuanya valid.
-    const planned: { yNode: YNode; style: ResponsiveStyle }[] = [];
-    for (const [i, id] of input.ids.entries()) {
-      const yNode = nodes.get(id);
-      if (!yNode)
-        return fail("NOT_FOUND", { id: `Node "${id}" tidak ditemukan`, en: `Node "${id}" not found` }, ["ids", i]);
-
-      const current = styleOf(yNode).get(breakpoint)?.toJSON() ?? {};
-      const next = mergeStyle(cloneJson(current), patch);
-      const parsed = resultSchema.safeParse(next);
-      if (!parsed.success) {
-        const issue = parsed.error.issues[0];
-        return fail(
-          "INVALID_RESULT",
-          {
-            id: `Style "${id}" (${breakpoint}) tidak valid: ${issue?.message}`,
-            en: `Invalid style for "${id}" (${breakpoint}): ${issue?.message}`,
-          },
-          ["patch", ...(issue?.path.map(String) ?? [])],
-        );
-      }
-      if (nodeType(yNode) === "image" && hasHug(next)) {
-        return fail(
-          "INVALID_RESULT",
-          { id: `Image "${id}" tidak boleh memakai ukuran "hug"`, en: `Image "${id}" cannot use "hug" sizing` },
-          ["patch", "size"],
-        );
-      }
-      // DM-036: normalisasi seluruh style node — perubahan base bisa membuat override tablet/mobile redundan.
-      const full = { ...(styleOf(yNode).toJSON() as ResponsiveStyle), [breakpoint]: next };
-      planned.push({ yNode, style: normalizeOverrides(full) });
-    }
-
-    for (const { yNode, style } of planned) writeStyle(yNode, style);
-
+    const planned = planStyles(ctx, input.ids, (style) => patchBreakpoint(style, input.breakpoint, input.patch));
+    if (!Array.isArray(planned)) return planned;
+    writePlannedStyles(planned);
     return { ok: true, value: undefined, affected: [...input.ids] };
   },
 });
