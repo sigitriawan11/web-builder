@@ -5,6 +5,8 @@ import { WorkspaceRoleSchema } from "./workspaces";
 // `POST /api/v1/realtime/token` (ARCHITECTURE §3, §7.3): JWT 5 menit untuk koneksi Hocuspocus satu dokumen.
 
 export const REALTIME_TOKEN_TTL_SECONDS = 300;
+// `aud` JWT: api menandatangani, apps/realtime memverifikasi dengan nilai yang sama.
+export const REALTIME_TOKEN_AUDIENCE = "realtime";
 
 export const RealtimeTokenBodySchema = z.object({
   docId: UuidV7Schema,

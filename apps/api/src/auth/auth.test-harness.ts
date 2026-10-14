@@ -11,6 +11,7 @@ import { createAuth } from "./auth";
 
 export const TEST_ORIGIN = "http://app.localhost:3000";
 export const STRONG_PASSWORD = "Kue-Lapis-2026!";
+export const TEST_REALTIME_SECRET = "test-realtime-token-secret-0123456789abcdef";
 
 export interface RecordedJob {
   queue: string;
@@ -57,6 +58,7 @@ export function authTestApp(
     auth,
     redis,
     rateLimitPrefix: `rl-test:${uuidv7()}`,
+    realtime: { tokenSecret: TEST_REALTIME_SECRET, url: "ws://realtime.localhost:4100" },
     ...appExtra,
   });
 }

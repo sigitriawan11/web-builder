@@ -18,6 +18,9 @@ export const apiEnvSchema = {
   BETTER_AUTH_SECRET: envField.secret(32),
   BETTER_AUTH_URL: envField.url(),
   PUBLIC_APP_URL: envField.url(),
+  // Realtime (ARCHITECTURE §5.5): secret JWT token koneksi & URL WebSocket publik yang diberikan ke editor.
+  REALTIME_TOKEN_SECRET: envField.secret(32),
+  PUBLIC_REALTIME_URL: z.string().regex(/^wss?:\/\//, "harus URL WebSocket (ws:// atau wss://)"),
   // Login Google (ACC-002), opsional: keduanya diisi untuk mengaktifkan.
   GOOGLE_CLIENT_ID: envField.string().optional(),
   GOOGLE_CLIENT_SECRET: envField.secret(8).optional(),

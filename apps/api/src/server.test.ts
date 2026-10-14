@@ -17,6 +17,8 @@ const baseEnv = {
   BETTER_AUTH_SECRET: "test-better-auth-secret-0123456789abcdef",
   BETTER_AUTH_URL: "http://app.localhost:3000/api/auth",
   CAPTCHA_SECRET: "1x0000000000000000000000000000000AA",
+  REALTIME_TOKEN_SECRET: "test-realtime-token-secret-0123456789abcdef",
+  PUBLIC_REALTIME_URL: "ws://realtime.localhost:4100",
   PUBLIC_APP_URL: "http://app.localhost:3000",
 };
 

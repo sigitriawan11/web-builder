@@ -16,6 +16,8 @@ import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
 import { createAccountRouter } from "./modules/account/account.routes";
 import { createAccountService } from "./modules/account/account.service";
+import { createRealtimeTokenRouter } from "./modules/realtime-token/realtime-token.routes";
+import { createRealtimeTokenService } from "./modules/realtime-token/realtime-token.service";
 import { createSiteScopeRouter } from "./modules/sites/site-scope.routes";
 import { createWorkspaceRouter } from "./modules/workspaces/workspaces.routes";
 import type { QueueProducer } from "./queues/producer";
@@ -27,6 +29,8 @@ export interface AppDeps {
   logger: Logger;
   // Database untuk router modul (bersama `auth`: `/v1/account`).
   db?: Db;
+  // Token koneksi realtime (ARCHITECTURE §5.5); bila ada (bersama auth & db), `/v1/realtime/token` dipasang.
+  realtime?: { tokenSecret: string; url: string };
   // Redis untuk rate limit per router (T1.4.5); router publik memasangnya saat dibuat.
   redis?: Redis;
   // Prefix kunci rate limit (test: counter terpisah per app).
@@ -126,6 +130,20 @@ export function createApp(deps: AppDeps): Express {
       createWorkspaceRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }),
     );
     app.use("/v1/sites/:siteId", createSiteScopeRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }));
+    if (deps.realtime) {
+      app.use(
+        "/v1/realtime",
+        createRealtimeTokenRouter({
+          service: createRealtimeTokenService({
+            db: deps.db,
+            secret: deps.realtime.tokenSecret,
+            url: deps.realtime.url,
+          }),
+          ...(deps.redis ? { redis: deps.redis } : {}),
+          ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
+        }),
+      );
+    }
   }
 
   if (deps.internalJwtSecret)

@@ -91,6 +91,7 @@ export async function startServer(
   const app = createApp({
     logger,
     db,
+    realtime: { tokenSecret: env.REALTIME_TOKEN_SECRET, url: env.PUBLIC_REALTIME_URL },
     auth,
     verifyCaptcha: turnstileVerifier(env.CAPTCHA_SECRET, (error) =>
       logger.warn({ err: error }, "verifikasi Turnstile gagal dihubungi"),
