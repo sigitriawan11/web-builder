@@ -2,6 +2,7 @@
 export {
   autolayoutDocument,
   freeformDocument,
+  fullTopLevelDocument,
   heroDocument,
   minimalDocument,
   nestedDocument,

@@ -1,10 +1,14 @@
 import type { SiteDocument } from "../../src";
+import { emptySiteSettings, emptyTheme } from "../../src/defaults/top-level";
 
 // DM-004 AC: dokumen kosong minimal (1 page tanpa child) harus valid.
 export function minimalDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Situs Kosong", createdWith: "blank" },
+    settings: emptySiteSettings(),
+    theme: emptyTheme(),
+    componentDeps: {},
     assets: {},
     pageOrder: ["pg_home000001"],
     nodes: {
@@ -28,6 +32,9 @@ export function heroDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Toko Kue Budi", createdWith: "template" },
+    settings: emptySiteSettings(),
+    theme: emptyTheme(),
+    componentDeps: {},
     assets: {
       ast_cake000001: { kind: "image", width: 1600, height: 1067, mime: "image/jpeg" },
     },
@@ -176,6 +183,9 @@ export function nestedDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Kasus Tepi" },
+    settings: emptySiteSettings(),
+    theme: emptyTheme(),
+    componentDeps: {},
     assets: {
       ast_logo000001: { kind: "svg", mime: "image/svg+xml", libraryShared: true },
     },
@@ -259,6 +269,9 @@ export function freeformDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Papan Bebas" },
+    settings: emptySiteSettings(),
+    theme: emptyTheme(),
+    componentDeps: {},
     assets: { ast_ph0000001: { kind: "image", width: 1200, height: 800, mime: "image/jpeg" } },
     pageOrder: ["pg_home000001"],
     nodes: {
@@ -433,6 +446,9 @@ export function autolayoutDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Auto-layout" },
+    settings: emptySiteSettings(),
+    theme: emptyTheme(),
+    componentDeps: {},
     assets: {},
     pageOrder: ["pg_home000001"],
     nodes: Object.fromEntries(nodes.map((node) => [node.id, node])),
@@ -517,8 +533,41 @@ export function wrapGridDocument(count = 100): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: `Grid wrap ${count}` },
+    settings: emptySiteSettings(),
+    theme: emptyTheme(),
+    componentDeps: {},
     assets: {},
     pageOrder: ["pg_home000001"],
     nodes: Object.fromEntries(nodes.map((node) => [node.id, node])),
+  };
+}
+
+/** Semua field top-level DM-004 terisi (templateRef, componentDeps, dataSources, theme lengkap) — uji mapping. */
+export function fullTopLevelDocument(): SiteDocument {
+  return {
+    ...minimalDocument(),
+    meta: {
+      title: "Toko Kue Budi",
+      createdWith: "template",
+      templateRef: { templateId: "tpl_bakery01", version: 3 },
+    },
+    theme: {
+      tokens: {
+        color: { primary: "#c2410c", primaryHover: { $token: "color.primary" }, brand: { 600: "#9a3412" } },
+        typography: { h1: { fontFamily: { $token: "fontFamily.heading" }, fontSize: { value: 48, unit: "px" } } },
+        fontFamily: { heading: "Playfair Display", body: "Inter" },
+        space: { "4": { value: 16, unit: "px" } },
+        radius: { md: { value: 8, unit: "px" } },
+        shadow: { sm: [{ x: 0, y: 1, blur: 2, spread: 0, color: "#0000001a" }] },
+        size: { container: { value: 1200, unit: "px" } },
+      },
+      fonts: [
+        { family: "Inter", source: "google", weights: [400, 600], fallback: "sans-serif" },
+        { family: "Playfair Display", source: "google", weights: [700], italic: true, fallback: "serif" },
+      ],
+      modes: { default: "light", available: ["light"] },
+    },
+    componentDeps: { cmp_navbar0001: { version: 4, source: "library" } },
+    dataSources: { collections: ["col_produk0001"] },
   };
 }

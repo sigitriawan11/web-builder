@@ -1,13 +1,30 @@
 import { describe, expect, it } from "vitest";
 import * as Y from "yjs";
-import { heroDocument, minimalDocument, nestedDocument } from "../../test/fixtures/basic-documents";
+import {
+  autolayoutDocument,
+  freeformDocument,
+  fullTopLevelDocument,
+  heroDocument,
+  minimalDocument,
+  nestedDocument,
+  wrapGridDocument,
+} from "../../test/fixtures/basic-documents";
+import { landing200 } from "../../test/fixtures/landing-generator";
+import { responsiveSectionsDocument } from "../../test/fixtures/responsive-sections";
 import { SiteDocumentSchema } from "../schema";
 import { jsonToYDoc, YDOC_KEYS, yDocToJson } from "./mapping";
 
+// Semua fixture (AC DM-002/DM-058: round-trip lossless untuk SEMUA fixture).
 const fixtures = [
   { name: "minimal", create: minimalDocument },
   { name: "hero", create: heroDocument },
   { name: "nested", create: nestedDocument },
+  { name: "freeform", create: freeformDocument },
+  { name: "autolayout", create: autolayoutDocument },
+  { name: "wrapGrid", create: wrapGridDocument },
+  { name: "landing200", create: landing200 },
+  { name: "responsiveSections", create: () => responsiveSectionsDocument().document },
+  { name: "fullTopLevel", create: fullTopLevelDocument },
 ];
 
 describe("jsonToYDoc ↔ yDocToJson (DM-058)", () => {

@@ -85,6 +85,7 @@ apps/api/src/modules/<fitur>/
 - Referensi token memakai format `{ "$token": "..." }`, referensi prop `{ "$prop": "..." }`, sesuai spec 01. Jangan membuat format alternatif.
 - Style responsif disimpan sebagai `{ base, tablet?, mobile? }` sesuai spec 01.
 - Perubahan schema dokumen **wajib**: naikkan `schemaVersion`, tulis fungsi migrasi, dan tambahkan fixture test.
+  - **Pengecualian M1 (keputusan owner 2026-10-14):** selama M1 `schemaVersion: 1` masih draft — Epic 1.8/1.9 boleh mengubah schema v1 langsung (perbarui fixture, seed, factory; DB dev di-`pnpm db:reset` bila perlu). v1 **dibekukan sebelum deploy pertama**; sejak itu aturan di atas berlaku penuh.
 
 ### Multi-tenant & keamanan
 - **Setiap query data tenant wajib di-scope** dengan `site_id`/`workspace_id` lewat `TenantContext` di repository. Tidak ada query tenant tanpa scope.

@@ -7,6 +7,9 @@ function idSchema(...prefixes: IdPrefix[]) {
 }
 
 export const NodeIdSchema = idSchema("pg", "n");
+export const ComponentIdSchema = idSchema("cmp");
+export const TemplateIdSchema = idSchema("tpl");
+export const CollectionIdSchema = idSchema("col");
 export const PageIdSchema = idSchema("pg");
 export const AssetIdSchema = idSchema("ast");
 
@@ -30,7 +33,21 @@ export const ColorSchema = z.union([
   z.strictObject({ $token: TokenRefSchema.shape.$token, alpha: z.number().min(0).max(1) }),
 ]);
 
+// DM-002: JSON murni — tanpa undefined bermakna, angka finite (bukan NaN/Infinity).
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number().finite(),
+    z.boolean(),
+    z.null(),
+    z.array(JsonValueSchema),
+    z.record(z.string(), JsonValueSchema),
+  ]),
+);
+
 export type NodeId = z.infer<typeof NodeIdSchema>;
+export type ComponentId = z.infer<typeof ComponentIdSchema>;
 export type PageId = z.infer<typeof PageIdSchema>;
 export type AssetId = z.infer<typeof AssetIdSchema>;
 export type TokenRef = z.infer<typeof TokenRefSchema>;
