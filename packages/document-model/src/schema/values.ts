@@ -10,6 +10,7 @@ export const NodeIdSchema = idSchema("pg", "n");
 export const ComponentIdSchema = idSchema("cmp");
 export const TemplateIdSchema = idSchema("tpl");
 export const CollectionIdSchema = idSchema("col");
+export const InteractionIdSchema = idSchema("ix");
 export const PageIdSchema = idSchema("pg");
 export const AssetIdSchema = idSchema("ast");
 
@@ -48,6 +49,7 @@ export const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
 
 export type NodeId = z.infer<typeof NodeIdSchema>;
 export type ComponentId = z.infer<typeof ComponentIdSchema>;
+export type InteractionId = z.infer<typeof InteractionIdSchema>;
 export type PageId = z.infer<typeof PageIdSchema>;
 export type AssetId = z.infer<typeof AssetIdSchema>;
 export type TokenRef = z.infer<typeof TokenRefSchema>;
