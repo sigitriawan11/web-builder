@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RichTextDocSchema } from "./rich-text";
 import { ResponsiveStyleSchema } from "./style";
 import {
   AssetIdSchema,
@@ -10,44 +11,6 @@ import {
 } from "./values";
 
 const ChildIdSchema = z.string().regex(/^n_[0-9a-z]{6,24}$/);
-
-// ── Rich text (DM-013, subset M0: paragraph, heading, hardBreak, mark dasar) ─
-
-const TextAlignSchema = z.enum(["left", "center", "right", "justify"]);
-
-export const MarkSchema = z.strictObject({
-  type: z.enum(["bold", "italic", "underline", "strike"]),
-});
-
-export const InlineSchema = z.discriminatedUnion("type", [
-  z.strictObject({
-    type: z.literal("text"),
-    text: z.string().min(1),
-    marks: z.array(MarkSchema).optional(),
-  }),
-  z.strictObject({ type: z.literal("hardBreak") }),
-]);
-
-export const BlockSchema = z.discriminatedUnion("type", [
-  z.strictObject({
-    type: z.literal("paragraph"),
-    attrs: z.strictObject({ align: TextAlignSchema.optional() }).optional(),
-    content: z.array(InlineSchema).optional(),
-  }),
-  z.strictObject({
-    type: z.literal("heading"),
-    attrs: z.strictObject({
-      level: z.literal([1, 2, 3, 4, 5, 6]),
-      align: TextAlignSchema.optional(),
-    }),
-    content: z.array(InlineSchema).optional(),
-  }),
-]);
-
-export const RichTextDocSchema = z.strictObject({
-  type: z.literal("doc"),
-  content: z.array(BlockSchema),
-});
 
 // ── Asset reference (DM-057) ───────────────────────────────────────────────
 
@@ -192,7 +155,6 @@ export const NodeSchema = z.discriminatedUnion("type", [
   ImageNodeSchema,
 ]);
 
-export type RichTextDoc = z.infer<typeof RichTextDocSchema>;
 export type AssetRef = z.infer<typeof AssetRefSchema>;
 export type PageNode = z.infer<typeof PageNodeSchema>;
 export type FrameNode = z.infer<typeof FrameNodeSchema>;

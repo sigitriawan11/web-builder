@@ -571,3 +571,70 @@ export function fullTopLevelDocument(): SiteDocument {
     dataSources: { collections: ["col_produk0001"] },
   };
 }
+
+/** Rich text lengkap DM-013: mark bold/link/textStyle token, list bersarang, hardBreak (T1.8.7). */
+export function richTextDocument(): SiteDocument {
+  const doc = minimalDocument();
+  const page = doc.nodes.pg_home000001;
+  if (page?.type !== "page") throw new Error("fixture minimal berubah");
+  page.children = ["n_richtext001"];
+  doc.nodes.n_richtext001 = {
+    id: "n_richtext001",
+    type: "text",
+    name: "Konten / Promo",
+    parentId: "pg_home000001",
+    visible: true,
+    locked: false,
+    style: { base: {} },
+    props: {
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: { align: "center" },
+            content: [
+              { type: "text", text: "Kue rumahan, " },
+              {
+                type: "text",
+                text: "fresh setiap hari",
+                marks: [{ type: "bold" }, { type: "textStyle", attrs: { color: { $token: "color.primary" } } }],
+              },
+              { type: "hardBreak" },
+              {
+                type: "text",
+                text: "pesan via WhatsApp",
+                marks: [
+                  { type: "link", attrs: { link: { type: "whatsapp", phone: "6281234567890", message: "Halo" } } },
+                ],
+              },
+            ],
+          },
+          {
+            type: "bulletList",
+            content: [
+              { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Bolu" }] }] },
+              {
+                type: "listItem",
+                content: [
+                  { type: "paragraph", content: [{ type: "text", text: "Kue kering" }] },
+                  {
+                    type: "orderedList",
+                    attrs: { start: 1 },
+                    content: [
+                      {
+                        type: "listItem",
+                        content: [{ type: "paragraph", content: [{ type: "text", text: "Nastar" }] }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  };
+  return doc;
+}

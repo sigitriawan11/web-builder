@@ -1,5 +1,7 @@
 export * from "./document";
+export * from "./link";
 export * from "./nodes";
+export * from "./rich-text";
 export * from "./settings";
 export * from "./style";
 export * from "./theme";

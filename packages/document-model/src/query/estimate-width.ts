@@ -1,5 +1,6 @@
 import type { LengthValue, Node, SiteDocument, Style, TextNode } from "../schema";
 import { type Breakpoint, resolveStyle } from "./resolve-style";
+import { textLines } from "./rich-text";
 
 // PROTOTIPE (spike M0, T0.8.4 / OPEN-DM-5): estimasi statis lebar konten untuk rule `stackRows` (DM-038),
 // tanpa DOM. Dipertahankan atau dibuang sesuai keputusan T0.8.4; implementasi final di `packages/renderer` (M1).
@@ -48,9 +49,9 @@ function textWidth(node: TextNode, ctx: WidthEstimateContext): number {
   const fontSize = ctx.text.fontSizePx(node);
   const headingBold = HEADING_TAGS.has(node.tag ?? "p");
   let widest = 0;
-  for (const block of node.props.content.content) {
+  for (const { inlines } of textLines(node.props.content)) {
     let line = 0;
-    for (const inline of block.content ?? []) {
+    for (const inline of inlines) {
       if (inline.type === "hardBreak") {
         widest = Math.max(widest, line);
         line = 0;

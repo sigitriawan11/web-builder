@@ -1,17 +1,17 @@
 import * as Y from "yjs";
-import type { RichTextDoc } from "../schema";
+import type { Block, Inline, ListItem, Mark, RichTextDoc } from "../schema";
 
 // DM-058: `props.content` node text = Y.XmlFragment agar edit teks per karakter ter-merge.
 // Encoding SAMA dengan y-prosemirror / @tiptap/y-tiptap (dipakai editor untuk binding Tiptap):
 //   blok   → Y.XmlElement(nama tipe), attrs → atribut elemen (nilai null tidak ditulis)
 //   teks   → satu Y.XmlText per deretan teks berurutan; mark → atribut format `{ [mark]: attrs }`
 //   inline non-teks (hardBreak) → Y.XmlElement tanpa anak
+//   list (bulletList/orderedList → listItem → blok) → Y.XmlElement bersarang
 // Ditulis sendiri (tanpa ProseMirror) agar document-model hanya bergantung pada yjs (keputusan T0.8.5);
 // kompatibilitas dijaga test round-trip terhadap y-tiptap di apps/editor.
 
-type Block = RichTextDoc["content"][number];
-type Inline = NonNullable<Block["content"]>[number];
-type Mark = NonNullable<Extract<Inline, { type: "text" }>["marks"]>[number];
+// Elemen Yjs yang merupakan node inline (bukan blok) saat dibaca kembali.
+const INLINE_ELEMENTS = new Set(["hardBreak"]);
 
 function marksToAttributes(marks: readonly Mark[] | undefined): Record<string, object> {
   const attributes: Record<string, object> = {};
@@ -19,11 +19,15 @@ function marksToAttributes(marks: readonly Mark[] | undefined): Record<string, o
   return attributes;
 }
 
-function blockToElement(block: Block): Y.XmlElement {
+function blockToElement(block: Block | ListItem): Y.XmlElement {
   const element = new Y.XmlElement(block.type);
-  for (const [key, value] of Object.entries(block.attrs ?? {})) {
+  for (const [key, value] of Object.entries("attrs" in block && block.attrs ? block.attrs : {})) {
     // Y.XmlElement menerima nilai JSON apa pun walau tipenya ditulis string (y-prosemirror melakukan hal sama).
     if (value !== null && value !== undefined) element.setAttribute(key, value as string);
+  }
+  if (block.type === "bulletList" || block.type === "orderedList" || block.type === "listItem") {
+    element.insert(0, (block.content as (Block | ListItem)[]).map(blockToElement));
+    return element;
   }
   const children: (Y.XmlText | Y.XmlElement)[] = [];
   // Deretan teks dikumpulkan sebagai delta lalu ditulis sekali: Y.XmlText yang belum terpasang di Y.Doc
@@ -36,7 +40,7 @@ function blockToElement(block: Block): Y.XmlElement {
     children.push(text);
     run = [];
   };
-  for (const inline of block.content ?? []) {
+  for (const inline of (block.content ?? []) as Inline[]) {
     if (inline.type === "text") {
       run.push({ insert: inline.text, attributes: marksToAttributes(inline.marks) });
       continue;
@@ -71,7 +75,8 @@ function elementToBlock(element: Y.XmlElement): Record<string, unknown> {
         content.push(marks.length > 0 ? { type: "text", text: op.insert, marks } : { type: "text", text: op.insert });
       }
     } else if (child instanceof Y.XmlElement) {
-      content.push({ type: child.nodeName });
+      // Inline non-teks (hardBreak) tanpa isi; selain itu blok bersarang (listItem, list di dalam item).
+      content.push(INLINE_ELEMENTS.has(child.nodeName) ? { type: child.nodeName } : elementToBlock(child));
     }
   }
   const attrs = element.getAttributes();

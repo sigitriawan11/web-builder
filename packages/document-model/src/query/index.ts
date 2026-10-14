@@ -7,3 +7,4 @@ export {
   type WidthEstimateContext,
 } from "./estimate-width";
 export { applyStylePatch, BREAKPOINTS, type Breakpoint, resolveStyle } from "./resolve-style";
+export { plainText, textLines } from "./rich-text";
