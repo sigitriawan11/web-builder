@@ -60,7 +60,8 @@ export interface AuthConfig {
   secureCookies: boolean;
   // Login Google (ACC-002); tanpa kredensial provider tidak aktif. Redirect URI di Google Console:
   // `<publicAuthUrl>/callback/google`.
-  google?: { clientId: string; clientSecret: string };
+  // `redirectUri` bila beda dari `<publicAuthUrl>/callback/google` (lokal: Google menolak `*.localhost`).
+  google?: { clientId: string; clientSecret: string; redirectUri?: string };
 }
 
 /**
@@ -412,7 +413,7 @@ export function createAuth(deps: {
               clientId: config.google.clientId,
               clientSecret: config.google.clientSecret,
               // Eksplisit: default BA membentuknya dari baseURL tanpa basePath (`/api/callback/google`, salah).
-              redirectURI: `${config.publicAuthUrl.replace(/\/$/, "")}/callback/google`,
+              redirectURI: config.google.redirectUri ?? `${config.publicAuthUrl.replace(/\/$/, "")}/callback/google`,
               // Default scope BA = openid email profile (ACC-002); pilih akun tiap kali (PC bersama).
               prompt: "select_account" as const,
             },

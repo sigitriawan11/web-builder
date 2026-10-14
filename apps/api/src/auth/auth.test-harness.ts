@@ -33,7 +33,9 @@ export function authTestApp(
   testDb: TestDb,
   redis: Redis,
   queues: QueueProducer = recordingQueues(),
-  extra: Pick<AppDeps, "verifyCaptcha" | "mountRoutes"> & { google?: { clientId: string; clientSecret: string } } = {},
+  extra: Pick<AppDeps, "verifyCaptcha" | "mountRoutes"> & {
+    google?: { clientId: string; clientSecret: string; redirectUri?: string };
+  } = {},
 ) {
   const { google, ...appExtra } = extra;
   const auth = createAuth({

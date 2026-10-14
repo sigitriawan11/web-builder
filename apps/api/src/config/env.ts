@@ -21,6 +21,9 @@ export const apiEnvSchema = {
   // Login Google (ACC-002), opsional: keduanya diisi untuk mengaktifkan.
   GOOGLE_CLIENT_ID: envField.string().optional(),
   GOOGLE_CLIENT_SECRET: envField.secret(8).optional(),
+  // Redirect URI terdaftar di Google Console; default `<BETTER_AUTH_URL>/callback/google`. Lokal: Google menolak
+  // `*.localhost`, jadi dipakai `http://localhost:3000/...` yang diteruskan web ke `app.localhost` (T1.14.2).
+  GOOGLE_REDIRECT_URI: envField.url().optional(),
   // Cloudflare Turnstile secret (ACC-004); lokal memakai secret uji yang selalu lolos.
   CAPTCHA_SECRET: envField.secret(16),
 };

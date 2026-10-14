@@ -247,6 +247,32 @@ describe("login Google (ACC-002)", () => {
     expect(signIn.status).toBe(200);
   });
 
+  it("redirect URI lokal (localhost polos, diteruskan web ke app.localhost): authorize & tukar kode memakai URI yang sama", async () => {
+    const redirectUri = "http://localhost:3000/api/auth/callback/google";
+    const target = authTestApp(testDb, redis, undefined, { google: { ...GOOGLE, redirectUri } });
+    const exchanged: string[] = [];
+    fakeGoogle({ sub: "g-8008", email: uniqueEmail(), emailVerified: true });
+    const fakeFetch = vi.mocked(globalThis.fetch);
+    const inner = fakeFetch.getMockImplementation();
+    fakeFetch.mockImplementation(async (input, init) => {
+      if (String(input).startsWith(TOKEN_ENDPOINT)) exchanged.push(String(init?.body));
+      return inner ? inner(input, init) : Response.error();
+    });
+    const start = await request(target)
+      .post("/auth/sign-in/social")
+      .set("origin", TEST_ORIGIN)
+      .send({ provider: "google", callbackURL: "/" });
+    const authorizeUrl = new URL(start.body.url);
+    expect(authorizeUrl.searchParams.get("redirect_uri")).toBe(redirectUri);
+    // Browser tiba di app.localhost (setelah diteruskan web) dengan cookie state miliknya.
+    const cookies = ([] as string[]).concat(start.headers["set-cookie"] ?? []).map((cookie) => cookie.split(";")[0]);
+    const callback = await request(target)
+      .get(`/auth/callback/google?code=kode-uji&state=${authorizeUrl.searchParams.get("state")}`)
+      .set("cookie", cookies.join("; "));
+    expect(sessionCookie(callback.headers["set-cookie"])).toBeDefined();
+    expect(exchanged.some((body) => body.includes(encodeURIComponent(redirectUri)))).toBe(true);
+  });
+
   it("tanpa kredensial Google → provider tidak tersedia", async () => {
     const response = await request(authTestApp(testDb, redis))
       .post("/auth/sign-in/social")

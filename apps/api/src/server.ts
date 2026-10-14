@@ -77,7 +77,13 @@ export async function startServer(
       // Lokal memakai http; cookie `Secure` hanya di staging/production.
       secureCookies: env.APP_ENV !== "local",
       ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
-        ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET } }
+        ? {
+            google: {
+              clientId: env.GOOGLE_CLIENT_ID,
+              clientSecret: env.GOOGLE_CLIENT_SECRET,
+              ...(env.GOOGLE_REDIRECT_URI ? { redirectUri: env.GOOGLE_REDIRECT_URI } : {}),
+            },
+          }
         : {}),
     },
   });
