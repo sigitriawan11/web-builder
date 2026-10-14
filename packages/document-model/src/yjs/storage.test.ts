@@ -169,7 +169,14 @@ describe("restoreDocument (diff-apply)", () => {
       content: [{ type: "paragraph", content: [{ type: "text", text: "Judul baru" }] }],
     };
     const live = jsonToYDoc(heroDocument());
+    const fragment = () =>
+      (
+        live.getMap<Y.Map<unknown>>(YDOC_KEYS.nodes).get("n_herottl001")?.get("props") as Y.Map<unknown> | undefined
+      )?.get("content");
+    const before = fragment();
     restoreDocument(live, target, systemOrigin("import"));
     expect(read(live)).toEqual(target);
+    // Isi diganti di tempat: editor yang terikat pada fragment ini tetap sinkron.
+    expect(fragment()).toBe(before);
   });
 });

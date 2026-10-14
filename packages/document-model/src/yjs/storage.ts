@@ -128,7 +128,11 @@ function syncNode(yNode: Y.Map<unknown>, node: Node): void {
         syncLeafMap(yProps, rest, ["content"]);
         const yContent = yProps.get("content");
         if (!(yContent instanceof Y.XmlFragment) || !jsonEqual(yXmlFragmentToRichText(yContent), node.props.content)) {
-          yProps.set("content", richTextToYXmlFragment(node.props.content));
+          // Di tempat bila fragment sudah ada: editor (y-tiptap) terikat pada instance ini.
+          if (yContent instanceof Y.XmlFragment) {
+            yContent.delete(0, yContent.length);
+            richTextToYXmlFragment(node.props.content, yContent);
+          } else yProps.set("content", richTextToYXmlFragment(node.props.content));
         }
       } else {
         syncLeafMap(yProps, props);

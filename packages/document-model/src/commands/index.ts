@@ -1,7 +1,9 @@
+import { replaceText, setImage, setLink, setNodeProps, setTextContent } from "./content";
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
 import { moveNode } from "./move-node";
 import { renameNode, reorderNode, setLocked, setTag, setVisible } from "./node-fields";
+import { createPage, deletePage, reorderPages, updatePage } from "./pages";
 import { clearBreakpointOverrides, setBreakpointOverride, setLayoutMode, setSettings } from "./style-commands";
 import { duplicateNodes, insertSubtree } from "./subtree";
 import { updateStyle } from "./update-style";
@@ -18,22 +20,32 @@ export {
   runCommands,
   step,
 } from "./command";
+export { plainToRichText } from "./content";
 export { type Subtree, SubtreeSchema } from "./subtree";
 export {
   clearBreakpointOverrides,
   createNode,
+  createPage,
   deleteNodes,
+  deletePage,
   duplicateNodes,
   insertSubtree,
   moveNode,
   renameNode,
   reorderNode,
+  reorderPages,
+  replaceText,
   setBreakpointOverride,
+  setImage,
   setLayoutMode,
+  setLink,
   setLocked,
+  setNodeProps,
   setSettings,
   setTag,
+  setTextContent,
   setVisible,
+  updatePage,
   updateStyle,
 };
 
@@ -54,4 +66,13 @@ export const COMMANDS = {
   setBreakpointOverride,
   clearBreakpointOverrides,
   setSettings,
+  setTextContent,
+  replaceText,
+  setImage,
+  setLink,
+  setNodeProps,
+  createPage,
+  updatePage,
+  reorderPages,
+  deletePage,
 } as const;
