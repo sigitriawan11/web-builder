@@ -10,8 +10,15 @@ describe("createBlankSiteDocument (ACC-051 blank)", () => {
     expect(doc.meta).toEqual({ title: "Toko Kue Bu Sri", createdWith: "blank" });
     expect(doc.pageOrder).toHaveLength(1);
     const home = doc.nodes[doc.pageOrder[0] ?? ""];
-    expect(home).toMatchObject({ type: "page", props: { path: "/", title: "Home", isHome: true }, children: [] });
+    expect(home).toMatchObject({ type: "page", props: { path: "/", title: "Beranda", isHome: true }, children: [] });
+    expect(doc.settings).toMatchObject({ language: "id", seo: { titleTemplate: "%s · Toko Kue Bu Sri" } });
     expect(Object.keys(doc.nodes)).toHaveLength(1);
+  });
+
+  it("bahasa website mengikuti bahasa UI pembuat (AC DM-005): en → judul Home", () => {
+    const doc = createBlankSiteDocument({ title: "Cake Shop", language: "en" });
+    expect(doc.settings.language).toBe("en");
+    expect(doc.nodes[doc.pageOrder[0] ?? ""]).toMatchObject({ props: { title: "Home" } });
   });
 
   it("ID page baru setiap dokumen", () => {

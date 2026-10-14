@@ -9,18 +9,21 @@ import { emptyDocumentShell } from "./top-level";
 export interface BlankSiteInput {
   // Judul situs (meta.title) — nama situs saat dibuat.
   title: string;
-  // Judul page Home di panel Pages.
+  // Bahasa website (bahasa UI user); default `id`.
+  language?: string;
+  // Judul page Home di panel Pages; default "Beranda" (id) / "Home" (lainnya).
   homeTitle?: string;
 }
 
 /** Dokumen baru yang SUDAH lolos validasi strict (`SiteDocumentSchema`); ID node dibuat baru tiap panggilan. */
 export function createBlankSiteDocument(input: BlankSiteInput): SiteDocument {
   const homeId = createId("pg");
-  const homeTitle = input.homeTitle ?? "Home";
+  const language = input.language ?? "id";
+  const homeTitle = input.homeTitle ?? (language === "id" ? "Beranda" : "Home");
   return SiteDocumentSchema.parse({
     schemaVersion: CURRENT_SCHEMA_VERSION,
     meta: { title: input.title, createdWith: "blank" },
-    ...emptyDocumentShell(),
+    ...emptyDocumentShell({ title: input.title, language }),
     pageOrder: [homeId],
     nodes: {
       [homeId]: {

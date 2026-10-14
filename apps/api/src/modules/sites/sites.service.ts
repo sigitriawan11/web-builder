@@ -72,7 +72,9 @@ export function createSitesService(deps: { db: Db }) {
       assertCan(tenant, "site.create");
       // Batas jumlah situs per paket (ACC-131, PLAN_LIMIT_REACHED) dipasang saat entitlements (M4).
       // Situs kosong (ACC-051 "blank"): dokumen awal 1 page Home, tervalidasi strict sebelum disimpan.
-      const document = createBlankSiteDocument({ title: body.name });
+      // Bahasa website awal = bahasa UI pembuat (AC DM-005).
+      const language = await repository.findActorLocale(db, tenant);
+      const document = createBlankSiteDocument({ title: body.name, ...(language ? { language } : {}) });
       const state = siteDocumentToState(document);
       const site = await db.transaction(async (tx) => {
         const created = await repository.insertSiteWithDocument(tx, tenant, {

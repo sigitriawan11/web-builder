@@ -1,12 +1,12 @@
 import type { SiteDocument } from "../../src";
-import { emptySiteSettings, emptyTheme } from "../../src/defaults/top-level";
+import { defaultSiteSettings, emptyTheme } from "../../src/defaults/top-level";
 
 // DM-004 AC: dokumen kosong minimal (1 page tanpa child) harus valid.
 export function minimalDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Situs Kosong", createdWith: "blank" },
-    settings: emptySiteSettings(),
+    settings: defaultSiteSettings({ title: "Situs Kosong" }),
     theme: emptyTheme(),
     componentDeps: {},
     assets: {},
@@ -32,7 +32,7 @@ export function heroDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Toko Kue Budi", createdWith: "template" },
-    settings: emptySiteSettings(),
+    settings: defaultSiteSettings({ title: "Toko Kue Budi" }),
     theme: emptyTheme(),
     componentDeps: {},
     assets: {
@@ -183,7 +183,7 @@ export function nestedDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Kasus Tepi" },
-    settings: emptySiteSettings(),
+    settings: defaultSiteSettings({ title: "Kasus Tepi" }),
     theme: emptyTheme(),
     componentDeps: {},
     assets: {
@@ -269,7 +269,7 @@ export function freeformDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Papan Bebas" },
-    settings: emptySiteSettings(),
+    settings: defaultSiteSettings({ title: "Papan Bebas" }),
     theme: emptyTheme(),
     componentDeps: {},
     assets: { ast_ph0000001: { kind: "image", width: 1200, height: 800, mime: "image/jpeg" } },
@@ -446,7 +446,7 @@ export function autolayoutDocument(): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: "Auto-layout" },
-    settings: emptySiteSettings(),
+    settings: defaultSiteSettings({ title: "Auto-layout" }),
     theme: emptyTheme(),
     componentDeps: {},
     assets: {},
@@ -533,7 +533,7 @@ export function wrapGridDocument(count = 100): SiteDocument {
   return {
     schemaVersion: 1,
     meta: { title: `Grid wrap ${count}` },
-    settings: emptySiteSettings(),
+    settings: defaultSiteSettings({ title: `Grid wrap ${count}` }),
     theme: emptyTheme(),
     componentDeps: {},
     assets: {},

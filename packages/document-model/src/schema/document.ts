@@ -107,6 +107,18 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
     }
   }
 
+  // DM-069: aset yang dirujuk settings (favicon, gambar OG default) harus ada di registry.
+  const settingsAssets: [string, string | undefined][] = [
+    ["favicon", doc.settings.favicon?.assetId],
+    ["ogImage", doc.settings.seo.ogImage?.assetId],
+  ];
+  for (const [field, assetId] of settingsAssets) {
+    if (assetId !== undefined && !(assetId in doc.assets)) {
+      const path = field === "favicon" ? ["settings", "favicon", "assetId"] : ["settings", "seo", "ogImage", "assetId"];
+      report(path, `Asset "${assetId}" tidak ada di assets`);
+    }
+  }
+
   const listedChildren = new Set<string>();
   for (const node of Object.values(nodes)) {
     if (!("children" in node)) continue;

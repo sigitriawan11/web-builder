@@ -216,3 +216,13 @@ export async function softDeleteSite(db: DbExecutor, tenant: Tenant, siteId: str
     .returning({ id: sites.id });
   return rows.length > 0;
 }
+
+/** Bahasa UI pembuat situs (bahasa awal website, AC DM-005). Aktor staf/tanpa user → undefined. */
+export async function findActorLocale(db: DbExecutor, tenant: Tenant): Promise<"id" | "en" | undefined> {
+  if (tenant.actor.type === "staff") return undefined;
+  const [row] = await db
+    .select({ locale: schema.users.locale })
+    .from(schema.users)
+    .where(eq(schema.users.id, tenant.actor.userId));
+  return row?.locale;
+}

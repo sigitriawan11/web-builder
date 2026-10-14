@@ -309,6 +309,22 @@ describe("daftar situs dashboard (T1.6.1, ACC-050)", () => {
 });
 
 describe("buat situs kosong (T1.6.2, ACC-051)", () => {
+  it("bahasa website & judul Home mengikuti bahasa UI pembuat (AC DM-005)", async () => {
+    const owner = await register();
+    await testDb.db.update(schema.users).set({ locale: "id" }).where(eq(schema.users.id, owner.user.id));
+    const site = (await request(app()).post(sitesOf(owner)).set(as(owner)).send({ name: "Toko Kue" })).body.data;
+    const [snapshot] = await testDb.db
+      .select()
+      .from(schema.documentSnapshots)
+      .where(eq(schema.documentSnapshots.documentId, site.documentId));
+    const json = SiteDocumentSchema.parse(snapshot?.json);
+    expect(json.settings).toMatchObject({
+      language: "id",
+      seo: { titleTemplate: "%s · Toko Kue", defaultTitle: "Toko Kue" },
+    });
+    expect(json.nodes[json.pageOrder[0] ?? ""]).toMatchObject({ props: { title: "Beranda" } });
+  });
+
   it("dokumen awal: snapshot seq 0 (state Yjs + JSON strict, 1 page Home) + read model site_pages", async () => {
     const owner = await register();
     const created = await request(app()).post(sitesOf(owner)).set(as(owner)).send({ name: "Toko Kue Bu Sri" });
