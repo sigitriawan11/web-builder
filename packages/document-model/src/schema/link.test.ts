@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { heroDocument } from "../../test/fixtures/basic-documents";
 import { findBrokenLinks } from "../query/links";
-import { lintDocument } from "../validate/lint";
+import { validateDocument } from "../validate/validate-document";
 import { SiteDocumentSchema } from "./document";
 import type { SiteDocument } from "./index";
 import { LinkValueSchema, normalizeLinkInput, normalizePhone } from "./link";
@@ -85,7 +85,7 @@ describe("rujukan link page/anchor", () => {
     }
   });
 
-  it("link di mark rich text ikut diperiksa & muncul sebagai lint BROKEN_LINK (warning, dokumen tetap valid)", () => {
+  it("link di mark rich text ikut diperiksa & muncul sebagai BROKEN_LINK (warning saat edit, error saat publish)", () => {
     const doc = heroDocument();
     const title = doc.nodes.n_herottl001;
     if (title?.type !== "text") throw new Error("fixture berubah");
@@ -119,8 +119,13 @@ describe("rujukan link page/anchor", () => {
       "attrs",
       "link",
     ]);
-    expect(lintDocument(doc)).toContainEqual(
-      expect.objectContaining({ code: "BROKEN_LINK", pageId: "pg_home000001", nodeId: "n_herottl001" }),
-    );
+    expect(validateDocument(doc, { mode: "edit" })).toMatchObject({
+      ok: true,
+      warnings: [expect.objectContaining({ code: "BROKEN_LINK", nodeId: "n_herottl001" })],
+    });
+    expect(validateDocument(doc, { mode: "publish" })).toMatchObject({
+      ok: false,
+      errors: [expect.objectContaining({ code: "BROKEN_LINK", nodeId: "n_herottl001" })],
+    });
   });
 });

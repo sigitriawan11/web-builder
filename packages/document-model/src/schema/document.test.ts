@@ -6,6 +6,7 @@ import {
   minimalDocument,
   wrapGridDocument,
 } from "../../test/fixtures/basic-documents";
+import { publishIssues } from "../../test/validation";
 import { SiteDocumentSchema } from "./document";
 
 type Path = (string | number)[];
@@ -211,8 +212,11 @@ describe("SiteDocumentSchema — invariant flat map", () => {
     expectIssueAt(heroWith(["nodes", "n_heroimg001", "parentId"], "pg_home000001"), "nodes.n_hero000001.children.1");
   });
 
-  it("menolak image yang asset-nya tidak terdaftar (DM-014)", () => {
-    expectIssueAt(heroWith(["assets"], {}), "nodes.n_heroimg001.props.image.assetId");
+  it("image yang asset-nya tidak terdaftar: struktur tetap valid, publish ditolak (DM-014, DM-068)", () => {
+    expect(issuePaths(heroWith(["assets"], {}))).toEqual([]);
+    expect(publishIssues(heroWith(["assets"], {}))).toEqual([
+      'nodes.n_heroimg001.props.image.assetId: Asset "ast_cake000001" tidak ada di assets',
+    ]);
   });
 
   it("menolak image berukuran hug di base maupun patch (DM-027)", () => {

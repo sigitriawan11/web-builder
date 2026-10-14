@@ -1,5 +1,6 @@
 import type { LengthValue, Node, ResponsiveStyle, SiteDocument, Style } from "../../src";
-import { defaultSiteSettings, emptyTheme } from "../../src/defaults/top-level";
+import { defaultTheme } from "../../src/defaults/theme";
+import { defaultSiteSettings } from "../../src/defaults/top-level";
 
 // T0.8.4 / OPEN-DM-5: 10 section landing UMKM yang umum (navbar, hero, fitur, statistik, logo, CTA,
 // testimoni, harga, footer, kontak) untuk menguji deteksi overflow `stackRows` (DM-038) statis vs DOM.
@@ -309,7 +310,7 @@ export function responsiveSectionsDocument(): { document: SiteDocument; sections
       schemaVersion: 1,
       meta: { title: "Uji responsif", createdWith: "template" },
       settings: defaultSiteSettings({ title: "Uji responsif" }),
-      theme: emptyTheme(),
+      theme: defaultTheme(),
       componentDeps: {},
       assets: { [IMAGE_ASSET]: { kind: "image", width: 1200, height: 800, mime: "image/jpeg" } },
       pageOrder: [PAGE_ID],

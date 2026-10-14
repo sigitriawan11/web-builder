@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { minimalDocument } from "../../test/fixtures/basic-documents";
+import { publishIssues } from "../../test/validation";
 import { DEFAULT_BREAKPOINTS, defaultSiteSettings } from "../defaults/top-level";
 import { SiteDocumentSchema } from "./document";
 import { type SiteSettings, SiteSettingsSchema } from "./settings";
@@ -109,10 +110,11 @@ describe("invariant aset settings (DM-069)", () => {
         seo: { ...doc.settings.seo, ogImage: { assetId: "ast_og00000001" } },
       },
     };
-    const result = SiteDocumentSchema.safeParse(withRefs);
-    expect(result.success).toBe(false);
-    expect(result.error?.issues.map((issue) => issue.path.join("."))).toEqual(
-      expect.arrayContaining(["settings.favicon.assetId", "settings.seo.ogImage.assetId"]),
+    expect(publishIssues(withRefs)).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/^settings\.favicon\.assetId: /),
+        expect.stringMatching(/^settings\.seo\.ogImage\.assetId: /),
+      ]),
     );
     const registered = {
       ...withRefs,

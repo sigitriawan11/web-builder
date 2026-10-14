@@ -1,15 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { heroDocument, styledDocument } from "../../test/fixtures/basic-documents";
+import { publishIssues } from "../../test/validation";
 import { mergeStyle } from "../ops/merge-style";
 import { gcAssets } from "../query/assets";
 import { resolveStyle } from "../query/resolve-style";
-import { SiteDocumentSchema } from "./document";
 import type { SiteDocument } from "./index";
 import { StylePatchSchema, StyleSchema } from "./style";
 
 // T1.8.10: style model (DM-027, DM-028, DM-029, DM-030, DM-032, DM-034).
-const issues = (doc: SiteDocument) =>
-  (SiteDocumentSchema.safeParse(doc).error?.issues ?? []).map((issue) => `${issue.path.join(".")}: ${issue.message}`);
+const issues = (doc: SiteDocument) => publishIssues(doc);
 const valid = (style: unknown) => StyleSchema.safeParse(style).success;
 
 describe("fixture semua kelompok style", () => {

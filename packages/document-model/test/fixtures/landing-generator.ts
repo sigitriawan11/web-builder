@@ -1,5 +1,6 @@
 import type { Node, ResponsiveStyle, SiteDocument } from "../../src";
-import { defaultSiteSettings, emptyTheme } from "../../src/defaults/top-level";
+import { defaultTheme } from "../../src/defaults/theme";
+import { defaultSiteSettings } from "../../src/defaults/top-level";
 
 // Generator halaman landing realistis untuk benchmark canvas (ED-022, T0.2.4).
 // Deterministik (PRNG ber-seed) agar hasil benchmark antar run bisa dibandingkan.
@@ -355,7 +356,7 @@ export function generateLandingDocument({ nodeCount, seed = 1 }: LandingOptions)
     schemaVersion: 1,
     meta: { title: `Benchmark Landing ${nodeCount}`, createdWith: "template" },
     settings: defaultSiteSettings({ title: `Benchmark Landing ${nodeCount}` }),
-    theme: emptyTheme(),
+    theme: defaultTheme(),
     componentDeps: {},
     assets: Object.fromEntries(
       ASSET_IDS.map((id) => [id, { kind: "image" as const, width: 1200, height: 800, mime: "image/jpeg" }]),

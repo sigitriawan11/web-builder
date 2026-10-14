@@ -1,17 +1,10 @@
-import { findBrokenLinks, pageOf } from "../query/links";
 import type { Node, SiteDocument } from "../schema";
+import type { Issue } from "./issues";
 
 // Lint semantik DM-009: WARNING (bukan error validasi) — dokumen tetap valid; editor/AI menampilkan saran.
 
-// `BROKEN_LINK`: warning saat edit; mode publish (DM-068, T1.8.14) menjadikannya error.
-export type LintCode = "MULTIPLE_H1" | "HEADING_SKIP" | "IMAGE_MISSING_ALT" | "BROKEN_LINK";
-
-export interface LintWarning {
-  code: LintCode;
-  pageId: string;
-  nodeId: string;
-  message: string;
-}
+// Hasil lint memakai format `Issue` (kode stabil + pesan id/en) agar bisa digabung dengan `validateDocument`.
+export type LintWarning = Issue & { pageId: string; nodeId: string };
 
 const headingLevel = (node: Node): number | null => {
   if (node.type !== "text" || !node.tag || !/^h[1-6]$/.test(node.tag)) return null;
@@ -38,14 +31,24 @@ export function lintDocument(doc: SiteDocument): LintWarning[] {
       const level = headingLevel(node);
       if (level !== null) {
         if (level === 1 && ++h1Count > 1) {
-          warnings.push({ code: "MULTIPLE_H1", pageId, nodeId: node.id, message: "Lebih dari satu h1 di halaman ini" });
+          warnings.push({
+            code: "MULTIPLE_H1",
+            path: ["nodes", node.id, "tag"],
+            pageId,
+            nodeId: node.id,
+            message: { id: "Lebih dari satu h1 di halaman ini", en: "More than one h1 on this page" },
+          });
         }
         if (previousLevel > 0 && level > previousLevel + 1) {
           warnings.push({
             code: "HEADING_SKIP",
+            path: ["nodes", node.id, "tag"],
             pageId,
             nodeId: node.id,
-            message: `Heading melompat dari h${previousLevel} ke h${level}`,
+            message: {
+              id: `Heading melompat dari h${previousLevel} ke h${level}`,
+              en: `Heading skips from h${previousLevel} to h${level}`,
+            },
           });
         }
         previousLevel = level;
@@ -53,20 +56,16 @@ export function lintDocument(doc: SiteDocument): LintWarning[] {
       if (node.type === "image" && !node.props.decorative && !node.props.image.alt?.trim()) {
         warnings.push({
           code: "IMAGE_MISSING_ALT",
+          path: ["nodes", node.id, "props", "image", "alt"],
           pageId,
           nodeId: node.id,
-          message: "Gambar tanpa teks alternatif (tandai dekoratif bila hanya hiasan)",
+          message: {
+            id: "Gambar tanpa teks alternatif (tandai dekoratif bila hanya hiasan)",
+            en: "Image has no alternative text (mark it decorative if purely ornamental)",
+          },
         });
       }
     }
-  }
-  for (const link of findBrokenLinks(doc)) {
-    warnings.push({
-      code: "BROKEN_LINK",
-      pageId: pageOf(doc, link.nodeId) ?? "",
-      nodeId: link.nodeId,
-      message: link.message,
-    });
   }
   return warnings;
 }

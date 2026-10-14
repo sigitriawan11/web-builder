@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { minimalDocument } from "../../test/fixtures/basic-documents";
+import { publishIssues } from "../../test/validation";
 import { createBlankSiteDocument } from "../defaults/blank-site";
 import { defaultTheme } from "../defaults/theme";
 import { emptyTheme } from "../defaults/top-level";
-import { SiteDocumentSchema, type Theme, ThemeSchema } from "../schema";
+import { type Theme, ThemeSchema } from "../schema";
 import { resolveStyle } from "./resolve-style";
 import {
   listTokenPaths,
@@ -25,7 +26,7 @@ function theme(colors: Theme["tokens"]["color"], extra: Partial<Theme["tokens"]>
 
 const issues = (t: Theme) => {
   const doc = { ...minimalDocument(), theme: t };
-  return (SiteDocumentSchema.safeParse(doc).error?.issues ?? []).map((i) => `${i.path.join(".")}: ${i.message}`);
+  return publishIssues(doc);
 };
 
 describe("resolveToken", () => {

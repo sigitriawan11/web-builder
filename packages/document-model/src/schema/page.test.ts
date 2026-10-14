@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { heroDocument } from "../../test/fixtures/basic-documents";
+import { publishIssues } from "../../test/validation";
 import { SiteDocumentSchema } from "./document";
 import type { Node, SiteDocument } from "./index";
 
@@ -9,8 +10,7 @@ const ABOUT = "pg_about00001";
 
 type PageNode = Extract<Node, { type: "page" }>;
 const page = (doc: SiteDocument, id: string) => doc.nodes[id] as PageNode;
-const issues = (doc: SiteDocument) =>
-  (SiteDocumentSchema.safeParse(doc).error?.issues ?? []).map((issue) => `${issue.path.join(".")}: ${issue.message}`);
+const issues = (doc: SiteDocument) => publishIssues(doc);
 
 describe("page home & path (AC DM-010)", () => {
   it("fixture: tepat satu home di '/', path unik → valid", () => {

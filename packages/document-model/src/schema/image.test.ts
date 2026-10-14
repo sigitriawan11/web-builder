@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { heroDocument, richTextDocument } from "../../test/fixtures/basic-documents";
+import { publishIssues } from "../../test/validation";
 import { siteDocumentFromState, siteDocumentToState } from "../yjs";
 import { AssetRefSchema } from "./asset-ref";
 import { SiteDocumentSchema } from "./document";
@@ -10,8 +11,7 @@ import { ImagePropsSchema } from "./nodes";
 const IMG = "n_heroimg001";
 type ImageNode = Extract<Node, { type: "image" }>;
 const image = (doc: SiteDocument) => doc.nodes[IMG] as ImageNode;
-const issues = (doc: SiteDocument) =>
-  (SiteDocumentSchema.safeParse(doc).error?.issues ?? []).map((issue) => `${issue.path.join(".")}: ${issue.message}`);
+const issues = (doc: SiteDocument) => publishIssues(doc);
 
 describe("AssetRef (DM-057)", () => {
   it("crop & focalPoint ternormalisasi 0..1", () => {
@@ -67,7 +67,7 @@ describe("invariant registry assets (AC DM-057)", () => {
     expect(issues(doc)).toEqual(
       expect.arrayContaining([
         `nodes.${IMG}.props.link.assetId: Asset "ast_brosur0001" tidak ada di assets`,
-        `theme.fonts.0.assetId: Asset "ast_font000001" tidak ada di assets`,
+        `theme.fonts.3.assetId: Asset "ast_font000001" tidak ada di assets`,
       ]),
     );
 

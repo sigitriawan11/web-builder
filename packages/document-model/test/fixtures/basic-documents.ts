@@ -1,5 +1,6 @@
 import type { SiteDocument } from "../../src";
-import { defaultSiteSettings, emptyTheme } from "../../src/defaults/top-level";
+import { defaultTheme } from "../../src/defaults/theme";
+import { defaultSiteSettings } from "../../src/defaults/top-level";
 
 // DM-004 AC: dokumen kosong minimal (1 page tanpa child) harus valid.
 export function minimalDocument(): SiteDocument {
@@ -7,7 +8,7 @@ export function minimalDocument(): SiteDocument {
     schemaVersion: 1,
     meta: { title: "Situs Kosong", createdWith: "blank" },
     settings: defaultSiteSettings({ title: "Situs Kosong" }),
-    theme: emptyTheme(),
+    theme: defaultTheme(),
     componentDeps: {},
     assets: {},
     pageOrder: ["pg_home000001"],
@@ -33,7 +34,7 @@ export function heroDocument(): SiteDocument {
     schemaVersion: 1,
     meta: { title: "Toko Kue Budi", createdWith: "template" },
     settings: defaultSiteSettings({ title: "Toko Kue Budi" }),
-    theme: emptyTheme(),
+    theme: defaultTheme(),
     componentDeps: {},
     assets: {
       ast_cake000001: { kind: "image", width: 1600, height: 1067, mime: "image/jpeg" },
@@ -180,11 +181,15 @@ export function nestedDocument(): SiteDocument {
     props: {},
   });
 
+  // Token bersarang `color.brand.600` (DM-041) dipakai fill di bawah.
+  const theme = defaultTheme();
+  theme.tokens.color.brand = { 600: "#9A3412" };
+
   return {
     schemaVersion: 1,
     meta: { title: "Kasus Tepi" },
     settings: defaultSiteSettings({ title: "Kasus Tepi" }),
-    theme: emptyTheme(),
+    theme,
     componentDeps: {},
     assets: {
       ast_logo000001: { kind: "svg", mime: "image/svg+xml", libraryShared: true },
@@ -270,7 +275,7 @@ export function freeformDocument(): SiteDocument {
     schemaVersion: 1,
     meta: { title: "Papan Bebas" },
     settings: defaultSiteSettings({ title: "Papan Bebas" }),
-    theme: emptyTheme(),
+    theme: defaultTheme(),
     componentDeps: {},
     assets: { ast_ph0000001: { kind: "image", width: 1200, height: 800, mime: "image/jpeg" } },
     pageOrder: ["pg_home000001"],
@@ -447,7 +452,7 @@ export function autolayoutDocument(): SiteDocument {
     schemaVersion: 1,
     meta: { title: "Auto-layout" },
     settings: defaultSiteSettings({ title: "Auto-layout" }),
-    theme: emptyTheme(),
+    theme: defaultTheme(),
     componentDeps: {},
     assets: {},
     pageOrder: ["pg_home000001"],
@@ -534,7 +539,7 @@ export function wrapGridDocument(count = 100): SiteDocument {
     schemaVersion: 1,
     meta: { title: `Grid wrap ${count}` },
     settings: defaultSiteSettings({ title: `Grid wrap ${count}` }),
-    theme: emptyTheme(),
+    theme: defaultTheme(),
     componentDeps: {},
     assets: {},
     pageOrder: ["pg_home000001"],
@@ -642,7 +647,7 @@ export function richTextDocument(): SiteDocument {
 /** Semua kelompok style M1 (DM-027–DM-032): sizing, position, fills solid+image, stroke, radius, typography, color (T1.8.10). */
 export function styledDocument(): SiteDocument {
   const doc = heroDocument();
-  doc.theme.fonts = [{ family: "Poppins", source: "google", weights: [400, 700], fallback: "sans-serif" }];
+  doc.theme.fonts.push({ family: "Poppins", source: "google", weights: [400, 700], fallback: "sans-serif" });
   doc.assets.ast_bg00000001 = { kind: "image", width: 1920, height: 1080, mime: "image/webp" };
   const hero = doc.nodes.n_hero000001;
   const title = doc.nodes.n_herottl001;

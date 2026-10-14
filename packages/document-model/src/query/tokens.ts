@@ -1,5 +1,6 @@
 import { type Theme, TOKEN_GROUPS, TOKEN_LITERAL_SCHEMAS, type TokenGroup } from "../schema/theme";
 import { isTokenRef } from "../schema/values";
+import type { IssueReporter } from "../validate/issues";
 import type { Breakpoint } from "./resolve-style";
 
 // Resolver token theme (DM-041, DM-042): alias rekursif maks 5 langkah, error bertipe untuk siklus & path hilang.
@@ -130,18 +131,35 @@ export function listTokenPaths(theme: Theme): string[] {
 
 const LENGTH_GROUPS: readonly TokenGroup[] = ["space", "radius", "size"];
 
+// Pesan EN untuk issue validasi (pesan ID ada di error).
+const TOKEN_ERROR_EN: Record<TokenErrorCode, (error: TokenResolveError) => string> = {
+  TOKEN_NOT_FOUND: (e) => `Token "${e.path}" does not exist in the theme`,
+  TOKEN_CYCLE: (e) => `Token aliases form a cycle: ${[...e.chain, e.path].join(" → ")}`,
+  TOKEN_DEPTH: (e) => `Token alias "${e.path}" exceeds ${MAX_ALIAS_DEPTH} steps`,
+  TOKEN_GROUP_MISMATCH: (e) => `Alias "${e.path}" points to a different token group`,
+};
+
 /**
- * Validasi theme (DM-041/DM-042) untuk invariant dokumen: setiap alias ter-resolve (tanpa siklus, path hilang,
+ * Validasi theme (DM-041/DM-042) untuk `validateDocument`: setiap alias ter-resolve (tanpa siklus, path hilang,
  * > 5 langkah, atau lintas grup), field token di dalam literal typography merujuk grup yang cocok, dan family di
  * grup `fontFamily` terdaftar di `theme.fonts`.
  */
-export function checkThemeTokens(theme: Theme, report: (path: (string | number)[], message: string) => void): void {
+export function checkThemeTokens(theme: Theme, report: IssueReporter): void {
   const families = new Set(theme.fonts.map((font) => font.family));
   const refersTo = (ref: unknown, groups: readonly TokenGroup[], at: (string | number)[]) => {
     if (!isTokenRef(ref)) return;
     const group = tokenGroupOf(ref.$token);
-    if (!group || !groups.includes(group)) report(at, `Token "${ref.$token}" harus dari grup ${groups.join("/")}`);
-    else if (tokenEntry(theme, ref.$token) === undefined) report(at, `Token "${ref.$token}" tidak ada di theme`);
+    if (!group || !groups.includes(group)) {
+      report("TOKEN_REF", at, {
+        id: `Token "${ref.$token}" harus dari grup ${groups.join("/")}`,
+        en: `Token "${ref.$token}" must belong to group ${groups.join("/")}`,
+      });
+    } else if (tokenEntry(theme, ref.$token) === undefined) {
+      report("TOKEN_REF", at, {
+        id: `Token "${ref.$token}" tidak ada di theme`,
+        en: `Token "${ref.$token}" does not exist in the theme`,
+      });
+    }
   };
 
   for (const path of listTokenPaths(theme)) {
@@ -150,11 +168,14 @@ export function checkThemeTokens(theme: Theme, report: (path: (string | number)[
       try {
         const value = resolveToken(theme, path, { mode });
         if (path.startsWith("fontFamily.") && typeof value === "string" && !families.has(value)) {
-          report(at, `Font "${value}" tidak terdaftar di theme.fonts`);
+          report("FONT_REF", at, {
+            id: `Font "${value}" tidak terdaftar di theme.fonts`,
+            en: `Font "${value}" is not registered in theme.fonts`,
+          });
         }
       } catch (error) {
         if (!(error instanceof TokenResolveError)) throw error;
-        report(at, error.message);
+        report("TOKEN_REF", at, { id: error.message, en: TOKEN_ERROR_EN[error.code](error) });
         break;
       }
     }
@@ -163,8 +184,9 @@ export function checkThemeTokens(theme: Theme, report: (path: (string | number)[
       const literal = isResponsiveToken(entry) ? entry.value : entry;
       if (isRecord(literal)) {
         refersTo(literal.fontFamily, ["fontFamily"], [...at, "fontFamily"]);
-        for (const field of ["fontSize", "letterSpacing", "lineHeight"])
+        for (const field of ["fontSize", "letterSpacing", "lineHeight"]) {
           refersTo(literal[field], LENGTH_GROUPS, [...at, field]);
+        }
       }
     }
   }
