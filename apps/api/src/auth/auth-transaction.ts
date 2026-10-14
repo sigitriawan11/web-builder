@@ -33,6 +33,11 @@ export function currentAuthTransaction(): DbTransaction {
   return tracked.tx;
 }
 
+/** Transaksi auth aktif, atau `undefined` bila operasi BA ini tidak dibungkus transaksi (mis. menautkan akun). */
+export function activeAuthTransaction(): DbTransaction | undefined {
+  return storage.getStore()?.tx;
+}
+
 /**
  * Jalankan `callback` setelah transaksi auth aktif commit (rollback → tidak dijalankan); di luar transaksi → langsung.
  * `callback` tidak boleh melempar (menangani error-nya sendiri), karena commit sudah terjadi.

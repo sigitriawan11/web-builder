@@ -1,3 +1,4 @@
+export { personalWorkspaceSlug, randomAlphanumeric } from "./random-id";
 export {
   createUuidV7Generator,
   UUIDV7_PATTERN,

@@ -125,6 +125,12 @@ describe("login Google (ACC-002)", () => {
     const user = await userByEmail(email);
     expect(user).toMatchObject({ emailVerified: true, locale: "en", name: "Siti Google" });
     expect(await accountsOf(user?.id ?? "")).toEqual(["google"]);
+    // ACC-030: registrasi lewat Google juga mendapat personal workspace.
+    const workspaces = await testDb.db
+      .select()
+      .from(schema.workspaces)
+      .where(and(eq(schema.workspaces.ownerUserId, user?.id ?? ""), eq(schema.workspaces.type, "personal")));
+    expect(workspaces).toHaveLength(1);
     const audit = await testDb.db
       .select()
       .from(schema.auditLogs)
@@ -150,13 +156,24 @@ describe("login Google (ACC-002)", () => {
   });
 
   it("email sama dengan akun password TERVERIFIKASI → Google ditautkan ke user yang sama", async () => {
-    const target = app();
+    const queues = recordingQueues();
+    const target = app(queues);
     const email = await passwordUser(target, true);
     const before = await userByEmail(email);
     const { callback, cookie } = await loginWithGoogle(target, { sub: "g-2002", email, emailVerified: true });
     expect(callback.status).toBe(302);
     expect(cookie).toBeDefined();
     expect(await accountsOf(before?.id ?? "")).toEqual(["credential", "google"]);
+    // Menautkan ke user lama: tidak ada email sambutan kedua (hanya dari registrasi awal) ...
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const welcomes = queues.jobs.filter((job) => (job.payload as { template?: string }).template === "auth.welcome");
+    expect(welcomes).toHaveLength(1);
+    // ... dan tidak membuat workspace kedua.
+    const workspaces = await testDb.db
+      .select()
+      .from(schema.workspaces)
+      .where(eq(schema.workspaces.ownerUserId, before?.id ?? ""));
+    expect(workspaces).toHaveLength(1);
   });
 
   it("email sama dengan akun password BELUM terverifikasi → ditolak, tidak ditautkan (cegah takeover)", async () => {

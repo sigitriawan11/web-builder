@@ -9,9 +9,10 @@ import { setSessionCookie } from "better-auth/cookies";
 import { emailOTP } from "better-auth/plugins";
 import type { Redis } from "ioredis";
 import { recordAudit } from "../audit/audit.repository";
+import { ensurePersonalWorkspace } from "../modules/workspaces/personal-workspace";
 import type { QueueProducer } from "../queues/producer";
-import { AUTH_TABLES, activeSessionTokens, insertConsents } from "./auth.repository";
-import { afterAuthCommit, currentAuthTransaction, trackTransactions } from "./auth-transaction";
+import { AUTH_TABLES, activeSessionTokens, findUserName, insertConsents } from "./auth.repository";
+import { activeAuthTransaction, afterAuthCommit, currentAuthTransaction, trackTransactions } from "./auth-transaction";
 import { currentEmailChange } from "./email-change";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
 import { currentPasswordReset } from "./password-reset";
@@ -429,6 +430,13 @@ export function createAuth(deps: {
         create: {
           // Berjalan di transaksi registrasi tepat setelah insert user → consent ikut commit/rollback bersama user.
           before: async (account) => {
+            // Personal workspace (ACC-030) untuk SETIAP registrasi (email & Google), di transaksi yang sama dengan
+            // user. Menautkan akun ke user lama → sudah punya → tidak dibuat ulang (dan tidak ada email sambutan).
+            const executor = activeAuthTransaction() ?? deps.db;
+            const name = (await findUserName(executor, account.userId)) ?? "";
+            if (await ensurePersonalWorkspace(executor, { id: account.userId, name })) {
+              enqueueEmail({ template: "auth.welcome", userId: account.userId });
+            }
             const signUp = currentSignUp();
             if (!signUp || account.providerId !== "credential") return;
             await insertConsents(currentAuthTransaction(), signUpConsents(account.userId, signUp));

@@ -38,6 +38,9 @@ it("gagal menulis consent → seluruh registrasi di-rollback (tanpa user, akun, 
   expect(await testDb.db.select().from(schema.users).where(eq(schema.users.email, email))).toHaveLength(0);
   expect(await testDb.db.select().from(schema.accounts)).toHaveLength(0);
   expect(await testDb.db.select().from(schema.sessions)).toHaveLength(0);
+  // Personal workspace (ACC-030) dibuat di transaksi yang sama → ikut batal.
+  expect(await testDb.db.select().from(schema.workspaces)).toHaveLength(0);
+  expect(await testDb.db.select().from(schema.workspaceMembers)).toHaveLength(0);
   // Email verifikasi diantrekan setelah commit → rollback = tidak ada email.
   await new Promise((resolve) => setTimeout(resolve, 100));
   expect(queues.jobs).toHaveLength(0);

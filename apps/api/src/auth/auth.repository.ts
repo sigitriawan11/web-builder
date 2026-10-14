@@ -59,3 +59,11 @@ export async function hasCredentialAccount(executor: DbExecutor, userId: string)
     .limit(1);
   return row !== undefined;
 }
+
+export async function findUserName(executor: DbExecutor, userId: string): Promise<string | undefined> {
+  const [row] = await executor
+    .select({ name: schema.users.name })
+    .from(schema.users)
+    .where(eq(schema.users.id, userId));
+  return row?.name;
+}
