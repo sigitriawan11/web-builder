@@ -1,7 +1,7 @@
 import type { Db, SiteTenant, WorkspaceTenant } from "@platform/db";
 import { CURRENT_SCHEMA_VERSION } from "@platform/document-model";
 import { AppError } from "@platform/shared";
-import type { CreateSiteBody, Site, UpdateSiteBody } from "@platform/shared/contracts";
+import type { CreateSiteBody, ListSitesQuery, Site, UpdateSiteBody } from "@platform/shared/contracts";
 import { decodeCursor, encodeCursor } from "@platform/shared/contracts";
 import { z } from "zod";
 import { assertCan } from "../../permissions";
@@ -24,30 +24,41 @@ function toDto(row: repository.SiteRow): Site {
   };
 }
 
-const CursorPosition = z.object({ id: z.uuid() });
+// Cursor terikat urutan: cursor dari urutan lain → tidak valid (422), bukan halaman yang salah.
+const CursorPosition = z.discriminatedUnion("sort", [
+  z.object({ sort: z.literal("updated"), value: z.string().min(1).max(40), id: z.uuid() }),
+  z.object({ sort: z.literal("name"), value: z.string().max(200), id: z.uuid() }),
+  z.object({ sort: z.literal("created"), id: z.uuid() }),
+]);
 
 export function createSitesService(deps: { db: Db }) {
   const { db } = deps;
   return {
-    async list(tenant: Tenant, query: { limit: number; cursor?: string | undefined }) {
+    async list(tenant: Tenant, query: ListSitesQuery) {
       assertCan(tenant, "site.read");
       const position = query.cursor ? decodeCursor(CursorPosition, query.cursor) : null;
-      if (query.cursor && !position) {
+      if (query.cursor && (!position || position.sort !== query.sort)) {
         throw new AppError("VALIDATION_FAILED", 422, {
           issues: [{ location: "query", path: "cursor", code: "invalid_cursor", message: "cursor tidak valid" }],
         });
       }
       // Ambil satu lebih untuk tahu apakah masih ada halaman berikutnya.
       const rows = await repository.listSites(db, tenant, {
+        status: query.status,
+        sort: query.sort,
+        ...(query.q ? { q: query.q } : {}),
         limit: query.limit + 1,
-        ...(position ? { beforeId: position.id } : {}),
+        ...(position ? { after: position } : {}),
       });
       const page = rows.slice(0, query.limit);
       const last = page.at(-1);
-      return {
-        items: page.map(toDto),
-        nextCursor: rows.length > query.limit && last ? encodeCursor({ id: last.id }) : null,
-      };
+      const nextPosition =
+        rows.length > query.limit && last
+          ? query.sort === "created"
+            ? { sort: "created" as const, id: last.id }
+            : { sort: query.sort, value: last.cursorValue, id: last.id }
+          : null;
+      return { items: page.map(toDto), nextCursor: nextPosition ? encodeCursor(nextPosition) : null };
     },
 
     async get(tenant: Tenant, siteId: string): Promise<Site> {

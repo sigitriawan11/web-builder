@@ -1,15 +1,21 @@
 import {
   and,
+  asc,
   type DbExecutor,
   desc,
   eq,
+  ilike,
   lt,
+  ne,
   notDeleted,
   type SiteTenant,
+  type SQL,
   schema,
+  sql,
   type WorkspaceTenant,
   workspaceWhere,
 } from "@platform/db";
+import type { ListSitesQuery } from "@platform/shared/contracts";
 
 // SATU-SATUNYA tempat modul sites mengakses tabel (CLAUDE.md, ARCHITECTURE §6.2). Tenant selalu parameter pertama
 // dan selalu masuk ke filter; menerima db ATAU transaksi (service yang membuka transaksi).
@@ -19,22 +25,75 @@ const { documents, sites } = schema;
 type Tenant = WorkspaceTenant | SiteTenant;
 export type SiteRow = typeof sites.$inferSelect;
 
+/**
+ * Posisi keyset cursor per urutan. `updated` memakai teks timestamp presisi mikrodetik dari Postgres (Date JS hanya
+ * milidetik → halaman bisa melompati/menggandakan baris). `name` memakai lower(name).
+ */
+export type ListPosition =
+  | { sort: "updated"; value: string; id: string }
+  | { sort: "name"; value: string; id: string }
+  | { sort: "created"; id: string };
+
+export type ListedSite = SiteRow & { cursorValue: string };
+
+const updatedText = sql<string>`to_char(${sites.updatedAt} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
+const lowerName = sql<string>`lower(${sites.name})`;
+
+/** Escape wildcard LIKE agar pencarian "50%" tidak menjadi pola. */
+const likePattern = (query: string) => `%${query.replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
+
 export async function listSites(
   db: DbExecutor,
   tenant: Tenant,
-  page: { limit: number; beforeId?: string },
-): Promise<SiteRow[]> {
-  return (
-    db
-      .select()
+  query: Pick<ListSitesQuery, "status" | "sort" | "q"> & { limit: number; after?: ListPosition },
+): Promise<ListedSite[]> {
+  const filters: (SQL | undefined)[] = [workspaceWhere(tenant, sites), notDeleted(sites)];
+  if (query.status === "all") filters.push(ne(sites.status, "archived"));
+  else filters.push(eq(sites.status, query.status));
+  if (query.q) filters.push(ilike(sites.name, likePattern(query.q)));
+
+  const after = query.after;
+  if (query.sort === "updated") {
+    if (after?.sort === "updated")
+      filters.push(sql`(${sites.updatedAt}, ${sites.id}) < (${after.value}::timestamptz, ${after.id}::uuid)`);
+    return db
+      .select({ ...getSiteColumns(), cursorValue: updatedText })
       .from(sites)
-      .where(
-        and(workspaceWhere(tenant, sites), notDeleted(sites), page.beforeId ? lt(sites.id, page.beforeId) : undefined),
-      )
-      // UUIDv7 terurut waktu: id desc = terbaru dulu, dan stabil untuk cursor.
-      .orderBy(desc(sites.id))
-      .limit(page.limit)
-  );
+      .where(and(...filters))
+      .orderBy(desc(sites.updatedAt), desc(sites.id))
+      .limit(query.limit);
+  }
+  if (query.sort === "name") {
+    if (after?.sort === "name") filters.push(sql`(${lowerName}, ${sites.id}) > (${after.value}, ${after.id}::uuid)`);
+    return db
+      .select({ ...getSiteColumns(), cursorValue: lowerName })
+      .from(sites)
+      .where(and(...filters))
+      .orderBy(asc(lowerName), asc(sites.id))
+      .limit(query.limit);
+  }
+  // `created`: UUIDv7 terurut waktu → id desc = terbaru dibuat.
+  if (after?.sort === "created") filters.push(lt(sites.id, after.id));
+  return db
+    .select({ ...getSiteColumns(), cursorValue: sql<string>`''` })
+    .from(sites)
+    .where(and(...filters))
+    .orderBy(desc(sites.id))
+    .limit(query.limit);
+}
+
+function getSiteColumns() {
+  return {
+    id: sites.id,
+    workspaceId: sites.workspaceId,
+    name: sites.name,
+    status: sites.status,
+    documentId: sites.documentId,
+    createdBy: sites.createdBy,
+    createdAt: sites.createdAt,
+    updatedAt: sites.updatedAt,
+    deletedAt: sites.deletedAt,
+  };
 }
 
 export async function findSite(db: DbExecutor, tenant: Tenant, siteId: string): Promise<SiteRow | undefined> {

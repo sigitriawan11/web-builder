@@ -1,4 +1,4 @@
-import { eq, schema } from "@platform/db";
+import { eq, inArray, schema, sql } from "@platform/db";
 import { createTestDb, createWorkspace, type TestDb } from "@platform/db/testing";
 import type { WorkspaceRole } from "@platform/shared/contracts";
 import { dataEnvelope, ErrorBodySchema, listEnvelope, SiteSchema } from "@platform/shared/contracts";
@@ -224,5 +224,140 @@ describe("modul sites — isolasi tenant (CLAUDE.md § Testing)", () => {
           .set(as(alice))
       ).status,
     ).toBe(422);
+  });
+});
+
+describe("daftar situs dashboard (T1.6.1, ACC-050)", () => {
+  /** User baru (workspace kosong) + situs bernama `names`, dibuat berurutan. */
+  async function workspaceWith(names: string[]) {
+    const owner = await register();
+    const ids: string[] = [];
+    for (const name of names) {
+      ids.push((await request(app()).post(sitesOf(owner)).set(as(owner)).send({ name })).body.data.id);
+    }
+    return { owner, ids };
+  }
+
+  /** Semua halaman sampai habis; gagal bila ada ID ganda. */
+  async function allPages(owner: TestUser, params: string, limit = 2) {
+    const names: string[] = [];
+    const seen = new Set<string>();
+    let cursor: string | null = null;
+    do {
+      const query: string = `${params}&limit=${limit}${cursor ? `&cursor=${cursor}` : ""}`;
+      const body: { data: { id: string; name: string }[]; meta: { nextCursor: string | null } } = (
+        await request(app())
+          .get(`${sitesOf(owner)}?${query}`)
+          .set(as(owner))
+      ).body;
+      for (const item of body.data as { id: string; name: string }[]) {
+        expect(seen.has(item.id)).toBe(false);
+        seen.add(item.id);
+        names.push(item.name);
+      }
+      cursor = body.meta.nextCursor;
+    } while (cursor);
+    return names;
+  }
+
+  it("filter status: semua (tanpa arsip) / published / draft / arsip", async () => {
+    const { owner, ids } = await workspaceWith(["Draf", "Terbit", "Arsip"]);
+    await testDb.db
+      .update(schema.sites)
+      .set({ status: "published" })
+      .where(eq(schema.sites.id, ids[1] ?? ""));
+    await testDb.db
+      .update(schema.sites)
+      .set({ status: "archived" })
+      .where(eq(schema.sites.id, ids[2] ?? ""));
+    const names = async (status: string) =>
+      (
+        (
+          await request(app())
+            .get(`${sitesOf(owner)}?status=${status}`)
+            .set(as(owner))
+        ).body.data as { name: string }[]
+      )
+        .map((item) => item.name)
+        .sort();
+    expect(await names("all")).toEqual(["Draf", "Terbit"]);
+    expect(await names("published")).toEqual(["Terbit"]);
+    expect(await names("draft")).toEqual(["Draf"]);
+    expect(await names("archived")).toEqual(["Arsip"]);
+    expect(
+      (
+        await request(app())
+          .get(`${sitesOf(owner)}?status=hapus`)
+          .set(as(owner))
+      ).status,
+    ).toBe(422);
+  });
+
+  it("urutan nama (tanpa beda huruf besar/kecil), dibuat, & terakhir diedit — lintas halaman", async () => {
+    const { owner, ids } = await workspaceWith(["beta", "Alfa", "delta", "Charlie", "echo"]);
+    expect(await allPages(owner, "sort=name")).toEqual(["Alfa", "beta", "Charlie", "delta", "echo"]);
+    expect(await allPages(owner, "sort=created")).toEqual(["echo", "Charlie", "delta", "Alfa", "beta"]);
+    // Situs tertua diedit → paling atas di "terakhir diedit".
+    await request(app())
+      .patch(`${sitesOf(owner)}/${ids[0]}`)
+      .set(as(owner))
+      .send({ name: "beta baru" });
+    const updated = await allPages(owner, "sort=updated");
+    expect(updated[0]).toBe("beta baru");
+    expect(updated).toHaveLength(5);
+  });
+
+  it("terakhir diedit: waktu identik & beda mikrodetik tetap terurut tanpa ganda/terlewat", async () => {
+    const { owner, ids } = await workspaceWith(["s1", "s2", "s3", "s4", "s5", "s6"]);
+    // s1–s3 identik; s4–s6 hanya beda mikrodetik (presisi yang hilang bila memakai Date JS).
+    await testDb.db
+      .update(schema.sites)
+      .set({ updatedAt: sql`'2026-10-14 10:00:00.000500+00'::timestamptz` })
+      .where(inArray(schema.sites.id, ids.slice(0, 3)));
+    for (const [index, id] of ids.slice(3).entries()) {
+      await testDb.db
+        .update(schema.sites)
+        .set({ updatedAt: sql`${`2026-10-14 11:00:00.00010${index + 1}+00`}::timestamptz` })
+        .where(eq(schema.sites.id, id));
+    }
+    const names = await allPages(owner, "sort=updated", 2);
+    expect(names.slice(0, 3)).toEqual(["s6", "s5", "s4"]);
+    expect([...names.slice(3)].sort()).toEqual(["s1", "s2", "s3"]);
+  });
+
+  it("cari nama (tanpa beda huruf; % dan _ diperlakukan harfiah)", async () => {
+    const { owner } = await workspaceWith(["Toko Kue Bu Sri", "KUE BASAH", "Bengkel", "Diskon 50%", "Diskon 500"]);
+    const search = async (q: string) =>
+      (
+        (
+          await request(app())
+            .get(`${sitesOf(owner)}?q=${encodeURIComponent(q)}`)
+            .set(as(owner))
+        ).body.data as {
+          name: string;
+        }[]
+      )
+        .map((item) => item.name)
+        .sort();
+    expect(await search("kue")).toEqual(["KUE BASAH", "Toko Kue Bu Sri"]);
+    expect(await search("50%")).toEqual(["Diskon 50%"]);
+    expect(await search("_")).toEqual([]);
+  });
+
+  it("cursor dari urutan lain → 422; halaman default 24 situs", async () => {
+    const { owner } = await workspaceWith(Array.from({ length: 25 }, (_, index) => `Situs ${index}`));
+    const byName = (
+      await request(app())
+        .get(`${sitesOf(owner)}?sort=name&limit=2`)
+        .set(as(owner))
+    ).body;
+    const mixed = await request(app())
+      .get(`${sitesOf(owner)}?sort=updated&cursor=${byName.meta.nextCursor}`)
+      .set(as(owner));
+    expect(mixed.status).toBe(422);
+
+    const first = (await request(app()).get(sitesOf(owner)).set(as(owner))).body;
+    expect(first.data).toHaveLength(24);
+    expect(first.meta.nextCursor).toEqual(expect.any(String));
   });
 });

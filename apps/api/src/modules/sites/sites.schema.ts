@@ -1,4 +1,4 @@
-import { CreateSiteBodySchema, CursorQuerySchema, UpdateSiteBodySchema } from "@platform/shared/contracts";
+import { CreateSiteBodySchema, ListSitesQuerySchema, UpdateSiteBodySchema } from "@platform/shared/contracts";
 import { z } from "zod";
 
 // Zod request modul sites (CLAUDE.md § Struktur modul API). Bentuk body/response = `@platform/shared/contracts`
@@ -7,7 +7,7 @@ import { z } from "zod";
 const WorkspaceParams = z.object({ workspaceId: z.uuid() });
 const SiteParams = WorkspaceParams.extend({ siteId: z.uuid() });
 
-export const listSitesRequest = { params: WorkspaceParams, query: CursorQuerySchema };
+export const listSitesRequest = { params: WorkspaceParams, query: ListSitesQuerySchema };
 export const createSiteRequest = { params: WorkspaceParams, body: CreateSiteBodySchema };
 export const getSiteRequest = { params: SiteParams };
 export const updateSiteRequest = { params: SiteParams, body: UpdateSiteBodySchema };
