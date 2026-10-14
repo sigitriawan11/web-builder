@@ -469,7 +469,7 @@ Aset ber-hash diunggah hanya jika belum ada (`HEAD` atau cek tabel `site_assets`
 
 ### PUB-043 Tokens → CSS custom properties
 - **Prioritas:** P0 · **Fase:** M4
-- **Deskripsi / Perilaku:** Semua token site (color, typography, spacing, radius, shadow) dirender di `:root` dalam `global.css`, hanya token yang terpakai (tree-shake). Nama: `--t-<kategori>-<slug>` dengan fallback id (`--t-color-primary`, `--t-space-4`). Mode tema (light/dark, P2) → `[data-theme="dark"]` atau `@media (prefers-color-scheme: dark)` sesuai setting site. Typography token menjadi class `.ty-<slug>` yang menggabungkan family/size/line-height/letter-spacing/weight, dengan ukuran per breakpoint.
+- **Deskripsi / Perilaku:** Semua token site (color, typography, spacing, radius, shadow) dirender di `:root` dalam `global.css`, hanya token yang terpakai (tree-shake). Nama: `--t-<kategori>-<slug>` dengan fallback id (`--t-color-primary`, `--t-space-4`). Mode tema (light/dark, P2) → `[data-theme="dark"]` atau `@media (prefers-color-scheme: dark)` sesuai setting site. Typography token komposit menjadi **satu variabel per field** (`--t-typography-h1-font-size`, `--t-typography-h1-line-height`, …) yang dirujuk class style node; varian per breakpoint = override variabel di media query (tanpa class `.ty-<slug>` terpisah — keputusan owner 2026-10-15, selaras DM-041).
 - **Acceptance criteria:**
   - [ ] Mengubah nilai token lalu publish ulang hanya mengubah `global.<hash>.css` (CSS halaman tetap byte-identik).
   - [ ] Ukuran font fluid opsional (P1): `clamp(min, preferred vw, max)` bila token bertipe fluid.

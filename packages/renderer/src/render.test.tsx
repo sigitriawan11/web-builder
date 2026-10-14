@@ -113,7 +113,7 @@ describe("rich text", () => {
     expect(output).toContain(
       '<a href="https://wa.me/6281234567890?text=Halo" target="_blank" rel="noopener noreferrer">pesan via WhatsApp</a>',
     );
-    expect(output).toContain("color:var(--color-primary)");
+    expect(output).toContain("color:var(--t-color-primary)");
     expect(output).toMatch(/<ul><li>.*Bolu.*<\/li><li>.*Kue kering.*<ol><li>.*Nastar/);
     expect(output).toContain("<br/>");
 

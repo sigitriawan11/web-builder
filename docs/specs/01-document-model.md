@@ -1020,7 +1020,7 @@ interface FontDef { family: string; source: "google" | "fontsource" | "upload"; 
 - **Path token**: `<group>.<name>` (`color.primary`, `type.h1` → alias pendek `type` untuk group `typography`, `space.6`). Nama group tetap; nama di dalam group bebas `[a-zA-Z0-9-]+`, nested 1 level opsional (`color.brand.600`).
 - Token `typography` adalah token komposit (objek). Token dengan `mobile`/`tablet` = **responsive token** — dipakai rule `scaleType`/`scaleSpacing` dan renderer mengeluarkannya sebagai CSS variable yang di-override di media query.
 - **Acceptance criteria**:
-  - [ ] Renderer menghasilkan CSS variables: `--color-primary`, `--space-6`, `--type-h1-font-size`, dst.; node merujuk `var(--…)` (bukan nilai literal) sehingga ganti tema tidak perlu re-render node.
+  - [ ] Renderer menghasilkan CSS variables ber-prefix `--t-` (selaras PUB-043): `--t-color-primary`, `--t-space-6`, token typography komposit = satu variabel per field (`--t-typography-h1-font-size`, `--t-typography-h1-line-height`, …); node merujuk `var(--t-…)` (bukan nilai literal) sehingga ganti tema tidak perlu re-render node. *(Diselaraskan 2026-10-15, keputusan owner — lihat Lampiran D ROADMAP.)*
   - [ ] Set token default (`defaultTheme`) tersedia di package dan dipakai website blank.
 
 ### DM-042 Alias token
