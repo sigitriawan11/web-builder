@@ -14,6 +14,8 @@ export interface LinkAttributes {
 }
 
 const SAFE_URL = /^https?:\/\//i;
+const SAFE_PATH = /^\/(?!\/)[a-z0-9\-/[\]]*$/;
+const DIGITS = /^[1-9][0-9]{6,14}$/;
 
 /** ID elemen untuk anchor: `htmlId` bila ada, selain itu ID node (stabil, aman sebagai atribut). */
 export function anchorId(doc: Pick<SiteDocument, "nodes">, nodeId: string): string {
@@ -41,18 +43,20 @@ export function linkHref(link: LinkValue, doc: Pick<SiteDocument, "nodes">, ctx:
       return SAFE_URL.test(link.href) ? link.href : undefined;
     case "page": {
       const path = pagePath(doc, link.pageId);
-      if (path === undefined) return undefined;
+      // Hanya path relatif situs (`/…`, bukan `//host` atau skema lain).
+      if (path === undefined || !SAFE_PATH.test(path)) return undefined;
       return link.anchorNodeId ? `${path}#${anchorId(doc, link.anchorNodeId)}` : path;
     }
     case "anchor":
-      return `#${anchorId(doc, link.nodeId)}`;
+      return `#${encodeURIComponent(anchorId(doc, link.nodeId))}`;
     case "email": {
       const subject = link.subject ? `?subject=${encodeURIComponent(link.subject)}` : "";
       return `mailto:${encodeURIComponent(link.to).replace("%40", "@")}${subject}`;
     }
     case "phone":
-      return `tel:+${link.phone}`;
+      return DIGITS.test(link.phone) ? `tel:+${link.phone}` : undefined;
     case "whatsapp":
+      if (!DIGITS.test(link.phone)) return undefined;
       return `https://wa.me/${link.phone}${link.message ? `?text=${encodeURIComponent(link.message)}` : ""}`;
     case "asset":
       return ctx.assetUrl(link.assetId);

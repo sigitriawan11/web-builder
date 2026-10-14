@@ -5,7 +5,8 @@ import type { ColorValue, LengthValue, TokenRef } from "@platform/document-model
 // sehingga ganti tema hanya mengubah `:root`. `type.*` = alias pendek grup `typography`.
 export function tokenVarName(path: string): string {
   const [head, ...rest] = path.split(".");
-  return `--t-${[head === "type" ? "typography" : head, ...rest].join("-")}`;
+  // Pertahanan berlapis: dokumen yang belum tervalidasi tidak boleh menyisipkan `)`/`;` ke CSS lewat path token.
+  return `--t-${[head === "type" ? "typography" : head, ...rest].join("-").replace(/[^a-zA-Z0-9-]/g, "_")}`;
 }
 
 /** Variabel satu field token typography komposit: `typography.h1` + `font-size` → `--t-typography-h1-font-size`. */
@@ -17,20 +18,33 @@ export function tokenVar(ref: TokenRef): string {
   return `var(${tokenVarName(ref.$token)})`;
 }
 
+const UNITS = new Set(["px", "%", "vw", "vh", "rem", "em", "fr"]);
+const HEX = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
+// Nilai yang tidak berbentuk sesuai skema (dokumen belum tervalidasi) → nilai netral, bukan teks mentah ke CSS.
 export function lengthToCss(value: LengthValue): string {
-  return "$token" in value ? tokenVar(value) : `${value.value}${value.unit}`;
+  if ("$token" in value) return tokenVar(value);
+  return Number.isFinite(value.value) && UNITS.has(value.unit) ? `${value.value}${value.unit}` : "0";
 }
 
 export function colorToCss(value: ColorValue): string {
-  if (typeof value === "string") return value;
-  if ("alpha" in value) return `color-mix(in srgb, ${tokenVar(value)} ${value.alpha * 100}%, transparent)`;
+  if (typeof value === "string") return HEX.test(value) ? value : "currentColor";
+  if ("alpha" in value) {
+    const alpha = Number.isFinite(value.alpha) ? Math.min(1, Math.max(0, value.alpha)) : 1;
+    return `color-mix(in srgb, ${tokenVar(value)} ${alpha * 100}%, transparent)`;
+  }
   return tokenVar(value);
 }
 
-/** String CSS berkutip ganda yang aman (nama font, URL): escape `\`, `"`, dan baris baru. */
+/**
+ * String CSS berkutip ganda yang aman (nama font, URL): escape `\`, `"`, baris baru, dan `<` (CSS di-inline dalam
+ * `<style>` — `</style>` di nama font tidak boleh menutup elemen).
+ */
 export function cssString(value: string): string {
-  return `"${value
+  const escaped = value
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
-    .replace(/[\n\r\f]/g, "\\a ")}"`;
+    .replace(/[\n\r\f]/g, "\\a ")
+    .replace(/</g, "\\3c ");
+  return `"${escaped}"`;
 }
