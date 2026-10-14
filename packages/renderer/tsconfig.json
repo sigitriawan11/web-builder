@@ -1,4 +1,5 @@
 {
-  "extends": "@platform/config/tsconfig/base.json",
-  "include": ["src"]
+  "extends": "@platform/config/tsconfig/react.json",
+  "include": ["src", "test", "vitest.config.ts"],
+  "references": [{ "path": "../document-model" }, { "path": "../config" }]
 }
