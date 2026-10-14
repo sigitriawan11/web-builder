@@ -6,6 +6,8 @@ export const APP_PATHS = {
   forgotPassword: "/forgot-password",
   // Hasil klik link verifikasi (sukses / `?error=token_expired` + kirim ulang) dan form kode 6 digit (ACC-003).
   verifyEmail: "/verify-email",
+  // Form password baru setelah klik link reset (`?token=` atau `?error=INVALID_TOKEN`), ACC-005.
+  resetPassword: "/reset-password",
 } as const;
 
 /**

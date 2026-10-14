@@ -36,6 +36,11 @@ export const RATE_LIMITS = {
     { points: 1, durationSeconds: 60 },
     { points: 5, durationSeconds: 3600 },
   ],
+  // Permintaan link reset password per alamat (ACC-005).
+  passwordResetEmail: [
+    { points: 1, durationSeconds: 60 },
+    { points: 5, durationSeconds: 3600 },
+  ],
   publishFree: [{ points: 10, durationSeconds: 3600 }],
   runtimeFormSubmit: [{ points: 10, durationSeconds: 60 }],
   memberLogin: [

@@ -6,6 +6,7 @@ import { JSON_LIMIT } from "../middleware/body-parsers";
 import { RATE_LIMITS, rateLimit } from "../middleware/rate-limit";
 import { type Auth, authRequestHandler } from "./auth";
 import type { CaptchaVerifier } from "./captcha";
+import { newPasswordGuard } from "./password-reset";
 import { signInGuard } from "./sign-in";
 import { signUpGuard } from "./sign-up";
 
@@ -76,6 +77,20 @@ export function createAuthRouter(deps: {
       ),
     );
   }
+  if (deps.redis) {
+    router.post(
+      "/request-password-reset",
+      ...jsonForBetterAuth(),
+      rateLimit(
+        deps.redis,
+        { name: "password-reset-email", windows: RATE_LIMITS.passwordResetEmail, key: byBodyEmail },
+        limiterOptions,
+      ),
+    );
+  }
+  // Kebijakan password untuk password baru (ACC-001/ACC-005), termasuk ganti password dari pengaturan.
+  router.post("/reset-password", ...jsonForBetterAuth(), newPasswordGuard());
+  router.post("/change-password", ...jsonForBetterAuth(), newPasswordGuard());
   router.all("/*splat", toNodeHandler(authRequestHandler(deps.auth)));
   return router;
 }

@@ -4,15 +4,16 @@ import type { JobPayload } from "@platform/shared/contracts";
 import { getContext, type Logger } from "@platform/shared/node";
 import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError, createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware, getSessionFromCtx } from "better-auth/api";
 import { setSessionCookie } from "better-auth/cookies";
 import { emailOTP } from "better-auth/plugins";
 import type { Redis } from "ioredis";
 import { recordAudit } from "../audit/audit.repository";
 import type { QueueProducer } from "../queues/producer";
-import { AUTH_TABLES, insertConsents } from "./auth.repository";
+import { AUTH_TABLES, activeSessionTokens, insertConsents } from "./auth.repository";
 import { afterAuthCommit, currentAuthTransaction, trackTransactions } from "./auth-transaction";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
+import { currentPasswordReset } from "./password-reset";
 import { currentSignIn, recordSignInFailure } from "./sign-in";
 import { signUpConsents } from "./sign-up";
 import { currentSignUp } from "./sign-up-context";
@@ -31,6 +32,8 @@ export const SESSION_CACHE_TTL_SECONDS = 300;
 const REDIS_PREFIX = "auth:";
 // Verifikasi email (ACC-003): link & kode 6 digit berlaku 24 jam; kode gagal 3× → harus kirim ulang.
 export const EMAIL_VERIFICATION_EXPIRES_IN = DAY;
+// Token reset password berlaku 1 jam, sekali pakai (ACC-005).
+export const RESET_PASSWORD_EXPIRES_IN = 3600;
 const OTP_ALLOWED_ATTEMPTS = 3;
 // Endpoint plugin emailOTP yang TIDAK dipakai (login/reset/ganti email via OTP, kirim OTP terpisah): hanya
 // `/email-otp/verify-email` yang aktif; kode dikirim bersama link oleh `sendVerificationEmail`.
@@ -196,6 +199,46 @@ function signInTracking(deps: { db: Db; redis: Redis; logger: Logger }) {
   } satisfies BetterAuthPlugin;
 }
 
+/**
+ * Setelah `POST /reset-password` berhasil (ACC-005): cabut semua sesi user KECUALI sesi request ini (bila milik user
+ * yang sama) + audit `auth.password_reset`. Daftar sesi dari Postgres; `deleteSessions` menghapus DB & cache Redis.
+ */
+function passwordResetSessions(deps: { db: Db; logger: Logger }) {
+  return {
+    id: "platform-password-reset",
+    hooks: {
+      after: [
+        {
+          matcher: (ctx) => ctx.path === "/reset-password",
+          handler: createAuthMiddleware(async (ctx) => {
+            const reset = currentPasswordReset();
+            if (!reset?.userId) return;
+            const userId = reset.userId;
+            const current = await getSessionFromCtx(ctx);
+            const keepToken = current?.user.id === userId ? current.session.token : undefined;
+            const tokens = await activeSessionTokens(deps.db, userId, keepToken);
+            if (tokens.length > 0) await ctx.context.internalAdapter.deleteSessions(tokens);
+            try {
+              await recordAudit(deps.db, {
+                actorType: "user",
+                actorId: userId,
+                action: "auth.password_reset",
+                targetType: "user",
+                targetId: userId,
+                ip: reset.ip ?? null,
+                userAgent: reset.userAgent ?? null,
+                metadata: { revokedSessions: tokens.length },
+              });
+            } catch (error) {
+              deps.logger.error({ err: error }, "audit reset password gagal");
+            }
+          }),
+        },
+      ],
+    },
+  } satisfies BetterAuthPlugin;
+}
+
 export function createAuth(deps: {
   db: Db;
   redis: Redis;
@@ -240,6 +283,19 @@ export function createAuth(deps: {
       // Kebijakan lengkap (daftar password umum) di signUpGuard; batas ini cadangan untuk endpoint BA lain.
       minPasswordLength: PASSWORD_MIN_LENGTH,
       maxPasswordLength: PASSWORD_MAX_LENGTH,
+      resetPasswordTokenExpiresIn: RESET_PASSWORD_EXPIRES_IN,
+      // Pencabutan sesi diatur plugin `platform-password-reset` (sesi saat ini dipertahankan).
+      revokeSessionsOnPasswordReset: false,
+      sendResetPassword: async ({ user, token }) => {
+        // Link publik → BA memvalidasi token lalu mengarahkan ke form password baru di web.
+        const resetUrl = `${config.publicAuthUrl.replace(/\/$/, "")}/reset-password/${encodeURIComponent(token)}?callbackURL=${encodeURIComponent(APP_PATHS.resetPassword)}`;
+        enqueueEmail({ template: "auth.password_reset", userId: user.id, resetUrl });
+      },
+      onPasswordReset: async ({ user }) => {
+        const reset = currentPasswordReset();
+        if (reset) reset.userId = user.id;
+        enqueueEmail({ template: "auth.password_changed", userId: user.id });
+      },
       onExistingUserSignUp: async ({ user }) => {
         enqueueEmail({ template: "auth.account_exists", userId: user.id });
       },
@@ -296,6 +352,7 @@ export function createAuth(deps: {
     plugins: [
       signUpAutoSignIn,
       signInTracking({ db: deps.db, redis: deps.redis, logger }),
+      passwordResetSessions({ db: deps.db, logger }),
       emailOTP({
         expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
         allowedAttempts: OTP_ALLOWED_ATTEMPTS,
