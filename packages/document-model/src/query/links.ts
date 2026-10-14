@@ -1,4 +1,5 @@
 import type { SiteDocument } from "../schema";
+import { walkJsonObjects } from "./walk-json";
 
 // Rujukan link internal (DM-056): link `page` (+ `anchorNodeId`) dan `anchor` di props node — termasuk mark link
 // rich text & link image/frame. Dicari generik agar field link baru otomatis ikut diperiksa.
@@ -9,35 +10,27 @@ export type LinkRefLocation =
 
 export type BrokenLink = LinkRefLocation & { reason: "PAGE_MISSING" | "ANCHOR_MISSING"; message: string };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 export function collectLinkRefs(doc: Pick<SiteDocument, "nodes">): LinkRefLocation[] {
   const found: LinkRefLocation[] = [];
-  const visit = (value: unknown, nodeId: string, path: (string | number)[]): void => {
-    if (Array.isArray(value)) {
-      for (const [index, item] of value.entries()) visit(item, nodeId, [...path, index]);
-      return;
-    }
-    if (!isRecord(value)) return;
-    if (value.type === "page" && typeof value.pageId === "string") {
-      found.push({
-        kind: "page",
-        pageId: value.pageId,
-        ...(typeof value.anchorNodeId === "string" ? { anchorNodeId: value.anchorNodeId } : {}),
-        nodeId,
-        path,
-      });
-      return;
-    }
-    if (value.type === "anchor" && typeof value.nodeId === "string") {
-      found.push({ kind: "anchor", targetId: value.nodeId, nodeId, path });
-      return;
-    }
-    for (const [key, child] of Object.entries(value)) visit(child, nodeId, [...path, key]);
-  };
-  for (const node of Object.values(doc.nodes)) visit(node.props, node.id, ["nodes", node.id, "props"]);
+  for (const node of Object.values(doc.nodes)) {
+    walkJsonObjects(node.props, ["nodes", node.id, "props"], (value, path) => {
+      if (value.type === "page" && typeof value.pageId === "string") {
+        found.push({
+          kind: "page",
+          pageId: value.pageId,
+          ...(typeof value.anchorNodeId === "string" ? { anchorNodeId: value.anchorNodeId } : {}),
+          nodeId: node.id,
+          path: path(),
+        });
+        return true;
+      }
+      if (value.type === "anchor" && typeof value.nodeId === "string") {
+        found.push({ kind: "anchor", targetId: value.nodeId, nodeId: node.id, path: path() });
+        return true;
+      }
+      return false;
+    });
+  }
   return found;
 }
 

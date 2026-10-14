@@ -17,13 +17,16 @@ export const STRUCTURE_ISSUE_CODES = [
   "PAGE_LAYOUT",
   // DM-027: image tidak boleh hug.
   "SIZE_MODE",
+  // DM-076: batas hard dokumen (`details.limit` = nama batas).
+  "LIMITS",
 ] as const;
 
 // Rujukan ke data lain di dokumen: warning saat edit, error saat publish/ai (DM-068).
 export const REFERENCE_ISSUE_CODES = ["ASSET_REF", "ASSET_KIND", "TOKEN_REF", "FONT_REF", "BROKEN_LINK"] as const;
 
 // Lint kualitas/a11y (DM-009): selalu warning.
-export const LINT_ISSUE_CODES = ["MULTIPLE_H1", "HEADING_SKIP", "IMAGE_MISSING_ALT"] as const;
+// `LIMIT_WARNING`: mendekati batas DM-076 (melewati batas soft).
+export const LINT_ISSUE_CODES = ["MULTIPLE_H1", "HEADING_SKIP", "IMAGE_MISSING_ALT", "LIMIT_WARNING"] as const;
 
 export const ISSUE_CODES = [...STRUCTURE_ISSUE_CODES, ...REFERENCE_ISSUE_CODES, ...LINT_ISSUE_CODES] as const;
 export type IssueCode = (typeof ISSUE_CODES)[number];
@@ -36,9 +39,17 @@ export interface Issue {
   nodeId?: string;
   pageId?: string;
   message: IssueMessage;
+  details?: IssueDetails;
 }
 
-export type IssueReporter = (code: IssueCode, path: (string | number)[], message: IssueMessage) => void;
+export type IssueDetails = Record<string, string | number>;
+
+export type IssueReporter = (
+  code: IssueCode,
+  path: (string | number)[],
+  message: IssueMessage,
+  details?: IssueDetails,
+) => void;
 
 /** nodeId dari path `["nodes", id, ...]`. */
 export function nodeIdOfPath(path: readonly PropertyKey[]): string | undefined {

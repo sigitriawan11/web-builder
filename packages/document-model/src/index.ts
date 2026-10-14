@@ -9,6 +9,13 @@ export {
   type SettingsInput,
 } from "./defaults/top-level";
 export { createId, ID_PATTERN, ID_PREFIXES, type IdPrefix } from "./ids";
+export {
+  checkByteLimit,
+  checkLimit,
+  DOCUMENT_LIMITS,
+  type LimitCheck,
+  type LimitName,
+} from "./limits";
 export * from "./ops";
 export * from "./query";
 export * from "./schema";
@@ -17,11 +24,13 @@ export {
   ISSUE_CODES,
   type Issue,
   type IssueCode,
+  type IssueDetails,
   type IssueMessage,
   LINT_ISSUE_CODES,
   REFERENCE_ISSUE_CODES,
   STRUCTURE_ISSUE_CODES,
 } from "./validate/issues";
+export { limitMessage } from "./validate/limits";
 export { type LintWarning, lintDocument } from "./validate/lint";
 export { type ValidationMode, type ValidationResult, validateDocument } from "./validate/validate-document";
 export * from "./yjs";

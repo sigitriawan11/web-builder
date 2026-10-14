@@ -1,6 +1,7 @@
 import { type SiteDocument, SiteDocumentSchema } from "../schema";
 import { checkReferences } from "./invariants";
-import { ISSUE_CODES, type Issue, type IssueCode, type IssueMessage, nodeIdOfPath } from "./issues";
+import { ISSUE_CODES, type Issue, type IssueCode, type IssueDetails, type IssueMessage, nodeIdOfPath } from "./issues";
+import { checkDocumentLimits } from "./limits";
 import { lintDocument } from "./lint";
 
 /**
@@ -18,9 +19,9 @@ export type ValidationResult =
 
 const KNOWN_CODES = new Set<string>(ISSUE_CODES);
 
-function makeIssue(code: IssueCode, path: (string | number)[], message: IssueMessage): Issue {
+function makeIssue(code: IssueCode, path: (string | number)[], message: IssueMessage, details?: IssueDetails): Issue {
   const nodeId = nodeIdOfPath(path);
-  return { code, path, ...(nodeId ? { nodeId } : {}), message };
+  return { code, path, ...(nodeId ? { nodeId } : {}), message, ...(details ? { details } : {}) };
 }
 
 export function validateDocument(input: unknown, options: { mode: ValidationMode }): ValidationResult {
@@ -29,10 +30,12 @@ export function validateDocument(input: unknown, options: { mode: ValidationMode
     const errors = parsed.error.issues.map((issue) => {
       const path = issue.path.filter((key): key is string | number => typeof key !== "symbol");
       const params =
-        issue.code === "custom" ? (issue.params as { issueCode?: unknown; en?: unknown } | undefined) : undefined;
+        issue.code === "custom"
+          ? (issue.params as { issueCode?: unknown; en?: unknown; details?: IssueDetails } | undefined)
+          : undefined;
       if (typeof params?.issueCode === "string" && KNOWN_CODES.has(params.issueCode)) {
         const en = typeof params.en === "string" ? params.en : issue.message;
-        return makeIssue(params.issueCode as IssueCode, path, { id: issue.message, en });
+        return makeIssue(params.issueCode as IssueCode, path, { id: issue.message, en }, params.details);
       }
       return makeIssue("SCHEMA", path, { id: issue.message, en: issue.message });
     });
@@ -41,8 +44,11 @@ export function validateDocument(input: unknown, options: { mode: ValidationMode
 
   const document = parsed.data;
   const references: Issue[] = [];
-  checkReferences(document, (code, path, message) => references.push(makeIssue(code, path, message)));
-  const lint = lintDocument(document);
+  checkReferences(document, (code, path, message, details) => references.push(makeIssue(code, path, message, details)));
+  const lint: Issue[] = lintDocument(document);
+  checkDocumentLimits(document, "soft", (code, path, message, details) =>
+    lint.push(makeIssue(code, path, message, details)),
+  );
 
   if (options.mode === "edit") return { ok: true, document, errors: [], warnings: [...references, ...lint] };
   if (references.length === 0) return { ok: true, document, errors: [], warnings: lint };

@@ -1,15 +1,18 @@
+import { DOCUMENT_LIMITS } from "../limits";
 import { collectAssetRefs } from "../query/assets";
 import { findBrokenLinks } from "../query/links";
 import { checkThemeTokens, tokenEntry } from "../query/tokens";
+import { walkJsonObjects } from "../query/walk-json";
 import type { Node, SiteDocument, StylePatch } from "../schema";
 import type { IssueReporter } from "./issues";
+import { checkDocumentLimits } from "./limits";
 
 // Invariant lintas node DM-069. Dua kelompok:
 // - struktur (`checkStructure`): selalu error, dijalankan `SiteDocumentSchema` — dokumen tanpa ini tidak bisa dipakai;
 // - rujukan (`checkReferences`): asset/token/font/link — warning saat edit, error saat publish (DM-068).
 
-/** Kedalaman tree maksimum (DM-069 `DEPTH`): page = 0. */
-export const MAX_TREE_DEPTH = 32;
+/** Kedalaman tree maksimum (DM-069 `DEPTH`, DM-076): page = 0. */
+export const MAX_TREE_DEPTH = DOCUMENT_LIMITS.treeDepth.hard;
 
 type DocShape = Pick<SiteDocument, "nodes" | "pageOrder" | "assets" | "theme" | "settings">;
 
@@ -181,6 +184,8 @@ export function checkStructure(doc: DocShape, report: IssueReporter): void {
     }
   }
 
+  checkDocumentLimits(doc, "hard", report);
+
   // Siklus parent-child lolos cek relasi di atas, jadi pastikan semua node terjangkau dari page.
   for (const id of Object.keys(nodes)) {
     if (!reachable.has(id)) {
@@ -255,23 +260,24 @@ export function checkReferences(doc: DocShape, report: IssueReporter): void {
   checkFontFamilies(doc, report);
   // DM-041/DM-042 + DM-069 TOKEN_REF: alias theme ter-resolve; `$token` di node ada di theme.
   checkThemeTokens(doc.theme, report);
+  // Ribuan rujukan memakai segelintir token: hasil lookup di-cache per path (tokenEntry memvalidasi literal).
+  const tokenExists = new Map<string, boolean>();
+  const checkToken = (token: string, path: (string | number)[]) => {
+    let exists = tokenExists.get(token);
+    if (exists === undefined) {
+      exists = tokenEntry(doc.theme, token) !== undefined;
+      tokenExists.set(token, exists);
+    }
+    if (!exists) {
+      report("TOKEN_REF", path, {
+        id: `Token "${token}" tidak ada di theme`,
+        en: `Token "${token}" does not exist in the theme`,
+      });
+    }
+  };
   for (const node of Object.values(doc.nodes)) {
-    visitTokenRefs(node.style, ["nodes", node.id, "style"], (token, path) => {
-      if (tokenEntry(doc.theme, token) === undefined) {
-        report("TOKEN_REF", path, {
-          id: `Token "${token}" tidak ada di theme`,
-          en: `Token "${token}" does not exist in the theme`,
-        });
-      }
-    });
-    visitTokenRefs(node.props, ["nodes", node.id, "props"], (token, path) => {
-      if (tokenEntry(doc.theme, token) === undefined) {
-        report("TOKEN_REF", path, {
-          id: `Token "${token}" tidak ada di theme`,
-          en: `Token "${token}" does not exist in the theme`,
-        });
-      }
-    });
+    visitTokenRefs(node.style, ["nodes", node.id, "style"], checkToken);
+    visitTokenRefs(node.props, ["nodes", node.id, "props"], checkToken);
   }
 
   // DM-056: link page/anchor menunjuk page & node yang ada.
@@ -288,19 +294,14 @@ export function checkReferences(doc: DocShape, report: IssueReporter): void {
 
 function visitTokenRefs(
   value: unknown,
-  path: (string | number)[],
+  basePath: (string | number)[],
   visit: (token: string, path: (string | number)[]) => void,
 ): void {
-  if (Array.isArray(value)) {
-    for (const [index, item] of value.entries()) visitTokenRefs(item, [...path, index], visit);
-    return;
-  }
-  if (value === null || typeof value !== "object") return;
-  if ("$token" in value && typeof value.$token === "string") {
-    visit(value.$token, path);
-    return;
-  }
-  for (const [key, child] of Object.entries(value)) visitTokenRefs(child, [...path, key], visit);
+  walkJsonObjects(value, basePath, (object, path) => {
+    if (typeof object.$token !== "string") return false;
+    visit(object.$token, path());
+    return true;
+  });
 }
 
 // DM-032: family literal (bukan token) wajib terdaftar di `theme.fonts`, agar font pasti termuat saat publish.
@@ -329,20 +330,15 @@ function checkFontFamilies(doc: DocShape, report: IssueReporter): void {
 // Telusuri JSON rich text (list bersarang) dan laporkan fontFamily mark `textStyle` beserta path persisnya.
 function visitTextStyleMarks(
   value: unknown,
-  path: (string | number)[],
+  basePath: (string | number)[],
   check: (fontFamily: unknown, path: (string | number)[]) => void,
 ): void {
-  if (Array.isArray(value)) {
-    for (const [index, item] of value.entries()) visitTextStyleMarks(item, [...path, index], check);
-    return;
-  }
-  if (value === null || typeof value !== "object") return;
-  if ("type" in value && value.type === "textStyle" && "attrs" in value) {
-    const attrs = value.attrs;
+  walkJsonObjects(value, basePath, (object, path) => {
+    if (object.type !== "textStyle") return false;
+    const attrs = object.attrs;
     if (attrs !== null && typeof attrs === "object" && "fontFamily" in attrs) {
-      check(attrs.fontFamily, [...path, "attrs", "fontFamily"]);
+      check(attrs.fontFamily, [...path(), "attrs", "fontFamily"]);
     }
-    return;
-  }
-  for (const [key, child] of Object.entries(value)) visitTextStyleMarks(child, [...path, key], check);
+    return true;
+  });
 }

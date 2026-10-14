@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { NodeIdSchema } from "../schema";
+import { exceeds, locate, pageNodeCount, subtreeHeight } from "./limits";
 import { defineOp, fail } from "./op";
-import { childrenOf, isSelfOrDescendant, nodesMap, nodeType, parentIdOf } from "./y-access";
+import { childrenOf, collectSubtree, isSelfOrDescendant, nodesMap, nodeType, parentIdOf } from "./y-access";
 
 // Flat map membuat move cukup mengubah parentId + dua array children (DM-059).
 export const moveNode = defineOp({
@@ -26,6 +27,22 @@ export const moveNode = defineOp({
       return fail("CYCLE", `Node "${input.id}" tidak bisa dipindah ke dalam dirinya sendiri atau turunannya`, [
         "newParentId",
       ]);
+    }
+
+    // DM-076: pindah ke parent/page lain tidak boleh melewati batas (dicek sebelum menulis).
+    const currentParentId = parentIdOf(node);
+    if (currentParentId !== input.newParentId) {
+      const target = locate(nodes, input.newParentId);
+      const source = locate(nodes, input.id);
+      const limitError =
+        exceeds("childrenPerContainer", targetChildren.length + 1, ["newParentId"]) ??
+        exceeds("treeDepth", target.depth + 1 + subtreeHeight(nodes, input.id), ["newParentId"]) ??
+        (target.pageId && target.pageId !== source.pageId
+          ? exceeds("nodesPerPage", pageNodeCount(nodes, target.pageId) + collectSubtree(nodes, input.id).size, [
+              "newParentId",
+            ])
+          : null);
+      if (limitError) return limitError;
     }
 
     const oldParentId = parentIdOf(node);

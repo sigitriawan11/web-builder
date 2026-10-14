@@ -95,7 +95,8 @@ const baseShape = {
   metadata: NodeMetadataSchema.optional(),
 };
 
-const childrenShape = { children: z.array(ChildIdSchema).max(500) };
+// Batas jumlah anak (DM-076) diperiksa invariant `LIMITS` (pesan informatif + nama batas).
+const childrenShape = { children: z.array(ChildIdSchema) };
 
 // Hanya page yang boleh `parentId: null`; node lain selalu punya parent (DM-006).
 export const PageNodeSchema = z.strictObject({

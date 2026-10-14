@@ -1,4 +1,5 @@
 import type { SiteDocument } from "../schema";
+import { walkJsonObjects } from "./walk-json";
 
 // DM-057: rujukan asset dicari generik (objek ber-`assetId` di props & style node, rich text, settings, theme) agar node
 // atau field baru yang memakai AssetRef/LinkValue otomatis ikut diperiksa invariant & gcAssets tanpa daftar manual.
@@ -10,24 +11,16 @@ type AssetScanInput = Pick<SiteDocument, "nodes" | "settings" | "theme">;
 /** Semua rujukan asset dalam dokumen beserta path-nya (untuk pesan error invariant). */
 export function collectAssetRefs(doc: AssetScanInput): AssetRefLocation[] {
   const found: AssetRefLocation[] = [];
-  const visit = (value: unknown, path: (string | number)[]): void => {
-    if (Array.isArray(value)) {
-      for (const [index, item] of value.entries()) visit(item, [...path, index]);
-      return;
-    }
-    if (value === null || typeof value !== "object") return;
-    for (const [key, child] of Object.entries(value)) {
-      if (key === "assetId" && typeof child === "string") found.push({ assetId: child, path: [...path, key] });
-      else visit(child, [...path, key]);
-    }
+  const visit = (object: Record<string, unknown>, path: () => (string | number)[]) => {
+    if (typeof object.assetId === "string") found.push({ assetId: object.assetId, path: [...path(), "assetId"] });
   };
   for (const node of Object.values(doc.nodes)) {
-    visit(node.props, ["nodes", node.id, "props"]);
+    walkJsonObjects(node.props, ["nodes", node.id, "props"], visit);
     // Fill gambar (DM-029) di setiap breakpoint.
-    visit(node.style, ["nodes", node.id, "style"]);
+    walkJsonObjects(node.style, ["nodes", node.id, "style"], visit);
   }
-  visit(doc.settings, ["settings"]);
-  visit(doc.theme, ["theme"]);
+  walkJsonObjects(doc.settings, ["settings"], visit);
+  walkJsonObjects(doc.theme, ["theme"], visit);
   return found;
 }
 

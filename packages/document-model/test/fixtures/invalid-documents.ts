@@ -78,6 +78,14 @@ export const INVALID_DOCUMENTS = {
     const image = doc.nodes.n_heroimg001 as { style: Record<string, unknown> };
     image.style.tablet = { size: { height: { mode: "hug" } } };
   }),
+  LIMITS: hero((doc) => {
+    // Teks > 20.000 karakter (DM-076 `textCharsPerNode`) — batas paling kecil untuk disimpan sebagai fixture.
+    const title = doc.nodes.n_herottl001 as { props: Record<string, unknown> };
+    title.props.content = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Kue enak. ".repeat(2_001) }] }],
+    };
+  }),
   ASSET_REF: hero((doc) => {
     doc.assets = {};
   }),

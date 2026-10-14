@@ -50,7 +50,8 @@ const SiteDocumentShapeSchema = z.strictObject({
   assets: z.record(AssetIdSchema, AssetEntrySchema),
   componentDeps: z.record(ComponentIdSchema, ComponentDepSchema),
   dataSources: DataSourcesSchema.optional(),
-  pageOrder: z.array(PageIdSchema).min(1).max(200),
+  // Batas jumlah page (DM-076) diperiksa invariant `LIMITS` agar pesannya informatif.
+  pageOrder: z.array(PageIdSchema).min(1),
   nodes: z.record(NodeIdSchema, NodeSchema),
 });
 
@@ -59,8 +60,8 @@ type SiteDocumentShape = z.infer<typeof SiteDocumentShapeSchema>;
 // Invariant struktur DM-069 (selalu error). Kode issue dibawa di `params.issueCode` (+ pesan EN) agar
 // `validateDocument` bisa memetakannya; rujukan (asset/token/font/link) diperiksa `validateDocument` sesuai mode.
 function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
-  checkStructure(doc, (issueCode, path, message) => {
-    ctx.addIssue({ code: "custom", path, message: message.id, params: { issueCode, en: message.en } });
+  checkStructure(doc, (issueCode, path, message, details) => {
+    ctx.addIssue({ code: "custom", path, message: message.id, params: { issueCode, en: message.en, details } });
   });
 }
 

@@ -9,12 +9,20 @@ export interface OpContext {
   idGen?: (prefix: IdPrefix) => string;
 }
 
-export type OpErrorCode = "INVALID_INPUT" | "NOT_FOUND" | "INVALID_TARGET" | "CYCLE" | "INVALID_RESULT";
+export type OpErrorCode =
+  | "INVALID_INPUT"
+  | "NOT_FOUND"
+  | "INVALID_TARGET"
+  | "CYCLE"
+  | "INVALID_RESULT"
+  // DM-076: batas teknis dokumen; `details.limit` = nama batas (bukan batas paket `PLAN_LIMIT_REACHED`).
+  | "LIMIT_EXCEEDED";
 
 export interface OpIssue {
   code: OpErrorCode;
   message: string;
   path?: (string | number)[];
+  details?: Record<string, string | number>;
 }
 
 export type OpResult<T> = { ok: true; value: T; affected: string[] } | { ok: false; error: OpIssue };
@@ -32,8 +40,13 @@ export function defineOp<I extends z.ZodType, O>(def: OpDef<I, O>): OpDef<I, O> 
   return def;
 }
 
-export function fail(code: OpErrorCode, message: string, path?: (string | number)[]): OpResult<never> {
-  return { ok: false, error: path ? { code, message, path } : { code, message } };
+export function fail(
+  code: OpErrorCode,
+  message: string,
+  path?: (string | number)[],
+  details?: OpIssue["details"],
+): OpResult<never> {
+  return { ok: false, error: { code, message, ...(path ? { path } : {}), ...(details ? { details } : {}) } };
 }
 
 export function runOp<I extends z.ZodType, O>(ctx: OpContext, op: OpDef<I, O>, input: unknown): OpResult<O> {
