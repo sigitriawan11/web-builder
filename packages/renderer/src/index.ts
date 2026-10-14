@@ -48,3 +48,4 @@ export {
   type WidthEstimateContext,
 } from "./responsive/estimate-width";
 export { renderRichText } from "./rich-text";
+export { escapeHtml, renderToStaticHtml, type StaticPage, type StaticRenderOptions } from "./static";
