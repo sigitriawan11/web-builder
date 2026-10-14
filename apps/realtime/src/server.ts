@@ -1,4 +1,4 @@
-import { Server } from "@hocuspocus/server";
+import { type Extension, Server } from "@hocuspocus/server";
 import type { Logger } from "@platform/shared/node";
 import { authenticateConnection, RealtimeAuthError, type RealtimeContext } from "./auth";
 
@@ -10,6 +10,7 @@ export interface RealtimeServerOptions {
   host?: string;
   tokenSecret: string;
   logger: Logger;
+  extensions?: Extension[];
   now?: () => number;
 }
 
@@ -20,6 +21,7 @@ export function createRealtimeServer(options: RealtimeServerOptions): Server<Rea
     quiet: true,
     // Shutdown dikelola main.ts (flush persistence dulu).
     stopOnSignals: false,
+    extensions: options.extensions ?? [],
     async onAuthenticate({ token, documentName, connectionConfig, socketId }) {
       try {
         const context = await authenticateConnection(options.tokenSecret, token, documentName, options.now);

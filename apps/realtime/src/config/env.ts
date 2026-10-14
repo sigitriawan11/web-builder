@@ -11,6 +11,8 @@ export const realtimeEnvSchema = {
   REALTIME_HOST: z.string().min(1).default("0.0.0.0"),
   // Sama dengan api (penandatangan token koneksi, `POST /v1/realtime/token`).
   REALTIME_TOKEN_SECRET: envField.secret(32),
+  DATABASE_URL: envField.url(),
+  DATABASE_POOL_MAX: envField.int().default(5),
 };
 
 export type RealtimeEnv = ReturnType<typeof loadRealtimeEnv>;

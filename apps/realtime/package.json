@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@hocuspocus/server": "4.7.0",
+    "@platform/db": "workspace:*",
     "@platform/document-model": "workspace:*",
     "@platform/shared": "workspace:*",
     "y-protocols": "1.0.7",

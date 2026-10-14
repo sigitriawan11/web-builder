@@ -4,6 +4,7 @@
   "references": [
     { "path": "../../packages/config" },
     { "path": "../../packages/shared" },
-    { "path": "../../packages/document-model" }
+    { "path": "../../packages/document-model" },
+    { "path": "../../packages/db" }
   ]
 }
