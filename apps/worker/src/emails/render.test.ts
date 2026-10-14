@@ -53,6 +53,15 @@ describe("isi khusus", () => {
     expect(id.html).toContain("Kode verifikasi Anda: 482915");
   });
 
+  it("ganti email (verifikasi tanpa kode): subjek & isi khusus, tanpa blok kode", async () => {
+    const job: EmailJob = { ...base, template: "auth.verify_email", verifyUrl, email: "baru@contoh.id" };
+    const email = await renderEmail(job, { locale: "id", name: "Budi" }, appUrl);
+    expect(email.subject).toBe("Konfirmasi alamat email baru Anda");
+    expect(email.text).toContain("email lama tetap aktif");
+    expect(email.text).not.toMatch(/\b\d{6}\b/);
+    expect(email.html).toContain(`href="${escapeHref(verifyUrl)}"`);
+  });
+
   it("nama user di-escape (bukan HTML mentah)", async () => {
     const email = await renderEmail(
       { ...base, template: "auth.welcome" },

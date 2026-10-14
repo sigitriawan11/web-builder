@@ -2,6 +2,7 @@
   "VALIDATION_FAILED": "Data yang dikirim tidak valid. Periksa kembali isian Anda.",
   "UNAUTHENTICATED": "Silakan masuk terlebih dahulu.",
   "FORBIDDEN": "Anda tidak memiliki akses untuk tindakan ini.",
+  "REAUTH_REQUIRED": "Konfirmasi identitas Anda dulu (masukkan password atau masuk ulang) untuk melanjutkan.",
   "CAPTCHA_REQUIRED": "Verifikasi bahwa Anda bukan robot untuk melanjutkan.",
   "NOT_FOUND": "Data yang dicari tidak ditemukan.",
   "CONFLICT": "Data sudah berubah atau bentrok dengan data lain. Muat ulang lalu coba lagi.",

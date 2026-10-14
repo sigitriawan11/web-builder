@@ -38,3 +38,24 @@ export const SessionInfoSchema = z.object({
   expiresAt: z.iso.datetime(),
 });
 export type SessionInfo = z.infer<typeof SessionInfoSchema>;
+
+// Profil pengguna (ACC-008). Avatar (`image`) diunggah lewat pipeline aset (T2.12.1); sampai itu null → inisial.
+export const ProfileSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  email: z.email(),
+  emailVerified: z.boolean(),
+  image: z.string().nullable(),
+  locale: z.enum(["id", "en"]),
+  timezone: z.string(),
+  // Menentukan cara re-auth (password vs login ulang) & apakah tautan Google boleh diputus.
+  hasPassword: z.boolean(),
+});
+export type Profile = z.infer<typeof ProfileSchema>;
+
+export const UpdateProfileBodySchema = z
+  .strictObject({
+    name: z.string().trim().min(1).max(100).optional(),
+  })
+  .refine((body) => Object.keys(body).length > 0, "minimal satu field");
+export type UpdateProfileBody = z.infer<typeof UpdateProfileBodySchema>;

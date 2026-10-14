@@ -7,9 +7,11 @@ import { createAccountController } from "./account.controller";
 import {
   acceptConsentsRequest,
   getConsentsRequest,
+  getProfileRequest,
   listSessionsRequest,
   revokeOtherSessionsRequest,
   revokeSessionRequest,
+  updateProfileRequest,
 } from "./account.schema";
 import type { AccountService } from "./account.service";
 
@@ -34,6 +36,8 @@ export function createAccountRouter(deps: AccountRouterDeps): Router {
       ),
     );
   }
+  router.get("/profile", ...validated(getProfileRequest, controller.getProfile));
+  router.patch("/profile", ...validated(updateProfileRequest, controller.updateProfile));
   router.get("/consents", ...validated(getConsentsRequest, controller.getConsents));
   router.post("/consents", ...validated(acceptConsentsRequest, controller.acceptConsents));
   router.get("/sessions", ...validated(listSessionsRequest, controller.listSessions));

@@ -19,6 +19,8 @@
   "auth.verify_email.cta": "Verify email",
   "auth.verify_email.code": "Or enter this code on the verification page:",
   "auth.verify_email.ignore": "If you did not create a Platform account, you can ignore this email.",
+  "auth.verify_email.change_subject": "Confirm your new email address",
+  "auth.verify_email.change_body": "Click the button below to use this address as your Platform account email. Until you confirm, your old email stays active. The link is valid for 24 hours.",
   "auth.password_reset.subject": "Reset your password",
   "auth.password_reset.preview": "The password reset link is valid for 1 hour.",
   "auth.password_reset.greeting": "Hi {name},",

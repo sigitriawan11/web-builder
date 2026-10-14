@@ -1,6 +1,12 @@
 import type { Db } from "@platform/db";
 import { AppError, LEGAL_VERSIONS } from "@platform/shared";
-import type { AcceptConsentsBody, ConsentStatus, SessionInfo } from "@platform/shared/contracts";
+import type {
+  AcceptConsentsBody,
+  ConsentStatus,
+  Profile,
+  SessionInfo,
+  UpdateProfileBody,
+} from "@platform/shared/contracts";
 import { recordAudit } from "../../audit/audit.repository";
 import * as repository from "./account.repository";
 
@@ -31,6 +37,9 @@ export interface AccountServiceDeps {
   db: Db;
   // Port pencabutan sesi (implementasi: Better Auth `deleteSessions` → hapus DB + cache Redis seketika).
   revokeSessionTokens: (tokens: string[]) => Promise<void>;
+  // Port ubah field user (implementasi: Better Auth `updateUser` → DB + salinan user di cache sesi Redis, agar
+  // `req.ctx.user` tidak basi).
+  updateUser: (userId: string, fields: { name?: string }) => Promise<void>;
 }
 
 function toSessionInfo(row: repository.SessionRow, currentSessionId: string): SessionInfo {
@@ -110,7 +119,28 @@ export function createAccountService(deps: AccountServiceDeps) {
     return { revoked: tokens.length };
   }
 
-  return { consentStatus, acceptConsents, listSessions, revokeSession, revokeOtherSessions };
+  // --- Profil (ACC-008) ---
+
+  async function getProfile(userId: string): Promise<Profile> {
+    const profile = await repository.findProfile(db, userId);
+    if (!profile) throw new AppError("NOT_FOUND");
+    return profile;
+  }
+
+  async function updateProfile(userId: string, body: UpdateProfileBody): Promise<Profile> {
+    await deps.updateUser(userId, { ...(body.name === undefined ? {} : { name: body.name }) });
+    return getProfile(userId);
+  }
+
+  return {
+    consentStatus,
+    acceptConsents,
+    listSessions,
+    revokeSession,
+    revokeOtherSessions,
+    getProfile,
+    updateProfile,
+  };
 }
 
 export type AccountService = ReturnType<typeof createAccountService>;

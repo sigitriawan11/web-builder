@@ -5,9 +5,11 @@ import type { ValidatedHandler } from "../../middleware/validate";
 import type {
   acceptConsentsRequest,
   getConsentsRequest,
+  getProfileRequest,
   listSessionsRequest,
   revokeOtherSessionsRequest,
   revokeSessionRequest,
+  updateProfileRequest,
 } from "./account.schema";
 import type { AccountService, Actor } from "./account.service";
 
@@ -48,5 +50,11 @@ export function createAccountController(service: AccountService) {
   const revokeOtherSessions: ValidatedHandler<typeof revokeOtherSessionsRequest> = async (req, res) => {
     res.json({ data: await service.revokeOtherSessions(actor(req), evidence(req)), meta: meta(res) });
   };
-  return { getConsents, acceptConsents, listSessions, revokeSession, revokeOtherSessions };
+  const getProfile: ValidatedHandler<typeof getProfileRequest> = async (req, res) => {
+    res.json({ data: await service.getProfile(userId(req)), meta: meta(res) });
+  };
+  const updateProfile: ValidatedHandler<typeof updateProfileRequest> = async (req, res) => {
+    res.json({ data: await service.updateProfile(userId(req), req.valid.body), meta: meta(res) });
+  };
+  return { getConsents, acceptConsents, listSessions, revokeSession, revokeOtherSessions, getProfile, updateProfile };
 }

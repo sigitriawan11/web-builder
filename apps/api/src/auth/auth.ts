@@ -12,6 +12,7 @@ import { recordAudit } from "../audit/audit.repository";
 import type { QueueProducer } from "../queues/producer";
 import { AUTH_TABLES, activeSessionTokens, insertConsents } from "./auth.repository";
 import { afterAuthCommit, currentAuthTransaction, trackTransactions } from "./auth-transaction";
+import { currentEmailChange } from "./email-change";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
 import { currentPasswordReset } from "./password-reset";
 import { currentEvidence } from "./request-evidence";
@@ -51,6 +52,9 @@ const DISABLED_OTP_PATHS = [
 // Endpoint sesi bawaan BA membaca daftar sesi dari cache Redis (≤ 5 menit) → tidak lengkap. Pengganti berbasis
 // Postgres: `/v1/account/sessions` (ACC-007). `/sign-out` dan `/revoke-sessions` (semua sesi) tetap aktif.
 const DISABLED_SESSION_PATHS = ["/list-sessions", "/revoke-session", "/revoke-other-sessions"];
+// `/update-user` BA membiarkan klien mengisi `image` dengan URL sembarang (pelacak/konten luar) dan melewati validasi
+// kita → diganti `PATCH /v1/account/profile` (ACC-008).
+const DISABLED_PROFILE_PATHS = ["/update-user"];
 
 type EmailJobInput =
   JobPayload<"email"> extends infer Job ? (Job extends unknown ? Omit<Job, "requestId"> : never) : never;
@@ -232,11 +236,37 @@ function signInTracking(deps: { db: Db; redis: Redis; logger: Logger }) {
  * Setelah `POST /reset-password` berhasil (ACC-005): cabut semua sesi user KECUALI sesi request ini (bila milik user
  * yang sama) + audit `auth.password_reset`. Daftar sesi dari Postgres; `deleteSessions` menghapus DB & cache Redis.
  */
-function passwordResetSessions(deps: { db: Db; logger: Logger }) {
+function passwordResetSessions(deps: { db: Db; logger: Logger; onPasswordChanged: (userId: string) => void }) {
   return {
     id: "platform-password-reset",
     hooks: {
       after: [
+        {
+          // Ganti password dari pengaturan (ACC-005/ACC-008): email "password diubah" + audit. Cabut sesi lain lewat
+          // opsi `revokeOtherSessions` di body (BA, berbasis userId di Postgres).
+          matcher: (ctx) => ctx.path === "/change-password",
+          handler: createAuthMiddleware(async (ctx) => {
+            if (ctx.context.returned instanceof APIError) return;
+            const userId = ctx.context.session?.user.id;
+            if (!userId) return;
+            deps.onPasswordChanged(userId);
+            const evidence = currentEvidence();
+            try {
+              await recordAudit(deps.db, {
+                actorType: "user",
+                actorId: userId,
+                action: "auth.password_change",
+                targetType: "user",
+                targetId: userId,
+                ip: evidence.ip ?? null,
+                userAgent: evidence.userAgent ?? null,
+                metadata: { revokeOtherSessions: ctx.body?.revokeOtherSessions === true },
+              });
+            } catch (error) {
+              deps.logger.error({ err: error }, "audit ganti password gagal");
+            }
+          }),
+        },
         {
           matcher: (ctx) => ctx.path === "/reset-password",
           handler: createAuthMiddleware(async (ctx) => {
@@ -337,14 +367,23 @@ export function createAuth(deps: {
       expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
       autoSignInAfterVerification: false,
       sendVerificationEmail: async ({ user, token }) => {
-        if (!createVerificationCode) throw new Error("auth belum siap: createVerificationCode kosong");
-        const code = await createVerificationCode(user.email);
         // Link publik (lewat proxy web); setelah diproses BA mengarahkan ke halaman hasil di web.
         const verifyUrl = `${config.publicAuthUrl.replace(/\/$/, "")}/verify-email?token=${encodeURIComponent(token)}&callbackURL=${encodeURIComponent(APP_PATHS.verifyEmail)}`;
+        const emailChange = currentEmailChange();
+        if (emailChange) {
+          // Ganti email: ke alamat BARU, hanya tautan (kode OTP terikat alamat tersimpan).
+          enqueueEmail({ template: "auth.verify_email", userId: user.id, verifyUrl, email: emailChange.newEmail });
+          return;
+        }
+        if (!createVerificationCode) throw new Error("auth belum siap: createVerificationCode kosong");
+        const code = await createVerificationCode(user.email);
         enqueueEmail({ template: "auth.verify_email", userId: user.id, verifyUrl, code });
       },
     },
     user: {
+      // Ganti email (ACC-008): verifikasi ke alamat baru; email lama berlaku sampai diverifikasi. Re-auth di
+      // changeEmailGuard (auth.routes.ts).
+      changeEmail: { enabled: true },
       // Kolom platform yang diisi saat registrasi; tidak bisa diisi dari body dan tidak ikut respons BA
       // (respons email baru vs terdaftar harus berbentuk sama).
       additionalFields: {
@@ -400,7 +439,11 @@ export function createAuth(deps: {
     plugins: [
       signUpAutoSignIn,
       signInTracking({ db: deps.db, redis: deps.redis, logger }),
-      passwordResetSessions({ db: deps.db, logger }),
+      passwordResetSessions({
+        db: deps.db,
+        logger,
+        onPasswordChanged: (userId) => enqueueEmail({ template: "auth.password_changed", userId }),
+      }),
       emailOTP({
         expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
         allowedAttempts: OTP_ALLOWED_ATTEMPTS,
@@ -411,7 +454,7 @@ export function createAuth(deps: {
         },
       }),
     ],
-    disabledPaths: [...DISABLED_OTP_PATHS, ...DISABLED_SESSION_PATHS],
+    disabledPaths: [...DISABLED_OTP_PATHS, ...DISABLED_SESSION_PATHS, ...DISABLED_PROFILE_PATHS],
     // Rate limit memakai limiter API sendiri (Redis, 429 + Retry-After, ACC-255) di auth.routes.ts.
     rateLimit: { enabled: false },
     session: {

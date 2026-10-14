@@ -92,18 +92,17 @@ describe("login & ingat saya (ACC-004)", () => {
     const ip = uniqueIp();
     const email = await registeredUser(target, ip);
     const response = await signIn(target, ip, { email, password: STRONG_PASSWORD, rememberMe: false });
+    expect(response.status).toBe(200);
     const cookie = ([] as string[])
       .concat(response.headers["set-cookie"] ?? [])
       .find((value) => value.startsWith("platform.session_token="));
+    expect(cookie).toBeDefined();
     expect(cookie).not.toMatch(/Max-Age|Expires/i);
-    const [user] = await testDb.db.select().from(schema.users).where(eq(schema.users.email, email));
-    const [latest] = await testDb.db
-      .select()
-      .from(schema.sessions)
-      .where(eq(schema.sessions.userId, user?.id ?? ""))
-      .orderBy(sql`${schema.sessions.createdAt} desc`)
-      .limit(1);
-    const hours = ((latest?.expiresAt.getTime() ?? 0) - Date.now()) / 3_600_000;
+    // Cookie = "<token>.<signature>" (URL-encoded) → cari sesi persis milik login ini, bukan "sesi terbaru".
+    const token = decodeURIComponent(cookie?.split(";")[0]?.split("=")[1] ?? "").split(".")[0] ?? "";
+    const [session] = await testDb.db.select().from(schema.sessions).where(eq(schema.sessions.token, token));
+    expect(session).toBeDefined();
+    const hours = ((session?.expiresAt.getTime() ?? 0) - Date.now()) / 3_600_000;
     expect(hours).toBeGreaterThan(23);
     expect(hours).toBeLessThan(25);
   });

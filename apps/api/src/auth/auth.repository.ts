@@ -49,3 +49,13 @@ export async function touchSession(executor: DbExecutor, sessionId: string, stal
       ),
     );
 }
+
+/** Akun punya password (credential)? Menentukan cara re-auth (ACC-008) dan metode login yang tersisa. */
+export async function hasCredentialAccount(executor: DbExecutor, userId: string): Promise<boolean> {
+  const [row] = await executor
+    .select({ id: schema.accounts.id })
+    .from(schema.accounts)
+    .where(and(eq(schema.accounts.userId, userId), eq(schema.accounts.providerId, "credential")))
+    .limit(1);
+  return row !== undefined;
+}

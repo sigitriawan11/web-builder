@@ -2,6 +2,7 @@
   "VALIDATION_FAILED": "The submitted data is invalid. Please check your input.",
   "UNAUTHENTICATED": "Please sign in first.",
   "FORBIDDEN": "You don't have access to perform this action.",
+  "REAUTH_REQUIRED": "Please confirm it's you (enter your password or sign in again) to continue.",
   "CAPTCHA_REQUIRED": "Please confirm you are not a robot to continue.",
   "NOT_FOUND": "The requested data was not found.",
   "CONFLICT": "The data has changed or conflicts with other data. Reload and try again.",

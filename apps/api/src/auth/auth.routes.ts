@@ -1,3 +1,4 @@
+import type { Db } from "@platform/db";
 import type { Logger } from "@platform/shared/node";
 import { toNodeHandler } from "better-auth/node";
 import express, { type Request, type RequestHandler, type Router } from "express";
@@ -6,6 +7,7 @@ import { JSON_LIMIT } from "../middleware/body-parsers";
 import { RATE_LIMITS, rateLimit } from "../middleware/rate-limit";
 import { type Auth, authRequestHandler } from "./auth";
 import type { CaptchaVerifier } from "./captcha";
+import { changeEmailGuard } from "./email-change";
 import { newPasswordGuard } from "./password-reset";
 import { requestEvidence } from "./request-evidence";
 import { signInGuard } from "./sign-in";
@@ -36,6 +38,7 @@ const jsonForBetterAuth = (): RequestHandler[] => [
 
 export function createAuthRouter(deps: {
   auth: Auth;
+  db: Db;
   logger: Logger;
   redis?: Redis;
   rateLimitPrefix?: string;
@@ -93,6 +96,8 @@ export function createAuthRouter(deps: {
   // Kebijakan password untuk password baru (ACC-001/ACC-005), termasuk ganti password dari pengaturan.
   router.post("/reset-password", ...jsonForBetterAuth(), newPasswordGuard());
   router.post("/change-password", ...jsonForBetterAuth(), newPasswordGuard());
+  // Ganti email: re-auth + alamat baru dibawa ke callback verifikasi (ACC-008).
+  router.post("/change-email", ...jsonForBetterAuth(), changeEmailGuard({ auth: deps.auth, db: deps.db }));
   router.all("/*splat", toNodeHandler(authRequestHandler(deps.auth)));
   return router;
 }

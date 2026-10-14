@@ -28,7 +28,8 @@ export function createEmailProcessor(deps: EmailProcessorDeps): JobHandler<"emai
     const email = await renderEmail(payload, { locale: recipient.locale, name: recipient.name }, deps.appUrl);
     const { providerMessageId } = await deps.provider.send({
       from: deps.from,
-      to: recipient.email,
+      // Ganti email: verifikasi dikirim ke alamat baru (belum tersimpan), bukan alamat di DB.
+      to: payload.template === "auth.verify_email" && payload.email ? payload.email : recipient.email,
       ...(deps.replyTo ? { replyTo: deps.replyTo } : {}),
       subject: email.subject,
       html: email.html,

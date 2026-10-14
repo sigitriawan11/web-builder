@@ -28,7 +28,7 @@ function emailElement(job: EmailJob, props: BaseEmailProps): ReactElement {
     case "auth.account_exists":
       return <AccountExistsEmail {...props} />;
     case "auth.verify_email":
-      return <VerifyEmailEmail {...props} verifyUrl={job.verifyUrl} code={job.code} />;
+      return <VerifyEmailEmail {...props} verifyUrl={job.verifyUrl} {...(job.code ? { code: job.code } : {})} />;
     case "auth.password_reset":
       return <PasswordResetEmail {...props} resetUrl={job.resetUrl} />;
     case "auth.password_changed":
@@ -43,5 +43,8 @@ export async function renderEmail(
 ): Promise<RenderedEmail> {
   const element = emailElement(job, { ...recipient, appUrl });
   const [html, text] = await Promise.all([render(element), render(element, { plainText: true })]);
-  return { subject: t(recipient.locale, "emails", `${job.template}.subject`), html, text };
+  // Ganti email (verifikasi alamat baru, tanpa kode) memakai subjek sendiri.
+  const subjectKey =
+    job.template === "auth.verify_email" && !job.code ? "auth.verify_email.change_subject" : `${job.template}.subject`;
+  return { subject: t(recipient.locale, "emails", subjectKey), html, text };
 }

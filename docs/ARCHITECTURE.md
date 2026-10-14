@@ -476,6 +476,7 @@ Express 5 sudah meneruskan rejection dari async handler ke error handler — **t
 | Tidak login | 401 | `UNAUTHENTICATED` |
 | Tidak berhak / resource tenant lain | 404 | `NOT_FOUND` |
 | Role kurang (dalam tenant sendiri) | 403 | `FORBIDDEN` |
+| Konfirmasi identitas wajib (aksi sensitif, mis. ganti email) | 403 | `REAUTH_REQUIRED` — `details: { method: "password" \| "fresh_login" }` (ACC-008) |
 | Captcha wajib (login setelah 3× gagal) | 403 | `CAPTCHA_REQUIRED` — `details: { reason: "missing" \| "invalid" }` (ACC-004) |
 | Batas angka paket tercapai | 402 | `PLAN_LIMIT_REACHED` — `details: { key, used, limit, upgrade? }` (`key` = kunci entitlement: `sites.max`, `seats`, `storage.bytesMax`, kuota bulanan, dst.) |
 | Fitur tidak ada di paket | 402 | `PLAN_FEATURE_REQUIRED` — `details: { feature, upgrade? }` |

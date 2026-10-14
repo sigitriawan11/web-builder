@@ -64,3 +64,25 @@ export async function otherSessionTokens(db: Db, userId: string, currentSessionI
     .where(and(eq(schema.sessions.userId, userId), ne(schema.sessions.id, currentSessionId)));
   return rows.map((row) => row.token);
 }
+
+export async function findProfile(db: Db, userId: string) {
+  const [user] = await db
+    .select({
+      id: schema.users.id,
+      name: schema.users.name,
+      email: schema.users.email,
+      emailVerified: schema.users.emailVerified,
+      image: schema.users.image,
+      locale: schema.users.locale,
+      timezone: schema.users.timezone,
+    })
+    .from(schema.users)
+    .where(eq(schema.users.id, userId));
+  if (!user) return undefined;
+  const [credential] = await db
+    .select({ id: schema.accounts.id })
+    .from(schema.accounts)
+    .where(and(eq(schema.accounts.userId, userId), eq(schema.accounts.providerId, "credential")))
+    .limit(1);
+  return { ...user, hasPassword: credential !== undefined };
+}

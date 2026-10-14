@@ -65,6 +65,24 @@ describe("processor email (ACC-271)", () => {
     },
   );
 
+  it("ganti email: verifikasi dikirim ke alamat BARU (bukan alamat tersimpan)", async () => {
+    const oldEmail = `lama.${uuidv7()}@platform.test`;
+    const newEmail = `baru.${uuidv7()}@platform.test`;
+    const { user } = await createUser(testDb.db, { email: oldEmail });
+    await processor()(
+      {
+        requestId: `req-${uuidv7()}`,
+        template: "auth.verify_email",
+        userId: user.id,
+        verifyUrl: `${appUrl}/api/auth/verify-email?token=abc`,
+        email: newEmail,
+      },
+      context(),
+    );
+    await expect.poll(() => messagesTo(newEmail), { timeout: 5_000 }).toHaveLength(1);
+    expect(await messagesTo(oldEmail)).toHaveLength(0);
+  });
+
   it("user sudah tidak ada → selesai tanpa mengirim (tidak di-retry)", async () => {
     await expect(
       processor()({ requestId: `req-${uuidv7()}`, template: "auth.account_exists", userId: uuidv7() }, context()),

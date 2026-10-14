@@ -7,6 +7,7 @@ export const ERROR_STATUS = {
   VALIDATION_FAILED: 422, // `details.issues` = Zod issues
   UNAUTHENTICATED: 401,
   FORBIDDEN: 403, // role kurang di tenant sendiri
+  REAUTH_REQUIRED: 403, // details: { method: "password" | "fresh_login" } — aksi sensitif (ganti email, ACC-008)
   CAPTCHA_REQUIRED: 403, // details: { reason: "missing" | "invalid" } — login setelah 3× gagal (ACC-004)
   NOT_FOUND: 404, // juga resource tenant lain — jangan bocorkan keberadaannya
   CONFLICT: 409,

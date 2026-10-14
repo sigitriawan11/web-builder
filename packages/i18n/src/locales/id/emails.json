@@ -19,6 +19,8 @@
   "auth.verify_email.cta": "Verifikasi email",
   "auth.verify_email.code": "Atau masukkan kode ini di halaman verifikasi:",
   "auth.verify_email.ignore": "Bila Anda tidak membuat akun di Platform, abaikan email ini.",
+  "auth.verify_email.change_subject": "Konfirmasi alamat email baru Anda",
+  "auth.verify_email.change_body": "Klik tombol di bawah untuk memakai alamat ini sebagai email akun Platform Anda. Sampai dikonfirmasi, email lama tetap aktif. Tautan berlaku 24 jam.",
   "auth.password_reset.subject": "Atur ulang password Anda",
   "auth.password_reset.preview": "Tautan atur ulang password berlaku 1 jam.",
   "auth.password_reset.greeting": "Halo {name},",

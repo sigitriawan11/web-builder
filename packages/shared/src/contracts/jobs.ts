@@ -99,8 +99,14 @@ export const JOB_PAYLOADS = {
       template: z.literal("auth.verify_email"),
       userId: UuidV7Schema,
       verifyUrl: z.url(),
-      // Kode 6 digit untuk user yang membuka email di perangkat lain (ACC-003).
-      code: z.string().regex(/^\d{6}$/),
+      // Kode 6 digit untuk user yang membuka email di perangkat lain (ACC-003). Tidak ada untuk ganti email
+      // (kode OTP terikat alamat yang sudah tersimpan).
+      code: z
+        .string()
+        .regex(/^\d{6}$/)
+        .optional(),
+      // Penerima bila bukan email tersimpan: ganti email (ACC-008) memverifikasi alamat BARU.
+      email: z.email().optional(),
     }),
     z.object({ ...jobBase, template: z.literal("auth.password_reset"), userId: UuidV7Schema, resetUrl: z.url() }),
     z.object({ ...jobBase, template: z.literal("auth.password_changed"), userId: UuidV7Schema }),
