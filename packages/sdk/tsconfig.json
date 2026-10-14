@@ -1,4 +1,7 @@
 {
   "extends": "@platform/config/tsconfig/base.json",
-  "include": ["src"]
+  // Isomorfik: browser (web/editor) & server Next.js — fetch/Response/AbortSignal dari lib DOM (juga global di Node 22).
+  "compilerOptions": { "lib": ["ES2022", "DOM", "DOM.Iterable"] },
+  "include": ["src", "vitest.config.ts"],
+  "references": [{ "path": "../config" }, { "path": "../shared" }]
 }
