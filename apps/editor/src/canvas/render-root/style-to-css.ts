@@ -107,14 +107,17 @@ export function sizeToCss(size: SizeStyle, parent: ParentLayout): CSSProperties 
   return css;
 }
 
-function solidFillColor(fill: Fill): string {
+type SolidFill = Extract<Fill, { type: "solid" }>;
+
+function solidFillColor(fill: SolidFill): string {
   const color = colorToCss(fill.color);
   return fill.opacity === undefined ? color : `color-mix(in srgb, ${color} ${fill.opacity * 100}%, transparent)`;
 }
 
 // DM-029: index 0 = layer paling bawah; layer CSS pertama = paling atas, jadi urutan dibalik.
 export function fillsToCss(fills: readonly Fill[]): CSSProperties {
-  const visible = fills.filter((fill) => fill.visible !== false);
+  // Fill gambar butuh URL asset (CDN/varian) yang belum tersedia di canvas prototipe → dilewati sampai renderer T1.10.
+  const visible = fills.filter((fill): fill is SolidFill => fill.type === "solid" && fill.visible !== false);
   if (visible.length === 0) return {};
   if (visible.length === 1 && visible[0]) return { backgroundColor: solidFillColor(visible[0]) };
   return {

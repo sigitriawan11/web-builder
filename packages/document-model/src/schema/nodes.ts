@@ -1,37 +1,11 @@
 import { z } from "zod";
+import { AssetRefSchema } from "./asset-ref";
 import { LinkValueSchema } from "./link";
 import { RichTextDocSchema } from "./rich-text";
 import { ResponsiveStyleSchema } from "./style";
-import {
-  AssetIdSchema,
-  ComponentIdSchema,
-  JsonValueSchema,
-  NodeIdSchema,
-  PageIdSchema,
-  TemplateIdSchema,
-} from "./values";
+import { ComponentIdSchema, JsonValueSchema, NodeIdSchema, PageIdSchema, TemplateIdSchema } from "./values";
 
 const ChildIdSchema = z.string().regex(/^n_[0-9a-z]{6,24}$/);
-
-// ── Asset reference (DM-057) ───────────────────────────────────────────────
-
-// Crop non-destruktif, ternormalisasi 0..1 terhadap gambar asli; tidak boleh keluar bidang gambar.
-const CropSchema = z
-  .strictObject({
-    x: z.number().min(0).max(1),
-    y: z.number().min(0).max(1),
-    width: z.number().gt(0).max(1),
-    height: z.number().gt(0).max(1),
-  })
-  .refine((crop) => crop.x + crop.width <= 1 + 1e-9 && crop.y + crop.height <= 1 + 1e-9, "crop keluar dari gambar");
-
-export const AssetRefSchema = z.strictObject({
-  assetId: AssetIdSchema,
-  // Per pemakaian: gambar sama bisa beda alt.
-  alt: z.string().max(500).optional(),
-  focalPoint: z.strictObject({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }).optional(),
-  crop: CropSchema.optional(),
-});
 
 // ── Props per tipe ─────────────────────────────────────────────────────────
 
@@ -169,7 +143,6 @@ export const NodeSchema = z.discriminatedUnion("type", [
   ImageNodeSchema,
 ]);
 
-export type AssetRef = z.infer<typeof AssetRefSchema>;
 export type PageNode = z.infer<typeof PageNodeSchema>;
 export type FrameNode = z.infer<typeof FrameNodeSchema>;
 export type TextNode = z.infer<typeof TextNodeSchema>;

@@ -49,10 +49,18 @@ function mergePosition(current: unknown, patch: JsonRecord): JsonRecord | undefi
   return mergeShallow(current, patch);
 }
 
+// DM-032/DM-036: typography objek di-merge per field; token komposit (`$token`) atomik. Patch field di atas token
+// komposit butuh ekspansi token dari theme dulu — belum tersedia di sini (resolver theme T1.8.12), jadi patch
+// objek di atas token mengganti utuh.
+function mergeTypography(current: unknown, patch: JsonRecord): JsonRecord | undefined {
+  if ("$token" in patch || (isRecord(current) && "$token" in current)) return withoutNulls(patch);
+  return mergeShallow(current, patch);
+}
+
 /**
  * Menerapkan patch ke style satu breakpoint (DM-036):
- * 1. objek (`layout`, `size`, `flexChild`, `padding`) → merge per key;
- * 2. array (`fills`) → replace utuh; 3. nilai atomik (`radius`, token, dimensi) → replace;
+ * 1. objek (`layout`, `size`, `flexChild`, `padding`, `typography`) → merge per key;
+ * 2. array (`fills`, `strokes`) → replace utuh; 3. nilai atomik (`radius`, token, dimensi) → replace;
  * 4. `layout`/`position` dengan mode/type berbeda → replace; 5. `null` → hapus.
  * Mengembalikan objek baru; `current` tidak diubah.
  */
@@ -66,6 +74,7 @@ export function mergeStyle(current: JsonRecord, patch: StylePatch): JsonRecord {
     else if (group === "layout" && isRecord(value)) next = mergeLayout(merged.layout, value);
     else if ((group === "size" || group === "flexChild") && isRecord(value)) next = mergeShallow(merged[group], value);
     else if (group === "position" && isRecord(value)) next = mergePosition(merged.position, value);
+    else if (group === "typography" && isRecord(value)) next = mergeTypography(merged.typography, value);
     else next = value;
 
     if (next === undefined) delete merged[group];

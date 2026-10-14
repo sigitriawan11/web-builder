@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ColorSchema, LengthSchema } from "./values";
+import { AssetRefSchema } from "./asset-ref";
+import { ColorSchema, LengthSchema, TokenRefSchema, tv } from "./values";
 
 // Patch breakpoint (DM-036): setiap field opsional, dan `null` berarti "hapus override, kembali mewarisi".
 // `null` sengaja hanya ada di patch, tidak pernah di `base`.
@@ -117,13 +118,19 @@ const PositionPatchSchema = z.strictObject({
   constraints: ConstraintsSchema.nullable().optional(),
 });
 
-// ── Fills (DM-029, subset M0: solid) ───────────────────────────────────────
+// ── Fills (DM-029: solid & image P0 · M1; gradient P1 · M2) ─────────────────
 
 export const FillSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("solid"),
     color: ColorSchema,
     opacity: z.number().min(0).max(1).optional(),
+    visible: z.boolean().optional(),
+  }),
+  z.strictObject({
+    type: z.literal("image"),
+    image: AssetRefSchema,
+    fit: z.enum(["cover", "contain", "tile"]),
     visible: z.boolean().optional(),
   }),
 ]);
@@ -145,6 +152,47 @@ export const RadiusSchema = z.union([
     .partial(),
 ]);
 
+// ── Strokes (DM-030) ───────────────────────────────────────────────────────
+
+export const StrokeSchema = z.strictObject({
+  color: ColorSchema,
+  width: LengthSchema,
+  style: z.enum(["solid", "dashed", "dotted"]).optional(),
+  position: z.enum(["inside", "outside", "center"]).optional(),
+  // Sisi yang tidak disebut = digambar; `sides` tidak ada = semua sisi.
+  sides: z
+    .strictObject({ top: z.boolean(), right: z.boolean(), bottom: z.boolean(), left: z.boolean() })
+    .partial()
+    .optional(),
+  visible: z.boolean().optional(),
+});
+
+// Maks 1 stroke di M1; array agar multi-stroke (maks 4, P2) tidak butuh migrasi.
+export const StrokesSchema = z.array(StrokeSchema).max(1);
+
+// ── Typography (DM-032) ────────────────────────────────────────────────────
+
+const typographyShape = {
+  // String = nama family yang wajib terdaftar di `theme.fonts` (invariant dokumen).
+  fontFamily: tv(z.string().min(1).max(100)),
+  fontSize: LengthSchema,
+  fontWeight: z.number().int().min(100).max(900).multipleOf(100),
+  // Angka = pengali (tanpa unit, pengecualian DM-025).
+  lineHeight: z.union([z.number().positive().max(10), LengthSchema]),
+  letterSpacing: LengthSchema,
+  textTransform: z.enum(["none", "uppercase", "lowercase", "capitalize"]),
+  textDecoration: z.enum(["none", "underline", "lineThrough"]),
+  // Fallback; align per paragraf di rich text menang.
+  textAlign: z.enum(["left", "center", "right", "justify"]),
+  fontStyle: z.enum(["normal", "italic"]),
+};
+
+export const TypographyStyleSchema = z.strictObject(typographyShape).partial();
+
+// Objek field (sebagian boleh token) ATAU token text style komposit `{ $token: "typography.h1" }`.
+export const TypographySchema = z.union([TokenRefSchema, TypographyStyleSchema]);
+const TypographyPatchSchema = z.union([TokenRefSchema, z.strictObject(patchShape(typographyShape))]);
+
 // ── Style & responsive (DM-036) ────────────────────────────────────────────
 
 const styleShape = {
@@ -153,9 +201,14 @@ const styleShape = {
   flexChild: FlexChildSchema,
   position: PositionSchema,
   fills: FillsSchema,
+  strokes: StrokesSchema,
   radius: RadiusSchema,
+  typography: TypographySchema,
+  // Warna teks/ikon (diwariskan ke turunan seperti CSS `color`).
+  color: ColorSchema,
 };
 
+// DM-034: strict — tidak ada `customCss`/`className`/key tak dikenal; kebutuhan baru = field schema + migrasi.
 export const StyleSchema = z.strictObject(styleShape).partial();
 
 // Array & nilai atomik di-replace utuh; objek (layout, size) di-merge per key.
@@ -166,6 +219,7 @@ export const StylePatchSchema = z.strictObject(
     size: SizePatchSchema,
     flexChild: FlexChildPatchSchema,
     position: PositionPatchSchema,
+    typography: TypographyPatchSchema,
   }),
 );
 
@@ -183,6 +237,9 @@ export type FlexChildStyle = z.infer<typeof FlexChildSchema>;
 export type PositionStyle = z.infer<typeof PositionSchema>;
 export type Fill = z.infer<typeof FillSchema>;
 export type RadiusValue = z.infer<typeof RadiusSchema>;
+export type Stroke = z.infer<typeof StrokeSchema>;
+export type TypographyStyle = z.infer<typeof TypographyStyleSchema>;
+export type Typography = z.infer<typeof TypographySchema>;
 export type Style = z.infer<typeof StyleSchema>;
 export type StylePatch = z.infer<typeof StylePatchSchema>;
 export type ResponsiveStyle = z.infer<typeof ResponsiveStyleSchema>;

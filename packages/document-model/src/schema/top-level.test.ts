@@ -8,6 +8,7 @@ import {
   minimalDocument,
   nestedDocument,
   richTextDocument,
+  styledDocument,
   wrapGridDocument,
 } from "../../test/fixtures/basic-documents";
 import { landing200 } from "../../test/fixtures/landing-generator";
@@ -26,6 +27,7 @@ const fixtures = {
   responsiveSections: () => responsiveSectionsDocument().document,
   fullTopLevel: fullTopLevelDocument,
   richText: richTextDocument,
+  styled: styledDocument,
 };
 
 describe("SiteDocument top-level (DM-002, DM-004)", () => {

@@ -1,6 +1,6 @@
 import type { SiteDocument } from "../schema";
 
-// DM-057: rujukan asset dicari generik (objek ber-`assetId` di props node, rich text, settings, theme) agar node
+// DM-057: rujukan asset dicari generik (objek ber-`assetId` di props & style node, rich text, settings, theme) agar node
 // atau field baru yang memakai AssetRef/LinkValue otomatis ikut diperiksa invariant & gcAssets tanpa daftar manual.
 
 export type AssetRefLocation = { assetId: string; path: (string | number)[] };
@@ -21,7 +21,11 @@ export function collectAssetRefs(doc: AssetScanInput): AssetRefLocation[] {
       else visit(child, [...path, key]);
     }
   };
-  for (const node of Object.values(doc.nodes)) visit(node.props, ["nodes", node.id, "props"]);
+  for (const node of Object.values(doc.nodes)) {
+    visit(node.props, ["nodes", node.id, "props"]);
+    // Fill gambar (DM-029) di setiap breakpoint.
+    visit(node.style, ["nodes", node.id, "style"]);
+  }
   visit(doc.settings, ["settings"]);
   visit(doc.theme, ["theme"]);
   return found;

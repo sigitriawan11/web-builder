@@ -8,6 +8,7 @@ import {
   minimalDocument,
   nestedDocument,
   richTextDocument,
+  styledDocument,
   wrapGridDocument,
 } from "../../test/fixtures/basic-documents";
 import { landing200 } from "../../test/fixtures/landing-generator";
@@ -27,6 +28,7 @@ const fixtures = [
   { name: "responsiveSections", create: () => responsiveSectionsDocument().document },
   { name: "fullTopLevel", create: fullTopLevelDocument },
   { name: "richText", create: richTextDocument },
+  { name: "styled", create: styledDocument },
 ];
 
 describe("jsonToYDoc ↔ yDocToJson (DM-058)", () => {

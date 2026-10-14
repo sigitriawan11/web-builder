@@ -1,3 +1,4 @@
+export * from "./asset-ref";
 export * from "./document";
 export * from "./link";
 export * from "./nodes";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AssetRefSchema } from "./nodes";
+import { AssetRefSchema } from "./asset-ref";
 
 // `SiteSettings` (DM-005) field P0. P2 (`alternateLanguages` ❓ OPEN-DM-1, `defaultPageTransition`) ditambah bersama
 // fiturnya; `customHead` SENGAJA tidak ada (keamanan).

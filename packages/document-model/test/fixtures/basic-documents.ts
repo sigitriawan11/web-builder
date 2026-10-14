@@ -638,3 +638,52 @@ export function richTextDocument(): SiteDocument {
   };
   return doc;
 }
+
+/** Semua kelompok style M1 (DM-027–DM-032): sizing, position, fills solid+image, stroke, radius, typography, color (T1.8.10). */
+export function styledDocument(): SiteDocument {
+  const doc = heroDocument();
+  doc.theme.fonts = [{ family: "Poppins", source: "google", weights: [400, 700], fallback: "sans-serif" }];
+  doc.assets.ast_bg00000001 = { kind: "image", width: 1920, height: 1080, mime: "image/webp" };
+  const hero = doc.nodes.n_hero000001;
+  const title = doc.nodes.n_herottl001;
+  const image = doc.nodes.n_heroimg001;
+  if (hero?.type !== "frame" || title?.type !== "text" || !image) throw new Error("fixture hero berubah");
+  hero.style.base = {
+    ...hero.style.base,
+    size: {
+      width: { mode: "fill" },
+      height: { mode: "hug" },
+      minHeight: { value: 80, unit: "vh" },
+      maxWidth: { $token: "size.container" },
+    },
+    fills: [
+      { type: "image", image: { assetId: "ast_bg00000001", focalPoint: { x: 0.5, y: 0.3 } }, fit: "cover" },
+      { type: "solid", color: { $token: "color.background", alpha: 0.6 }, visible: false },
+    ],
+    strokes: [{ color: "#e5e7eb", width: { value: 1, unit: "px" }, position: "inside", sides: { top: false } }],
+    radius: { topLeft: { $token: "radius.md" }, topRight: { value: 16, unit: "px" } },
+    color: "#111827",
+  };
+  hero.style.mobile = { strokes: null, typography: { fontSize: { value: 14, unit: "px" } } };
+  title.style.base = {
+    ...title.style.base,
+    typography: {
+      fontFamily: "Poppins",
+      fontSize: { value: 56, unit: "px" },
+      fontWeight: 700,
+      lineHeight: 1.2,
+      letterSpacing: { value: -0.02, unit: "em" },
+      textTransform: "uppercase",
+      textDecoration: "none",
+      textAlign: "center",
+      fontStyle: "normal",
+    },
+    color: { $token: "color.primary" },
+  };
+  title.style.tablet = { typography: { fontWeight: null, lineHeight: { value: 40, unit: "px" } } };
+  image.style.base = {
+    ...image.style.base,
+    position: { type: "absolute", x: 24, y: 12, constraints: { horizontal: "right", vertical: "top" } },
+  };
+  return doc;
+}

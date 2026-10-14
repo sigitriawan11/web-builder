@@ -123,6 +123,8 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
     if (!(ref.assetId in doc.assets)) report(ref.path, `Asset "${ref.assetId}" tidak ada di assets`);
   }
 
+  checkFontFamilies(doc, report);
+
   const listedChildren = new Set<string>();
   for (const node of Object.values(nodes)) {
     if (!("children" in node)) continue;
@@ -247,3 +249,44 @@ export type AssetEntry = z.infer<typeof AssetEntrySchema>;
 export type ComponentDep = z.infer<typeof ComponentDepSchema>;
 export type DataSources = z.infer<typeof DataSourcesSchema>;
 export type SiteDocument = z.infer<typeof SiteDocumentSchema>;
+
+// DM-032: family literal (bukan token) wajib terdaftar di `theme.fonts`, agar font pasti termuat saat publish.
+// Berlaku untuk `style.typography` di semua breakpoint dan mark `textStyle` rich text.
+function checkFontFamilies(doc: SiteDocumentShape, report: (path: (string | number)[], message: string) => void): void {
+  const families = new Set(doc.theme.fonts.map((font) => font.family));
+  const check = (fontFamily: unknown, path: (string | number)[]) => {
+    if (typeof fontFamily === "string" && !families.has(fontFamily)) {
+      report(path, `Font "${fontFamily}" tidak terdaftar di theme.fonts`);
+    }
+  };
+  for (const node of Object.values(doc.nodes)) {
+    for (const breakpoint of ["base", "tablet", "mobile"] as const) {
+      const typography = node.style[breakpoint]?.typography;
+      if (typography && !("$token" in typography)) {
+        check(typography.fontFamily, ["nodes", node.id, "style", breakpoint, "typography", "fontFamily"]);
+      }
+    }
+    if (node.type === "text") visitTextStyleMarks(node.props.content, ["nodes", node.id, "props", "content"], check);
+  }
+}
+
+// Telusuri JSON rich text (list bersarang) dan laporkan fontFamily mark `textStyle` beserta path persisnya.
+function visitTextStyleMarks(
+  value: unknown,
+  path: (string | number)[],
+  check: (fontFamily: unknown, path: (string | number)[]) => void,
+): void {
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) visitTextStyleMarks(item, [...path, index], check);
+    return;
+  }
+  if (value === null || typeof value !== "object") return;
+  if ("type" in value && value.type === "textStyle" && "attrs" in value) {
+    const attrs = value.attrs;
+    if (attrs !== null && typeof attrs === "object" && "fontFamily" in attrs) {
+      check(attrs.fontFamily, [...path, "attrs", "fontFamily"]);
+    }
+    return;
+  }
+  for (const [key, child] of Object.entries(value)) visitTextStyleMarks(child, [...path, key], check);
+}

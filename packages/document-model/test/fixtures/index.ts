@@ -7,6 +7,7 @@ export {
   minimalDocument,
   nestedDocument,
   richTextDocument,
+  styledDocument,
   wrapGridDocument,
 } from "./basic-documents";
 export { generateLandingDocument, type LandingOptions, landing200, landing2000 } from "./landing-generator";

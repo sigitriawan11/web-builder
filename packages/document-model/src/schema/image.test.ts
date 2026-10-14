@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { heroDocument, richTextDocument } from "../../test/fixtures/basic-documents";
 import { siteDocumentFromState, siteDocumentToState } from "../yjs";
+import { AssetRefSchema } from "./asset-ref";
 import { SiteDocumentSchema } from "./document";
 import type { Node, SiteDocument } from "./index";
-import { AssetRefSchema, ImagePropsSchema } from "./nodes";
+import { ImagePropsSchema } from "./nodes";
 
 // T1.8.8: node image + AssetRef & registry assets (DM-014, DM-057).
 const IMG = "n_heroimg001";
