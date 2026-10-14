@@ -66,10 +66,10 @@ export function linkHref(link: LinkValue, doc: Pick<SiteDocument, "nodes">, ctx:
 export function linkAttributes(link: LinkValue, doc: Pick<SiteDocument, "nodes">, ctx: RenderContext): LinkAttributes {
   const href = linkHref(link, doc, ctx);
   if (href === undefined) return {};
-  if (ctx.mode === "editor") return { "data-href": href };
   const external = link.type === "url" ? link.newTab === true : link.type === "whatsapp";
   return {
-    href,
+    // Mode editor: atribut sama dengan publish, hanya `href` → `data-href` (tanpa href tidak ada navigasi; ED-017).
+    ...(ctx.mode === "editor" ? { "data-href": href } : { href }),
     ...(external ? { target: "_blank", rel: "noopener noreferrer" } : {}),
     ...(link.type === "asset" ? { download: true } : {}),
   };
