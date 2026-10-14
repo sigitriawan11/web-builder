@@ -38,6 +38,8 @@ export const PagePropsSchema = z.strictObject({
 export const FramePropsSchema = z.strictObject({
   role: z.enum(["section", "container", "card", "button", "list", "generic"]).optional(),
   clipContent: z.boolean().optional(),
+  // DM-011: frame berlink dirender sebagai <a> (card/tombol yang bisa diklik).
+  link: LinkValueSchema.optional(),
 });
 
 export const TextPropsSchema = z.strictObject({

@@ -1,8 +1,10 @@
+import { findBrokenLinks, pageOf } from "../query/links";
 import type { Node, SiteDocument } from "../schema";
 
 // Lint semantik DM-009: WARNING (bukan error validasi) — dokumen tetap valid; editor/AI menampilkan saran.
 
-export type LintCode = "MULTIPLE_H1" | "HEADING_SKIP" | "IMAGE_MISSING_ALT";
+// `BROKEN_LINK`: warning saat edit; mode publish (DM-068, T1.8.14) menjadikannya error.
+export type LintCode = "MULTIPLE_H1" | "HEADING_SKIP" | "IMAGE_MISSING_ALT" | "BROKEN_LINK";
 
 export interface LintWarning {
   code: LintCode;
@@ -57,6 +59,14 @@ export function lintDocument(doc: SiteDocument): LintWarning[] {
         });
       }
     }
+  }
+  for (const link of findBrokenLinks(doc)) {
+    warnings.push({
+      code: "BROKEN_LINK",
+      pageId: pageOf(doc, link.nodeId) ?? "",
+      nodeId: link.nodeId,
+      message: link.message,
+    });
   }
   return warnings;
 }

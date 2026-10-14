@@ -8,6 +8,7 @@ export {
   type TextMetrics,
   type WidthEstimateContext,
 } from "./estimate-width";
+export { type BrokenLink, collectLinkRefs, findBrokenLinks, type LinkRefLocation, pageOf } from "./links";
 export { jsonEqual, normalizeOverrides } from "./normalize-overrides";
 export {
   applyStylePatch,
