@@ -137,6 +137,29 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
     });
   }
 
+  // DM-010: path unik per situs; tepat satu home dengan path "/"; layout page tetap flex kolom & lebar fill.
+  const pathOwners = new Map<string, string>();
+  const homes: string[] = [];
+  for (const pageId of doc.pageOrder) {
+    const page = nodes[pageId];
+    if (page?.type !== "page") continue;
+    const owner = pathOwners.get(page.props.path);
+    if (owner) report(["nodes", pageId, "props", "path"], `Path "${page.props.path}" sudah dipakai "${owner}"`);
+    else pathOwners.set(page.props.path, pageId);
+    if (page.props.isHome) {
+      homes.push(pageId);
+      if (page.props.path !== "/") report(["nodes", pageId, "props", "path"], `Page home wajib di path "/"`);
+    }
+    const ogImage = page.props.seo?.ogImage?.assetId;
+    if (ogImage !== undefined && !(ogImage in doc.assets)) {
+      report(["nodes", pageId, "props", "seo", "ogImage", "assetId"], `Asset "${ogImage}" tidak ada di assets`);
+    }
+    checkPageLayout(page, report);
+  }
+  if (homes.length !== 1) {
+    report(["pageOrder"], `Harus tepat satu page isHome (ditemukan ${homes.length})`);
+  }
+
   // DM-008: htmlId (anchor publik) unik per page.
   for (const pageId of doc.pageOrder) {
     const seen = new Map<string, string>();
@@ -172,6 +195,29 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
     if (!reachable.has(id)) {
       report(["nodes", id], `Node "${id}" tidak terhubung ke page mana pun`);
     }
+  }
+}
+
+// DM-010: page = tumpukan section vertikal; layout tidak boleh diubah (juga di override breakpoint).
+// Field yang tidak diisi = default renderer (flex kolom, lebar fill).
+function checkPageLayout(
+  page: Extract<Node, { type: "page" }>,
+  report: (path: (string | number)[], message: string) => void,
+): void {
+  const layers: [string, StylePatch | undefined][] = [
+    ["base", page.style.base],
+    ["tablet", page.style.tablet],
+    ["mobile", page.style.mobile],
+  ];
+  for (const [breakpoint, style] of layers) {
+    const at = (...rest: string[]) => ["nodes", page.id, "style", breakpoint, ...rest];
+    const layout = style?.layout;
+    if (layout?.mode != null && layout.mode !== "flex") report(at("layout", "mode"), "Layout page wajib flex");
+    if (layout && "direction" in layout && layout.direction != null && layout.direction !== "column") {
+      report(at("layout", "direction"), "Layout page wajib kolom");
+    }
+    const width = style?.size?.width;
+    if (width != null && width.mode !== "fill") report(at("size", "width"), "Lebar page wajib fill");
   }
 }
 

@@ -324,7 +324,7 @@ interface PageProps {
 ```
 
 - **Acceptance criteria**:
-  - [ ] `path` unik per site, lowercase, `^/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\])*(/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\]))*$|^/$`.
+  - [ ] `path` unik per site, lowercase, `^/$|^(/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\]))+$` (tanpa segmen kosong; diperbaiki T1.8.5 — pola lama menerima `//x`).
   - [ ] Tepat satu page `isHome: true` dengan `path: "/"`.
   - [ ] Page selalu `layout.mode = "flex"`, `direction = "column"` (section bertumpuk vertikal), width `fill`.
 

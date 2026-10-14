@@ -59,20 +59,30 @@ export const AssetRefSchema = z.strictObject({
 
 // ── Props per tipe ─────────────────────────────────────────────────────────
 
-// DM-010: "/" untuk home, segmen lowercase atau segmen dinamis `[slug]`.
-const PAGE_PATH_PATTERN = /^\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\])*(\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\]))*$|^\/$/;
+// DM-010: "/" untuk home, atau satu+ segmen lowercase / dinamis `[slug]` — tanpa segmen kosong (`//`) atau "/" di akhir.
+const PAGE_PATH_PATTERN = /^\/$|^(\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\]))+$/;
 
+// DM-010. `access`/`dynamic` (M7) dan `drafts` (P1 · M4, DM-080) ditambah bersama fiturnya.
 export const PagePropsSchema = z.strictObject({
-  path: z.string().regex(PAGE_PATH_PATTERN),
-  title: z.string().min(1),
+  // Unik per situs; tepat satu home di "/" (invariant di document.ts).
+  path: z.string().max(200).regex(PAGE_PATH_PATTERN),
+  title: z.string().min(1).max(80),
   isHome: z.boolean().optional(),
+  // Meng-override `settings.seo` untuk halaman ini (AC DM-005).
   seo: z
     .strictObject({
-      title: z.string().optional(),
-      description: z.string().optional(),
+      title: z.string().max(120).optional(),
+      description: z.string().max(320).optional(),
+      ogImage: AssetRefSchema.optional(),
       noIndex: z.boolean().optional(),
+      canonical: z
+        .url({ protocol: /^https?$/ })
+        .max(2048)
+        .optional(),
     })
     .optional(),
+  // Editor-only: lebar artboard desktop (default 1440, settings.breakpoints).
+  canvas: z.strictObject({ width: z.number().int().min(240).max(10_000).optional() }).optional(),
 });
 
 export const FramePropsSchema = z.strictObject({
