@@ -1,3 +1,4 @@
+export * from "./account";
 export * from "./documents";
 export * from "./envelope";
 export * from "./jobs";

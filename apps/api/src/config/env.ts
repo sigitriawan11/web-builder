@@ -18,6 +18,9 @@ export const apiEnvSchema = {
   BETTER_AUTH_SECRET: envField.secret(32),
   BETTER_AUTH_URL: envField.url(),
   PUBLIC_APP_URL: envField.url(),
+  // Login Google (ACC-002), opsional: keduanya diisi untuk mengaktifkan.
+  GOOGLE_CLIENT_ID: envField.string().optional(),
+  GOOGLE_CLIENT_SECRET: envField.secret(8).optional(),
   // Cloudflare Turnstile secret (ACC-004); lokal memakai secret uji yang selalu lolos.
   CAPTCHA_SECRET: envField.secret(16),
 };

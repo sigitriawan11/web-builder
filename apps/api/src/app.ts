@@ -1,3 +1,4 @@
+import type { Db } from "@platform/db";
 import type { Logger } from "@platform/shared/node";
 import express, { type Express } from "express";
 import { AUTH_BASE_PATH, type Auth } from "./auth/auth";
@@ -12,6 +13,8 @@ import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-h
 import { httpLogger } from "./middleware/http-logger";
 import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
+import { createAccountRouter } from "./modules/account/account.routes";
+import { createAccountService } from "./modules/account/account.service";
 import type { QueueProducer } from "./queues/producer";
 
 // createApp(): susunan middleware + router (ARCHITECTURE §5.3). Tanpa `listen` agar bisa diuji dengan supertest.
@@ -19,6 +22,8 @@ import type { QueueProducer } from "./queues/producer";
 
 export interface AppDeps {
   logger: Logger;
+  // Database untuk router modul (bersama `auth`: `/v1/account`).
+  db?: Db;
   // Redis untuk rate limit per router (T1.4.5); router publik memasangnya saat dibuat.
   redis?: Redis;
   // Prefix kunci rate limit (test: counter terpisah per app).
@@ -72,6 +77,17 @@ export function createApp(deps: AppDeps): Express {
 
   // 6 — sesi pengguna untuk router berikutnya (health di atas tidak menyentuh sesi).
   if (deps.auth) app.use(authSession(deps.auth));
+
+  if (deps.auth && deps.db) {
+    app.use(
+      "/v1/account",
+      createAccountRouter({
+        service: createAccountService(deps.db),
+        ...(deps.redis ? { redis: deps.redis } : {}),
+        ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
+      }),
+    );
+  }
 
   if (deps.internalJwtSecret)
     app.use("/internal/v1", createInternalRouter({ internalJwtSecret: deps.internalJwtSecret }));

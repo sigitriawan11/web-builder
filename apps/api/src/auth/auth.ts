@@ -14,8 +14,9 @@ import { AUTH_TABLES, activeSessionTokens, insertConsents } from "./auth.reposit
 import { afterAuthCommit, currentAuthTransaction, trackTransactions } from "./auth-transaction";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
 import { currentPasswordReset } from "./password-reset";
+import { currentEvidence } from "./request-evidence";
 import { currentSignIn, recordSignInFailure } from "./sign-in";
-import { signUpConsents } from "./sign-up";
+import { signUpConsents, signUpLocale } from "./sign-up";
 import { currentSignUp } from "./sign-up-context";
 
 // Auth akun platform (ARCHITECTURE §9.1, spec 08 ACC-004). API me-mount handler di `/auth/*`; browser mengaksesnya
@@ -57,6 +58,9 @@ export interface AuthConfig {
   publicAuthUrl: string;
   trustedOrigins: string[];
   secureCookies: boolean;
+  // Login Google (ACC-002); tanpa kredensial provider tidak aktif. Redirect URI di Google Console:
+  // `<publicAuthUrl>/callback/google`.
+  google?: { clientId: string; clientSecret: string };
 }
 
 /**
@@ -158,6 +162,27 @@ function signInTracking(deps: { db: Db; redis: Redis; logger: Logger }) {
     id: "platform-sign-in",
     hooks: {
       after: [
+        {
+          matcher: (ctx) => ctx.path?.startsWith("/callback/") === true,
+          // Login/registrasi OAuth berhasil (sesi baru) → audit `auth.login` (method = provider).
+          handler: createAuthMiddleware(async (ctx) => {
+            const session = ctx.context.newSession;
+            if (!session) return;
+            const evidence = currentEvidence();
+            await safely("audit", () =>
+              recordAudit(deps.db, {
+                actorType: "user",
+                actorId: session.user.id,
+                action: "auth.login",
+                targetType: "user",
+                targetId: session.user.id,
+                ip: evidence.ip ?? null,
+                userAgent: evidence.userAgent ?? null,
+                metadata: { method: ctx.params?.id ?? "oauth" },
+              }),
+            );
+          }),
+        },
         {
           matcher: (ctx) => ctx.path === "/sign-in/email",
           handler: createAuthMiddleware(async (ctx) => {
@@ -267,6 +292,8 @@ export function createAuth(deps: {
     baseURL: `${publicUrl.origin}${publicUrl.pathname.replace(/\/auth\/?$/, "")}`,
     basePath: AUTH_BASE_PATH,
     trustedOrigins: config.trustedOrigins,
+    // Error alur redirect (mis. OAuth `account_not_linked`) → halaman login web dengan `?error=` (ACC-002).
+    onAPIError: { errorURL: `${publicUrl.origin}${APP_PATHS.login}` },
     database: drizzleAdapter(trackTransactions(deps.db), {
       provider: "pg",
       schema: AUTH_TABLES,
@@ -324,9 +351,15 @@ export function createAuth(deps: {
     databaseHooks: {
       user: {
         create: {
-          before: async (user) => {
+          before: async (user, context) => {
             const signUp = currentSignUp();
-            if (!signUp) return;
+            if (!signUp) {
+              // Registrasi lewat OAuth (Google): bahasa dari browser yang membuka callback; zona waktu default kolom.
+              const acceptLanguage = context?.headers?.get("accept-language");
+              return acceptLanguage === undefined
+                ? undefined
+                : { data: { ...user, locale: signUpLocale(acceptLanguage ?? undefined) } };
+            }
             return {
               data: { ...user, locale: signUp.locale, ...(signUp.timezone ? { timezone: signUp.timezone } : {}) },
             };
@@ -372,7 +405,32 @@ export function createAuth(deps: {
       // Postgres sumber kebenaran (daftar & cabut sesi, ACC-007); Redis hanya cache.
       storeSessionInDatabase: true,
     },
-    account: { encryptOAuthTokens: true },
+    ...(config.google
+      ? {
+          socialProviders: {
+            google: {
+              clientId: config.google.clientId,
+              clientSecret: config.google.clientSecret,
+              // Eksplisit: default BA membentuknya dari baseURL tanpa basePath (`/api/callback/google`, salah).
+              redirectURI: `${config.publicAuthUrl.replace(/\/$/, "")}/callback/google`,
+              // Default scope BA = openid email profile (ACC-002); pilih akun tiap kali (PC bersama).
+              prompt: "select_account" as const,
+            },
+          },
+        }
+      : {}),
+    account: {
+      encryptOAuthTokens: true,
+      accountLinking: {
+        enabled: true,
+        // ACC-002: tautkan Google ke akun email yang sama HANYA bila email akun lokal sudah terverifikasi DAN Google
+        // menyatakan emailnya terverifikasi (Google sengaja tidak dijadikan trusted provider) — cegah account takeover.
+        requireLocalEmailVerified: true,
+        trustedProviders: [],
+        // Memutus tautan hanya bila masih ada metode login lain (password).
+        allowUnlinkingAll: false,
+      },
+    },
     advanced: {
       // Eksplisit: default Better Auth mematikan origin check bila NODE_ENV=test, padahal test harus menguji
       // perilaku produksi (CSRF, ARCHITECTURE §9.1).

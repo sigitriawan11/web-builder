@@ -33,8 +33,9 @@ export function authTestApp(
   testDb: TestDb,
   redis: Redis,
   queues: QueueProducer = recordingQueues(),
-  extra: Pick<AppDeps, "verifyCaptcha" | "mountRoutes"> = {},
+  extra: Pick<AppDeps, "verifyCaptcha" | "mountRoutes"> & { google?: { clientId: string; clientSecret: string } } = {},
 ) {
+  const { google, ...appExtra } = extra;
   const auth = createAuth({
     db: testDb.db,
     redis,
@@ -45,9 +46,17 @@ export function authTestApp(
       publicAuthUrl: `${TEST_ORIGIN}/api/auth`,
       trustedOrigins: [TEST_ORIGIN],
       secureCookies: false,
+      ...(google ? { google } : {}),
     },
   });
-  return createApp({ logger: silentLogger(), auth, redis, rateLimitPrefix: `rl-test:${uuidv7()}`, ...extra });
+  return createApp({
+    logger: silentLogger(),
+    db: testDb.db,
+    auth,
+    redis,
+    rateLimitPrefix: `rl-test:${uuidv7()}`,
+    ...appExtra,
+  });
 }
 
 export const uniqueEmail = () =>

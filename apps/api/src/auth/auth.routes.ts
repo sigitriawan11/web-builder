@@ -7,6 +7,7 @@ import { RATE_LIMITS, rateLimit } from "../middleware/rate-limit";
 import { type Auth, authRequestHandler } from "./auth";
 import type { CaptchaVerifier } from "./captcha";
 import { newPasswordGuard } from "./password-reset";
+import { requestEvidence } from "./request-evidence";
 import { signInGuard } from "./sign-in";
 import { signUpGuard } from "./sign-up";
 
@@ -41,6 +42,7 @@ export function createAuthRouter(deps: {
   verifyCaptcha: CaptchaVerifier;
 }): Router {
   const router = express.Router();
+  router.use(requestEvidence());
   const limiterOptions = deps.rateLimitPrefix ? { keyPrefix: deps.rateLimitPrefix } : {};
   if (deps.redis) {
     // Mutasi auth (sign-in, sign-up, reset, …) per IP. GET (get-session) tidak dibatasi: dipanggil setiap halaman.

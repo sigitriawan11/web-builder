@@ -76,10 +76,15 @@ export async function startServer(
       trustedOrigins: [env.PUBLIC_APP_URL],
       // Lokal memakai http; cookie `Secure` hanya di staging/production.
       secureCookies: env.APP_ENV !== "local",
+      ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+        ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET } }
+        : {}),
     },
   });
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) logger.info("login Google nonaktif (GOOGLE_CLIENT_* kosong)");
   const app = createApp({
     logger,
+    db,
     auth,
     verifyCaptcha: turnstileVerifier(env.CAPTCHA_SECRET, (error) =>
       logger.warn({ err: error }, "verifikasi Turnstile gagal dihubungi"),
