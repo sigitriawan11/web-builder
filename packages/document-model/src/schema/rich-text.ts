@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { LinkValueSchema } from "./link";
-import { ColorSchema, LengthSchema, TokenRefSchema } from "./values";
+import { ColorSchema, LengthSchema, tv } from "./values";
 
 // Rich text node `text` (DM-013): JSON ProseMirror/Tiptap dengan schema terbatas — tanpa HTML mentah.
 // `RICH_TEXT_SPEC` = satu sumber nama node/mark/atribut: editor membangun extension Tiptap darinya (document-model
@@ -21,7 +21,7 @@ const TextStyleAttrsSchema = z
     color: ColorSchema.optional(),
     fontWeight: z.number().int().min(100).max(900).multipleOf(100).optional(),
     fontSize: LengthSchema.optional(),
-    fontFamily: z.union([TokenRefSchema, z.string().min(1).max(100)]).optional(),
+    fontFamily: tv(z.string().min(1).max(100)).optional(),
   })
   .refine((attrs) => Object.keys(attrs).length > 0, "textStyle tanpa atribut");
 

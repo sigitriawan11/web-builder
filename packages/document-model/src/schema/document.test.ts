@@ -263,3 +263,15 @@ describe("CURRENT_SCHEMA_VERSION (spec 01 §19)", () => {
     }
   });
 });
+
+// T1.8.9: AC DM-025 — `$prop` & `$bind` tidak sah di dokumen site (di luar ComponentDefinition / bindings).
+describe("referensi $prop/$bind di dokumen site ditolak", () => {
+  it.each<[string, Path, unknown]>([
+    ["warna fill $prop", ["nodes", "pg_home000001", "style", "base", "fills", 0, "color"], { $prop: "bg" }],
+    ["gap layout $bind", ["nodes", "n_hero000001", "style", "base", "layout", "gap"], { $bind: "item.gap" }],
+    ["props image $prop", ["nodes", "n_heroimg001", "props", "image"], { $prop: "image" }],
+    ["teks $prop", ["nodes", "n_herottl001", "props", "content"], { $prop: "title" }],
+  ])("%s", (_, path, value) => {
+    expectIssueAt(heroWith(path, value), path.join("."));
+  });
+});
