@@ -229,3 +229,18 @@ describe("UndoController — grup sesi edit teks (ED-115)", () => {
     expect(editor.undo.manager.redoStack).toHaveLength(2);
   });
 });
+
+// T1.9.2: cakupan undo = semua root dokumen (DM-060).
+describe("cakupan undo", () => {
+  it("edit theme & settings lokal bisa di-undo", () => {
+    const { doc, undo, read } = setup();
+    const before = read();
+    doc.transact(() => {
+      (doc.getMap("theme").get("tokens") as Y.Map<Y.Map<unknown>>).get("color")?.set("primary", "#000000");
+      doc.getMap("settings").set("manualResponsive", true);
+    }, LOCAL);
+    expect(read()).not.toEqual(before);
+    undo.undo();
+    expect(read()).toEqual(before);
+  });
+});

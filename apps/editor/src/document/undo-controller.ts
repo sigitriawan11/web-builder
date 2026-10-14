@@ -1,10 +1,10 @@
-import { YDOC_KEYS } from "@platform/document-model";
+import { UNDO_CAPTURE_TIMEOUT_MS, undoScope } from "@platform/document-model";
 import * as Y from "yjs";
 
 // ED-197: kedalaman stack undo (memori); tidak dipersist antar sesi.
 export const MAX_UNDO_STEPS = 200;
 // ED-197 / DM-060: perubahan beruntun dalam jendela ini digabung menjadi satu langkah (ketikan, nudge).
-export const CAPTURE_TIMEOUT_MS = 500;
+export const CAPTURE_TIMEOUT_MS = UNDO_CAPTURE_TIMEOUT_MS;
 
 const SELECTION_BEFORE = "selectionBefore";
 const SELECTION_AFTER = "selectionAfter";
@@ -43,15 +43,8 @@ export function createUndoController(
   selection: SelectionAccess,
 ): UndoController {
   const tracked = new Set(localOrigins);
-  const manager = new Y.UndoManager(
-    [
-      doc.getMap(YDOC_KEYS.nodes),
-      doc.getArray(YDOC_KEYS.pageOrder),
-      doc.getMap(YDOC_KEYS.meta),
-      doc.getMap(YDOC_KEYS.assets),
-    ],
-    { trackedOrigins: tracked, captureTimeout: CAPTURE_TIMEOUT_MS },
-  );
+  // Cakupan = semua root dokumen (DM-060), termasuk theme & settings.
+  const manager = new Y.UndoManager(undoScope(doc), { trackedOrigins: tracked, captureTimeout: CAPTURE_TIMEOUT_MS });
 
   // Seleksi saat transaksi lokal dimulai = "sebelum" untuk langkah yang dibuat transaksi itu.
   let selectionAtTransactionStart: readonly string[] = [];
