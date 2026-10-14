@@ -154,6 +154,8 @@ export function styleToCss(style: Style, parent: ParentLayout): CSSProperties {
     ...(style.radius ? radiusToCss(style.radius) : {}),
     // Terakhir: `position: absolute` milik node menang atas `relative` dari layout none.
     ...(style.position ? positionToCss(style.position) : {}),
+    // DM-039: sembunyi di breakpoint ini (frame artboard menerima style ter-resolve per breakpoint).
+    ...(style.display === "none" ? { display: "none" } : {}),
   };
 }
 

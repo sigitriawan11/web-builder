@@ -1,4 +1,5 @@
 export { type AssetRefLocation, collectAssetRefs, gcAssets } from "./assets";
+export { breakpointForWidth } from "./breakpoints";
 export {
   estimateAvailableWidth,
   estimateMaxContentWidth,
@@ -7,5 +8,6 @@ export {
   type TextMetrics,
   type WidthEstimateContext,
 } from "./estimate-width";
-export { applyStylePatch, BREAKPOINTS, type Breakpoint, resolveStyle } from "./resolve-style";
+export { jsonEqual, normalizeOverrides } from "./normalize-overrides";
+export { applyStylePatch, BREAKPOINTS, type Breakpoint, createStyleResolver, resolveStyle } from "./resolve-style";
 export { plainText, textLines } from "./rich-text";

@@ -23,3 +23,24 @@ export function resolveStyle(style: ResponsiveStyle, breakpoint: Breakpoint): St
   if (breakpoint === "tablet" || !style.mobile) return tablet;
   return applyStylePatch(tablet, style.mobile);
 }
+
+/**
+ * Resolver ter-memoize per (nodeId, breakpoint, docRevision) — AC DM-036. Hanya revisi terakhir per node+breakpoint
+ * yang disimpan, jadi memori sebanding jumlah node. `docRevision` = penanda perubahan dokumen milik pemanggil.
+ */
+export function createStyleResolver(): (
+  nodeId: string,
+  style: ResponsiveStyle,
+  breakpoint: Breakpoint,
+  docRevision: number,
+) => Style {
+  const cache = new Map<string, { revision: number; style: Style }>();
+  return (nodeId, style, breakpoint, docRevision) => {
+    const key = `${nodeId}\u0000${breakpoint}`;
+    const hit = cache.get(key);
+    if (hit && hit.revision === docRevision) return hit.style;
+    const resolved = resolveStyle(style, breakpoint);
+    cache.set(key, { revision: docRevision, style: resolved });
+    return resolved;
+  };
+}

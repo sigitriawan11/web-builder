@@ -200,6 +200,8 @@ const styleShape = {
   size: SizeSchema,
   flexChild: FlexChildSchema,
   position: PositionSchema,
+  // DM-039: "none" = sembunyi di breakpoint ini (tetap ada di HTML publish, disembunyikan media query).
+  display: z.enum(["auto", "none"]),
   fills: FillsSchema,
   strokes: StrokesSchema,
   radius: RadiusSchema,

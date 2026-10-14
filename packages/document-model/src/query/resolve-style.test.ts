@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ResponsiveStyle } from "../schema";
-import { applyStylePatch, resolveStyle } from "./resolve-style";
+import { applyStylePatch, createStyleResolver, resolveStyle } from "./resolve-style";
 
 const px = (value: number) => ({ value, unit: "px" as const });
 
@@ -78,5 +78,28 @@ describe("applyStylePatch", () => {
   it("patch yang menghasilkan style tidak valid diabaikan", () => {
     const style = { layout: { mode: "none" as const } };
     expect(applyStylePatch(style, { layout: { mode: "flex" } })).toBe(style);
+  });
+});
+
+// T1.8.11: DM-039 display per breakpoint + memo AC DM-036.
+describe("display per breakpoint (DM-039)", () => {
+  it("mobile mewarisi display tablet; mobile bisa menampilkan kembali", () => {
+    const style: ResponsiveStyle = { base: {}, tablet: { display: "none" } };
+    expect(resolveStyle(style, "base").display).toBeUndefined();
+    expect(resolveStyle(style, "mobile").display).toBe("none");
+    expect(resolveStyle({ ...style, mobile: { display: "auto" } }, "mobile").display).toBe("auto");
+  });
+});
+
+describe("createStyleResolver", () => {
+  it("memoize per (nodeId, breakpoint, docRevision)", () => {
+    const resolve = createStyleResolver();
+    const first = resolve("n_a00000001", dm036, "mobile", 1);
+    expect(resolve("n_a00000001", dm036, "mobile", 1)).toBe(first);
+    expect(resolve("n_a00000001", dm036, "tablet", 1)).not.toBe(first);
+
+    const changed: ResponsiveStyle = { ...dm036, mobile: { layout: { direction: "row" } } };
+    expect(resolve("n_a00000001", changed, "mobile", 2).layout).toMatchObject({ direction: "row" });
+    expect(resolve("n_b00000001", dm036, "mobile", 2)).toEqual(first);
   });
 });
