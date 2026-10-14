@@ -20,9 +20,24 @@ export {
 } from "./css/stylesheet";
 export { type TokenDeclarations, tokenDeclarations, usedTokens } from "./css/tokens";
 export { colorToCss, cssString, lengthToCss, tokenVar, tokenVarName, typographyVarName } from "./css/values";
-export { anchorId, anchorTargets, type LinkAttributes, linkAttributes, linkHref } from "./links";
+export {
+  anchorId,
+  anchorTargets,
+  type LinkAttributes,
+  linkAttributes,
+  linkHref,
+  type NodeSource,
+  nodeLookup,
+} from "./links";
 export { Box, Image, Link, Text } from "./primitives";
-export { render } from "./render";
+export {
+  childRenderEnv,
+  createRenderEnv,
+  type RenderEnv,
+  type RenderNodeOptions,
+  render,
+  renderNodeElement,
+} from "./render";
 export {
   type AutoResponsiveOptions,
   type AutoResponsiveOutput,

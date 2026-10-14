@@ -1,4 +1,4 @@
-import { collectLinkRefs, type LinkValue, type SiteDocument } from "@platform/document-model";
+import { collectLinkRefs, type LinkValue, type Node, type SiteDocument } from "@platform/document-model";
 import type { RenderContext } from "./context";
 
 // DM-056: LinkValue → atribut <a>. Skema sudah membatasi href ke http(s); di sini dicek ulang (pertahanan berlapis,
@@ -17,9 +17,18 @@ const SAFE_URL = /^https?:\/\//i;
 const SAFE_PATH = /^\/(?!\/)[a-z0-9\-/[\]]*$/;
 const DIGITS = /^[1-9][0-9]{6,14}$/;
 
+/**
+ * Sumber node: dokumen JSON, atau fungsi lookup (editor membaca Y.Doc per node, bukan JSON dokumen penuh — ED-018).
+ */
+export type NodeSource = Pick<SiteDocument, "nodes"> | ((id: string) => Node | undefined);
+
+export function nodeLookup(source: NodeSource): (id: string) => Node | undefined {
+  return typeof source === "function" ? source : (id) => source.nodes[id];
+}
+
 /** ID elemen untuk anchor: `htmlId` bila ada, selain itu ID node (stabil, aman sebagai atribut). */
-export function anchorId(doc: Pick<SiteDocument, "nodes">, nodeId: string): string {
-  return doc.nodes[nodeId]?.htmlId ?? nodeId;
+export function anchorId(source: NodeSource, nodeId: string): string {
+  return nodeLookup(source)(nodeId)?.htmlId ?? nodeId;
 }
 
 /** Node di page yang menjadi target anchor (butuh atribut `id`). */
@@ -32,12 +41,12 @@ export function anchorTargets(doc: Pick<SiteDocument, "nodes">): Set<string> {
   return targets;
 }
 
-function pagePath(doc: Pick<SiteDocument, "nodes">, pageId: string): string | undefined {
-  const page = doc.nodes[pageId];
+function pagePath(source: NodeSource, pageId: string): string | undefined {
+  const page = nodeLookup(source)(pageId);
   return page?.type === "page" ? page.props.path : undefined;
 }
 
-export function linkHref(link: LinkValue, doc: Pick<SiteDocument, "nodes">, ctx: RenderContext): string | undefined {
+export function linkHref(link: LinkValue, doc: NodeSource, ctx: RenderContext): string | undefined {
   switch (link.type) {
     case "url":
       return SAFE_URL.test(link.href) ? link.href : undefined;
@@ -63,7 +72,7 @@ export function linkHref(link: LinkValue, doc: Pick<SiteDocument, "nodes">, ctx:
   }
 }
 
-export function linkAttributes(link: LinkValue, doc: Pick<SiteDocument, "nodes">, ctx: RenderContext): LinkAttributes {
+export function linkAttributes(link: LinkValue, doc: NodeSource, ctx: RenderContext): LinkAttributes {
   const href = linkHref(link, doc, ctx);
   if (href === undefined) return {};
   const external = link.type === "url" ? link.newTab === true : link.type === "whatsapp";
