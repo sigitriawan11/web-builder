@@ -1,5 +1,6 @@
 import { eq, inArray, schema, sql } from "@platform/db";
 import { createTestDb, createWorkspace, type TestDb } from "@platform/db/testing";
+import { CURRENT_SCHEMA_VERSION, SiteDocumentSchema, siteDocumentFromState } from "@platform/document-model";
 import type { WorkspaceRole } from "@platform/shared/contracts";
 import { dataEnvelope, ErrorBodySchema, listEnvelope, SiteSchema } from "@platform/shared/contracts";
 import type { Express } from "express";
@@ -359,5 +360,51 @@ describe("daftar situs dashboard (T1.6.1, ACC-050)", () => {
     const first = (await request(app()).get(sitesOf(owner)).set(as(owner))).body;
     expect(first.data).toHaveLength(24);
     expect(first.meta.nextCursor).toEqual(expect.any(String));
+  });
+});
+
+describe("buat situs kosong (T1.6.2, ACC-051)", () => {
+  it("dokumen awal: snapshot seq 0 (state Yjs + JSON strict, 1 page Home) + read model site_pages", async () => {
+    const owner = await register();
+    const created = await request(app()).post(sitesOf(owner)).set(as(owner)).send({ name: "Toko Kue Bu Sri" });
+    expect(created.status).toBe(201);
+    const site = created.body.data as { id: string; documentId: string };
+
+    const [document] = await testDb.db.select().from(schema.documents).where(eq(schema.documents.id, site.documentId));
+    expect(document).toMatchObject({
+      siteId: site.id,
+      kind: "site",
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      lastSeq: 0,
+    });
+    expect(document?.sizeBytes).toBeGreaterThan(0);
+
+    const [snapshot] = await testDb.db
+      .select()
+      .from(schema.documentSnapshots)
+      .where(eq(schema.documentSnapshots.documentId, site.documentId));
+    expect(snapshot).toMatchObject({
+      id: document?.lastSnapshotId,
+      uptoSeq: 0,
+      kind: "auto",
+      createdBy: owner.user.id,
+    });
+    const json = SiteDocumentSchema.parse(snapshot?.json);
+    expect(json.meta).toEqual({ title: "Toko Kue Bu Sri", createdWith: "blank" });
+    expect(json.pageOrder).toHaveLength(1);
+    // State biner = JSON (realtime memuat dari state; publish/history dari JSON).
+    expect(siteDocumentFromState(snapshot?.state ?? new Uint8Array())).toEqual(json);
+
+    const pages = await testDb.db.select().from(schema.sitePages).where(eq(schema.sitePages.siteId, site.id));
+    expect(pages).toEqual([
+      expect.objectContaining({
+        pageId: json.pageOrder[0],
+        path: "/",
+        title: "Home",
+        isHome: true,
+        nodeCount: 1,
+        sortOrder: 0,
+      }),
+    ]);
   });
 });

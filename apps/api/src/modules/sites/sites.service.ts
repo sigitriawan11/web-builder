@@ -1,5 +1,5 @@
 import type { Db, SiteTenant, WorkspaceTenant } from "@platform/db";
-import { CURRENT_SCHEMA_VERSION } from "@platform/document-model";
+import { CURRENT_SCHEMA_VERSION, createBlankSiteDocument, siteDocumentToState } from "@platform/document-model";
 import { AppError } from "@platform/shared";
 import type { CreateSiteBody, ListSitesQuery, Site, UpdateSiteBody } from "@platform/shared/contracts";
 import { decodeCursor, encodeCursor } from "@platform/shared/contracts";
@@ -71,10 +71,24 @@ export function createSitesService(deps: { db: Db }) {
     async create(tenant: Tenant, body: CreateSiteBody): Promise<Site> {
       assertCan(tenant, "site.create");
       // Batas jumlah situs per paket (ACC-131, PLAN_LIMIT_REACHED) dipasang saat entitlements (M4).
-      const row = await db.transaction((tx) =>
-        repository.insertSiteWithDocument(tx, tenant, { name: body.name, schemaVersion: CURRENT_SCHEMA_VERSION }),
-      );
-      return toDto(row);
+      // Situs kosong (ACC-051 "blank"): dokumen awal 1 page Home, tervalidasi strict sebelum disimpan.
+      const document = createBlankSiteDocument({ title: body.name });
+      const state = siteDocumentToState(document);
+      const site = await db.transaction(async (tx) => {
+        const created = await repository.insertSiteWithDocument(tx, tenant, {
+          name: body.name,
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+        });
+        await repository.writeInitialDocument(tx, tenant, {
+          siteId: created.site.id,
+          documentId: created.documentId,
+          document,
+          state,
+          createdBy: tenant.actor.type === "staff" ? null : tenant.actor.userId,
+        });
+        return created.site;
+      });
+      return toDto(site);
     },
 
     async rename(tenant: Tenant, siteId: string, body: UpdateSiteBody): Promise<Site> {

@@ -15,12 +15,13 @@ import {
   type WorkspaceTenant,
   workspaceWhere,
 } from "@platform/db";
+import type { SiteDocument } from "@platform/document-model";
 import type { ListSitesQuery } from "@platform/shared/contracts";
 
 // SATU-SATUNYA tempat modul sites mengakses tabel (CLAUDE.md, ARCHITECTURE §6.2). Tenant selalu parameter pertama
 // dan selalu masuk ke filter; menerima db ATAU transaksi (service yang membuka transaksi).
 
-const { documents, sites } = schema;
+const { documents, documentSnapshots, sitePages, sites } = schema;
 
 type Tenant = WorkspaceTenant | SiteTenant;
 export type SiteRow = typeof sites.$inferSelect;
@@ -109,7 +110,7 @@ export async function insertSiteWithDocument(
   tx: DbExecutor,
   tenant: Tenant,
   input: { name: string; schemaVersion: number },
-): Promise<SiteRow> {
+): Promise<{ site: SiteRow; documentId: string }> {
   const [document] = await tx
     .insert(documents)
     .values({ workspaceId: tenant.workspaceId, kind: "site", schemaVersion: input.schemaVersion })
@@ -127,7 +128,70 @@ export async function insertSiteWithDocument(
     .returning();
   if (!site) throw new Error("insert situs gagal");
   await tx.update(documents).set({ siteId: site.id }).where(eq(documents.id, document.id));
-  return site;
+  return { site, documentId: document.id };
+}
+
+/**
+ * Isi awal dokumen (T1.6.2): snapshot `uptoSeq` 0 (state Yjs + JSON tervalidasi) yang dimuat realtime sebagai titik
+ * awal, plus read model `site_pages` dari page dokumen (projections realtime menimpanya kemudian, T1.12.7).
+ * WAJIB di transaksi yang sama dengan pembuatan situs.
+ */
+export async function writeInitialDocument(
+  tx: DbExecutor,
+  tenant: Tenant,
+  input: { siteId: string; documentId: string; document: SiteDocument; state: Uint8Array; createdBy: string | null },
+): Promise<void> {
+  const [snapshot] = await tx
+    .insert(documentSnapshots)
+    .values({
+      documentId: input.documentId,
+      uptoSeq: 0,
+      state: input.state,
+      json: input.document,
+      kind: "auto",
+      createdBy: input.createdBy,
+    })
+    .returning({ id: documentSnapshots.id });
+  if (!snapshot) throw new Error("insert snapshot awal gagal");
+  await tx
+    .update(documents)
+    .set({
+      lastSnapshotId: snapshot.id,
+      sizeBytes: input.state.byteLength,
+      schemaVersion: input.document.schemaVersion,
+    })
+    .where(and(eq(documents.id, input.documentId), eq(documents.workspaceId, tenant.workspaceId)));
+
+  const pages = input.document.pageOrder.flatMap((pageId, sortOrder) => {
+    const page = input.document.nodes[pageId];
+    if (page?.type !== "page") return [];
+    return [
+      {
+        siteId: input.siteId,
+        pageId,
+        path: page.props.path,
+        title: page.props.title,
+        seo: page.props.seo ?? null,
+        sortOrder,
+        isHome: page.props.isHome === true,
+        nodeCount: countNodes(input.document, pageId),
+      },
+    ];
+  });
+  if (pages.length > 0) await tx.insert(sitePages).values(pages);
+}
+
+/** Jumlah node di bawah page (termasuk page itu). */
+function countNodes(document: SiteDocument, pageId: string): number {
+  let count = 0;
+  const stack = [pageId];
+  while (stack.length > 0) {
+    const node = document.nodes[stack.pop() ?? ""];
+    if (!node) continue;
+    count += 1;
+    if ("children" in node) stack.push(...node.children);
+  }
+  return count;
 }
 
 export async function updateSiteName(

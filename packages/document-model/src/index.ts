@@ -1,3 +1,4 @@
+export { type BlankSiteInput, createBlankSiteDocument } from "./defaults/blank-site";
 export { createId, ID_PATTERN, ID_PREFIXES, type IdPrefix } from "./ids";
 export * from "./ops";
 export * from "./query";
