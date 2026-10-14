@@ -86,7 +86,22 @@ describe("profil (ACC-008)", () => {
     expect((await request(app).get("/auth/get-session").set("cookie", cookie)).body.user.name).toBe("Budi Hartono");
   });
 
+  it("PATCH bahasa & zona waktu (ACC-009) → tersimpan di user (dipakai email berikutnya & tampilan tanggal)", async () => {
+    const { app, cookie, userId } = await setup();
+    const update = await request(app)
+      .patch("/v1/account/profile")
+      .set("origin", TEST_ORIGIN)
+      .set("cookie", cookie)
+      .send({ locale: "en", timezone: "Asia/Makassar" });
+    expect(update.status).toBe(200);
+    expect(update.body.data).toMatchObject({ locale: "en", timezone: "Asia/Makassar" });
+    const [user] = await testDb.db.select().from(schema.users).where(eq(schema.users.id, userId));
+    expect(user).toMatchObject({ locale: "en", timezone: "Asia/Makassar" });
+  });
+
   it.each([
+    ["bahasa tidak didukung", { locale: "fr" }],
+    ["zona waktu tak dikenal", { timezone: "Mars/Olympus" }],
     ["body kosong", {}],
     ["nama kosong", { name: "   " }],
     ["field asing (image)", { image: "https://pelacak.example/x.png" }],

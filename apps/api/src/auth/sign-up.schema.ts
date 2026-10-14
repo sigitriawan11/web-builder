@@ -1,16 +1,8 @@
+import { isTimeZone } from "@platform/shared";
 import { z } from "zod";
 
 // Body registrasi email + password (ACC-001), divalidasi sebelum diteruskan ke Better Auth. `strict`: field lain
 // (mis. `emailVerified`, `image`) ditolak, bukan diam-diam diteruskan.
-
-function isTimeZone(value: string): boolean {
-  try {
-    new Intl.DateTimeFormat("en", { timeZone: value });
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export const SignUpBodySchema = z.strictObject({
   name: z.string().trim().min(1).max(100),

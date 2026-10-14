@@ -39,7 +39,7 @@ export interface AccountServiceDeps {
   revokeSessionTokens: (tokens: string[]) => Promise<void>;
   // Port ubah field user (implementasi: Better Auth `updateUser` → DB + salinan user di cache sesi Redis, agar
   // `req.ctx.user` tidak basi).
-  updateUser: (userId: string, fields: { name?: string }) => Promise<void>;
+  updateUser: (userId: string, fields: Partial<Pick<Profile, "name" | "locale" | "timezone">>) => Promise<void>;
 }
 
 function toSessionInfo(row: repository.SessionRow, currentSessionId: string): SessionInfo {
@@ -128,7 +128,11 @@ export function createAccountService(deps: AccountServiceDeps) {
   }
 
   async function updateProfile(userId: string, body: UpdateProfileBody): Promise<Profile> {
-    await deps.updateUser(userId, { ...(body.name === undefined ? {} : { name: body.name }) });
+    await deps.updateUser(userId, {
+      ...(body.name === undefined ? {} : { name: body.name }),
+      ...(body.locale === undefined ? {} : { locale: body.locale }),
+      ...(body.timezone === undefined ? {} : { timezone: body.timezone }),
+    });
     return getProfile(userId);
   }
 
