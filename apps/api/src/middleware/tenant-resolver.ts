@@ -10,9 +10,12 @@ import { findMembership, findSiteMembership } from "../modules/workspaces/worksp
 
 export type TenantScope = "workspace" | "site";
 
+// Penanda middleware untuk test inventaris rute (ARCHITECTURE §9.5): rute tenant wajib melewati tenantResolver.
+export const TENANT_RESOLVER_TAG = Symbol.for("platform.tenantResolver");
+
 export function tenantResolver(deps: { db: Db; scope?: TenantScope }): RequestHandler {
   const scope = deps.scope ?? "workspace";
-  return async (req, _res, next) => {
+  const middleware: RequestHandler = async (req, _res, next) => {
     const user = req.ctx.user;
     if (!user) throw new AppError("UNAUTHENTICATED");
     const param = scope === "workspace" ? req.params.workspaceId : req.params.siteId;
@@ -35,4 +38,5 @@ export function tenantResolver(deps: { db: Db; scope?: TenantScope }): RequestHa
     }
     next();
   };
+  return Object.assign(middleware, { [TENANT_RESOLVER_TAG]: scope });
 }

@@ -7,6 +7,7 @@ import { createAuthRouter } from "./auth/auth.routes";
 import type { CaptchaVerifier } from "./auth/captcha";
 import { type ReadinessCheck, readinessHandler } from "./health/readiness";
 import { createInternalRouter } from "./internal/internal.routes";
+import { mountAt } from "./lib/mount";
 import type { Redis } from "./lib/redis";
 import { authSession } from "./middleware/auth-session";
 import { bodyParsers } from "./middleware/body-parsers";
@@ -65,7 +66,8 @@ export function createApp(deps: AppDeps): Express {
   if (deps.auth) {
     // Router auth butuh DB (re-auth ganti email, consent); tanpa DB jangan diam-diam melonggarkan keamanan.
     if (!deps.db) throw new Error("createApp: `auth` membutuhkan `db`");
-    app.use(
+    mountAt(
+      app,
       AUTH_BASE_PATH,
       createAuthRouter({
         auth: deps.auth,
@@ -106,7 +108,8 @@ export function createApp(deps: AppDeps): Express {
 
   if (deps.auth && deps.db) {
     const auth = deps.auth;
-    app.use(
+    mountAt(
+      app,
       "/v1/account",
       createAccountRouter({
         service: createAccountService({
@@ -125,13 +128,19 @@ export function createApp(deps: AppDeps): Express {
   }
 
   if (deps.auth && deps.db) {
-    app.use(
+    mountAt(
+      app,
       "/v1/workspaces/:workspaceId",
       createWorkspaceRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }),
     );
-    app.use("/v1/sites/:siteId", createSiteScopeRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }));
+    mountAt(
+      app,
+      "/v1/sites/:siteId",
+      createSiteScopeRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }),
+    );
     if (deps.realtime) {
-      app.use(
+      mountAt(
+        app,
         "/v1/realtime",
         createRealtimeTokenRouter({
           service: createRealtimeTokenService({
@@ -147,7 +156,8 @@ export function createApp(deps: AppDeps): Express {
   }
 
   if (deps.internalJwtSecret)
-    app.use(
+    mountAt(
+      app,
       "/internal/v1",
       createInternalRouter({
         internalJwtSecret: deps.internalJwtSecret,

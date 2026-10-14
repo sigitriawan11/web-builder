@@ -987,15 +987,15 @@ Semua endpoint `/internal/*` juga dibatasi jaringan (private network/allowlist) 
 
 ### 9.5 Tenant isolation checklist
 
-- [ ] Setiap route tenant melewati `tenantResolver` (tes otomatis: daftar route di `app._router` vs allowlist publik).
+- [x] Setiap route tenant melewati `tenantResolver` (tes otomatis: inventaris rute `apps/api/test/route-inventory.ts` vs allowlist `NON_TENANT_ROUTES` di `tenant-isolation.int.test.ts`; mount lewat `mountAt`).
 - [ ] Repository menerima `TenantContext` dan selalu memfilter `site_id`/`workspace_id`.
-- [ ] Akses lintas tenant mengembalikan **404**.
+- [x] Akses lintas tenant mengembalikan **404**.
 - [ ] Runtime API memperoleh `siteId` hanya dari `X-Site-Token`.
 - [ ] Kunci Redis, nama queue job payload, key R2 selalu diawali ID tenant (`sites/<siteId>/…`).
 - [ ] Presigned upload URL dibatasi key prefix, content-type, dan ukuran.
 - [ ] Tool AI hanya bisa menyentuh dokumen/site dari run tersebut (context terikat `siteId`).
 - [ ] Workflow hanya bisa membaca/menulis collection dalam situs yang sama.
-- [ ] Integration test "cross-tenant" per modul (§14).
+- [x] Integration test "cross-tenant" per modul (§14) — tabel generik `ISOLATION_CASES` wajib mencakup setiap rute tenant.
 - [ ] RLS (P1) sebagai lapisan kedua.
 
 ### 9.6 Rate limiting (Redis)

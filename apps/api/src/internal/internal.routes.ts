@@ -1,6 +1,7 @@
 import type { Db } from "@platform/db";
 import type { Logger } from "@platform/shared/node";
 import express, { type Router } from "express";
+import { mountAt } from "../lib/mount";
 import { createInternalDocumentsRouter } from "./documents/documents.routes";
 import { requireServiceToken } from "./service-token";
 
@@ -14,6 +15,6 @@ export function createInternalRouter(deps: { internalJwtSecret: string; db?: Db;
     res.json({ data: { service: req.service?.sub }, meta: { requestId: req.ctx.requestId } });
   });
   if (deps.db && deps.logger)
-    router.use("/documents", createInternalDocumentsRouter({ db: deps.db, logger: deps.logger }));
+    mountAt(router, "/documents", createInternalDocumentsRouter({ db: deps.db, logger: deps.logger }));
   return router;
 }

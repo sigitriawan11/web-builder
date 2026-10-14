@@ -1,5 +1,6 @@
 import type { Db } from "@platform/db";
 import express, { type Router } from "express";
+import { mountAt } from "../../lib/mount";
 import type { Redis } from "../../lib/redis";
 import { requireAuth } from "../../middleware/auth-session";
 import { tenantResolver } from "../../middleware/tenant-resolver";
@@ -13,7 +14,8 @@ import { createSitesService } from "./sites.service";
 export function createSiteScopeRouter(deps: { db: Db; redis?: Redis }): Router {
   const router = express.Router({ mergeParams: true });
   router.use(requireAuth(), tenantResolver({ db: deps.db, scope: "site" }));
-  router.use(
+  mountAt(
+    router,
     "/",
     createSiteRouter({ service: createSitesService({ db: deps.db }), ...(deps.redis ? { redis: deps.redis } : {}) }),
   );

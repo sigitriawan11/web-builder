@@ -2,6 +2,7 @@ import type { Db } from "@platform/db";
 import { AppError, permissionsFor } from "@platform/shared";
 import type { WorkspaceMe } from "@platform/shared/contracts";
 import express, { type Router } from "express";
+import { mountAt } from "../../lib/mount";
 import type { Redis } from "../../lib/redis";
 import { requireAuth } from "../../middleware/auth-session";
 import { tenantResolver } from "../../middleware/tenant-resolver";
@@ -26,7 +27,8 @@ export function createWorkspaceRouter(deps: { db: Db; redis?: Redis }): Router {
     res.json({ data, meta: { requestId: req.ctx.requestId } });
   });
 
-  router.use(
+  mountAt(
+    router,
     "/sites",
     createSitesRouter({ service: createSitesService({ db: deps.db }), ...(deps.redis ? { redis: deps.redis } : {}) }),
   );
