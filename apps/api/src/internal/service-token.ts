@@ -25,3 +25,13 @@ export function requireServiceToken(secret: string): RequestHandler {
     next();
   };
 }
+
+/** Batasi rute internal ke service tertentu (setelah requireServiceToken); service lain → 403. */
+export function allowServices(...services: InternalClaims["sub"][]): RequestHandler {
+  return (req, _res, next) => {
+    if (!req.service || !services.includes(req.service.sub)) {
+      throw new AppError("FORBIDDEN", undefined, { allowed: services });
+    }
+    next();
+  };
+}

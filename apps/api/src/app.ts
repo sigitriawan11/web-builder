@@ -147,7 +147,14 @@ export function createApp(deps: AppDeps): Express {
   }
 
   if (deps.internalJwtSecret)
-    app.use("/internal/v1", createInternalRouter({ internalJwtSecret: deps.internalJwtSecret }));
+    app.use(
+      "/internal/v1",
+      createInternalRouter({
+        internalJwtSecret: deps.internalJwtSecret,
+        logger: deps.logger,
+        ...(deps.db ? { db: deps.db } : {}),
+      }),
+    );
 
   deps.mountRoutes?.(app);
 

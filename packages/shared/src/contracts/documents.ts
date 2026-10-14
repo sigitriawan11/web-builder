@@ -19,3 +19,13 @@ export const DocumentMetaSchema = z.object({
 
 export type DocumentKind = z.infer<typeof DocumentKindSchema>;
 export type DocumentMeta = z.infer<typeof DocumentMetaSchema>;
+
+// `GET /internal/v1/documents/:id/state` (ARCHITECTURE §5.5): body = state Yjs biner (application/octet-stream),
+// metadata di header. Sumber `db` = snapshot + update setelahnya; `memory` = dokumen yang sedang dibuka realtime.
+export const DOCUMENT_STATE_HEADERS = {
+  seq: "x-document-seq",
+  schemaVersion: "x-document-schema-version",
+  source: "x-document-state-source",
+} as const;
+export const DocumentStateSourceSchema = z.enum(["db", "memory"]);
+export type DocumentStateSource = z.infer<typeof DocumentStateSourceSchema>;

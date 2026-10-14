@@ -17,7 +17,8 @@
     "@types/supertest": "7.2.1",
     "supertest": "7.3.0",
     "tsx": "4.23.15",
-    "vitest": "5.0.4"
+    "vitest": "5.0.4",
+    "yjs": "13.6.33"
   },
   "dependencies": {
     "@platform/db": "workspace:*",
