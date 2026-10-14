@@ -1,3 +1,4 @@
+export { type AssetRefLocation, collectAssetRefs, gcAssets } from "./assets";
 export {
   estimateAvailableWidth,
   estimateMaxContentWidth,

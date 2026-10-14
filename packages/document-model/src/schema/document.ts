@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { collectAssetRefs } from "../query/assets";
 import { type Node, NodeSchema } from "./nodes";
 import { SiteSettingsSchema } from "./settings";
 import type { StylePatch } from "./style";
@@ -28,7 +29,7 @@ export const ComponentDepSchema = z.strictObject({
 // M7: hanya rujukan; schema collection ada di DB (spec 05).
 export const DataSourcesSchema = z.strictObject({ collections: z.array(CollectionIdSchema) });
 
-// DM-057: cache ringan metadata asset; URL tidak disimpan di dokumen.
+// DM-057: cache ringan metadata asset; URL tidak disimpan di dokumen (dibangun dari assetId + CDN + varian).
 export const AssetEntrySchema = z.strictObject({
   kind: z.enum(["image", "video", "file", "font", "svg"]),
   width: z.number().int().positive().optional(),
@@ -109,23 +110,17 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
 
     if (node.type === "image") {
       const { assetId } = node.props.image;
-      if (!(assetId in doc.assets)) {
-        report(["nodes", node.id, "props", "image", "assetId"], `Asset "${assetId}" tidak ada di assets`);
+      const asset = doc.assets[assetId];
+      if (asset && asset.kind !== "image" && asset.kind !== "svg") {
+        report(["nodes", node.id, "props", "image", "assetId"], `Asset "${assetId}" bukan gambar (${asset.kind})`);
       }
       checkNoHug(node, report);
     }
   }
 
-  // DM-069: aset yang dirujuk settings (favicon, gambar OG default) harus ada di registry.
-  const settingsAssets: [string, string | undefined][] = [
-    ["favicon", doc.settings.favicon?.assetId],
-    ["ogImage", doc.settings.seo.ogImage?.assetId],
-  ];
-  for (const [field, assetId] of settingsAssets) {
-    if (assetId !== undefined && !(assetId in doc.assets)) {
-      const path = field === "favicon" ? ["settings", "favicon", "assetId"] : ["settings", "seo", "ogImage", "assetId"];
-      report(path, `Asset "${assetId}" tidak ada di assets`);
-    }
+  // DM-057/DM-069: setiap assetId yang dirujuk node (termasuk rich text & link), settings, dan theme ada di registry.
+  for (const ref of collectAssetRefs(doc)) {
+    if (!(ref.assetId in doc.assets)) report(ref.path, `Asset "${ref.assetId}" tidak ada di assets`);
   }
 
   const listedChildren = new Set<string>();
@@ -158,10 +153,6 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
     if (page.props.isHome) {
       homes.push(pageId);
       if (page.props.path !== "/") report(["nodes", pageId, "props", "path"], `Page home wajib di path "/"`);
-    }
-    const ogImage = page.props.seo?.ogImage?.assetId;
-    if (ogImage !== undefined && !(ogImage in doc.assets)) {
-      report(["nodes", pageId, "props", "seo", "ogImage", "assetId"], `Asset "${ogImage}" tidak ada di assets`);
     }
     checkPageLayout(page, report);
   }
