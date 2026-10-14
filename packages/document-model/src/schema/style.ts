@@ -193,6 +193,18 @@ export const TypographyStyleSchema = z.strictObject(typographyShape).partial();
 export const TypographySchema = z.union([TokenRefSchema, TypographyStyleSchema]);
 const TypographyPatchSchema = z.union([TokenRefSchema, z.strictObject(patchShape(typographyShape))]);
 
+// ── Shadow (DM-031) — dipakai token `shadow.*` (M1); `effects` di style menyusul P1 · M2 ──────────────
+
+export const ShadowSchema = z.strictObject({
+  type: z.enum(["dropShadow", "innerShadow"]),
+  x: z.number().finite(),
+  y: z.number().finite(),
+  blur: z.number().nonnegative(),
+  spread: z.number().finite().optional(),
+  color: ColorSchema,
+  visible: z.boolean().optional(),
+});
+
 // ── Style & responsive (DM-036) ────────────────────────────────────────────
 
 const styleShape = {
@@ -240,6 +252,7 @@ export type PositionStyle = z.infer<typeof PositionSchema>;
 export type Fill = z.infer<typeof FillSchema>;
 export type RadiusValue = z.infer<typeof RadiusSchema>;
 export type Stroke = z.infer<typeof StrokeSchema>;
+export type Shadow = z.infer<typeof ShadowSchema>;
 export type TypographyStyle = z.infer<typeof TypographyStyleSchema>;
 export type Typography = z.infer<typeof TypographySchema>;
 export type Style = z.infer<typeof StyleSchema>;

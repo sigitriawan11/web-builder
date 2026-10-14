@@ -1,4 +1,5 @@
 export { type BlankSiteInput, createBlankSiteDocument } from "./defaults/blank-site";
+export { defaultTheme } from "./defaults/theme";
 export {
   DEFAULT_BREAKPOINTS,
   DEFAULT_MOBILE_SCALE,

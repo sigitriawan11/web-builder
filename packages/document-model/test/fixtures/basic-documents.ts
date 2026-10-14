@@ -558,7 +558,7 @@ export function fullTopLevelDocument(): SiteDocument {
         fontFamily: { heading: "Playfair Display", body: "Inter" },
         space: { "4": { value: 16, unit: "px" } },
         radius: { md: { value: 8, unit: "px" } },
-        shadow: { sm: [{ x: 0, y: 1, blur: 2, spread: 0, color: "#0000001a" }] },
+        shadow: { sm: [{ type: "dropShadow", x: 0, y: 1, blur: 2, spread: 0, color: "#0000001a" }] },
         size: { container: { value: 1200, unit: "px" } },
       },
       fonts: [

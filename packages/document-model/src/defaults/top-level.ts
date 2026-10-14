@@ -1,7 +1,7 @@
 import type { BreakpointDef, SiteDocument, SiteSettings, Theme } from "../schema";
+import { defaultTheme } from "./theme";
 
 // Nilai awal field top-level dokumen baru (DM-004). Satu sumber untuk factory situs & fixture test.
-// T1.8.12 mengganti `emptyTheme` dengan `defaultTheme` (DM-041).
 
 // DM-035: default (nilai bisa diubah, breakpoint tidak bisa dihapus).
 export const DEFAULT_BREAKPOINTS: readonly BreakpointDef[] = [
@@ -30,6 +30,7 @@ export function defaultSiteSettings(input: SettingsInput): SiteSettings {
   };
 }
 
+/** Theme tanpa token (fixture test & dokumen minimal); website baru memakai `defaultTheme()`. */
 export function emptyTheme(): Theme {
   return {
     tokens: { color: {}, typography: {}, fontFamily: {}, space: {}, radius: {}, shadow: {} },
@@ -41,5 +42,5 @@ export function emptyTheme(): Theme {
 export function emptyDocumentShell(
   input: SettingsInput,
 ): Pick<SiteDocument, "settings" | "theme" | "assets" | "componentDeps"> {
-  return { settings: defaultSiteSettings(input), theme: emptyTheme(), assets: {}, componentDeps: {} };
+  return { settings: defaultSiteSettings(input), theme: defaultTheme(), assets: {}, componentDeps: {} };
 }

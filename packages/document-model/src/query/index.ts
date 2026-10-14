@@ -9,5 +9,27 @@ export {
   type WidthEstimateContext,
 } from "./estimate-width";
 export { jsonEqual, normalizeOverrides } from "./normalize-overrides";
-export { applyStylePatch, BREAKPOINTS, type Breakpoint, createStyleResolver, resolveStyle } from "./resolve-style";
+export {
+  applyStylePatch,
+  BREAKPOINTS,
+  type Breakpoint,
+  createStyleResolver,
+  resolveStyle,
+  type StyleContext,
+} from "./resolve-style";
 export { plainText, textLines } from "./rich-text";
+export {
+  checkThemeTokens,
+  listTokenPaths,
+  MAX_ALIAS_DEPTH,
+  type ResolveValueContext,
+  resolveToken,
+  resolveValue,
+  type TokenContext,
+  TokenCycleError,
+  type TokenErrorCode,
+  TokenNotFoundError,
+  TokenResolveError,
+  tokenEntry,
+  tokenGroupOf,
+} from "./tokens";

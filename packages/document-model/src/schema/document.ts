@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { collectAssetRefs } from "../query/assets";
+import { checkThemeTokens } from "../query/tokens";
 import { type Node, NodeSchema } from "./nodes";
 import { SiteSettingsSchema } from "./settings";
 import type { StylePatch } from "./style";
@@ -124,6 +125,8 @@ function checkInvariants(doc: SiteDocumentShape, ctx: z.RefinementCtx): void {
   }
 
   checkFontFamilies(doc, report);
+  // DM-041/DM-042: alias token ter-resolve, tanpa siklus.
+  checkThemeTokens(doc.theme, report);
 
   const listedChildren = new Set<string>();
   for (const node of Object.values(nodes)) {
