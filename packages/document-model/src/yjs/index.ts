@@ -17,3 +17,12 @@ export {
 } from "./origin";
 export { richTextToYXmlFragment, yXmlFragmentToRichText } from "./rich-text";
 export { mergeDocumentUpdates, siteDocumentFromState, siteDocumentToState } from "./state";
+export {
+  compactState,
+  createJsonSnapshot,
+  documentFromJsonSnapshot,
+  type JsonSnapshot,
+  loadDocument,
+  restoreDocument,
+  stateSizeAfterUpdate,
+} from "./storage";
