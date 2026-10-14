@@ -20,6 +20,8 @@ export {
 } from "./resolve-style";
 export { plainText, textLines } from "./rich-text";
 export {
+  applyAlpha,
+  canonicalTokenPath,
   checkThemeTokens,
   listTokenPaths,
   MAX_ALIAS_DEPTH,

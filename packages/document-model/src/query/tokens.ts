@@ -38,6 +38,13 @@ export type TokenContext = { breakpoint?: Breakpoint; mode?: "light" | "dark" };
 // `type.*` = alias pendek grup `typography` (DM-041).
 const GROUP_ALIASES: Record<string, TokenGroup> = { type: "typography" };
 
+/** Path kanonis (`type.h1` → `typography.h1`) untuk membandingkan rujukan token. */
+export function canonicalTokenPath(path: string): string {
+  const [head = "", ...rest] = path.split(".");
+  const group = GROUP_ALIASES[head];
+  return group ? [group, ...rest].join(".") : path;
+}
+
 export function tokenGroupOf(path: string): TokenGroup | undefined {
   const head = path.split(".")[0] ?? "";
   const group = GROUP_ALIASES[head] ?? head;
@@ -201,7 +208,7 @@ export type ResolveValueContext = TokenContext & {
   onWarning?: (warning: { code: TokenErrorCode; path: string; message: string }) => void;
 };
 
-function applyAlpha(color: unknown, alpha: number): unknown {
+export function applyAlpha(color: unknown, alpha: number): unknown {
   if (typeof color !== "string" || !/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(color)) return color;
   const base = color.length === 9 ? Number.parseInt(color.slice(7), 16) / 255 : 1;
   const channel = Math.round(base * alpha * 255)

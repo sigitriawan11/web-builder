@@ -42,6 +42,17 @@ export const TOKEN_LITERAL_SCHEMAS = {
   size: LengthLiteralSchema,
 } as const;
 
+/** Skema nilai satu token per grup (literal | alias | responsif) — dipakai command `setToken`. */
+export const TOKEN_VALUE_SCHEMAS = {
+  color: tokenValue(TOKEN_LITERAL_SCHEMAS.color),
+  typography: tokenValue(TOKEN_LITERAL_SCHEMAS.typography),
+  fontFamily: tokenValue(TOKEN_LITERAL_SCHEMAS.fontFamily),
+  space: tokenValue(TOKEN_LITERAL_SCHEMAS.space),
+  radius: tokenValue(TOKEN_LITERAL_SCHEMAS.radius),
+  shadow: tokenValue(TOKEN_LITERAL_SCHEMAS.shadow),
+  size: tokenValue(TOKEN_LITERAL_SCHEMAS.size),
+} as const;
+
 export const ThemeTokensSchema = z.strictObject({
   color: tokenGroup(TOKEN_LITERAL_SCHEMAS.color),
   typography: tokenGroup(TOKEN_LITERAL_SCHEMAS.typography),

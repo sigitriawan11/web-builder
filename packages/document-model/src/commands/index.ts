@@ -6,6 +6,7 @@ import { renameNode, reorderNode, setLocked, setTag, setVisible } from "./node-f
 import { createPage, deletePage, reorderPages, updatePage } from "./pages";
 import { clearBreakpointOverrides, setBreakpointOverride, setLayoutMode, setSettings } from "./style-commands";
 import { duplicateNodes, insertSubtree } from "./subtree";
+import { addFont, deleteToken, renameToken, setToken } from "./theme";
 import { updateStyle } from "./update-style";
 
 export {
@@ -23,6 +24,7 @@ export {
 export { plainToRichText } from "./content";
 export { type Subtree, SubtreeSchema } from "./subtree";
 export {
+  addFont,
   clearBreakpointOverrides,
   createNode,
   createPage,
@@ -75,4 +77,8 @@ export const COMMANDS = {
   updatePage,
   reorderPages,
   deletePage,
+  setToken,
+  renameToken,
+  deleteToken,
+  addFont,
 } as const;
