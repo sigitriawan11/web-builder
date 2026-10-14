@@ -58,7 +58,13 @@ export async function insertSiteWithDocument(
   if (!document) throw new Error("insert dokumen gagal");
   const [site] = await tx
     .insert(sites)
-    .values({ workspaceId: tenant.workspaceId, name: input.name, documentId: document.id })
+    .values({
+      workspaceId: tenant.workspaceId,
+      name: input.name,
+      documentId: document.id,
+      // Staf tidak membuat situs atas namanya sendiri; AI = user yang memulai run.
+      createdBy: tenant.actor.type === "staff" ? null : tenant.actor.userId,
+    })
     .returning();
   if (!site) throw new Error("insert situs gagal");
   await tx.update(documents).set({ siteId: site.id }).where(eq(documents.id, document.id));

@@ -3,5 +3,6 @@ export * from "./app-paths";
 export * from "./errors";
 export * from "./ids";
 export * from "./legal";
+export * from "./permissions";
 export * from "./result";
 export * from "./time-zone";

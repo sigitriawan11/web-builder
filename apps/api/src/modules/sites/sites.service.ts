@@ -4,20 +4,13 @@ import { AppError } from "@platform/shared";
 import type { CreateSiteBody, Site, UpdateSiteBody } from "@platform/shared/contracts";
 import { decodeCursor, encodeCursor } from "@platform/shared/contracts";
 import { z } from "zod";
+import { assertCan } from "../../permissions";
 import * as repository from "./sites.repository";
 
 // Logika bisnis sites (CLAUDE.md § Struktur modul API): transaksi, aturan akses, pemetaan row → DTO kontrak.
 // Resource di luar tenant = NOT_FOUND (bukan FORBIDDEN) agar keberadaannya tidak bocor (ARCHITECTURE §5.3).
 
-// Role yang boleh mengubah situs. Sementara sampai lapisan `can()` / matriks izin spec 08 ACC-033 (T1.5).
-const WRITE_ROLES = new Set(["owner", "admin", "editor"]);
-
 type Tenant = WorkspaceTenant | SiteTenant;
-
-function assertCanWrite(tenant: Tenant): void {
-  const role = tenant.actor.type === "staff" ? null : tenant.actor.role;
-  if (!role || !WRITE_ROLES.has(role)) throw new AppError("FORBIDDEN");
-}
 
 function toDto(row: repository.SiteRow): Site {
   return {
@@ -37,6 +30,7 @@ export function createSitesService(deps: { db: Db }) {
   const { db } = deps;
   return {
     async list(tenant: Tenant, query: { limit: number; cursor?: string | undefined }) {
+      assertCan(tenant, "site.read");
       const position = query.cursor ? decodeCursor(CursorPosition, query.cursor) : null;
       if (query.cursor && !position) {
         throw new AppError("VALIDATION_FAILED", 422, {
@@ -57,13 +51,14 @@ export function createSitesService(deps: { db: Db }) {
     },
 
     async get(tenant: Tenant, siteId: string): Promise<Site> {
+      assertCan(tenant, "site.read");
       const row = await repository.findSite(db, tenant, siteId);
       if (!row) throw new AppError("NOT_FOUND");
       return toDto(row);
     },
 
     async create(tenant: Tenant, body: CreateSiteBody): Promise<Site> {
-      assertCanWrite(tenant);
+      assertCan(tenant, "site.create");
       // Batas jumlah situs per paket (ACC-131, PLAN_LIMIT_REACHED) dipasang saat entitlements (M4).
       const row = await db.transaction((tx) =>
         repository.insertSiteWithDocument(tx, tenant, { name: body.name, schemaVersion: CURRENT_SCHEMA_VERSION }),
@@ -72,14 +67,17 @@ export function createSitesService(deps: { db: Db }) {
     },
 
     async rename(tenant: Tenant, siteId: string, body: UpdateSiteBody): Promise<Site> {
-      assertCanWrite(tenant);
+      assertCan(tenant, "site.edit");
       const row = await repository.updateSiteName(db, tenant, siteId, body.name);
       if (!row) throw new AppError("NOT_FOUND");
       return toDto(row);
     },
 
     async remove(tenant: Tenant, siteId: string): Promise<void> {
-      assertCanWrite(tenant);
+      // Editor hanya boleh situs buatannya (ACC-033) → perlu baris situs dulu; tenant lain/terhapus = 404.
+      const site = await repository.findSite(db, tenant, siteId);
+      if (!site) throw new AppError("NOT_FOUND");
+      assertCan(tenant, "site.delete", { createdBy: site.createdBy });
       if (!(await repository.softDeleteSite(db, tenant, siteId))) throw new AppError("NOT_FOUND");
     },
   };

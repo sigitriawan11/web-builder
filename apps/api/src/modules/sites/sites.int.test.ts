@@ -1,4 +1,4 @@
-import { type Actor, workspaceScope } from "@platform/db";
+import { type Actor, eq, schema, workspaceScope } from "@platform/db";
 import { createTestDb, createUser, type TestDb } from "@platform/db/testing";
 import { dataEnvelope, ErrorBodySchema, listEnvelope, SiteSchema } from "@platform/shared/contracts";
 import type { RequestHandler } from "express";
@@ -166,6 +166,41 @@ describe("modul sites — isolasi tenant (CLAUDE.md § Testing)", () => {
     const viewer = { ...as(alice), "x-test-role": "viewer" };
     expect((await request(app()).post(sitesOf(alice)).set(viewer).send({ name: "x" })).status).toBe(403);
     expect((await request(app()).get(sitesOf(alice)).set(viewer)).status).toBe(200);
+  });
+
+  it("billing tidak boleh melihat situs (403) — matriks ACC-033", async () => {
+    const billing = { ...as(alice), "x-test-role": "billing" };
+    expect((await request(app()).get(sitesOf(alice)).set(billing)).status).toBe(403);
+  });
+
+  it("editor: hapus situs buatannya boleh, buatan orang lain tidak (403); admin boleh", async () => {
+    const editor = { ...as(alice), "x-test-role": "editor" };
+    // Situs buatan "orang lain": dibuat lalu pembuatnya dikosongkan (pembuat tidak diketahui).
+    const own = (await request(app()).post(sitesOf(alice)).set(editor).send({ name: "Punya Editor" })).body.data;
+    const other = (await request(app()).post(sitesOf(alice)).set(as(alice)).send({ name: "Bukan Punya Editor" })).body
+      .data;
+    await testDb.db.update(schema.sites).set({ createdBy: null }).where(eq(schema.sites.id, other.id));
+
+    expect(
+      (
+        await request(app())
+          .delete(`${sitesOf(alice)}/${own.id}`)
+          .set(editor)
+      ).status,
+    ).toBe(204);
+    const denied = await request(app())
+      .delete(`${sitesOf(alice)}/${other.id}`)
+      .set(editor);
+    expect(denied.status).toBe(403);
+    expect(denied.body.error.details).toEqual({ action: "site.delete" });
+    const admin = { ...as(alice), "x-test-role": "admin" };
+    expect(
+      (
+        await request(app())
+          .delete(`${sitesOf(alice)}/${other.id}`)
+          .set(admin)
+      ).status,
+    ).toBe(204);
   });
 
   it("validasi: nama kosong / siteId bukan UUID → 422", async () => {

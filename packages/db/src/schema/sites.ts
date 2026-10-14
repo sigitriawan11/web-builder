@@ -15,6 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { id, softDelete, timestamps } from "../columns";
 import { documents } from "./documents";
+import { users } from "./identity";
 import { workspaces } from "./workspaces";
 
 // Situs & read model halaman (spec 01 DM-078, ARCHITECTURE §6.3). Isi situs (SEO, favicon, bahasa, tema) ada di
@@ -40,6 +41,9 @@ export const sites = pgTable(
       .notNull()
       .unique("sites_document_id_key")
       .references((): AnyPgColumn => documents.id), // FK dua arah dengan documents.site_id
+    // Pembuat situs: editor hanya boleh mengarsipkan/menghapus situs buatannya (ACC-033). Null = tidak diketahui
+    // (data lama / user dihapus) → hanya owner/admin.
+    createdBy: uuid().references(() => users.id, { onDelete: "set null" }),
     ...timestamps,
     ...softDelete,
   },

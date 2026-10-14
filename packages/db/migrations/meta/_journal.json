@@ -50,6 +50,13 @@
       "when": 1791939463654,
       "tag": "0006_session_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791940728650,
+      "tag": "0007_site_created_by",
+      "breakpoints": true
     }
   ]
 }
