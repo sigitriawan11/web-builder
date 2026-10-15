@@ -62,6 +62,16 @@ describe("gate sesi", () => {
   });
 });
 
+describe("permukaan header keamanan", () => {
+  it("api, editor & app di host app; selain itu marketing", () => {
+    expect(decide({ pathname: "/api/v1/me" })).toMatchObject({ surface: "api" });
+    expect(decide({ pathname: "/editor/x", cookies: session })).toMatchObject({ surface: "editor" });
+    expect(decide({ pathname: "/login" })).toMatchObject({ surface: "app" });
+    expect(decide({ host: "localhost:3000", pathname: "/" })).toMatchObject({ surface: "marketing" });
+    expect(decide({ host: "127.0.0.1:3000", pathname: "/editor" })).toMatchObject({ surface: "marketing" });
+  });
+});
+
 describe("request id & locale", () => {
   it("x-request-id valid dipertahankan; kosong/tidak valid → baru", () => {
     expect(decide({ pathname: "/login", requestId: "req-123" })).toMatchObject({ requestId: "req-123" });

@@ -1,4 +1,5 @@
 import { LOCALES, type Locale, localeFromAcceptLanguage } from "@platform/i18n";
+import type { Surface } from "../security/headers";
 
 // Keputusan proxy Next.js (ARCHITECTURE §3.4, §5.1) sebagai fungsi murni — `src/proxy.ts` hanya menerjemahkannya
 // ke NextResponse. Urutan: request id → host routing (apex vs `app.`) → gate cookie sesi → locale.
@@ -50,7 +51,7 @@ export interface ProxyInput {
 
 export type ProxyDecision =
   | { type: "redirect"; location: string; status: 307; requestId: string }
-  | { type: "next"; requestId: string; locale: Locale };
+  | { type: "next"; requestId: string; locale: Locale; surface: Surface };
 
 export function decideProxy(input: ProxyInput): ProxyDecision {
   const requestId =
@@ -80,5 +81,14 @@ export function decideProxy(input: ProxyInput): ProxyDecision {
     cookieLocale && (LOCALES as readonly string[]).includes(cookieLocale)
       ? (cookieLocale as Locale)
       : localeFromAcceptLanguage(input.acceptLanguage);
-  return { type: "next", requestId, locale };
+  // Permukaan menentukan header keamanan (PUB-211); host tak dikenal diperlakukan sebagai marketing (paling longgar
+  // yang tetap aman: tanpa sesi).
+  const surface: Surface = matches(path, ["/api"])
+    ? "api"
+    : isAppHost && matches(path, ["/editor"])
+      ? "editor"
+      : isAppHost
+        ? "app"
+        : "marketing";
+  return { type: "next", requestId, locale, surface };
 }

@@ -200,7 +200,7 @@ Pemetaan production ↔ lokal dikonfigurasi lewat env (`PUBLIC_APP_URL`, `PUBLIC
 Urutan (Next.js `proxy.ts` — nama `middleware.ts` sejak Next 16 — + `rewrites()` `beforeFiles`; proxy berjalan sebelum rewrites sehingga header request yang ia set, mis. `x-request-id`, ikut ke `/api`):
 
 1. `/api/:path*` → `${API_INTERNAL_URL}/:path*` (header `x-forwarded-host`, `x-request-id` diteruskan).
-2. `/editor/:path*` → `${EDITOR_ORIGIN}/editor/:path*`; jika file tidak ada → `index.html` (SPA fallback). Middleware memeriksa *keberadaan* cookie session sebelum rewrite; tanpa cookie → redirect `/login?next=…`. Validasi session sesungguhnya dilakukan editor via `GET /api/v1/me`.
+2. `/editor/:path*` → `${EDITOR_ORIGIN}/editor/:path*`; jika file tidak ada → `index.html` (SPA fallback). Rewrite ini dilakukan **oleh proxy** (bukan `rewrites()` next.config) karena header respons proxy (CSP, anti-frame) hanya ikut pada rewrite yang ia lakukan sendiri. Proxy memeriksa *keberadaan* cookie session sebelum rewrite; tanpa cookie → redirect `/login?next=…`. Validasi session sesungguhnya dilakukan editor via `GET /api/v1/me`.
 3. Selain itu → App Router (`(auth)`, `(dashboard)`, `(admin)`).
 4. Host tanpa `app.` → `(marketing)`.
 
@@ -1022,7 +1022,7 @@ Selain itu Cloudflare WAF/rate limiting di depan `*.platformmu.site` dan `api.`.
 - **Input:** Zod di setiap boundary (HTTP, job, tool AI, workflow, webhook, env). Data record divalidasi dengan schema Zod yang dibangun dari `collections.schema`.
 - **Output:** renderer selalu meng-escape teks (React). Rich text (Tiptap JSON) dirender dari node yang diizinkan saja — tidak ada `dangerouslySetInnerHTML` dari input user. URL (`href`, `src`) disanitasi (blok `javascript:`, `data:` kecuali gambar). Custom code embed = P2 dan hanya di iframe sandbox domain terpisah.
 - **CSP situs publish** (default): `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' data: https://assets.platformmu.site https:; font-src 'self' fonts.gstatic.com; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self' <gateway hosts>`. Integrasi pihak ketiga (analytics, chat) menambah sumber lewat allowlist per integrasi (P1).
-- **CSP app/editor:** `script-src 'self'` + nonce untuk Next.js; `connect-src` termasuk `api.`, `realtime.`, Sentry.
+- **CSP app/editor** (PUB-211, `apps/web/src/lib/security/headers.ts`, dipasang proxy): halaman Next di `app.` → `script-src 'self' 'nonce-…' 'strict-dynamic'` (nonce per request; route group `(auth)/(dashboard)/(admin)` dirender dinamis); editor (SPA statis) → `script-src 'self'` (dev: + `'unsafe-inline'` untuk preamble Vite & WS HMR); marketing (SSG) → tanpa nonce (`'unsafe-inline'`). Semua: `style-src 'self' 'unsafe-inline'` (atribut `style` Radix/canvas), `connect-src` 'self' + `api.`, `realtime.`, Sentry; `img-src` + host aset; `frame-ancestors 'none'` + `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP; HSTS `max-age=31536000; includeSubDomains` hanya production (`preload` saat semua subdomain HTTPS). `/api` memakai header apps/api (helmet).
 - Editor me-render dokumen user di DOM yang sama dengan UI editor → karena itu **renderer tidak boleh** mengeksekusi script dari dokumen. Preview situs dengan island aktif dibuka di iframe `sandbox` dengan origin situs (`*.localhost:8787` / preview host).
 
 ### 9.8 SSRF guard (blok `http_request`, fetch URL oleh AI/import)

@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 // Routing app.<domain> (ARCHITECTURE §3.4): `/api/*` → apps/api (prefix `/api` dibuang: api memasang `/v1/*` &
-// `/auth/*`), `/editor/*` → origin statis editor (dev: Vite, base `/editor/`; SPA fallback ditangani origin itu).
-// Dijalankan `beforeFiles` agar menang atas route App Router. Gate cookie sesi untuk `/editor` di middleware (T1.14.2).
+// `/auth/*`) lewat rewrites `beforeFiles`. `/editor/*` → origin statis editor (dev: Vite, base `/editor/`; SPA
+// fallback ditangani origin itu) di-rewrite oleh PROXY (`editorRewriteUrl`), bukan next.config: header respons proxy
+// (CSP/anti-frame, PUB-211) hanya ikut pada rewrite yang dilakukan proxy sendiri (diverifikasi T1.14.3).
 
 export const WebEnvSchema = z.object({
   API_INTERNAL_URL: z.url(),
@@ -10,9 +11,14 @@ export const WebEnvSchema = z.object({
   // Host routing (proxy): apex = marketing, `app.` = auth/dashboard/admin/editor (ARCHITECTURE §3).
   PUBLIC_APP_URL: z.url(),
   PUBLIC_MARKETING_URL: z.url(),
+  // Header keamanan (PUB-211): HSTS hanya production; connect-src/img-src dari origin publik.
+  APP_ENV: z.enum(["local", "staging", "production"]).default("local"),
+  PUBLIC_API_URL: z.url(),
+  PUBLIC_REALTIME_URL: z.url(),
+  PUBLIC_ASSETS_URL: z.url(),
+  NEXT_PUBLIC_SENTRY_DSN: z.union([z.url(), z.literal("")]).optional(),
 });
 export type WebEnv = z.infer<typeof WebEnvSchema>;
-export type WebRoutingEnv = Pick<WebEnv, "API_INTERNAL_URL" | "EDITOR_ORIGIN">;
 
 export interface Rewrite {
   source: string;
@@ -21,16 +27,15 @@ export interface Rewrite {
 
 const trimSlash = (url: string) => url.replace(/\/+$/, "");
 
-export function platformRewrites(env: WebRoutingEnv): { beforeFiles: Rewrite[] } {
+export function platformRewrites(env: Pick<WebEnv, "API_INTERNAL_URL">): { beforeFiles: Rewrite[] } {
   const api = trimSlash(env.API_INTERNAL_URL);
-  const editor = trimSlash(env.EDITOR_ORIGIN);
-  return {
-    beforeFiles: [
-      { source: "/api/:path*", destination: `${api}/:path*` },
-      { source: "/editor", destination: `${editor}/editor/` },
-      { source: "/editor/:path*", destination: `${editor}/editor/:path*` },
-    ],
-  };
+  return { beforeFiles: [{ source: "/api/:path*", destination: `${api}/:path*` }] };
+}
+
+/** URL tujuan rewrite editor untuk path `/editor…` (`/editor` → `/editor/`, base Vite). */
+export function editorRewriteUrl(env: Pick<WebEnv, "EDITOR_ORIGIN">, pathname: string, search: string): string {
+  const path = pathname === "/editor" ? "/editor/" : pathname;
+  return `${trimSlash(env.EDITOR_ORIGIN)}${path}${search}`;
 }
 
 /** Env apps/web dari `process.env`; salah konfigurasi → gagal saat start/build dengan pesan jelas. */
