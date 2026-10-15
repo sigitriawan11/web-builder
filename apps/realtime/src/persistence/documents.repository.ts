@@ -7,7 +7,7 @@ export interface StoredDocument {
   siteId: string | null;
   schemaVersion: number;
   lastSeq: number;
-  snapshot: { state: Uint8Array; uptoSeq: number } | null;
+  snapshot: { state: Uint8Array; uptoSeq: number; createdAt: Date } | null;
   // Update setelah snapshot, urut seq.
   updates: Uint8Array[];
 }
@@ -30,7 +30,11 @@ export async function loadStoredDocument(
 
   const [snapshot] = document.lastSnapshotId
     ? await db
-        .select({ state: schema.documentSnapshots.state, uptoSeq: schema.documentSnapshots.uptoSeq })
+        .select({
+          state: schema.documentSnapshots.state,
+          uptoSeq: schema.documentSnapshots.uptoSeq,
+          createdAt: schema.documentSnapshots.createdAt,
+        })
         .from(schema.documentSnapshots)
         .where(
           and(
@@ -103,5 +107,46 @@ export async function appendDocumentUpdates(
       })
       .where(eq(schema.documents.id, documentId));
     return { lastSeq };
+  });
+}
+
+export type SnapshotKind = (typeof schema.documentSnapshotKindEnum.enumValues)[number];
+
+export interface NewSnapshot {
+  // Snapshot mencakup semua update sampai seq ini; state boleh memuat lebih (update ganda tidak berefek di Yjs).
+  uptoSeq: number;
+  state: Uint8Array;
+  json: unknown;
+  jsonInvalid: boolean;
+  kind: SnapshotKind;
+  createdBy?: string | null;
+}
+
+/** Simpan snapshot dan jadikan titik awal load berikutnya (`documents.last_snapshot_id`), satu transaksi. */
+export async function createDocumentSnapshot(
+  db: DbExecutor,
+  _tenant: SystemTenant,
+  documentId: string,
+  snapshot: NewSnapshot,
+): Promise<{ id: string; createdAt: Date }> {
+  return db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(schema.documentSnapshots)
+      .values({
+        documentId,
+        uptoSeq: snapshot.uptoSeq,
+        state: snapshot.state,
+        json: snapshot.json,
+        jsonInvalid: snapshot.jsonInvalid,
+        kind: snapshot.kind,
+        createdBy: snapshot.createdBy ?? null,
+      })
+      .returning({ id: schema.documentSnapshots.id, createdAt: schema.documentSnapshots.createdAt });
+    if (!created) throw new Error(`snapshot dokumen ${documentId} gagal dibuat`);
+    await tx
+      .update(schema.documents)
+      .set({ lastSnapshotId: created.id, updatedAt: sql`now()` })
+      .where(eq(schema.documents.id, documentId));
+    return created;
   });
 }

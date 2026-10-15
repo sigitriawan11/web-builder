@@ -1,6 +1,7 @@
 import {
   type AnyPgColumn,
   bigint,
+  boolean,
   index,
   integer,
   jsonb,
@@ -23,7 +24,14 @@ const timestamptz = () => timestamp({ withTimezone: true });
 export const documentKindEnum = pgEnum("document_kind", ["site", "component", "template"]);
 // Origin transaksi Yjs (spec 01 DM-060); `ai` = hasil Terapkan run AI.
 export const documentUpdateOriginEnum = pgEnum("document_update_origin", ["local", "ai", "server", "migration"]);
-export const documentSnapshotKindEnum = pgEnum("document_snapshot_kind", ["auto", "named", "publish", "pre_ai"]);
+// `migration` = sebelum & sesudah migrasi schemaVersion (DM-071); tidak di-thinning (ARCHITECTURE §7.4).
+export const documentSnapshotKindEnum = pgEnum("document_snapshot_kind", [
+  "auto",
+  "named",
+  "publish",
+  "pre_ai",
+  "migration",
+]);
 
 export const documents = pgTable(
   "documents",
@@ -77,6 +85,8 @@ export const documentSnapshots = pgTable(
     state: bytea().notNull(),
     // JSON snapshot tervalidasi (history, restore, publish); opsional untuk snapshot `auto`.
     json: jsonb().$type<unknown>(),
+    // DM-061: JSON yang gagal validasi tetap disimpan (history/fallback korupsi), ditandai agar publish/restore menghindarinya.
+    jsonInvalid: boolean().notNull().default(false),
     kind: documentSnapshotKindEnum().notNull(),
     label: text(),
     createdBy: uuid().references(() => users.id, { onDelete: "set null" }),

@@ -1,6 +1,6 @@
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import type { Server } from "@hocuspocus/server";
-import { eq, schema, systemScope } from "@platform/db";
+import { asc, eq, schema, systemScope } from "@platform/db";
 import { createSite, createTestDb, createUser, createWorkspace, type TestDb } from "@platform/db/testing";
 import {
   createBlankSiteDocument,
@@ -152,6 +152,20 @@ describe("onLoadDocument", () => {
     ]);
     const [after] = await testDb.db.select().from(schema.documents).where(eq(schema.documents.id, document.id));
     expect(after).toMatchObject({ schemaVersion: 1, lastSeq: 2 });
+
+    // Snapshot `migration` sebelum (JSON v0, tidak valid untuk schema terkini) & sesudah (valid, titik awal load).
+    const snapshots = await testDb.db
+      .select()
+      .from(schema.documentSnapshots)
+      .where(eq(schema.documentSnapshots.documentId, document.id))
+      .orderBy(asc(schema.documentSnapshots.uptoSeq));
+    expect(snapshots.map(({ kind, uptoSeq, jsonInvalid }) => ({ kind, uptoSeq, jsonInvalid }))).toEqual([
+      { kind: "migration", uptoSeq: 1, jsonInvalid: true },
+      { kind: "migration", uptoSeq: 2, jsonInvalid: false },
+    ]);
+    expect(snapshots[0]?.json).toMatchObject({ schemaVersion: 0 });
+    expect(SiteDocumentSchema.parse(snapshots[1]?.json)).toEqual(received);
+    expect(after?.lastSnapshotId).toBe(snapshots[1]?.id);
 
     // Dokumen di-unload saat klien terakhir putus; load ulang dari DB tidak memigrasi lagi.
     await new Promise((resolve) => setTimeout(resolve, 200));

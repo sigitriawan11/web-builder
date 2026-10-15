@@ -620,7 +620,7 @@ Tabel Better Auth (`users`, `sessions`, `accounts`, `verifications`, dan tabel p
 | `site_pages` *(read model, turunan)* | site_id, page_id (= page node id `pg_…`), path, title, seo jsonb, sort_order, is_home, node_count, updated_at — dibangun ulang dari dokumen; halaman terhapus = baris dihapus | pk(site_id, page_id), unique(site_id, path), satu home per situs |
 | `documents` | id, workspace_id, site_id (null untuk library), kind (`site`/`component`/`template`), schema_version, last_seq, last_snapshot_id, size_bytes | (site_id), (kind) |
 | `document_updates` | id bigint, document_id, seq, update bytea, origin (`local`/`ai`/`server`/`migration`), actor_id, ai_run_id, created_at | unique(document_id, seq) |
-| `document_snapshots` | id, document_id, upto_seq, state bytea (Yjs), json jsonb (opsional, untuk publish/history), kind (`auto`/`named`/`publish`/`pre_ai`), label, created_by | (document_id, created_at desc) |
+| `document_snapshots` | id, document_id, upto_seq, state bytea (Yjs), json jsonb (opsional, untuk publish/history), json_invalid (JSON gagal validasi tetap disimpan, DM-061), kind (`auto`/`named`/`publish`/`pre_ai`/`migration` — sebelum & sesudah migrasi schemaVersion, DM-071), label, created_by | (document_id, created_at desc) |
 
 **Library** (`schema/library.ts`) — [spec 03](./specs/03-components-templates.md)
 
@@ -739,7 +739,7 @@ Entitlement efektif = `plans.entitlements` + override per workspace (`workspaces
 
 1. Editor mengubah Y.Doc lokal → `HocuspocusProvider` mengirim update ke `apps/realtime` (real time, tanpa menunggu).
 2. `persistence.onChange` men-*buffer* update per dokumen; **flush** setiap 2 s *debounce* (max 10 s) → `Y.mergeUpdates(buffer)` → `INSERT document_updates (seq = last_seq + 1)` dan `UPDATE documents SET last_seq` dalam satu transaksi.
-3. Setiap ≥ 500 update **atau** ≥ 10 menit sejak snapshot terakhir → buat snapshot (`kind = auto`) dari doc in-memory.
+3. Setiap ≥ 500 update **atau** ≥ 10 menit sejak snapshot terakhir → buat snapshot (`kind = auto`, `state` + `json`) dari doc in-memory.
 4. `onDisconnect` terakhir / `onStoreDocument` → flush paksa.
 5. Editor menampilkan status: `Tersimpan` (server mengonfirmasi via stateless message `saved:{seq}`), `Menyimpan…`, `Offline — perubahan disimpan di perangkat`.
 
@@ -753,7 +753,7 @@ Entitlement efektif = `plans.entitlements` + override per workspace (`workspaces
 ### 7.4 Compaction (queue `cleanup`)
 
 - Untuk dokumen dengan snapshot terbaru di `upto_seq = S`: hapus `document_updates` dengan `seq <= S` **yang lebih tua dari retensi history paket** (mis. Free 7 hari, Pro 90 hari — angka di [spec 08](./specs/08-accounts-plans-admin.md)).
-- Snapshot `auto` lama di-thinning: simpan 1/jam untuk 48 jam terakhir, 1/hari setelahnya, sampai batas retensi. Snapshot `named`, `publish`, `pre_ai` tidak di-thinning selama dalam retensi.
+- Snapshot `auto` lama di-thinning: simpan 1/jam untuk 48 jam terakhir, 1/hari setelahnya, sampai batas retensi. Snapshot `named`, `publish`, `pre_ai`, `migration` tidak di-thinning selama dalam retensi.
 - Version history UI = daftar snapshot + kemampuan "restore" (restore = buat update baru yang mengubah state ke snapshot lama, bukan menghapus history).
 
 ### 7.5 Recovery lokal

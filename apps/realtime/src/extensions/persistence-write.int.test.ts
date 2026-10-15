@@ -1,6 +1,6 @@
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import type { Server } from "@hocuspocus/server";
-import { asc, eq, schema, systemScope } from "@platform/db";
+import { asc, desc, eq, schema, systemScope } from "@platform/db";
 import { createSite, createTestDb, createUser, createWorkspace, type TestDb } from "@platform/db/testing";
 import {
   createBlankSiteDocument,
@@ -21,7 +21,7 @@ import { createRealtimeServer } from "../server";
 import { LIMIT_WARNING_MESSAGE, PersistenceExtension, type PersistenceOptions } from "./persistence";
 
 // T1.12.3: buffer update klien → flush satu baris (debounce + batas tunggu maksimum), flush paksa saat putus,
-// batas ukuran state (ARCHITECTURE §7.2, DM-061/DM-076).
+// batas ukuran state (ARCHITECTURE §7.2, DM-061/DM-076); T1.12.4: snapshot otomatis.
 const SECRET = "test-realtime-secret-0123456789abcdef";
 const logger = createLogger({ service: "realtime-test", env: "test", level: "silent" });
 const tenant = systemScope("test realtime flush");
@@ -167,8 +167,9 @@ describe("flush update", () => {
     await start({ flushDebounceMs: 200, flushMaxWaitMs: 300 });
     const { owner, siteId, docId } = await seededSite();
     const client = await connect(owner.id, docId, siteId);
-    // Edit tiap 40 ms (< debounce) selama ~800 ms: tanpa batas maksimum, debounce tidak pernah habis.
-    for (let i = 0; i < 20; i++) {
+    // Edit tiap 40 ms (< debounce) selama ≥ 1,2 s: tanpa batas maksimum, debounce tidak pernah habis (hanya baris
+    // seed); dengan batas 300 ms ada ≥ 3 flush — ambang ≥ 3 baris menyisakan margin untuk jitter timer.
+    for (let i = 0; i < 30; i++) {
       addFrames(client.doc, 1, `T${i}-`);
       await sleep(40);
     }
@@ -230,5 +231,100 @@ describe("batas ukuran state (DM-076)", () => {
     client.provider.destroy();
     await sleep(300);
     expect(await storedRows(docId)).toEqual(before);
+  });
+});
+
+async function snapshots(docId: string) {
+  return testDb.db
+    .select({
+      id: schema.documentSnapshots.id,
+      kind: schema.documentSnapshots.kind,
+      uptoSeq: schema.documentSnapshots.uptoSeq,
+      jsonInvalid: schema.documentSnapshots.jsonInvalid,
+      json: schema.documentSnapshots.json,
+      createdBy: schema.documentSnapshots.createdBy,
+    })
+    .from(schema.documentSnapshots)
+    .where(eq(schema.documentSnapshots.documentId, docId))
+    .orderBy(desc(schema.documentSnapshots.createdAt));
+}
+
+async function lastSnapshotId(docId: string) {
+  const [row] = await testDb.db.select().from(schema.documents).where(eq(schema.documents.id, docId));
+  return row?.lastSnapshotId ?? null;
+}
+
+describe("snapshot otomatis (ARCHITECTURE §7.2, DM-061)", () => {
+  it("≥ N update sejak snapshot terakhir → snapshot `auto` (state + JSON valid), jadi titik awal load", async () => {
+    await start({ flushDebounceMs: 50, flushMaxWaitMs: 200, snapshotEveryUpdates: 10, snapshotIntervalMs: 60_000 });
+    const { owner, siteId, docId } = await seededSite();
+    const client = await connect(owner.id, docId, siteId);
+    // Baris awal (seed) dihitung saat load: 1 + 5 = 6 < 10 → belum.
+    addFrames(client.doc, 5);
+    await waitFor(async () => (await storedRows(docId)).length >= 2);
+    await sleep(150);
+    expect(await snapshots(docId)).toEqual([]);
+
+    addFrames(client.doc, 4, "G");
+    await waitFor(async () => (await snapshots(docId)).length === 1);
+    const [snapshot] = await snapshots(docId);
+    const rows = await storedRows(docId);
+    expect(snapshot).toMatchObject({ kind: "auto", jsonInvalid: false, createdBy: owner.id });
+    expect(snapshot?.uptoSeq).toBe(rows.at(-1)?.seq);
+    expect(SiteDocumentSchema.parse(snapshot?.json)).toEqual(SiteDocumentSchema.parse(yDocToJson(client.doc)));
+    expect(await lastSnapshotId(docId)).toBe(snapshot?.id);
+
+    // Hitungan direset: 3 update lagi tidak membuat snapshot baru; load = snapshot + update setelahnya.
+    addFrames(client.doc, 3, "H");
+    await waitFor(async () => (await storedRows(docId)).length > rows.length);
+    await sleep(150);
+    expect(await snapshots(docId)).toHaveLength(1);
+    const expected = SiteDocumentSchema.parse(yDocToJson(client.doc));
+    client.provider.destroy();
+    await server?.destroy();
+    await start({});
+    const reloaded = await connect(owner.id, docId, siteId);
+    expect(SiteDocumentSchema.parse(yDocToJson(reloaded.doc))).toEqual(expected);
+  });
+
+  it("≥ interval sejak snapshot terakhir → snapshot `auto` walau update sedikit", async () => {
+    // Jam disuntik: interval tidak bergantung pada kecepatan mesin saat test paralel.
+    let clock = Date.now();
+    await start({
+      flushDebounceMs: 50,
+      flushMaxWaitMs: 200,
+      snapshotEveryUpdates: 1_000,
+      snapshotIntervalMs: 10 * 60_000,
+      now: () => clock,
+    });
+    const { owner, siteId, docId } = await seededSite();
+    const client = await connect(owner.id, docId, siteId);
+    addFrames(client.doc, 1);
+    await waitFor(async () => (await storedRows(docId)).length === 2);
+    await sleep(100);
+    expect(await snapshots(docId)).toEqual([]);
+
+    clock += 9 * 60_000;
+    addFrames(client.doc, 1, "G");
+    await waitFor(async () => (await storedRows(docId)).length === 3);
+    await sleep(100);
+    expect(await snapshots(docId)).toEqual([]);
+
+    clock += 60_000;
+    addFrames(client.doc, 1, "H");
+    await waitFor(async () => (await snapshots(docId)).length === 1);
+    expect((await snapshots(docId))[0]).toMatchObject({ kind: "auto", uptoSeq: 4 });
+  });
+
+  it("JSON gagal validasi → snapshot tetap disimpan dengan `json_invalid` (AC DM-061)", async () => {
+    await start({ flushDebounceMs: 50, flushMaxWaitMs: 200, snapshotEveryUpdates: 1, snapshotIntervalMs: 60_000 });
+    const { owner, siteId, docId } = await seededSite();
+    const client = await connect(owner.id, docId, siteId);
+    // Sengaja merusak dokumen lewat Y.Map mentah (bukan command): yang diuji jalur penyimpanan, bukan validasi command.
+    client.doc.getMap("meta").set("schemaVersion", "rusak");
+    await waitFor(async () => (await snapshots(docId)).length === 1);
+    const [snapshot] = await snapshots(docId);
+    expect(snapshot).toMatchObject({ kind: "auto", jsonInvalid: true, uptoSeq: 2 });
+    expect(snapshot?.json).toMatchObject({ schemaVersion: "rusak" });
   });
 });

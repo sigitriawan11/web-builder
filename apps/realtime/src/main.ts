@@ -24,6 +24,8 @@ const server = createRealtimeServer({
       logger,
       flushDebounceMs: env.REALTIME_FLUSH_DEBOUNCE_MS,
       flushMaxWaitMs: env.REALTIME_FLUSH_MAX_MS,
+      snapshotEveryUpdates: env.REALTIME_SNAPSHOT_EVERY,
+      snapshotIntervalMs: env.REALTIME_SNAPSHOT_INTERVAL_MS,
     }),
   ],
 });

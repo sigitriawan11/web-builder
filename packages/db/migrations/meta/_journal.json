@@ -57,6 +57,13 @@
       "when": 1791940728650,
       "tag": "0007_site_created_by",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792014417268,
+      "tag": "0008_snapshot_migration_kind",
+      "breakpoints": true
     }
   ]
 }
