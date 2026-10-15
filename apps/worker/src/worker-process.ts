@@ -1,12 +1,14 @@
 import type { Server } from "node:http";
 import { createDb } from "@platform/db";
 import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
+import { Queue } from "bullmq";
 import { Redis } from "ioredis";
 import type { WorkerEnv } from "./config/env";
 import { createEmailProvider } from "./email/provider";
 import { createHealthApp, listen } from "./health/health-server";
 import { createProcessors } from "./processors";
 import type { ProcessorRegistry } from "./processors/types";
+import { registerCleanupSchedules } from "./runtime/schedules";
 import { selectQueues, startWorkers } from "./runtime/workers";
 
 // Proses worker (ARCHITECTURE §5.4): env → worker BullMQ per queue → health server. `close()` = graceful shutdown.
@@ -79,6 +81,7 @@ export async function startWorkerProcess(
     logger,
     ...(options.prefix ? { prefix: options.prefix } : {}),
   });
+  if (queues.includes("cleanup")) await scheduleCleanup(env, logger, options.prefix);
   // Koneksi terpisah untuk readiness & Bull Board: perintah gagal cepat saat Redis mati (tidak menumpuk).
   const redis = new Redis(env.REDIS_URL, { enableOfflineQueue: false, maxRetriesPerRequest: 1 });
   redis.on("error", () => {
@@ -110,4 +113,20 @@ export async function startWorkerProcess(
   };
 
   return { server, logger, queues, close };
+}
+
+/** Daftarkan job berulang `cleanup` (idempoten). Gagal → log error; worker tetap melayani job yang ada. */
+async function scheduleCleanup(env: WorkerEnv, logger: Logger, prefix?: string): Promise<void> {
+  const connection = new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
+  const queue = new Queue("cleanup", { connection, prefix: prefix ?? "bull" });
+  try {
+    const schedules = [{ task: "compact-documents", pattern: env.CLEANUP_COMPACTION_CRON }] as const;
+    await registerCleanupSchedules(queue, schedules);
+    logger.info({ schedules }, "jadwal cleanup terdaftar");
+  } catch (error) {
+    logger.error({ err: error }, "jadwal cleanup gagal didaftarkan");
+  } finally {
+    await queue.close();
+    connection.disconnect();
+  }
 }

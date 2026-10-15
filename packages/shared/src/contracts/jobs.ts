@@ -82,6 +82,11 @@ export const QUEUE_POLICIES: Readonly<Record<QueueName, QueuePolicy>> = {
 
 const jobBase = { requestId: z.string().min(1) };
 
+// Tugas queue `cleanup` (ARCHITECTURE §5.4, §7.4) — dijadwalkan worker (repeatable). Aset yatim, deployment lama &
+// sesi kedaluwarsa ditambah bersama fiturnya.
+export const CLEANUP_TASKS = ["compact-documents"] as const;
+export type CleanupTask = (typeof CLEANUP_TASKS)[number];
+
 // Payload per queue; queue lain ditambahkan saat processor-nya dibangun.
 export const JOB_PAYLOADS = {
   // Idempoten per deploymentId.
@@ -111,6 +116,7 @@ export const JOB_PAYLOADS = {
     z.object({ ...jobBase, template: z.literal("auth.password_reset"), userId: UuidV7Schema, resetUrl: z.url() }),
     z.object({ ...jobBase, template: z.literal("auth.password_changed"), userId: UuidV7Schema }),
   ]),
+  cleanup: z.object({ ...jobBase, task: z.enum(CLEANUP_TASKS) }),
   // Job yang gagal final di queue lain (ARCHITECTURE §5.4). `payload` sudah disensor (`redactJobPayload`); worker
   // `dead-letter` menyimpannya ke tabel `dead_letter_jobs` + alert.
   "dead-letter": z.object({

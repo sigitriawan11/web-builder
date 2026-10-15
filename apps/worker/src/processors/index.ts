@@ -1,4 +1,5 @@
 import type { Db } from "@platform/db";
+import { createCleanupProcessor } from "./cleanup/cleanup.processor";
 import { createDeadLetterProcessor } from "./dead-letter/dead-letter.processor";
 import { createEmailProcessor, type EmailProcessorDeps } from "./email/email.processor";
 import type { ProcessorRegistry } from "./types";
@@ -9,5 +10,6 @@ export function createProcessors(deps: { db: Db; email: EmailProcessorDeps }): P
   return {
     email: createEmailProcessor(deps.email),
     "dead-letter": createDeadLetterProcessor({ db: deps.db }),
+    cleanup: createCleanupProcessor({ db: deps.db }),
   };
 }

@@ -32,6 +32,8 @@ export const workerEnvSchema = {
   WORKER_HEALTH_PORT: envField.port().default(4200),
   DATABASE_URL: envField.url(),
   DATABASE_POOL_MAX: envField.int().default(5),
+  // Jadwal queue `cleanup` (cron, zona Asia/Jakarta). Compaction dokumen: harian 03:00 (trafik rendah).
+  CLEANUP_COMPACTION_CRON: z.string().min(9).default("0 3 * * *"),
   // Email (ACC-271): Mailpit lewat SMTP di lokal, Resend di production.
   EMAIL_PROVIDER: z.enum(["smtp", "resend"]).default("smtp"),
   SMTP_URL: envField.url().optional(),
