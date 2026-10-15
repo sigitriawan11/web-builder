@@ -15,7 +15,7 @@ import {
   type WorkspaceTenant,
   workspaceWhere,
 } from "@platform/db";
-import type { SiteDocument } from "@platform/document-model";
+import { type SiteDocument, summarizePages } from "@platform/document-model";
 import type { ListSitesQuery } from "@platform/shared/contracts";
 
 // SATU-SATUNYA tempat modul sites mengakses tabel (CLAUDE.md, ARCHITECTURE §6.2). Tenant selalu parameter pertama
@@ -162,36 +162,8 @@ export async function writeInitialDocument(
     })
     .where(and(eq(documents.id, input.documentId), eq(documents.workspaceId, tenant.workspaceId)));
 
-  const pages = input.document.pageOrder.flatMap((pageId, sortOrder) => {
-    const page = input.document.nodes[pageId];
-    if (page?.type !== "page") return [];
-    return [
-      {
-        siteId: input.siteId,
-        pageId,
-        path: page.props.path,
-        title: page.props.title,
-        seo: page.props.seo ?? null,
-        sortOrder,
-        isHome: page.props.isHome === true,
-        nodeCount: countNodes(input.document, pageId),
-      },
-    ];
-  });
+  const pages = summarizePages(input.document).map((page) => ({ ...page, siteId: input.siteId }));
   if (pages.length > 0) await tx.insert(sitePages).values(pages);
-}
-
-/** Jumlah node di bawah page (termasuk page itu). */
-function countNodes(document: SiteDocument, pageId: string): number {
-  let count = 0;
-  const stack = [pageId];
-  while (stack.length > 0) {
-    const node = document.nodes[stack.pop() ?? ""];
-    if (!node) continue;
-    count += 1;
-    if ("children" in node) stack.push(...node.children);
-  }
-  return count;
 }
 
 export async function updateSiteName(

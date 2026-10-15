@@ -3,6 +3,7 @@ import { createLogger } from "@platform/shared/node";
 import { Redis } from "ioredis";
 import { loadRealtimeEnv } from "./config/env";
 import { PersistenceExtension } from "./extensions/persistence";
+import { ProjectionsExtension } from "./extensions/projections";
 import { SingleEditorLockExtension } from "./extensions/single-editor-lock";
 import { EditorLock } from "./lock/editor-lock";
 import { createRealtimeServer } from "./server";
@@ -34,6 +35,7 @@ const server = createRealtimeServer({
       snapshotEveryUpdates: env.REALTIME_SNAPSHOT_EVERY,
       snapshotIntervalMs: env.REALTIME_SNAPSHOT_INTERVAL_MS,
     }),
+    new ProjectionsExtension({ db, logger }),
   ],
 });
 await server.listen();

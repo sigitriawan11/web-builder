@@ -14,6 +14,9 @@ export interface RealtimeServerOptions {
   extensions?: Extension[];
   // Single-editor lock: diambil saat autentikasi (read-only harus diketahui sebelum koneksi dibuat).
   lock?: SingleEditorLockExtension;
+  // Debounce `onStoreDocument` Hocuspocus (projections); default Hocuspocus 2 s / maks 10 s.
+  storeDebounceMs?: number;
+  storeMaxDebounceMs?: number;
   now?: () => number;
 }
 
@@ -22,6 +25,8 @@ export function createRealtimeServer(options: RealtimeServerOptions): Server<Rea
     port: options.port,
     ...(options.host ? { address: options.host } : {}),
     quiet: true,
+    ...(options.storeDebounceMs !== undefined ? { debounce: options.storeDebounceMs } : {}),
+    ...(options.storeMaxDebounceMs !== undefined ? { maxDebounce: options.storeMaxDebounceMs } : {}),
     // Shutdown dikelola main.ts (flush persistence dulu).
     stopOnSignals: false,
     extensions: [...(options.lock ? [options.lock] : []), ...(options.extensions ?? [])],

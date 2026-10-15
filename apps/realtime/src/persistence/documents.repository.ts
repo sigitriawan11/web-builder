@@ -1,4 +1,5 @@
 import { and, asc, type DbExecutor, eq, gt, type SystemTenant, schema, sql } from "@platform/db";
+import type { PageSummary } from "@platform/document-model";
 
 // Akses dokumen untuk realtime (ARCHITECTURE §7): satu-satunya tempat realtime menyentuh tabel Drizzle. Koneksi sudah
 // diautentikasi token per dokumen; `SystemTenant` mencatat alasan akses lintas tenant (ARCHITECTURE §6.2).
@@ -148,5 +149,29 @@ export async function createDocumentSnapshot(
       .set({ lastSnapshotId: created.id, updatedAt: sql`now()` })
       .where(eq(schema.documents.id, documentId));
     return created;
+  });
+}
+
+/**
+ * Bangun ulang `site_pages` situs pemilik dokumen (read model, tanpa soft delete): hapus semua lalu sisipkan, satu
+ * transaksi — path/home yang bertukar antar page tidak melanggar unique index di tengah jalan. Dokumen tanpa situs
+ * (library) → `false`.
+ */
+export async function replaceSitePages(
+  db: DbExecutor,
+  _tenant: SystemTenant,
+  documentId: string,
+  pages: readonly PageSummary[],
+): Promise<boolean> {
+  return db.transaction(async (tx) => {
+    const [document] = await tx
+      .select({ siteId: schema.documents.siteId })
+      .from(schema.documents)
+      .where(eq(schema.documents.id, documentId));
+    const siteId = document?.siteId;
+    if (!siteId) return false;
+    await tx.delete(schema.sitePages).where(eq(schema.sitePages.siteId, siteId));
+    if (pages.length > 0) await tx.insert(schema.sitePages).values(pages.map((page) => ({ ...page, siteId })));
+    return true;
   });
 }
