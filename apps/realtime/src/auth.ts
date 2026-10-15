@@ -1,4 +1,5 @@
 import {
+  type LockHolder,
   REALTIME_TOKEN_AUDIENCE,
   type RealtimeTokenClaims,
   RealtimeTokenClaimsSchema,
@@ -13,6 +14,9 @@ export interface RealtimeContext {
   docId: string;
   siteId: string | null;
   role: RealtimeTokenClaims["role"];
+  // Diisi single-editor-lock saat autentikasi: nama user & pemegang lock bila dokumen sedang diedit user lain.
+  userName?: string;
+  lockedBy?: LockHolder | undefined;
 }
 
 export type AuthFailure = "INVALID" | "EXPIRED" | "DOCUMENT_MISMATCH";

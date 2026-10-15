@@ -1,6 +1,7 @@
 import { type Extension, Server } from "@hocuspocus/server";
 import type { Logger } from "@platform/shared/node";
 import { authenticateConnection, RealtimeAuthError, type RealtimeContext } from "./auth";
+import type { SingleEditorLockExtension } from "./extensions/single-editor-lock";
 
 // ARCHITECTURE §5.5: Hocuspocus sebagai jalur sinkronisasi & autosave dokumen sejak M1 (single-editor).
 // Extension (persistence, lock, projections, redis-bus, internal-http) ditambah di T1.12.2–T1.12.9.
@@ -11,6 +12,8 @@ export interface RealtimeServerOptions {
   tokenSecret: string;
   logger: Logger;
   extensions?: Extension[];
+  // Single-editor lock: diambil saat autentikasi (read-only harus diketahui sebelum koneksi dibuat).
+  lock?: SingleEditorLockExtension;
   now?: () => number;
 }
 
@@ -21,17 +24,18 @@ export function createRealtimeServer(options: RealtimeServerOptions): Server<Rea
     quiet: true,
     // Shutdown dikelola main.ts (flush persistence dulu).
     stopOnSignals: false,
-    extensions: options.extensions ?? [],
+    extensions: [...(options.lock ? [options.lock] : []), ...(options.extensions ?? [])],
     async onAuthenticate({ token, documentName, connectionConfig, socketId }) {
       try {
         const context = await authenticateConnection(options.tokenSecret, token, documentName, options.now);
         // Viewer (preview) boleh tersambung tetapi tidak boleh menulis (ARCHITECTURE §5.5).
         if (context.role === "viewer") connectionConfig.readOnly = true;
+        const lockContext = options.lock ? await options.lock.authorize(context, connectionConfig) : {};
         options.logger.debug(
           { socketId, docId: context.docId, userId: context.userId },
           "koneksi realtime diautentikasi",
         );
-        return context;
+        return { ...context, ...lockContext };
       } catch (error) {
         if (error instanceof RealtimeAuthError) {
           options.logger.warn({ socketId, documentName, reason: error.failure }, "koneksi realtime ditolak");

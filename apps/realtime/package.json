@@ -21,6 +21,7 @@
     "@platform/db": "workspace:*",
     "@platform/document-model": "workspace:*",
     "@platform/shared": "workspace:*",
+    "ioredis": "6.0.0",
     "y-protocols": "1.0.7",
     "yjs": "13.6.33",
     "zod": "4.6.7"

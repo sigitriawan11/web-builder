@@ -178,6 +178,9 @@ importers:
       '@platform/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      ioredis:
+        specifier: 6.0.0
+        version: 6.0.0
       y-protocols:
         specifier: 1.0.7
         version: 1.0.7(yjs@13.6.33)

@@ -11,6 +11,7 @@ import {
   encodeCursor,
   listEnvelope,
   parseJobPayload,
+  parseRealtimeClientMessage,
   parseRealtimeStatelessMessage,
   RealtimeTokenClaimsSchema,
   RealtimeTokenResponseSchema,
@@ -143,6 +144,15 @@ describe("stateless message realtime (ED-200, DM-076)", () => {
     expect(parseRealtimeStatelessMessage(JSON.stringify({ type: "saved", seq: -1, clocks: {} }))).toBeNull();
     expect(parseRealtimeStatelessMessage(JSON.stringify({ type: "saved", seq: 1, clocks: { abc: 1 } }))).toBeNull();
     expect(parseRealtimeStatelessMessage(JSON.stringify({ type: "lainnya" }))).toBeNull();
+  });
+
+  it("pesan lock: locked membawa holder; klien hanya boleh mengirim takeover", () => {
+    const locked = { type: "locked", holder: { userId: id(), name: "Sari" } };
+    expect(parseRealtimeStatelessMessage(JSON.stringify(locked))).toEqual(locked);
+    expect(parseRealtimeStatelessMessage(JSON.stringify({ type: "locked" }))).toBeNull();
+    expect(parseRealtimeClientMessage(JSON.stringify({ type: "takeover" }))).toEqual({ type: "takeover" });
+    expect(parseRealtimeClientMessage(JSON.stringify({ type: "saved", seq: 1, clocks: {} }))).toBeNull();
+    expect(parseRealtimeClientMessage("takeover")).toBeNull();
   });
 });
 
