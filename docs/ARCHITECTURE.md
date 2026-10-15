@@ -389,7 +389,7 @@ Penegakan: `dependency-cruiser` (rule di `.dependency-cruiser.cjs`) dijalankan d
 - **Next.js tidak mengakses database secara langsung.** Semua lewat `apps/api` agar aturan bisnis & tenant isolation hanya ada di satu tempat.
 - Mutasi memakai Route Handler/Server Action **hanya** sebagai proxy tipis bila perlu (mis. redirect setelah login); logika tetap di API.
 
-**i18n:** `next-intl` dengan pesan dari `@platform/i18n`; locale dari preferensi user → cookie `NEXT_LOCALE` (spec 08 §13) → `Accept-Language`; default `id`. Proxy meneruskannya sebagai header request `x-locale`.
+**i18n:** `next-intl` (tanpa routing bahasa di URL) dengan pesan dari `@platform/i18n`; locale dari preferensi user → cookie `NEXT_LOCALE` (spec 08 §13) → `Accept-Language`; default `id`. Proxy meneruskannya sebagai header request `x-locale`, dibaca `src/i18n/request.ts`. **Dua root layout:** `(marketing)/layout.tsx` statis (SSG, `lang="id"`) dan `(app)/layout.tsx` dinamis (bahasa & CSP nonce per request) yang membungkus `(auth)`, `(dashboard)`, `(admin)`; 404 global = `app/global-not-found.tsx` (flag eksperimental Next 16 `globalNotFound`).
 
 ### 5.2 `apps/editor` — Vite + React SPA
 

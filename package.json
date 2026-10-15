@@ -44,7 +44,9 @@
   },
   "pnpm": {
     "overrides": {
-      "pino": "10.3.1"
+      "pino": "10.3.1",
+      "use-intl": "4.14.8",
+      "icu-minify": "4.14.8"
     }
   }
 }
