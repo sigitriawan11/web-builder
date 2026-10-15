@@ -25,6 +25,8 @@ const APP_PREFIXES = [
   "/verify-email",
   "/forgot-password",
   "/reset-password",
+  // Katalog komponen dev (T1.15.4; 404 di production).
+  "/dev",
 ];
 // Butuh cookie sesi; tanpa cookie → `/login?next=…`.
 const PROTECTED_PREFIXES = ["/sites", "/account", "/billing", "/admin", "/editor"];

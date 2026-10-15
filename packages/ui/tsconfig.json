@@ -1,4 +1,12 @@
 {
   "extends": "@platform/config/tsconfig/react.json",
-  "include": ["src"]
+  "include": ["src", "vitest.config.ts"],
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "references": [
+    {
+      "path": "../config"
+    }
+  ]
 }

@@ -9,7 +9,8 @@
     "./tsconfig/node.json": "./tsconfig/node.json",
     "./biome": "./biome.json",
     "./vitest": "./vitest/preset.ts",
-    "./tailwind/preset.css": "./tailwind/preset.css"
+    "./tailwind/preset.css": "./tailwind/preset.css",
+    "./vitest/perf": "./vitest/perf.ts"
   },
   "scripts": {
     "typecheck": "tsc -b"

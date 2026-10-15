@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./globals.css";
 
 // 404 global (Next 16 `global-not-found`, eksperimental — wajib karena ada dua root layout: marketing & app). STATIS:
 // tanpa layout & tanpa hidrasi di host `app.` (CSP nonce), jadi halaman ini harus berfungsi tanpa JS. Tampilan &

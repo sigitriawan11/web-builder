@@ -1,9 +1,21 @@
 /*
  * Preset Tailwind v4 bersama untuk UI platform (web, editor, ui) — ARCHITECTURE §4.2.
  * Tailwind v4 dikonfigurasi lewat CSS: pemakai menulis `@import "tailwindcss";` lalu
- * `@import "@platform/config/tailwind/preset.css";`. Token desain UI platform (warna, radius, font)
- * diisi di T1.15.4 (`@platform/ui`); di sini hanya aturan bersama.
+ * `@import "@platform/config/tailwind/preset.css";`. Token desain UI platform ada di `@platform/ui/styles.css`.
  */
 
-/* Tema terang/gelap chrome editor & dashboard via kelas `.dark` (T1.15.4), bukan preferensi OS saja. */
-@custom-variant dark (&:where(.dark, .dark *));
+/*
+ * Varian `dark:` (ED-012: ikuti OS, bisa dipaksa) tanpa JS saat render pertama:
+ * - `.dark` di <html> → gelap dipaksa; `.light` → terang dipaksa;
+ * - tanpa keduanya → mengikuti `prefers-color-scheme`.
+ */
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:not(.light, .light *)) {
+      @slot;
+    }
+  }
+}

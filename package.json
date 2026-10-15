@@ -22,6 +22,7 @@
     "infra:up": "dotenv -e .env -- sh docker/infra.sh up",
     "infra:down": "dotenv -e .env -- sh docker/infra.sh down",
     "test": "dotenv -e .env -- turbo run test",
+    "test:perf": "dotenv -e .env -v PERF_ASSERT=1 -- turbo run test --filter=@platform/document-model --filter=@platform/renderer --concurrency=1",
     "test:coverage": "dotenv -e .env -- turbo run test:coverage",
     "test:integration": "dotenv -e .env -- turbo run test:integration",
     "test:e2e": "dotenv -e .env -- turbo run test:e2e",

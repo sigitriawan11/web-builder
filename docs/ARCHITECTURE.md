@@ -1217,6 +1217,8 @@ Runtime API juga melayani endpoint publik baca yang dapat di-cache (mis. daftar 
 
 **Factories:** `packages/db/test/factories` (`createUser`, `createWorkspace`, `createSite({ plan })`, `createCollection`, `createOrder`) memakai `@faker-js/faker` locale `id_ID`; document fixture di `packages/document-model/test/fixtures`. Factory menulis lewat query builder Drizzle (bukan SQL mentah) dan menegakkan aturan bisnis yang sama dengan produk (mis. user selalu punya personal workspace + owner, situs dibuat bersama dokumennya); repository API tidak bisa dipakai karena packages dilarang mengimport apps (§4.3). Dipakai paket lain lewat `@platform/db/testing` (`createTestDb`, factories).
 
+**Asersi waktu (kinerja indikatif):** test yang mengukur durasi memakai `expectDurationBelow()` (`@platform/config/vitest/perf`) — batas waktu hanya dinilai saat `PERF_ASSERT=1` lewat `pnpm test:perf` (paket berurutan, `--concurrency=1`); di `pnpm test` paralel jalur kodenya tetap dijalankan tanpa menilai waktu. Benchmark sungguhan tetap `pnpm bench`.
+
 **Aturan:** bug yang diperbaiki wajib punya test regresi; PR yang mengubah `document-model` atau `renderer` wajib lulus snapshot + visual regression.
 
 ---

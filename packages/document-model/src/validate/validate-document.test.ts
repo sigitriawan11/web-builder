@@ -1,3 +1,4 @@
+import { expectDurationBelow } from "@platform/config/vitest/perf";
 import { describe, expect, it } from "vitest";
 import * as fixtures from "../../test/fixtures";
 import { heroDocument, minimalDocument } from "../../test/fixtures/basic-documents";
@@ -98,6 +99,6 @@ describe("mode validasi (DM-068)", () => {
       validateDocument(doc, { mode: "publish" });
       fastest = Math.min(fastest, performance.now() - start);
     }
-    expect(fastest).toBeLessThan(250);
+    expectDurationBelow(fastest, 250);
   });
 });

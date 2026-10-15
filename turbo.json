@@ -19,7 +19,8 @@
     "//#lint": {},
     "//#lint:deps": {},
     "test": {
-      "outputs": ["coverage/**"]
+      "outputs": ["coverage/**"],
+      "env": ["PERF_ASSERT"]
     },
     "test:coverage": {
       "outputs": ["coverage/**"]

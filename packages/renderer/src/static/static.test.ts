@@ -1,3 +1,4 @@
+import { expectDurationBelow } from "@platform/config/vitest/perf";
 import type { SiteDocument } from "@platform/document-model";
 import { generateLandingDocument, heroDocument, styledDocument } from "@platform/document-model/fixtures";
 import { describe, expect, it } from "vitest";
@@ -114,6 +115,6 @@ describe("kinerja (AC PUB-025, indikatif)", () => {
     const docs = Array.from({ length: 10 }, (_, seed) => generateLandingDocument({ nodeCount: 500, seed: seed + 1 }));
     const start = performance.now();
     for (const doc of docs) renderToStaticHtml(doc, doc.pageOrder[0] as string, { assetUrl });
-    expect(performance.now() - start).toBeLessThan(3000);
+    expectDurationBelow(performance.now() - start, 3000);
   });
 });

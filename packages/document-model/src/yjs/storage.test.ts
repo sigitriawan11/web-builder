@@ -1,3 +1,4 @@
+import { expectDurationBelow } from "@platform/config/vitest/perf";
 import { describe, expect, it } from "vitest";
 import * as Y from "yjs";
 import { heroDocument } from "../../test/fixtures/basic-documents";
@@ -62,7 +63,7 @@ describe("snapshot + update (DM-061)", () => {
       loadDocument(state, []).destroy();
       fastest = Math.min(fastest, performance.now() - start);
     }
-    expect(fastest).toBeLessThan(500);
+    expectDurationBelow(fastest, 500);
   });
 });
 

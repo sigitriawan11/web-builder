@@ -1,1 +1,8 @@
-{}
+{
+  "theme": {
+    "label": "Tema",
+    "system": "Ikuti sistem",
+    "light": "Terang",
+    "dark": "Gelap"
+  }
+}
