@@ -2,9 +2,28 @@
   "extends": "@platform/config/tsconfig/react.json",
   "compilerOptions": {
     "types": ["node"],
-    "plugins": [{ "name": "next" }]
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "src", "next.config.ts", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "src",
+    "e2e",
+    "next.config.ts",
+    "playwright.config.ts",
+    ".next/types/**/*.ts",
+    "vitest.config.ts"
+  ],
   "exclude": ["node_modules", ".next"],
-  "references": [{ "path": "../../packages/config" }]
+  "references": [
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/i18n"
+    }
+  ]
 }

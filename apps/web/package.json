@@ -8,16 +8,19 @@
     "build": "next build",
     "start": "next start --port 3000",
     "typecheck": "tsc -b",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@platform/config": "workspace:*",
+    "@playwright/test": "1.63.0",
     "@types/node": "22.20.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "vitest": "5.0.4"
   },
   "dependencies": {
+    "@platform/i18n": "workspace:^",
     "next": "16.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",

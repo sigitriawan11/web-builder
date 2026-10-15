@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
-import { loadRoutingEnv, platformRewrites } from "./src/config/routing";
+import { loadWebEnv, platformRewrites } from "./src/config/routing";
 
 // Next.js App Router (ARCHITECTURE §5.1). Header keamanan menyusul T1.14.3, middleware T1.14.2.
-const routing = loadRoutingEnv();
+const routing = loadWebEnv();
 
 const config: NextConfig = {
   reactStrictMode: true,

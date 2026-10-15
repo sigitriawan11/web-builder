@@ -4,11 +4,15 @@ import { z } from "zod";
 // `/auth/*`), `/editor/*` → origin statis editor (dev: Vite, base `/editor/`; SPA fallback ditangani origin itu).
 // Dijalankan `beforeFiles` agar menang atas route App Router. Gate cookie sesi untuk `/editor` di middleware (T1.14.2).
 
-export const WebRoutingEnvSchema = z.object({
+export const WebEnvSchema = z.object({
   API_INTERNAL_URL: z.url(),
   EDITOR_ORIGIN: z.url(),
+  // Host routing (proxy): apex = marketing, `app.` = auth/dashboard/admin/editor (ARCHITECTURE §3).
+  PUBLIC_APP_URL: z.url(),
+  PUBLIC_MARKETING_URL: z.url(),
 });
-export type WebRoutingEnv = z.infer<typeof WebRoutingEnvSchema>;
+export type WebEnv = z.infer<typeof WebEnvSchema>;
+export type WebRoutingEnv = Pick<WebEnv, "API_INTERNAL_URL" | "EDITOR_ORIGIN">;
 
 export interface Rewrite {
   source: string;
@@ -29,9 +33,9 @@ export function platformRewrites(env: WebRoutingEnv): { beforeFiles: Rewrite[] }
   };
 }
 
-/** Env routing dari `process.env`; salah konfigurasi → gagal saat start/build dengan pesan jelas. */
-export function loadRoutingEnv(source: Readonly<Record<string, string | undefined>> = process.env): WebRoutingEnv {
-  const parsed = WebRoutingEnvSchema.safeParse(source);
+/** Env apps/web dari `process.env`; salah konfigurasi → gagal saat start/build dengan pesan jelas. */
+export function loadWebEnv(source: Readonly<Record<string, string | undefined>> = process.env): WebEnv {
+  const parsed = WebEnvSchema.safeParse(source);
   if (!parsed.success) {
     const fields = parsed.error.issues.map((issue) => issue.path.join(".")).join(", ");
     throw new Error(`env apps/web tidak valid: ${fields} (lihat .env.example)`);

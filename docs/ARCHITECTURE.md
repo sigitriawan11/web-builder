@@ -197,7 +197,7 @@ Pemetaan production ↔ lokal dikonfigurasi lewat env (`PUBLIC_APP_URL`, `PUBLIC
 
 ### 3.4 Routing di dalam `app.<domain>`
 
-Urutan (Next.js `middleware.ts` + `rewrites()` `beforeFiles`):
+Urutan (Next.js `proxy.ts` — nama `middleware.ts` sejak Next 16 — + `rewrites()` `beforeFiles`; proxy berjalan sebelum rewrites sehingga header request yang ia set, mis. `x-request-id`, ikut ke `/api`):
 
 1. `/api/:path*` → `${API_INTERNAL_URL}/:path*` (header `x-forwarded-host`, `x-request-id` diteruskan).
 2. `/editor/:path*` → `${EDITOR_ORIGIN}/editor/:path*`; jika file tidak ada → `index.html` (SPA fallback). Middleware memeriksa *keberadaan* cookie session sebelum rewrite; tanpa cookie → redirect `/login?next=…`. Validasi session sesungguhnya dilakukan editor via `GET /api/v1/me`.
@@ -223,7 +223,7 @@ web-builder/
 │   │   │   └── not-found.tsx
 │   │   ├── src/components/          # komponen khusus web (pakai @platform/ui)
 │   │   ├── src/lib/                 # api client (server & client), session helper, i18n setup
-│   │   ├── src/middleware.ts        # host routing, auth gate, locale
+│   │   ├── src/proxy.ts             # host routing, auth gate, locale (Next 16: pengganti middleware.ts)
 │   │   └── next.config.ts           # rewrites /api, /editor
 │   ├── editor/                      # Vite + React SPA (base: /editor/)
 │   │   ├── src/
@@ -389,7 +389,7 @@ Penegakan: `dependency-cruiser` (rule di `.dependency-cruiser.cjs`) dijalankan d
 - **Next.js tidak mengakses database secara langsung.** Semua lewat `apps/api` agar aturan bisnis & tenant isolation hanya ada di satu tempat.
 - Mutasi memakai Route Handler/Server Action **hanya** sebagai proxy tipis bila perlu (mis. redirect setelah login); logika tetap di API.
 
-**i18n:** `next-intl` dengan pesan dari `@platform/i18n`; locale dari preferensi user → cookie `locale` → `Accept-Language`; default `id`.
+**i18n:** `next-intl` dengan pesan dari `@platform/i18n`; locale dari preferensi user → cookie `NEXT_LOCALE` (spec 08 §13) → `Accept-Language`; default `id`. Proxy meneruskannya sebagai header request `x-locale`.
 
 ### 5.2 `apps/editor` — Vite + React SPA
 
