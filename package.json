@@ -11,6 +11,7 @@
     "dev": "dotenv -e .env -- turbo run dev",
     "dev:api": "dotenv -e .env -- turbo run dev --filter=@platform/api",
     "dev:editor": "dotenv -e .env -- turbo run dev --filter=@platform/editor",
+    "dev:web": "dotenv -e .env -- turbo run dev --filter=@platform/web",
     "dev:worker": "dotenv -e .env -- turbo run dev --filter=@platform/worker",
     "build": "dotenv -e .env -- turbo run build",
     "typecheck": "turbo run typecheck",

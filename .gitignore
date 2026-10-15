@@ -1,6 +1,9 @@
 node_modules/
 .turbo/
 dist/
+# Next.js (apps/web): output build & deklarasi tipe yang dibuat ulang `next dev/build`.
+.next/
+next-env.d.ts
 coverage/
 .env
 .env.*
