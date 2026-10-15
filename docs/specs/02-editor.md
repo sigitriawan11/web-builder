@@ -2394,7 +2394,7 @@ Versi web dari "Prototype" Figma: fokus pada link, state, dan animasi ringan. Ou
 - Prioritas: P0 · Fase: M1
 - Deskripsi: Tidak ada tombol Save. Sejak M1 setiap Yjs update dikirim lewat **Hocuspocus** (`HocuspocusProvider` → `apps/realtime`, single-editor; multiplayer M9+) dan dipersist ke IndexedDB lokal (`y-indexeddb`). Tidak ada endpoint autosave HTTP terpisah ([ARCHITECTURE §7.2](../ARCHITECTURE.md#72-write-path-autosave)).
 - Perilaku:
-  - Status di toolbar: **"Tersimpan"** (✓ abu; dikonfirmasi server lewat stateless message `saved:{seq}`), **"Menyimpan…"** (spinner; muncul bila ada update tertunda > 500 ms), **"Offline — perubahan disimpan di perangkat"** (ikon awan coret, kuning), **"Gagal menyimpan — mencoba lagi"** (merah, dengan tombol "Coba sekarang" dan detail).
+  - Status di toolbar: **"Tersimpan"** (✓ abu; dikonfirmasi server lewat stateless message `saved:{seq}` — kontrak `RealtimeSavedMessageSchema`, berisi juga `clocks` per clientID agar update yang masih di jalan tidak ikut dianggap tersimpan), **"Menyimpan…"** (spinner; muncul bila ada update tertunda > 500 ms), **"Offline — perubahan disimpan di perangkat"** (ikon awan coret, kuning), **"Gagal menyimpan — mencoba lagi"** (merah, dengan tombol "Coba sekarang" dan detail).
   - Provider mengirim update real time lewat WebSocket; server mem-flush ke Postgres dengan debounce (ARCHITECTURE §7.2). Saat `visibilitychange: hidden` / `beforeunload` editor memastikan update tertunda terkirim lewat koneksi WS (dan selalu ada di IndexedDB).
   - `beforeunload` memperingatkan jika ada update yang belum terkonfirmasi server.
   - `Mod+S` → flush segera + toast "Semua perubahan sudah tersimpan otomatis" (mencegah dialog save browser).

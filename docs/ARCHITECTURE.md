@@ -741,7 +741,7 @@ Entitlement efektif = `plans.entitlements` + override per workspace (`workspaces
 2. `persistence.onChange` men-*buffer* update per dokumen; **flush** setiap 2 s *debounce* (max 10 s) → `Y.mergeUpdates(buffer)` → `INSERT document_updates (seq = last_seq + 1)` dan `UPDATE documents SET last_seq` dalam satu transaksi.
 3. Setiap ≥ 500 update **atau** ≥ 10 menit sejak snapshot terakhir → buat snapshot (`kind = auto`, `state` + `json`) dari doc in-memory.
 4. `onDisconnect` terakhir / `onStoreDocument` → flush paksa.
-5. Editor menampilkan status: `Tersimpan` (server mengonfirmasi via stateless message `saved:{seq}`), `Menyimpan…`, `Offline — perubahan disimpan di perangkat`.
+5. Editor menampilkan status: `Tersimpan` (server mengonfirmasi via stateless message `saved:{seq}` — JSON `{"type":"saved","seq","clocks"}` di `@platform/shared/contracts`; klien tersimpan bila `clocks[doc.clientID]` ≥ clock lokalnya), `Menyimpan…`, `Offline — perubahan disimpan di perangkat`.
 
 ### 7.3 Load path
 

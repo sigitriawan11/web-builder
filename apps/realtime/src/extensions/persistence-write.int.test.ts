@@ -11,14 +11,18 @@ import {
   userOrigin,
   yDocToJson,
 } from "@platform/document-model";
-import { REALTIME_TOKEN_AUDIENCE } from "@platform/shared/contracts";
+import {
+  parseRealtimeStatelessMessage,
+  REALTIME_TOKEN_AUDIENCE,
+  type RealtimeStatelessMessage,
+} from "@platform/shared/contracts";
 import { createLogger, signToken } from "@platform/shared/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import * as Y from "yjs";
 import type { RealtimeContext } from "../auth";
 import { appendDocumentUpdates } from "../persistence/documents.repository";
 import { createRealtimeServer } from "../server";
-import { LIMIT_WARNING_MESSAGE, PersistenceExtension, type PersistenceOptions } from "./persistence";
+import { PersistenceExtension, type PersistenceOptions } from "./persistence";
 
 // T1.12.3: buffer update klien → flush satu baris (debounce + batas tunggu maksimum), flush paksa saat putus,
 // batas ukuran state (ARCHITECTURE §7.2, DM-061/DM-076); T1.12.4: snapshot otomatis.
@@ -74,10 +78,15 @@ interface Client {
   closed: Promise<void>;
 }
 
-async function connect(userId: string, docId: string, siteId: string): Promise<Client> {
+async function connect(
+  userId: string,
+  docId: string,
+  siteId: string,
+  role: "owner" | "viewer" = "owner",
+): Promise<Client> {
   const token = await signToken(
     SECRET,
-    { sub: userId, docId, siteId, role: "owner" },
+    { sub: userId, docId, siteId, role },
     { expiresInSeconds: 300, audience: REALTIME_TOKEN_AUDIENCE },
   );
   const doc = new Y.Doc();
@@ -116,6 +125,15 @@ function addFrames(doc: Y.Doc, count: number, prefix = "F"): void {
     if (!result.ok) throw new Error(result.error.code);
   }
 }
+
+function messages<T extends RealtimeStatelessMessage["type"]>(client: Client, type: T) {
+  return client.stateless
+    .map(parseRealtimeStatelessMessage)
+    .filter((message): message is Extract<RealtimeStatelessMessage, { type: T }> => message?.type === type);
+}
+
+// Clock Yjs klien ini sendiri (jumlah struct yang sudah ia buat).
+const ownClock = (doc: Y.Doc) => Y.decodeStateVector(Y.encodeStateVector(doc)).get(doc.clientID) ?? 0;
 
 async function storedRows(docId: string) {
   return testDb.db
@@ -161,6 +179,31 @@ describe("flush update", () => {
     await start({});
     const reloaded = await connect(owner.id, docId, siteId);
     expect(SiteDocumentSchema.parse(yDocToJson(reloaded.doc))).toEqual(expected);
+  });
+
+  it("setiap flush → `saved` (seq + clock) ke semua klien dokumen; klien mengenali perubahannya tersimpan (ED-200)", async () => {
+    await start({ flushDebounceMs: 50, flushMaxWaitMs: 200 });
+    const { owner, siteId, docId } = await seededSite();
+    const editor = await connect(owner.id, docId, siteId);
+    const viewer = await connect(owner.id, docId, siteId, "viewer");
+    addFrames(editor.doc, 3);
+    const clock = ownClock(editor.doc);
+    await waitFor(async () => messages(editor, "saved").some((m) => (m.clocks[editor.doc.clientID] ?? -1) >= clock));
+
+    const rows = await storedRows(docId);
+    const [saved] = messages(editor, "saved");
+    expect(saved).toEqual({ type: "saved", seq: rows.at(-1)?.seq, clocks: { [editor.doc.clientID]: clock } });
+    await waitFor(async () => messages(viewer, "saved").length === 1);
+    expect(messages(viewer, "saved")).toEqual([saved]);
+
+    // Edit berikutnya → `saved` baru dengan seq & clock lebih tinggi.
+    addFrames(editor.doc, 1, "G");
+    const next = ownClock(editor.doc);
+    await waitFor(async () => messages(editor, "saved").length === 2);
+    expect(messages(editor, "saved")[1]).toMatchObject({
+      seq: (saved?.seq ?? 0) + 1,
+      clocks: { [editor.doc.clientID]: next },
+    });
   });
 
   it("edit terus-menerus tidak menunda flush melewati batas tunggu maksimum", async () => {
@@ -216,14 +259,13 @@ describe("batas ukuran state (DM-076)", () => {
     // Sengaja menulis Y.Map mentah (bukan command): yang diuji transport & batas byte, bukan isi dokumen.
     const scratch = client.doc.getMap("scratch");
     scratch.set("a", "x".repeat(3_000));
-    await waitFor(async () => client.stateless.length > 0);
+    await waitFor(async () => messages(client, "limit-warning").length > 0);
     scratch.set("b", "y".repeat(500));
-    await waitFor(async () => (await storedRows(docId)).length >= 2);
-    expect(client.stateless).toHaveLength(1);
-    expect(JSON.parse(client.stateless[0] ?? "{}")).toMatchObject({
-      type: LIMIT_WARNING_MESSAGE,
-      limit: "yDocStateBytes",
-    });
+    const bClock = ownClock(client.doc);
+    await waitFor(async () => messages(client, "saved").some((m) => (m.clocks[client.doc.clientID] ?? -1) >= bClock));
+    expect(messages(client, "limit-warning")).toEqual([
+      expect.objectContaining({ type: "limit-warning", limit: "yDocStateBytes" }),
+    ]);
 
     const before = await storedRows(docId);
     scratch.set("c", "z".repeat(30_000));

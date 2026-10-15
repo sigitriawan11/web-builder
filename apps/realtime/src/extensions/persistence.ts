@@ -1,5 +1,6 @@
 import type {
   beforeHandleMessagePayload,
+  Document,
   Extension,
   onChangePayload,
   onDisconnectPayload,
@@ -14,6 +15,7 @@ import {
   migrateYDoc,
   yDocToJson,
 } from "@platform/document-model";
+import type { RealtimeLimitWarningMessage, RealtimeSavedMessage } from "@platform/shared/contracts";
 import type { Logger } from "@platform/shared/node";
 import * as Y from "yjs";
 import type { RealtimeContext } from "../auth";
@@ -54,7 +56,7 @@ interface DocumentBuffer {
   // Ukuran state terakhir yang diketahui (load/flush) — dasar estimasi batas tanpa encode ulang tiap pesan.
   stateBytes: number;
   // Dokumen live (dari onChange) — ukuran state dihitung ulang darinya saat flush.
-  document: Y.Doc | null;
+  document: Document | null;
   warned: boolean;
   // Update klien (sebelum digabung) yang sudah tersimpan sejak snapshot terakhir.
   updatesSinceSnapshot: number;
@@ -62,8 +64,6 @@ interface DocumentBuffer {
   // Flush per dokumen berurutan agar seq tidak bertukar urutan.
   flushing: Promise<void>;
 }
-
-export const LIMIT_WARNING_MESSAGE = "limit-warning";
 
 export class PersistenceExtension implements Extension {
   private readonly buffers = new Map<string, DocumentBuffer>();
@@ -131,14 +131,13 @@ export class PersistenceExtension implements Extension {
     }
     if (estimate > this.limits.soft && !buffer.warned) {
       buffer.warned = true;
-      connection.sendStateless(
-        JSON.stringify({
-          type: LIMIT_WARNING_MESSAGE,
-          limit: "yDocStateBytes",
-          bytes: estimate,
-          max: this.limits.soft,
-        }),
-      );
+      const warning: RealtimeLimitWarningMessage = {
+        type: "limit-warning",
+        limit: "yDocStateBytes",
+        bytes: estimate,
+        max: this.limits.soft,
+      };
+      connection.sendStateless(JSON.stringify(warning));
     }
   }
 
@@ -210,6 +209,16 @@ export class PersistenceExtension implements Extension {
         buffer.updates = [...updates, ...buffer.updates];
         buffer.bytes += bytes;
         throw error;
+      }
+      // ED-200: indikator "Tersimpan" — semua klien dokumen; masing-masing mencocokkan clock clientID-nya sendiri.
+      if (buffer.document) {
+        const clocks: RealtimeSavedMessage["clocks"] = {};
+        // `parseUpdateMeta().to`, bukan `encodeStateVectorFromUpdate` (yang hanya memuat klien berawal dari clock 0).
+        for (const [clientId, clock] of Y.parseUpdateMeta(merged).to) {
+          clocks[String(clientId)] = clock;
+        }
+        const saved: RealtimeSavedMessage = { type: "saved", seq: savedSeq, clocks };
+        buffer.document.broadcastStateless(JSON.stringify(saved));
       }
       // Snapshot gagal tidak membatalkan update yang sudah tersimpan; dicoba lagi pada flush berikutnya.
       const due =

@@ -11,6 +11,7 @@ import {
   encodeCursor,
   listEnvelope,
   parseJobPayload,
+  parseRealtimeStatelessMessage,
   RealtimeTokenClaimsSchema,
   RealtimeTokenResponseSchema,
   SiteSchema,
@@ -129,6 +130,19 @@ describe("realtime token (ARCHITECTURE §5.5)", () => {
     const claims = { sub: id(), docId: id(), siteId: id(), role: "editor", exp: 1_790_000_000 };
     expect(RealtimeTokenClaimsSchema.parse(claims)).toEqual(claims);
     expect(RealtimeTokenClaimsSchema.safeParse({ ...claims, role: "superuser" }).success).toBe(false);
+  });
+});
+
+describe("stateless message realtime (ED-200, DM-076)", () => {
+  it("saved & limit-warning ter-parse; payload asing/rusak → null", () => {
+    const saved = { type: "saved", seq: 12, clocks: { "1234567": 40 } };
+    expect(parseRealtimeStatelessMessage(JSON.stringify(saved))).toEqual(saved);
+    const warning = { type: "limit-warning", limit: "yDocStateBytes", bytes: 9_000_000, max: 8_000_000 };
+    expect(parseRealtimeStatelessMessage(JSON.stringify(warning))).toEqual(warning);
+    expect(parseRealtimeStatelessMessage("saved:12")).toBeNull();
+    expect(parseRealtimeStatelessMessage(JSON.stringify({ type: "saved", seq: -1, clocks: {} }))).toBeNull();
+    expect(parseRealtimeStatelessMessage(JSON.stringify({ type: "saved", seq: 1, clocks: { abc: 1 } }))).toBeNull();
+    expect(parseRealtimeStatelessMessage(JSON.stringify({ type: "lainnya" }))).toBeNull();
   });
 });
 
