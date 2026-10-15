@@ -4,5 +4,6 @@ export * from "./audit";
 export * from "./consents";
 export * from "./documents";
 export * from "./identity";
+export * from "./operations";
 export * from "./sites";
 export * from "./workspaces";

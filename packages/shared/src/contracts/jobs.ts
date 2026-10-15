@@ -111,6 +111,18 @@ export const JOB_PAYLOADS = {
     z.object({ ...jobBase, template: z.literal("auth.password_reset"), userId: UuidV7Schema, resetUrl: z.url() }),
     z.object({ ...jobBase, template: z.literal("auth.password_changed"), userId: UuidV7Schema }),
   ]),
+  // Job yang gagal final di queue lain (ARCHITECTURE §5.4). `payload` sudah disensor (`redactJobPayload`); worker
+  // `dead-letter` menyimpannya ke tabel `dead_letter_jobs` + alert.
+  "dead-letter": z.object({
+    ...jobBase,
+    sourceQueue: QueueNameSchema.exclude(["dead-letter"]),
+    jobId: z.string().min(1),
+    jobName: z.string(),
+    payload: z.unknown(),
+    error: z.object({ message: z.string(), stack: z.string().optional() }),
+    attempts: z.number().int().nonnegative(),
+    failedAt: z.iso.datetime(),
+  }),
 } satisfies Partial<Record<QueueName, z.ZodType>>;
 
 export type JobPayload<Q extends keyof typeof JOB_PAYLOADS> = z.infer<(typeof JOB_PAYLOADS)[Q]>;
@@ -122,4 +134,20 @@ export function parseJobPayload<Q extends keyof typeof JOB_PAYLOADS>(queue: Q, p
 
 export function thumbnailJobId(documentId: string, snapshotId: string): string {
   return `thumb:${documentId}:${snapshotId}`;
+}
+
+// Field payload berisi URL bertoken (Better Auth) — tidak boleh tersimpan utuh di DLQ (keputusan owner T1.13.3).
+const REDACTED_PAYLOAD_KEYS = new Set(["verifyUrl", "resetUrl"]);
+export const REDACTED = "[redacted]";
+
+/** Salinan payload dengan field rahasia diganti `[redacted]` (rekursif); nilai non-objek dikembalikan apa adanya. */
+export function redactJobPayload(payload: unknown): unknown {
+  if (Array.isArray(payload)) return payload.map(redactJobPayload);
+  if (payload === null || typeof payload !== "object") return payload;
+  return Object.fromEntries(
+    Object.entries(payload).map(([key, value]) => [
+      key,
+      REDACTED_PAYLOAD_KEYS.has(key) ? REDACTED : redactJobPayload(value),
+    ]),
+  );
 }

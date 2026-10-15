@@ -50,6 +50,7 @@ function createResources(env: WorkerEnv): WorkerResources {
       : { provider: "resend", apiKey: env.RESEND_API_KEY ?? "" },
   );
   const processors = createProcessors({
+    db,
     email: {
       db,
       provider: emailProvider,

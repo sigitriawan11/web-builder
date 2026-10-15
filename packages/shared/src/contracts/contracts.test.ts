@@ -13,8 +13,10 @@ import {
   parseJobPayload,
   parseRealtimeClientMessage,
   parseRealtimeStatelessMessage,
+  REDACTED,
   RealtimeTokenClaimsSchema,
   RealtimeTokenResponseSchema,
+  redactJobPayload,
   SiteSchema,
   thumbnailJobId,
 } from "./index";
@@ -153,6 +155,26 @@ describe("stateless message realtime (ED-200, DM-076)", () => {
     expect(parseRealtimeClientMessage(JSON.stringify({ type: "takeover" }))).toEqual({ type: "takeover" });
     expect(parseRealtimeClientMessage(JSON.stringify({ type: "saved", seq: 1, clocks: {} }))).toBeNull();
     expect(parseRealtimeClientMessage("takeover")).toBeNull();
+  });
+});
+
+describe("redactJobPayload (DLQ, keputusan owner T1.13.3)", () => {
+  it("URL bertoken disensor rekursif; field lain & nilai non-objek utuh", () => {
+    const payload = {
+      requestId: "r",
+      userId: "u",
+      verifyUrl: "https://x?token=a",
+      nested: [{ resetUrl: "https://y" }],
+    };
+    expect(redactJobPayload(payload)).toEqual({
+      requestId: "r",
+      userId: "u",
+      verifyUrl: REDACTED,
+      nested: [{ resetUrl: REDACTED }],
+    });
+    expect(payload.verifyUrl).toBe("https://x?token=a");
+    expect(redactJobPayload("teks")).toBe("teks");
+    expect(redactJobPayload(null)).toBeNull();
   });
 });
 

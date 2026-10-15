@@ -504,7 +504,7 @@ Satu proses Node mendaftarkan semua processor; dapat dipecah per queue via env `
 | `domains` | api (custom domain) | 2 | 20 / fixed 5 menit | 30 s | Polling verifikasi DNS & status SSL Cloudflare (job `domain-check`, `reconcile-hosts` — spec 07) |
 | `payments` | api (webhook gateway user), scheduler | 5 | 8 / exp 10 s | 30 s | Job `process-payment-event`, `reconcile-pending`, `expire-orders` (spec 06 COM-054, COM-170); idempotent per `provider_event_id` |
 | `cleanup` | scheduler (repeatable) | 1 | 3 | 10 menit | Compaction dokumen, aset yatim, deployment lama, sesi kedaluwarsa |
-| `dead-letter` | worker (on final fail) | 1 | — | — | Menyimpan payload + error; tampil di admin; alert Sentry |
+| `dead-letter` | worker (on final fail) | 1 | — | — | Menyimpan payload (URL bertoken disensor) + error ke tabel `dead_letter_jobs`; tampil di admin; alert Sentry |
 
 Konvensi:
 
@@ -706,6 +706,7 @@ Entitlement efektif = `plans.entitlements` + override per workspace (`workspaces
 | `moderation_actions` | id, site_id, action (`warn`/`unpublish`/`suspend`/`restore`), reason, admin_user_id | (site_id) |
 | `content_scans` | id, site_id, deployment_id, result jsonb, score, flagged | (flagged, created_at) |
 | `audit_logs` | id bigint, actor_type (`user`/`staff`/`system`/`ai`), actor_id text (di-hash saat akun dihapus), impersonator_id, workspace_id, site_id, action (`site.publish`, `payment_config.update`, …), target_type, target_id, before/after jsonb, reason, ip, user_agent, metadata jsonb, created_at — **tanpa FK**; append-only ditegakkan role `platform_app` (SELECT/INSERT saja) + trigger penolak UPDATE/DELETE/TRUNCATE | (workspace_id, created_at desc), (site_id, created_at desc), (target_type, target_id), (actor_id, created_at) |
+| `dead_letter_jobs` | id, queue, job_id, job_name, payload jsonb (tersensor), error jsonb, attempts, request_id, status (`open`/`retried`/`discarded`), failed_at, resolved_at, resolved_by — level platform, ditulis processor `dead-letter` | (status, failed_at desc), (queue, job_id) |
 | `outbound_messages` | id, site_id, channel (`email`/`whatsapp`), provider, to_hash, template, status, provider_ref, error | (site_id, created_at desc) |
 
 `audit_logs` append-only (role DB aplikasi hanya punya `INSERT, SELECT`); dipartisi bulanan saat besar ([§17](#17-scalability-path)).
