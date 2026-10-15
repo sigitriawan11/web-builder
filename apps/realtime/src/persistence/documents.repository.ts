@@ -175,3 +175,16 @@ export async function replaceSitePages(
     return true;
   });
 }
+
+/** Metadata ringan (tanpa update) untuk header state internal. */
+export async function findDocumentMeta(
+  db: DbExecutor,
+  _tenant: SystemTenant,
+  documentId: string,
+): Promise<{ lastSeq: number; schemaVersion: number } | undefined> {
+  const [document] = await db
+    .select({ lastSeq: schema.documents.lastSeq, schemaVersion: schema.documents.schemaVersion })
+    .from(schema.documents)
+    .where(eq(schema.documents.id, documentId));
+  return document;
+}

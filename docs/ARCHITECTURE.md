@@ -523,7 +523,7 @@ Konvensi:
 - `persistence` extension (custom, bukan `@hocuspocus/extension-database` bawaan karena kita butuh append-only): lihat [§7](#7-penyimpanan-dokumen-editor).
 - `redis-bus` extension: subscribe `doc-ext:<docId>` untuk update dari server-side writer (mis. AI mode headless, migrasi, update component massal) lalu `Y.applyUpdate(doc, u, 'server')` agar klien yang terhubung ikut menerima. Kontrak: penulis **menyimpan dulu** update ke `document_updates`, baru mem-publish update Yjs biner (`documentUpdateChannel(docId)` di `@platform/shared/contracts`); persistence realtime melewati origin `server` (tidak disimpan dua kali). Subscribe per dokumen sebelum load DB, pesan selama load diantre (update idempoten → tidak ada yang hilang); unsubscribe saat unload.
 - `projections` extension: setelah store, ekstrak read model ringan (daftar halaman, judul, path, SEO, jumlah node) ke tabel `site_pages` — dipakai dashboard tanpa harus memuat Y.Doc.
-- `internal-http`: `GET /internal/documents/:id/state` (service token) mengembalikan state terkini (in-memory jika dokumen sedang dibuka, jika tidak dari DB). Dipakai worker (AI, publish).
+- `internal-http`: `GET /internal/documents/:id/state` (service token JWT `aud = "realtime"`, pemanggil `worker`/`api`) mengembalikan state terkini (in-memory jika dokumen sedang dibuka — buffer persistence di-flush dulu sehingga state ⊇ semua update ≤ header `seq`; jika tidak dari DB), kontrak header sama dengan api `/internal/v1/documents/:id/state` (`DOCUMENT_STATE_HEADERS`). Plus `GET /health/live` & `/health/ready` (DB, Redis). Semua di port Hocuspocus (hook `onRequest`). Dipakai worker (AI, publish).
 
 ### 5.6 `apps/site-host` — Cloudflare Worker
 

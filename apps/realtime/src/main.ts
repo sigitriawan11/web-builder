@@ -1,7 +1,8 @@
-import { createDb } from "@platform/db";
+import { createDb, sql } from "@platform/db";
 import { createLogger } from "@platform/shared/node";
 import { Redis } from "ioredis";
 import { loadRealtimeEnv } from "./config/env";
+import { InternalHttpExtension } from "./extensions/internal-http";
 import { PersistenceExtension } from "./extensions/persistence";
 import { ProjectionsExtension } from "./extensions/projections";
 import { RedisBusExtension } from "./extensions/redis-bus";
@@ -21,6 +22,14 @@ const logger = createLogger({
 });
 const { db, close: closeDb } = createDb({ connectionString: env.DATABASE_URL, maxConnections: env.DATABASE_POOL_MAX });
 const redis = new Redis(env.REDIS_URL, { maxRetriesPerRequest: 2 });
+const persistence = new PersistenceExtension({
+  db,
+  logger,
+  flushDebounceMs: env.REALTIME_FLUSH_DEBOUNCE_MS,
+  flushMaxWaitMs: env.REALTIME_FLUSH_MAX_MS,
+  snapshotEveryUpdates: env.REALTIME_SNAPSHOT_EVERY,
+  snapshotIntervalMs: env.REALTIME_SNAPSHOT_INTERVAL_MS,
+});
 const server = createRealtimeServer({
   port: env.REALTIME_PORT,
   host: env.REALTIME_HOST,
@@ -30,15 +39,15 @@ const server = createRealtimeServer({
   extensions: [
     // Koneksi Redis terpisah: ioredis dalam mode subscribe tidak bisa menjalankan perintah lain.
     new RedisBusExtension({ subscriber: redis.duplicate(), logger }),
-    new PersistenceExtension({
+    persistence,
+    new ProjectionsExtension({ db, logger }),
+    new InternalHttpExtension({
       db,
       logger,
-      flushDebounceMs: env.REALTIME_FLUSH_DEBOUNCE_MS,
-      flushMaxWaitMs: env.REALTIME_FLUSH_MAX_MS,
-      snapshotEveryUpdates: env.REALTIME_SNAPSHOT_EVERY,
-      snapshotIntervalMs: env.REALTIME_SNAPSHOT_INTERVAL_MS,
+      internalSecret: env.INTERNAL_JWT_SECRET,
+      persistence,
+      readinessChecks: { db: () => db.execute(sql`select 1`), redis: () => redis.ping() },
     }),
-    new ProjectionsExtension({ db, logger }),
   ],
 });
 await server.listen();
