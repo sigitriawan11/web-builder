@@ -7,11 +7,17 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc -b",
-    "test": "vitest run"
+    "typecheck": "tsc -b tsconfig.json scripts/tsconfig.json",
+    "test": "vitest run",
+    "check": "tsx scripts/i18n-check.ts"
   },
   "devDependencies": {
     "@platform/config": "workspace:*",
+    "@types/node": "22.20.5",
+    "tsx": "4.23.15",
     "vitest": "5.0.4"
+  },
+  "dependencies": {
+    "intl-messageformat": "11.2.15"
   }
 }

@@ -1,4 +1,4 @@
-import { type Locale, t } from "@platform/i18n";
+import { type Locale, translate } from "@platform/i18n";
 import type { JobPayload } from "@platform/shared/contracts";
 import type { ReactElement } from "react";
 import { render } from "react-email";
@@ -46,5 +46,5 @@ export async function renderEmail(
   // Ganti email (verifikasi alamat baru, tanpa kode) memakai subjek sendiri.
   const subjectKey =
     job.template === "auth.verify_email" && !job.code ? "auth.verify_email.change_subject" : `${job.template}.subject`;
-  return { subject: t(recipient.locale, "emails", subjectKey), html, text };
+  return { subject: translate(recipient.locale, "emails", subjectKey), html, text };
 }

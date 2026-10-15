@@ -1,42 +1,86 @@
-import enEmails from "./locales/en/emails.json" with { type: "json" };
-import enErrors from "./locales/en/errors.json" with { type: "json" };
-import idEmails from "./locales/id/emails.json" with { type: "json" };
-import idErrors from "./locales/id/errors.json" with { type: "json" };
+import { IntlMessageFormat } from "intl-messageformat";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  type Locale,
+  MESSAGES,
+  type MessageKey,
+  type Messages,
+  type Namespace,
+} from "./messages";
 
-// @platform/i18n (ACC-290): string UI/API ID (default) & EN. Fondasi minimal untuk pesan error API (T1.4.4);
-// struktur `locales/{id,en}/<namespace>.json`, helper `t()` bertipe, dan deteksi key hilang dilengkapi di T1.15.1.
+// @platform/i18n (ACC-290): string UI/API/email ID (default) & EN dalam ICU MessageFormat. Dipakai api (pesan error),
+// worker (email), web (next-intl memakai `getMessages`), editor (konteks ringan, T1.15.6).
 
-export const LOCALES = ["id", "en"] as const;
-export type Locale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = "id";
+export { checkMessages, formatIssues, type MessageIssue } from "./check";
+export {
+  DEFAULT_LOCALE,
+  LOCALES,
+  type Locale,
+  type MessageKey,
+  type Messages,
+  NAMESPACES,
+  type Namespace,
+} from "./messages";
 
-const MESSAGES = {
-  id: { errors: idErrors, emails: idEmails },
-  en: { errors: enErrors, emails: enEmails },
-} as const;
+export type MessageValues = Readonly<Record<string, string | number | Date>>;
 
-export type Namespace = keyof (typeof MESSAGES)["id"];
+function lookup(locale: Locale, namespace: Namespace, key: string): string | undefined {
+  let node: unknown = MESSAGES[locale][namespace];
+  for (const part of key.split(".")) {
+    if (node === null || typeof node !== "object") return undefined;
+    node = (node as Record<string, unknown>)[part];
+  }
+  return typeof node === "string" ? node : undefined;
+}
+
+const formatters = new Map<string, IntlMessageFormat>();
+
+function format(locale: Locale, message: string, values?: MessageValues): string {
+  const cacheKey = `${locale}\u0000${message}`;
+  let formatter = formatters.get(cacheKey);
+  if (!formatter) {
+    formatter = new IntlMessageFormat(message, locale, undefined, { ignoreTag: true });
+    formatters.set(cacheKey, formatter);
+  }
+  try {
+    return String(formatter.format(values));
+  } catch {
+    // Nilai placeholder tidak diberikan → teks mentah (tidak pernah melempar ke pemanggil).
+    return message;
+  }
+}
+
+/** Pesan untuk key bertipe; jatuh ke bahasa default, lalu ke key itu sendiri. Nilai = ICU (`{name}`, plural, select). */
+export function t<N extends Namespace>(
+  locale: Locale,
+  namespace: N,
+  key: MessageKey<N>,
+  values?: MessageValues,
+): string {
+  return translate(locale, namespace, key, values);
+}
 
 /**
- * Teks untuk key; jatuh ke bahasa default, lalu ke key itu sendiri (tidak pernah melempar). `{nama}` diganti nilai
- * `values` (teks biasa — escaping tanggung jawab renderer, mis. React); placeholder tanpa nilai dibiarkan.
+ * Seperti `t()` untuk key yang baru diketahui saat runtime (kode error dari server, nama template job). Key yang
+ * tidak ada → key itu sendiri; cek dulu dengan `hasMessage` bila perlu.
  */
-export function t(
-  locale: Locale,
-  namespace: Namespace,
-  key: string,
-  values?: Readonly<Record<string, string | number>>,
-): string {
-  const pick = (target: Locale) => (MESSAGES[target][namespace] as Readonly<Record<string, string>>)[key];
-  const text = pick(locale) ?? pick(DEFAULT_LOCALE) ?? key;
-  if (!values) return text;
-  return text.replace(/\{(\w+)\}/g, (match, name: string) =>
-    Object.hasOwn(values, name) ? String(values[name]) : match,
-  );
+export function translate(locale: Locale, namespace: Namespace, key: string, values?: MessageValues): string {
+  const message = lookup(locale, namespace, key) ?? lookup(DEFAULT_LOCALE, namespace, key);
+  return message === undefined ? key : format(locale, message, values);
 }
 
 export function hasMessage(locale: Locale, namespace: Namespace, key: string): boolean {
-  return key in MESSAGES[locale][namespace];
+  return lookup(locale, namespace, key) !== undefined;
+}
+
+/** Semua namespace satu bahasa — bentuk yang diterima next-intl (`NextIntlClientProvider messages`). */
+export function getMessages(locale: Locale): Messages {
+  return MESSAGES[locale];
+}
+
+export function isLocale(value: unknown): value is Locale {
+  return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
 }
 
 /** Bahasa dari header `Accept-Language` (q-value dihormati); hanya `id`/`en`, default `id`. */
@@ -51,8 +95,5 @@ export function localeFromAcceptLanguage(header: string | undefined | null): Loc
     })
     .filter((entry) => entry.language && Number.isFinite(entry.q) && entry.q > 0)
     .sort((a, b) => b.q - a.q || a.index - b.index);
-  return (
-    (ranked.find((entry) => (LOCALES as readonly string[]).includes(entry.language))?.language as Locale) ??
-    DEFAULT_LOCALE
-  );
+  return (ranked.find((entry) => isLocale(entry.language))?.language as Locale | undefined) ?? DEFAULT_LOCALE;
 }

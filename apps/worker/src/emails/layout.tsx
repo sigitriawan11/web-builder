@@ -1,4 +1,4 @@
-import { type Locale, t } from "@platform/i18n";
+import { type Locale, t, translate } from "@platform/i18n";
 import type { ReactNode } from "react";
 import { Body, Container, Head, Hr, Html, Preview, Text } from "react-email";
 
@@ -40,9 +40,10 @@ export const emailButton = {
   textDecoration: "none",
 } as const;
 
-/** Teks satu template dari namespace i18n `emails` (key `<template>.<bagian>`). */
+/** Teks satu template dari namespace i18n `emails` (key `<template>.<bagian>`, dirangkai saat runtime → `translate`). */
 export function emailCopy(locale: Locale, template: string) {
-  return (key: string, values?: Readonly<Record<string, string>>) => t(locale, "emails", `${template}.${key}`, values);
+  return (key: string, values?: Readonly<Record<string, string>>) =>
+    translate(locale, "emails", `${template}.${key}`, values);
 }
 
 /** Props bersama semua template: penerima + basis URL web. */

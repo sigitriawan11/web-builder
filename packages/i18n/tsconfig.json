@@ -1,5 +1,5 @@
 {
   "extends": "@platform/config/tsconfig/base.json",
-  "include": ["src", "src/**/*.json", "vitest.config.ts"],
+  "include": ["src", "messages/**/*.json", "vitest.config.ts"],
   "references": [{ "path": "../config" }]
 }
