@@ -4,6 +4,7 @@ import { Redis } from "ioredis";
 import { loadRealtimeEnv } from "./config/env";
 import { PersistenceExtension } from "./extensions/persistence";
 import { ProjectionsExtension } from "./extensions/projections";
+import { RedisBusExtension } from "./extensions/redis-bus";
 import { SingleEditorLockExtension } from "./extensions/single-editor-lock";
 import { EditorLock } from "./lock/editor-lock";
 import { createRealtimeServer } from "./server";
@@ -27,6 +28,8 @@ const server = createRealtimeServer({
   logger,
   lock: new SingleEditorLockExtension({ lock: new EditorLock(redis, LOCK_TTL_MS), db, logger }),
   extensions: [
+    // Koneksi Redis terpisah: ioredis dalam mode subscribe tidak bisa menjalankan perintah lain.
+    new RedisBusExtension({ subscriber: redis.duplicate(), logger }),
     new PersistenceExtension({
       db,
       logger,

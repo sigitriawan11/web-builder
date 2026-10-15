@@ -25,6 +25,7 @@ import {
   loadStoredDocument,
   type SnapshotKind,
 } from "../persistence/documents.repository";
+import { isServerBusOrigin } from "./redis-bus";
 
 // ARCHITECTURE §5.5/§7: persistence custom (append-only, bukan @hocuspocus/extension-database).
 // Load (§7.3) = snapshot terbaru + update seq > upto_seq → migrasi schemaVersion bila perlu (origin `migration`).
@@ -141,7 +142,15 @@ export class PersistenceExtension implements Extension {
     }
   }
 
-  async onChange({ documentName, document, update, context }: onChangePayload<RealtimeContext>): Promise<void> {
+  async onChange({
+    documentName,
+    document,
+    update,
+    context,
+    transactionOrigin,
+  }: onChangePayload<RealtimeContext>): Promise<void> {
+    // Update dari redis-bus sudah disimpan penulisnya (ARCHITECTURE §5.5) — jangan disimpan dua kali.
+    if (isServerBusOrigin(transactionOrigin)) return;
     const buffer = this.buffer(documentName);
     buffer.document = document;
     buffer.updates.push(update);
