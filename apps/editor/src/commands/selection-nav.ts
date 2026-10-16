@@ -15,6 +15,18 @@ type Lookup = (id: string) => Node | null;
 const childrenOf = (node: Node | null): readonly string[] | null => (node && "children" in node ? node.children : null);
 
 /**
+ * ED-056: `Mod+A` memilih semua sibling dalam konteks seleksi saat ini — yaitu semua anak dari parent node
+ * terseleksi. Tanpa seleksi (atau node tanpa parent, mis. page root) konteksnya adalah page root `rootId`,
+ * sehingga memilih semua section top-level. Mengembalikan daftar anak konteks (kosong bila konteks bukan container).
+ */
+export function selectAllInContext(selectedIds: readonly string[], lookup: Lookup, rootId: string): string[] {
+  const first = selectedIds[0];
+  const contextId = first ? (lookup(first)?.parentId ?? rootId) : rootId;
+  const children = childrenOf(lookup(contextId));
+  return children ? [...children] : [];
+}
+
+/**
  * Hitung efek navigasi seleksi (ED-055):
  * - `child` (Enter): node teks → edit; container → pilih semua anak langsung.
  * - `parent` (Shift+Enter / `\`): pilih parent unik dari node terseleksi; page root (tanpa parent) → tidak ada efek.

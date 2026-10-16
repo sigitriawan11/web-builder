@@ -107,6 +107,28 @@ test("AC ED-055: Enter pilih anak, Shift+Enter pilih parent (page root di ujung)
   expect(await selection(page)).toEqual([b]);
 });
 
+test("AC ED-056: Mod+A memilih semua sibling dalam konteks (grid), tanpa seleksi = section page root", async ({
+  page,
+}) => {
+  await openEditor(page, "Select All");
+  const pageId = await firstPageId(page);
+  const grid = await createFrame(page, pageId, { x: 40, y: 40, width: 400, height: 300 });
+  const card1 = await createFrame(page, grid, { x: 20, y: 20, width: 120, height: 80 });
+  const card2 = await createFrame(page, grid, { x: 160, y: 20, width: 120, height: 80 });
+  const card3 = await createFrame(page, grid, { x: 20, y: 120, width: 120, height: 80 });
+
+  // Satu card terpilih → Mod+A memilih semua card di grid.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), card1);
+  await page.keyboard.press("ControlOrMeta+a");
+  expect([...(await selection(page))].sort()).toEqual([card1, card2, card3].sort());
+
+  // Tanpa seleksi → semua section top-level (anak page root). Di sini hanya `grid`.
+  await page.evaluate(() => window.__editorTestApi?.select([]));
+  await page.keyboard.press("ControlOrMeta+a");
+  expect(await selection(page)).toEqual([grid]);
+  void pageId;
+});
+
 test("AC ED-054: Mod+klik memilih node terdalam langsung", async ({ page }) => {
   await openEditor(page, "Deep Select");
   const pageId = await firstPageId(page);

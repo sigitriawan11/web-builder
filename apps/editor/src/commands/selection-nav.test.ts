@@ -1,6 +1,6 @@
 import { nestedDocument } from "@platform/document-model/fixtures";
 import { describe, expect, it } from "vitest";
-import { navigateSelection } from "./selection-nav";
+import { navigateSelection, selectAllInContext } from "./selection-nav";
 
 // ED-055: Enter (anak/edit teks), Shift+Enter / `\` (parent), Tab / Shift+Tab (sibling wrap).
 // nestedDocument: pg_home → lvl1 → lvl2 → lvl3 → [lvl4text (teks, terkunci), lvl4img (image)].
@@ -46,5 +46,21 @@ describe("navigateSelection (ED-055)", () => {
   it("child & sibling hanya untuk seleksi tunggal", () => {
     expect(nav("child", ["n_lvl4text001", "n_lvl4img0001"])).toEqual({ type: "none" });
     expect(nav("nextSibling", ["n_lvl4text001", "n_lvl4img0001"])).toEqual({ type: "none" });
+  });
+});
+
+describe("selectAllInContext (ED-056)", () => {
+  const root = "pg_home000001";
+
+  it("memilih semua anak dari parent node terseleksi", () => {
+    expect(selectAllInContext(["n_lvl4text001"], lookup, root)).toEqual(["n_lvl4text001", "n_lvl4img0001"]);
+  });
+
+  it("tanpa seleksi → semua anak page root (section top-level)", () => {
+    expect(selectAllInContext([], lookup, root)).toEqual(["n_lvl1000001"]);
+  });
+
+  it("node tanpa parent (page root) → konteks page root", () => {
+    expect(selectAllInContext([root], lookup, root)).toEqual(["n_lvl1000001"]);
   });
 });
