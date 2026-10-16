@@ -36,6 +36,9 @@ export function exposeDevApi(runtime: CanvasRuntime): void {
         runCommand({ doc: runtime.doc, origin: runtime.origin }, op, input),
       // Dipakai E2E & benchmark canvas (T0.4.6, T0.7.3).
       camera: cameraStore,
+      // T2.3.5: benchmark switch page.
+      pages: () => runtime.doc.getArray<string>("pageOrder").toArray(),
+      setPage: (pageId: string) => runtime.setPage(pageId),
       geometry: runtime.geometry.store,
       undo: runtime.undo,
       undoManager: runtime.undo.manager,
