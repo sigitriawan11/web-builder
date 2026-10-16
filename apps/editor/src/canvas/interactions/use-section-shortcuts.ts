@@ -4,10 +4,10 @@ import { isEditableEvent } from "../../commands/is-editable-target";
 import { selectionStore } from "../../store/selection-store";
 import { showToast } from "../../store/toast-store";
 import type { CanvasRuntime } from "../canvas-runtime";
-import { reorderStepIndex } from "../section-order";
+import { type ZOrderOp, zOrderIndex } from "../section-order";
 
-// ED-036: `Mod+]` turunkan / `Mod+[` naikkan node terpilih satu posisi dalam parentnya (urutan flow = section di
-// page root). `Delete`/`Backspace` pada page root tidak menghapus apa pun (page dihapus dari Pages panel) — toast.
+// ED-036/091: `Mod+]`/`Mod+[` majukan/mundurkan satu posisi (z-order); `Mod+Alt+]`/`Mod+Alt+[` ke paling
+// depan/belakang. Urutan DOM = stacking. `Delete`/`Backspace` pada page root → toast (hapus lewat Pages panel).
 export function useSectionShortcuts(runtime: CanvasRuntime): void {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -15,14 +15,15 @@ export function useSectionShortcuts(runtime: CanvasRuntime): void {
       const ids = selectionStore.getState().selectedIds;
       const mod = event.ctrlKey || event.metaKey;
 
-      if (mod && !event.shiftKey && !event.altKey && (event.code === "BracketRight" || event.code === "BracketLeft")) {
+      if (mod && !event.shiftKey && (event.code === "BracketRight" || event.code === "BracketLeft")) {
         if (ids.length !== 1) return;
         const id = ids[0] as string;
         const node = runtime.nodeStore.getNode(id);
         const parent = node?.parentId ? runtime.nodeStore.getNode(node.parentId) : null;
         if (!node || !parent || !("children" in parent)) return;
-        const from = parent.children.indexOf(id);
-        const to = reorderStepIndex(parent.children.length, from, event.code === "BracketRight" ? "down" : "up");
+        const forward = event.code === "BracketRight";
+        const op: ZOrderOp = event.altKey ? (forward ? "front" : "back") : forward ? "forward" : "backward";
+        const to = zOrderIndex(parent.children.length, parent.children.indexOf(id), op);
         if (to === null) return;
         event.preventDefault();
         runtime.undo.stopCapturing();

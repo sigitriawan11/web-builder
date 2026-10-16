@@ -1009,7 +1009,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 - [ ] **T2.8.9** Panel UI auto-layout lengkap (sesuai mockup spec) — ED-087 · `apps/editor/src/panels/properties/auto-layout` · Verifikasi: e2e screenshot panel
 - [ ] **T2.8.10** Absolute position di dalam auto-layout (ignore layout) — ED-088 · `apps/editor` · Verifikasi: e2e
 - [ ] **T2.8.11** Reorder via drag & keyboard di auto-layout (ringkas) — ED-090 · `apps/editor` · Verifikasi: e2e
-- [ ] **T2.8.12** Bring forward / send backward (z-index eksplisit untuk absolute) — ED-091 · `apps/editor/src/commands` · Verifikasi: unit test
+- [x] **T2.8.12** Bring forward / send backward (z-index eksplisit untuk absolute) — ED-091 · `apps/editor/src/commands` · Verifikasi: unit test
+  - Catatan: ✅ 2026-10-17 — `zOrderIndex(count, from, op)` murni (`forward`/`backward` ±1, `front`/`back` ke ujung, null bila tak gerak). `use-section-shortcuts` kini: `Mod+]`/`Mod+[` maju/mundur satu, **`Mod+Alt+]`/`Mod+Alt+[` ke paling depan/belakang** (urutan DOM = stacking; `reorderNode`, satu undo). Verifikasi: **unit** `section-order.test` (zOrderIndex 8 kasus) + **e2e** `editor-sections.spec` (bring-to-front A → `[b,c,a]`; send-to-back → `[a,b,c]`). **Belum:** `z-index` eksplisit saat urutan DOM tak cukup (overlap absolute kompleks) — DOM order memadai untuk mayoritas; menyusul bila diperlukan.
 - [ ] **T2.8.13** (P1) Visual helper auto-layout di canvas (garis padding/gap saat hover) — ED-096 · `apps/editor/src/canvas/overlay` · Verifikasi: e2e screenshot
 - [ ] **T2.8.14** (P1) Grid layout di document-model & renderer (dasar, tanpa UI lengkap) — DM-011, DM-026 · `packages/document-model`, `packages/renderer` · Verifikasi: unit test render grid
 

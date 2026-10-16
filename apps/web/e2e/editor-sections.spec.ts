@@ -84,3 +84,23 @@ test("AC ED-036: page root tanpa handle resize; Delete tidak menghapus (toast)",
   await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
   await expect(page.locator(".overlay-handle")).toHaveCount(8);
 });
+
+test("AC ED-091: bring to front / send to back (Mod+Alt+] / Mod+Alt+[)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Z Order Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  const pageId = await firstPageId(page);
+  const a = String((await editorCommand(page, "createNode", { parentId: pageId, type: "frame", name: "A" })).value);
+  const b = String((await editorCommand(page, "createNode", { parentId: pageId, type: "frame", name: "B" })).value);
+  const c = String((await editorCommand(page, "createNode", { parentId: pageId, type: "frame", name: "C" })).value);
+  expect(await children(page, pageId)).toEqual([a, b, c]);
+
+  // Bring A to front → urutan DOM terakhir (tampil paling atas).
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), a);
+  await page.keyboard.press("Control+Alt+BracketRight");
+  await expect.poll(() => children(page, pageId)).toEqual([b, c, a]);
+
+  // Send A to back → index 0.
+  await page.keyboard.press("Control+Alt+BracketLeft");
+  await expect.poll(() => children(page, pageId)).toEqual([a, b, c]);
+});
