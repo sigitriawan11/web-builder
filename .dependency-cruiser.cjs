@@ -131,7 +131,7 @@ module.exports = {
   ],
   options: {
     doNotFollow: { path: "node_modules" },
-    exclude: { path: "(?:^|/)(?:dist|coverage|test-results|playwright-report|\\.turbo)/" },
+    exclude: { path: "(?:^|/)(?:dist|coverage|test-results|playwright-report|\\.turbo|\\.next|\\.next-e2e)/" },
     parser: "swc",
     // SWC (bukan tsc — dependency-cruiser 18 belum mendukung TypeScript 7) sudah menandai `import type`
     // sebagai `type-only`; tsPreCompilationDeps hanya berlaku untuk parser tsc.

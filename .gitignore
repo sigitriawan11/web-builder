@@ -3,6 +3,7 @@ node_modules/
 dist/
 # Next.js (apps/web): output build & deklarasi tipe yang dibuat ulang `next dev/build`.
 .next/
+.next-e2e/
 next-env.d.ts
 coverage/
 .env

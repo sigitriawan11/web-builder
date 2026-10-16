@@ -22,6 +22,24 @@
     "sent": "Email verifikasi dikirim ulang. Periksa kotak masuk Anda."
   },
   "sites": {
-    "title": "Website"
+    "title": "Website",
+    "description": "Semua website di workspace ini.",
+    "empty": {
+      "title": "Belum ada website",
+      "description": "Website yang Anda buat akan muncul di sini."
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Dipublikasikan",
+      "suspended": "Ditangguhkan",
+      "archived": "Diarsipkan"
+    },
+    "edited": "Diedit {time}",
+    "open": "Buka {name} di editor",
+    "pagination": {
+      "label": "Halaman",
+      "next": "Halaman berikutnya",
+      "first": "Kembali ke halaman pertama"
+    }
   }
 }

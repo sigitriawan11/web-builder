@@ -69,6 +69,7 @@ export default defineConfig({
         API_INTERNAL_URL: `http://127.0.0.1:${API_PORT}`,
         EDITOR_ORIGIN: `http://127.0.0.1:${EDITOR_FIXTURE_PORT}`,
         APP_ENV: "local",
+        NEXT_DIST_DIR: ".next-e2e",
       },
     },
     {

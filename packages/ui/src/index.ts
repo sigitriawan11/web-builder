@@ -2,6 +2,7 @@
 // bukan UI situs user (ARCHITECTURE §4.2, ED-012). Gaya & token: `@platform/ui/styles.css`.
 export { Alert, AlertDescription, AlertTitle } from "./components/Alert";
 export { Avatar, AvatarFallback, AvatarImage, initials } from "./components/Avatar";
+export { Badge } from "./components/Badge";
 export { Button, type ButtonProps, buttonVariants } from "./components/Button";
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./components/Card";
 export { Checkbox } from "./components/Checkbox";

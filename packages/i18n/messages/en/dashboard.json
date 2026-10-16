@@ -22,6 +22,24 @@
     "sent": "Verification email sent again. Check your inbox."
   },
   "sites": {
-    "title": "Websites"
+    "title": "Websites",
+    "description": "All websites in this workspace.",
+    "empty": {
+      "title": "No websites yet",
+      "description": "Websites you create will appear here."
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "suspended": "Suspended",
+      "archived": "Archived"
+    },
+    "edited": "Edited {time}",
+    "open": "Open {name} in the editor",
+    "pagination": {
+      "label": "Pages",
+      "next": "Next page",
+      "first": "Back to first page"
+    }
   }
 }
