@@ -10,7 +10,8 @@
   "scripts": {
     "typecheck": "tsc -b tsconfig.json bench/tsconfig.json",
     "test": "vitest run",
-    "bench": "vitest bench --run --reporter=verbose"
+    "bench": "vitest bench --run --reporter=verbose",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "nanoid": "6.0.2",

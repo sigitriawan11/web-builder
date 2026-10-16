@@ -58,16 +58,21 @@ describe("snapshot + update (DM-061)", () => {
     expect(limit).toBeNull();
   });
 
-  it("muat 5.000 node < 500 ms (AC DM-061, indikatif)", () => {
-    const state = Y.encodeStateAsUpdate(jsonToYDoc(generateLandingDocument({ nodeCount: 5000 })));
-    let fastest = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < 3; i++) {
-      const start = performance.now();
-      loadDocument(state, []).destroy();
-      fastest = Math.min(fastest, performance.now() - start);
-    }
-    expectDurationBelow(fastest, 500);
-  });
+  it(
+    "muat 5.000 node < 500 ms (AC DM-061, indikatif)",
+    () => {
+      const state = Y.encodeStateAsUpdate(jsonToYDoc(generateLandingDocument({ nodeCount: 5000 })));
+      let fastest = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < 3; i++) {
+        const start = performance.now();
+        loadDocument(state, []).destroy();
+        fastest = Math.min(fastest, performance.now() - start);
+      }
+      expectDurationBelow(fastest, 500);
+      // Batas durasi diukur di dalam (PERF_ASSERT); timeout test hanya untuk fixture 5.000 node saat run dingin/paralel.
+    },
+    HEAVY_TEST_TIMEOUT_MS,
+  );
 });
 
 describe("GC (DM-062)", () => {

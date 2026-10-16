@@ -44,6 +44,8 @@ jobs:
           TURBO_SCM_HEAD: ${{ github.sha }}
       - name: Katalog i18n id/en
         run: pnpm i18n:check
+      - name: Coverage document-model ≥ 90%, renderer ≥ 80% (ARCHITECTURE §14)
+        run: pnpm test:coverage
 
   integration:
     name: Integration, build, migration check

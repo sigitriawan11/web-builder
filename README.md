@@ -20,7 +20,7 @@ pnpm dev
 
 Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 
-> **Status M1:** fondasi sedang dibangun. `db:migrate` membuat tabel inti dan `db:seed` mengisi `owner@platform.test`, `admin@platform.test`, dan 2 situs contoh (login baru bisa setelah auth, T1.5). `pnpm dev` menjalankan editor (`http://localhost:5173/editor/`), API (`http://localhost:4000`), dan worker (`http://localhost:4200/queues`). Bagian ini diperbarui seiring app bertambah.
+> **Status M1 (fondasi):** daftar akun baru (kode verifikasi di Mailpit http://localhost:8025) atau login dengan user seed → dashboard **Websites** → **Create website** → editor terbuka (`/editor/:siteId`) dengan dokumen tersimpan otomatis lewat realtime + IndexedDB. Sampai toolbar M2, node ditambah lewat **tombol dev** di atas canvas (frame/teks); seleksi, drag/resize, dan undo (Ctrl+Z) memakai interaksi canvas M0. Playground canvas M0 (fixture, dev saja): http://localhost:5173/editor/.
 
 ## Perintah
 
@@ -34,7 +34,7 @@ Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 | `pnpm lint:deps` | Aturan dependensi antar paket (dependency-cruiser, ARCHITECTURE §4.3) |
 | `pnpm test` / `pnpm test:coverage` | Vitest unit / dengan coverage |
 | `pnpm test:integration` | Test dengan Postgres asli (container `postgres-test`, port 5433) |
-| `pnpm test:e2e` | Playwright |
+| `pnpm test:e2e` | Playwright (web: stack e2e sendiri — boleh jalan bersamaan dengan `pnpm dev`) |
 | `pnpm bench` / `pnpm bench:canvas` | Benchmark Vitest (document-model) / benchmark canvas Playwright |
 | `pnpm infra:up` / `pnpm infra:down` | Nyalakan / matikan infrastruktur lokal (data tetap di volume) |
 | `pnpm db:generate` / `db:migrate` / `db:seed` / `db:reset` | Migration Drizzle, seed data dev, reset: drop + migrate + seed (lokal saja) |
@@ -48,7 +48,7 @@ Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 |---|---|
 | Marketing | http://localhost:3000 |
 | Dashboard + admin | http://app.localhost:3000 |
-| Editor | http://app.localhost:3000/editor/:siteId (sementara: http://localhost:5173/editor/) |
+| Editor | http://app.localhost:3000/editor/:siteId (playground M0 dev: http://localhost:5173/editor/) |
 | API | http://api.localhost:4000 |
 | Realtime | ws://realtime.localhost:4100 |
 | Worker (health + Bull Board) | http://localhost:4200/queues |
@@ -77,6 +77,9 @@ Lalu buka `http://app.localhost:3000` dan login sebagai `owner@platform.test`.
 
   Browser dan Chromium Playwright me-resolve `*.localhost` sendiri.
 - **Bind server dev**: dengan localhost forwarding (default) atau mode mirrored, server yang bind ke `localhost` (default Vite/Next) sudah bisa dibuka dari browser Windows. Bila forwarding tidak aktif dan mirrored tidak tersedia, jalankan dengan host `0.0.0.0` lalu buka lewat IP WSL (`hostname -I`).
+- **Cookie sesi & port**: cookie login di-set untuk host `app.localhost` (port tidak memisahkan cookie). Selalu buka dashboard **dan** editor lewat `http://app.localhost:3000` — editor di-rewrite Next ke Vite sehingga satu origin dengan `/api`. Membuka editor langsung di `localhost:5173` = tidak ada sesi (hanya playground). Login dari `localhost:3000` (tanpa `app.`) juga tidak berlaku untuk `app.localhost`.
+- **Kode Node & `*.localhost`**: resolver Node/WSL belum tentu me-resolve `foo.localhost` → script/test Node memakai `127.0.0.1` + header Host (lihat `apps/web/e2e/support/localhost.ts`).
+- **Next 16 mengunci `distDir`** per `next dev`: e2e web memakai `.next-e2e` (`NEXT_DIST_DIR`), jadi e2e bisa jalan saat `pnpm dev` aktif; untuk `pnpm build` lokal saat dev jalan, pakai `NEXT_DIST_DIR=.next-e2e pnpm build`.
 - **Port bentrok** (mis. Postgres lain sudah memakai 5432): ubah port di `.env` (`POSTGRES_PORT=5434`, dll.) **dan** port di `DATABASE_URL`, lalu `pnpm infra:down && pnpm infra:up`. Container platform terpisah dari Postgres lain di mesin Anda, sehingga `pnpm db:reset` tidak menyentuh data project lain.
 - **Memori**: Playwright dan `sharp` (worker) cukup berat. Batasi memori WSL2 bila Windows ikut melambat:
 

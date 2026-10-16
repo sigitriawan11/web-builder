@@ -835,13 +835,20 @@ Termasuk: semua requirement P0 berfase M1 di spec 01 (DM-*), 02 (ED-012, ED-017,
 
 ### M1.d Exit criteria / demo
 
-- [ ] Demo end-to-end: clone bersih → `pnpm install && pnpm infra:up && pnpm db:migrate && pnpm db:seed && pnpm dev` → register user baru (verifikasi via Mailpit) → buat situs kosong → editor terbuka → tambah frame & teks (tombol dev) → drag/resize → undo → tutup tab → buka lagi → perubahan ada.
-- [ ] Offline: matikan realtime, edit, nyalakan, perubahan tersinkron tanpa kehilangan.
-- [ ] Tab kedua menampilkan dialog takeover (single-editor lock).
+- [x] Demo end-to-end: clone bersih → `pnpm install && pnpm infra:up && pnpm db:migrate && pnpm db:seed && pnpm dev` → register user baru (verifikasi via Mailpit) → buat situs kosong → editor terbuka → tambah frame & teks (tombol dev) → drag/resize → undo → tutup tab → buka lagi → perubahan ada.
+  - ✅ 2026-10-16 — Diotomasi `apps/web/e2e/demo.spec.ts`: daftar → kode dari Mailpit → dialog Create website → editor → tombol dev frame + teks → resize handle (160 → 220 px) → undo/redo → drag reorder teks di frame auto-layout + undo/redo → terkonfirmasi server → tab ditutup → buka lagi → semua perubahan ada. Catatan: page situs kosong ber-layout blok, jadi reorder dilakukan di dalam frame (ED-063 hanya di auto-layout). Clone bersih (`git clone` ke direktori kosong) → `pnpm install --frozen-lockfile` → typecheck, lint, lint:deps, unit test hijau; `pnpm infra:up`/`pnpm dev` di clone tidak dijalankan agar tidak bentrok port dengan stack dev owner (stack e2e menjalankan semua service yang sama dari nol). Ditemukan & diperbaiki: test perf document-model "muat 5.000 node" melewati timeout 5 s pada run dingin → timeout 30 s (batas 500 ms tetap diukur di dalam).
+- [x] Offline: matikan realtime, edit, nyalakan, perubahan tersinkron tanpa kehilangan.
+  - ✅ 2026-10-16 — e2e `document.spec`: (1) proxy WebSocket membuang pesan ke realtime → edit tetap belum terkonfirmasi → tab ditutup → dibuka lagi saat realtime tersambung → perubahan dari IndexedDB terkirim & terlihat di perangkat lain; (2) `setOffline` → banner/indikator Offline → online → Tersimpan & terkonfirmasi. Proses realtime tidak dimatikan secara harfiah (dibagi seluruh suite) — pemutusan dilakukan di jaringan.
+- [x] Tab kedua menampilkan dialog takeover (single-editor lock).
+  - ✅ 2026-10-16 — e2e `document.spec` lock: sesuai keputusan owner T1.12.6 lock per USER (tab kedua user yang sama boleh mengedit, ED-201), jadi "tab kedua" = user kedua anggota workspace → dialog takeover → Ambil alih → pemegang lama lihat saja + dialog → pemegang pergi → "Mulai mengedit".
 - [ ] `pnpm typecheck && pnpm lint && pnpm lint:deps && pnpm test && pnpm test:integration && pnpm test:e2e` hijau di CI.
-- [ ] Coverage `document-model` ≥ 90%, `renderer` ≥ 80% (ARCHITECTURE §14).
-- [ ] Suite isolasi tenant dijalankan untuk semua endpoint data yang ada.
-- [ ] UI web & editor dapat diganti ke EN tanpa string Indonesia tersisa.
+  - 🟡 2026-10-16 — Semua perintah hijau **lokal** (unit + coverage, integration, e2e web 70, editor 234) dan di clone bersih (unit). Belum dicentang: butuh run GitHub Actions (`ci.yml`/`e2e.yml`) setelah owner push.
+- [x] Coverage `document-model` ≥ 90%, `renderer` ≥ 80% (ARCHITECTURE §14).
+  - ✅ 2026-10-16 — document-model statement 94,2% / baris 97,1%, renderer statement 93,4% / baris 96,7% (branch 86%/87%). Ditegakkan: `test:coverage` + `thresholds` (90/80, statement & baris) di vitest config kedua paket + langkah CI; mutasi (threshold 99) → gagal.
+- [x] Suite isolasi tenant dijalankan untuk semua endpoint data yang ada.
+  - ✅ 2026-10-16 — `apps/api/src/tenant-isolation.int.test.ts`: inventaris rute memastikan setiap rute tenant punya kasus isolasi (user lain + ID korban → 404, data korban utuh) dan allowlist non-tenant beralasan; `pnpm test:integration` hijau.
+- [x] UI web & editor dapat diganti ke EN tanpa string Indonesia tersisa.
+  - ✅ 2026-10-16 — `apps/web/e2e/english-ui.spec.ts` memindai teks TERLIHAT (bukan hanya katalog) untuk kata Indonesia umum: /sites, /account, /login, /register, /forgot-password, editor (shell + toolbar dev + banner offline + layar error + situs tidak ditemukan) — bersih; elemen `lang` non-en & data user dikecualikan. 404 global sengaja statis dwibahasa (`<html lang="id">` + blok `lang="en"`, T1.14.9). Pengecualian yang sudah diketahui: marketing EN ditunda (temuan T1.14.9). Ditambah `pnpm i18n:check` & lint `jsx-literal`.
 
 ### M1.e Risiko & mitigasi
 
@@ -851,7 +858,7 @@ Termasuk: semua requirement P0 berfase M1 di spec 01 (DM-*), 02 (ED-012, ED-017,
 | Better Auth tidak cocok (nama tabel, Express 5) | Spike kecil di T1.5.1; bila gagal, putuskan ulang 08 OPEN #1 sebelum lanjut |
 | Hocuspocus persistence custom rumit | Ikuti ARCHITECTURE §7 persis; integration test berbasis seq; jangan optimasi dulu |
 | Fondasi terlalu lama (over-engineering) | Hanya task di epic ini; P1 (RLS, OpenAPI) jangan disentuh |
-| WSL2 + `*.localhost` + cookie lintas port | Ikuti ARCHITECTURE §3.3/§15.1; catat solusi di README |
+| WSL2 + `*.localhost` + cookie lintas port | Ikuti ARCHITECTURE §3.3/§15.1; catat solusi di README — ✅ 2026-10-16 README "WSL2 & troubleshooting": mirrored networking, curl/Node `*.localhost` (Host header), cookie sesi host-only `app.localhost` (editor selalu lewat rewrite `app.localhost:3000`), `distDir` Next 16 & e2e paralel dev, port bentrok, memori |
 
 ---
 
