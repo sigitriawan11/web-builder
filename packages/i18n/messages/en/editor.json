@@ -165,5 +165,19 @@
     "online": "Online",
     "offline": "Offline",
     "show": "Show bottom bar"
+  },
+  "pages": {
+    "add": "Add page",
+    "newTitle": "Page {number}",
+    "rename": "Rename",
+    "actions": "Actions for {title}",
+    "duplicate": "Duplicate",
+    "copyTitle": "{title} (copy)",
+    "setHome": "Set as home",
+    "delete": "Delete",
+    "deleteTitle": "Delete page “{title}”?",
+    "deleteDescription": "The page and its content will be deleted. You can revert this with Undo.",
+    "cancel": "Cancel",
+    "home": "Home"
   }
 }

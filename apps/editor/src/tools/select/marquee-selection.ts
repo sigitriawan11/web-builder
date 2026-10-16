@@ -7,8 +7,8 @@ import { marqueeHits, rectFromPoints } from "./marquee";
 export interface MarqueeContext {
   nodeStore: NodeStore;
   geometry: GeometryStore;
-  // Page aktif: lingkup marquee top-level.
-  pageId: string;
+  // Page aktif: lingkup marquee top-level (getter — page bisa berganti).
+  readonly pageId: string;
   camera(): CameraState;
   viewportOffset(): { left: number; top: number };
 }

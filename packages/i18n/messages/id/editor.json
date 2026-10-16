@@ -165,5 +165,19 @@
     "online": "Online",
     "offline": "Offline",
     "show": "Tampilkan bar bawah"
+  },
+  "pages": {
+    "add": "Tambah page",
+    "newTitle": "Page {number}",
+    "rename": "Ganti nama",
+    "actions": "Aksi untuk {title}",
+    "duplicate": "Duplikat",
+    "copyTitle": "{title} (salinan)",
+    "setHome": "Jadikan beranda",
+    "delete": "Hapus",
+    "deleteTitle": "Hapus page “{title}”?",
+    "deleteDescription": "Page beserta isinya akan dihapus. Anda bisa membatalkannya dengan Undo.",
+    "cancel": "Batal",
+    "home": "Beranda"
   }
 }

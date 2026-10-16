@@ -3,7 +3,7 @@ import { isApiError } from "@platform/sdk";
 import { useSite } from "@platform/sdk/react";
 import type { Site } from "@platform/shared/contracts";
 import { Button } from "@platform/ui";
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import * as Y from "yjs";
 import { useStore } from "zustand";
 import { CanvasViewport } from "../canvas/CanvasViewport";
@@ -17,9 +17,10 @@ import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
 import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
-import { NodeStoreContext, useNode, useNodeFromStore } from "../document/use-node";
+import { NodeStoreContext, useNodeFromStore } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
 import { LeftSidebar } from "../panels/LeftSidebar";
+import { PagesPanel } from "../panels/pages/PagesPanel";
 import { Inspector } from "../panels/properties/Inspector";
 import { uiPreferencesStore } from "../store/ui-preferences";
 import { setTelemetryScope } from "../telemetry/telemetry";
@@ -69,9 +70,17 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
     void setTelemetryScope({ siteId: site.id });
   }, [site.id]);
   const { session, status } = useDocumentSession(site.documentId);
-  const workspace = useWorkspaceRuntime(session, pageId);
+  // ED-032: page yang diminta (`?page=` awal, lalu klik di Pages panel) — URL diperbarui tanpa reload.
+  const [requestedPage, setRequestedPage] = useState(pageId);
+  const openPage = useCallback((id: string) => {
+    setRequestedPage(id);
+    const url = new URL(window.location.href);
+    url.searchParams.set("page", id);
+    window.history.replaceState(window.history.state, "", url);
+  }, []);
+  const workspace = useWorkspaceRuntime(session, requestedPage);
   const bottomBarHidden = useStore(uiPreferencesStore, (state) => state.bottomBarHidden);
-  const pageNode = useNodeFromStore(workspace.runtime?.nodeStore ?? null, workspace.runtime?.pageId ?? null);
+  const pageNode = useNodeFromStore(workspace.runtime?.nodeStore ?? null, workspace.activePageId);
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-connection-status={status}>
       <Toolbar
@@ -91,9 +100,14 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
       <ProfileLocaleSync />
       {session ? <SessionBanners session={session} status={status} /> : null}
       {session ? <EditAccessGate session={session} /> : null}
-      <div className="flex min-h-0 flex-1 bg-muted/40" data-testid="editor-canvas-slot" data-page-id={pageId ?? ""}>
+      <div
+        className="flex min-h-0 flex-1 bg-muted/40"
+        data-testid="editor-canvas-slot"
+        data-page-id={workspace.activePageId ?? ""}
+        data-requested-page-id={requestedPage ?? ""}
+      >
         {session && status !== "loading" ? (
-          <DocumentWorkspace session={session} workspace={workspace} />
+          <DocumentWorkspace session={session} workspace={workspace} onOpenPage={openPage} />
         ) : (
           <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
         )}
@@ -109,6 +123,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
 
 interface WorkspaceRuntime {
   runtime: CanvasRuntime | null;
+  activePageId: string | null;
   pageOrder: readonly string[];
   schemaVersion: number | null;
   outdated: boolean;
@@ -125,21 +140,30 @@ function useWorkspaceRuntime(session: DocumentSession | null, pageId: string | n
   const schemaVersion = useDocumentSchemaVersion(doc);
   const outdated = isNewerThanEditor(schemaVersion);
   const readOnly = useEditAccessOrEditing(session) !== "editing";
+  // Page diminta tidak ada (dihapus / ID salah) → page pertama.
   const activePageId = pageId && pageOrder.includes(pageId) ? pageId : (pageOrder[0] ?? null);
+  const hasPage = activePageId !== null;
+  // Runtime satu per DOKUMEN (bukan per page): ganti page = `setPage`, stack undo tetap (ED-197).
   // Dibuat di effect (bukan useMemo/useState): StrictMode menjalankan cleanup lalu effect lagi — runtime dari
   // useMemo akan sudah di-destroy (observer lepas) dan canvas berhenti mengikuti dokumen.
   const [runtime, setRuntime] = useState<CanvasRuntime | null>(null);
+  const initialPage = useRef(activePageId);
+  initialPage.current ??= activePageId;
   useEffect(() => {
-    if (!session || !activePageId || outdated) return;
-    const next = createCanvasRuntime({ doc: session.doc, pageId: activePageId, origin: TAB_ORIGIN });
+    const first = initialPage.current;
+    if (!session || !hasPage || !first || outdated) return;
+    const next = createCanvasRuntime({ doc: session.doc, pageId: first, origin: TAB_ORIGIN });
     setRuntime(next);
     return () => {
       setRuntime(null);
       next.destroy();
     };
-  }, [session, activePageId, outdated]);
+  }, [session, hasPage, outdated]);
+  useEffect(() => {
+    if (runtime && activePageId) runtime.setPage(activePageId);
+  }, [runtime, activePageId]);
   useEffect(() => runtime?.setReadOnly(readOnly), [runtime, readOnly]);
-  return { runtime, pageOrder, schemaVersion, outdated, readOnly };
+  return { runtime, activePageId, pageOrder, schemaVersion, outdated, readOnly };
 }
 
 function useEditAccessOrEditing(session: DocumentSession | null): string {
@@ -148,22 +172,32 @@ function useEditAccessOrEditing(session: DocumentSession | null): string {
   return useSyncExternalStore(subscribe, read, read);
 }
 
-function DocumentWorkspace({ session, workspace }: { session: DocumentSession; workspace: WorkspaceRuntime }) {
-  const { runtime, pageOrder, schemaVersion, outdated, readOnly } = workspace;
+function DocumentWorkspace({
+  session,
+  workspace,
+  onOpenPage,
+}: {
+  session: DocumentSession;
+  workspace: WorkspaceRuntime;
+  onOpenPage(pageId: string): void;
+}) {
+  const { runtime, pageOrder, schemaVersion, outdated, readOnly, activePageId } = workspace;
   // ED-230: dokumen dari editor yang lebih baru → tidak ada canvas/runtime (tidak bisa diedit).
   if (outdated && schemaVersion !== null) return <EditorOutdated version={schemaVersion} />;
-  if (!runtime) return null;
+  if (!runtime || !activePageId) return null;
   return (
     <NodeStoreContext.Provider value={runtime.nodeStore}>
       {/* ED-242: test API hanya di build dev (ter-tree-shake dari production). */}
       {import.meta.env.DEV ? <EditorTestHook session={session} runtime={runtime} /> : null}
       <LeftSidebar
         pages={
-          <ul className="flex flex-col gap-1" data-testid="document-pages">
-            {pageOrder.map((id) => (
-              <PageItem key={id} id={id} active={id === runtime.pageId} />
-            ))}
-          </ul>
+          <PagesPanel
+            runtime={runtime}
+            pageOrder={pageOrder}
+            activePageId={activePageId}
+            readOnly={readOnly}
+            onOpen={onOpenPage}
+          />
         }
       />
       <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
@@ -176,7 +210,7 @@ function DocumentWorkspace({ session, workspace }: { session: DocumentSession; w
         {/* ED-229: mode lihat saja — pointer ke canvas ditahan (server juga menolak update koneksi read-only). */}
         {readOnly ? <div className="absolute inset-0 z-10 cursor-not-allowed" data-testid="read-only-blocker" /> : null}
       </div>
-      <Inspector pageId={runtime.pageId} />
+      <Inspector pageId={activePageId} />
     </NodeStoreContext.Provider>
   );
 }
@@ -211,16 +245,6 @@ function EditorTestHook({ session, runtime }: { session: DocumentSession; runtim
 
 // Origin transaksi lokal tab ini (DM-060): dilacak UndoManager; tab lain = sesi lain.
 const TAB_ORIGIN = userOrigin(crypto.randomUUID());
-
-function PageItem({ id, active }: { id: string; active: boolean }) {
-  const node = useNode(id);
-  if (node?.type !== "page") return null;
-  return (
-    <li data-page-id={id} aria-current={active ? "page" : undefined} className={active ? "font-semibold" : undefined}>
-      {node.props.title}
-    </li>
-  );
-}
 
 export function SiteNotFound() {
   const t = useT();

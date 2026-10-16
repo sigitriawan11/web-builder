@@ -2,6 +2,8 @@ import type { TxOrigin } from "@platform/document-model";
 import { ySyncPluginKey } from "@tiptap/y-tiptap";
 import { createContext, useContext } from "react";
 import type * as Y from "yjs";
+import { useStore } from "zustand";
+import { createStore, type StoreApi } from "zustand/vanilla";
 import { NodeStore } from "../document/node-store";
 import { createUndoController, type UndoController } from "../document/undo-controller";
 import { selectionStore } from "../store/selection-store";
@@ -11,21 +13,26 @@ import { resolvePressTarget } from "../tools/select/marquee";
 import type { MarqueeContext } from "../tools/select/marquee-selection";
 import { nodeLookupFrom } from "../tools/select/node-lookup";
 import { cameraStore } from "./camera-store";
+import type { CameraState } from "./geometry/coordinates";
 import { createDomGeometry, type DomGeometry } from "./geometry/dom-geometry";
 import { hitTestCanvas } from "./hit-test/canvas-hit-test";
 import { type HitResult, isSelectablePath } from "./hit-test/hit-test";
 import type { PressTarget } from "./interactions/interaction-machine";
 
 /**
- * Semua yang dibutuhkan canvas untuk SATU dokumen & page (pengganti singleton spike M0): node store, geometry,
- * undo, hit-test, konteks marquee. Dibuat per dokumen terbuka (playground fixture atau dokumen situs), di-destroy
- * saat dokumen ditutup.
+ * Semua yang dibutuhkan canvas untuk SATU dokumen (pengganti singleton spike M0): node store, geometry, undo,
+ * hit-test, konteks marquee. Dibuat per dokumen terbuka (playground fixture atau dokumen situs), di-destroy saat
+ * dokumen ditutup. Page aktif bisa diganti (`setPage`) tanpa membuat ulang runtime — stack undo tetap satu per
+ * dokumen (ED-197), kamera terakhir tiap page diingat (ED-032).
  */
 export interface CanvasRuntime {
   doc: Y.Doc;
   // Origin transaksi lokal user ini (DM-060) — dilacak UndoManager.
   origin: Extract<TxOrigin, { kind: "user" }>;
-  pageId: string;
+  /** Page aktif saat ini (baca saat dipakai; komponen React memakai `usePageId`). */
+  readonly pageId: string;
+  readonly page: StoreApi<{ pageId: string }>;
+  setPage(pageId: string): void;
   nodeStore: NodeStore;
   geometry: DomGeometry;
   undo: UndoController;
@@ -53,6 +60,8 @@ export function createCanvasRuntime(options: {
 }): CanvasRuntime {
   const { doc, pageId, origin } = options;
   const nodeStore = new NodeStore(doc);
+  const page = createStore<{ pageId: string }>()(() => ({ pageId }));
+  const cameras = new Map<string, CameraState>();
   const geometry = createDomGeometry();
   // ED-019: transaksi dokumen bisa menggeser node tanpa mengubah ukurannya → ukur ulang semua (lazy).
   const onTransaction = (transaction: Y.Transaction) => {
@@ -77,10 +86,32 @@ export function createCanvasRuntime(options: {
   const stopUiSync = syncUiWithDocument(doc, exists);
   let readOnly = false;
 
+  const marquee: MarqueeContext = {
+    nodeStore,
+    geometry: geometry.store,
+    get pageId() {
+      return page.getState().pageId;
+    },
+    camera: () => cameraStore.getState(),
+    viewportOffset: () => document.getElementById("editor-viewport")?.getBoundingClientRect() ?? { left: 0, top: 0 },
+  };
+
   return {
     doc,
     origin,
-    pageId,
+    get pageId() {
+      return page.getState().pageId;
+    },
+    page,
+    setPage(next) {
+      const current = page.getState().pageId;
+      if (next === current) return;
+      const { x, y, zoom } = cameraStore.getState();
+      cameras.set(current, { x, y, zoom });
+      selectionStore.getState().clear();
+      page.setState({ pageId: next });
+      cameraStore.getState().setCamera(cameras.get(next) ?? { x: 0, y: 0, zoom: 1 });
+    },
     nodeStore,
     geometry,
     undo,
@@ -91,13 +122,7 @@ export function createCanvasRuntime(options: {
     },
     // ED-053: node vs area kosong (marquee) bergantung pada seleksi saat ditekan.
     resolveTarget: (hit) => resolvePressTarget(hit, selectionStore.getState().selectedIds, lookup),
-    marquee: {
-      nodeStore,
-      geometry: geometry.store,
-      pageId,
-      camera: () => cameraStore.getState(),
-      viewportOffset: () => document.getElementById("editor-viewport")?.getBoundingClientRect() ?? { left: 0, top: 0 },
-    },
+    marquee,
     isReadOnly: () => readOnly,
     setReadOnly: (next) => {
       readOnly = next;
@@ -110,6 +135,11 @@ export function createCanvasRuntime(options: {
       nodeStore.destroy();
     },
   };
+}
+
+/** Page aktif runtime untuk komponen React (render ulang saat page berganti). */
+export function usePageId(runtime: CanvasRuntime): string {
+  return useStore(runtime.page, (state) => state.pageId);
 }
 
 export const CanvasRuntimeContext = createContext<CanvasRuntime | null>(null);

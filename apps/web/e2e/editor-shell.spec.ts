@@ -26,7 +26,9 @@ test("situs milik sendiri → shell editor dengan nama situs & tombol kembali (A
   const siteId = await newUserWithSite(page, "Toko Kopi Sari");
   await page.goto(`${APP_URL}/editor/${siteId}?page=pg_home000001`);
   await expect(page.getByTestId("editor-site-name")).toHaveText("Toko Kopi Sari");
-  await expect(page.getByTestId("editor-canvas-slot")).toHaveAttribute("data-page-id", "pg_home000001");
+  // `?page=` diteruskan ke editor; ID yang tidak ada di dokumen → page aktif = page pertama (ED-032).
+  await expect(page.getByTestId("editor-canvas-slot")).toHaveAttribute("data-requested-page-id", "pg_home000001");
+  await expect(page.getByTestId("editor-canvas-slot")).toHaveAttribute("data-page-id", /^pg_/);
   await page.getByRole("link", { name: "Back to dashboard" }).click();
   await expect(page).toHaveURL(`${APP_URL}/sites`);
 });

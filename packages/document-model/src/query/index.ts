@@ -2,6 +2,7 @@ export { type AssetRefLocation, collectAssetRefs, gcAssets } from "./assets";
 export { breakpointForWidth } from "./breakpoints";
 export { type BrokenLink, collectLinkRefs, findBrokenLinks, type LinkRefLocation } from "./links";
 export { jsonEqual, normalizeOverrides } from "./normalize-overrides";
+export { slugify, uniquePagePath } from "./page-paths";
 export { type PageSummary, summarizePages } from "./pages";
 export {
   applyStylePatch,

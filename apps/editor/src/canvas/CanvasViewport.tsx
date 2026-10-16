@@ -10,7 +10,7 @@ import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-t
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
-import { type CanvasRuntime, CanvasRuntimeContext } from "./canvas-runtime";
+import { type CanvasRuntime, CanvasRuntimeContext, usePageId } from "./canvas-runtime";
 import { type DragSessionDeps, useDragSessions } from "./drag/use-drag-sessions";
 import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { CanvasFrames } from "./frames/CanvasFrames";
@@ -65,6 +65,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   const viewportRef = useRef<HTMLElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
   const deps = useMemo(() => runtimeDeps(runtime), [runtime]);
+  const pageId = usePageId(runtime);
   const { setAppliedZoom } = runtime.geometry;
   useToolShortcuts();
   useUndoShortcuts(runtime.undo, deps.canEdit);
@@ -141,7 +142,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
         <NodeErrorActionsContext.Provider value={deps.nodeErrors}>
           <UndoContext.Provider value={runtime.undo}>
             <CanvasFrames
-              pageId={runtime.pageId}
+              pageId={pageId}
               showAll={frameOptions.showAll}
               mode={frameOptions.mode}
               scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}

@@ -13,7 +13,7 @@ import { type KeyboardEvent, useState, useSyncExternalStore } from "react";
 import { useStore } from "zustand";
 import { zoomStep, zoomTo } from "../../canvas/camera-commands";
 import { cameraStore } from "../../canvas/camera-store";
-import type { CanvasRuntime } from "../../canvas/canvas-runtime";
+import { type CanvasRuntime, usePageId } from "../../canvas/canvas-runtime";
 import { zoomTo100, zoomToFit, zoomToSelection } from "../../canvas/fit-commands";
 import type { ConnectionStatus } from "../../collaboration/document-session";
 import { useNodes } from "../../document/use-node";
@@ -93,7 +93,7 @@ function SelectionInfo({ runtime }: { runtime: CanvasRuntime }) {
 
 export function BottomBar({ runtime, connection }: { runtime: CanvasRuntime; connection: ConnectionStatus }) {
   const t = useT();
-  const nodeCount = usePageNodeCount(runtime.doc, runtime.nodeStore, runtime.pageId);
+  const nodeCount = usePageNodeCount(runtime.doc, runtime.nodeStore, usePageId(runtime));
   const { soft, hard } = DOCUMENT_LIMITS.nodesPerPage;
   const online = connection === "synced";
   return (
