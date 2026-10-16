@@ -221,3 +221,62 @@ test("T2.8.7 ED-085: min/max width & height", async ({ page }) => {
   await expect.poll(async () => (await sizeOf())?.minWidth?.value).toBe(50);
   expect((await sizeOf())?.maxHeight?.value).toBe(200);
 });
+
+test("T2.8.10 ED-088: toggle absolute position untuk anak auto-layout", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Absolute Child")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const flex = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            layout: {
+              mode: "flex",
+              direction: "row",
+              padding: { top: { value: 10, unit: "px" }, left: { value: 10, unit: "px" } },
+            },
+            position: { type: "absolute", x: 0, y: 0 },
+            size: {
+              width: { mode: "fixed", value: 300, unit: "px" },
+              height: { mode: "fixed", value: 120, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  const child = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: flex,
+        type: "frame",
+        style: {
+          base: {
+            size: { width: { mode: "fixed", value: 60, unit: "px" }, height: { mode: "fixed", value: 60, unit: "px" } },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), child);
+  await expect.poll(() => page.evaluate((id) => window.__editorTestApi?.getGeometry(id) ?? null, child)).not.toBeNull();
+
+  const posType = () =>
+    page.evaluate((id) => {
+      const d = window.__editorTestApi?.getDoc() as {
+        nodes: Record<string, { style: { base: { position?: { type?: string } } } }>;
+      };
+      return d?.nodes[id]?.style.base.position?.type;
+    }, child);
+
+  await page.getByTestId("inspector").getByTestId("inspector-absolute").click();
+  await expect.poll(posType).toBe("absolute");
+  await page.getByTestId("inspector").getByTestId("inspector-absolute").click();
+  await expect.poll(posType).toBe("flow");
+});

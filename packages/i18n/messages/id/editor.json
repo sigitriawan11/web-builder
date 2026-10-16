@@ -193,7 +193,8 @@
     "minWidthShort": "Min W",
     "maxWidthShort": "Maks W",
     "minHeightShort": "Min H",
-    "maxHeightShort": "Maks H"
+    "maxHeightShort": "Maks H",
+    "absolutePosition": "Posisi absolut"
   },
   "nodeType": {
     "page": "Page",

@@ -1,4 +1,6 @@
 import { type Node, resolveStyle, runCommand, updateStyle } from "@platform/document-model";
+import { cn } from "@platform/ui";
+import { Anchor } from "lucide-react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useWorldRects } from "../../canvas/overlay/use-world-rects";
@@ -78,6 +80,29 @@ export function PositionSizeSection({
     });
   };
 
+  // ED-088: toggle "Absolute position" untuk anak auto-layout → keluar dari flow (keepVisualPosition).
+  const firstPosition = nodes[0] ? resolveStyle(nodes[0].style, "base").position : undefined;
+  const isAbsolute = firstPosition?.type === "absolute";
+  const hasParent = nodes.every((node) => node.parentId !== null);
+  const setAbsolute = (on: boolean) => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runtime.doc.transact(() => {
+      nodes.forEach((node, index) => {
+        const rect = rects[index];
+        const patch = on
+          ? {
+              type: "absolute" as const,
+              x: rect ? round(rect.x - parentX(node)) : 0,
+              y: rect ? round(rect.y - parentY(node)) : 0,
+            }
+          : { type: "flow" as const };
+        runCommand(ctx(), updateStyle, { ids: [node.id], patch: { position: patch } });
+      });
+    }, runtime.origin);
+    runtime.undo.stopCapturing();
+  };
+
   // ED-084: mode sizing per sumbu (Fixed / Hug / Fill). Fixed memakai nilai terukur sebagai titik awal.
   const sizeModeValue = (axis: "width" | "height") =>
     mixedValue(nodes.map((node) => resolveStyle(node.style, "base").size?.[axis]?.mode ?? "fixed"));
@@ -99,33 +124,52 @@ export function PositionSizeSection({
     <InspectorSection id="layout-box" title={t("inspector.positionSize")}>
       <AlignToolbar runtime={runtime} selectedIds={ids} readOnly={readOnly} />
       <InspectorRow label={t("inspector.position")}>
-        <div className="grid grid-cols-2 gap-1">
-          <NumberInput
-            label={t("inspector.x")}
-            scrubLabel="X"
-            value={xValue}
-            testId="inspector-x"
-            onCommit={(update) =>
-              commit(
-                update,
-                (node, i) => (rects[i] ? (rects[i]?.x ?? 0) - parentX(node) : undefined),
-                (node, value) => setPosition(node, "x", value),
-              )
-            }
-          />
-          <NumberInput
-            label={t("inspector.y")}
-            scrubLabel="Y"
-            value={yValue}
-            testId="inspector-y"
-            onCommit={(update) =>
-              commit(
-                update,
-                (node, i) => (rects[i] ? (rects[i]?.y ?? 0) - parentY(node) : undefined),
-                (node, value) => setPosition(node, "y", value),
-              )
-            }
-          />
+        <div className="flex items-center gap-1">
+          <div className="grid flex-1 grid-cols-2 gap-1">
+            <NumberInput
+              label={t("inspector.x")}
+              scrubLabel="X"
+              value={xValue}
+              testId="inspector-x"
+              onCommit={(update) =>
+                commit(
+                  update,
+                  (node, i) => (rects[i] ? (rects[i]?.x ?? 0) - parentX(node) : undefined),
+                  (node, value) => setPosition(node, "x", value),
+                )
+              }
+            />
+            <NumberInput
+              label={t("inspector.y")}
+              scrubLabel="Y"
+              value={yValue}
+              testId="inspector-y"
+              onCommit={(update) =>
+                commit(
+                  update,
+                  (node, i) => (rects[i] ? (rects[i]?.y ?? 0) - parentY(node) : undefined),
+                  (node, value) => setPosition(node, "y", value),
+                )
+              }
+            />
+          </div>
+          {hasParent ? (
+            <button
+              type="button"
+              disabled={readOnly}
+              aria-pressed={isAbsolute}
+              aria-label={t("inspector.absolutePosition")}
+              title={t("inspector.absolutePosition")}
+              data-testid="inspector-absolute"
+              className={cn(
+                "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40",
+                isAbsolute && "bg-accent text-foreground",
+              )}
+              onClick={() => setAbsolute(!isAbsolute)}
+            >
+              <Anchor className="size-3.5" />
+            </button>
+          ) : null}
         </div>
       </InspectorRow>
       <InspectorRow label={t("inspector.size")}>
