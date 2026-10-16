@@ -178,7 +178,8 @@
     "paddingRight": "Padding kanan",
     "paddingBottom": "Padding bawah",
     "paddingLeft": "Padding kiri",
-    "paddingPerSide": "Padding per sisi"
+    "paddingPerSide": "Padding per sisi",
+    "alignment": "Perataan"
   },
   "nodeType": {
     "page": "Page",

@@ -178,7 +178,8 @@
     "paddingRight": "Right padding",
     "paddingBottom": "Bottom padding",
     "paddingLeft": "Left padding",
-    "paddingPerSide": "Padding per side"
+    "paddingPerSide": "Padding per side",
+    "alignment": "Alignment"
   },
   "nodeType": {
     "page": "Page",

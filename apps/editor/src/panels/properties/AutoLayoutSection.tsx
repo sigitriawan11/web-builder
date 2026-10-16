@@ -110,6 +110,19 @@ export function AutoLayoutSection({
       flexLayouts.map((layout) => (sides.length === 1 ? lengthValue(layout.padding?.[sides[0] as Side]) : undefined)),
     );
 
+  // ED-083: alignment 9-titik. Grid kolom = sumbu horizontal, baris = vertikal; main/cross axis tergantung arah.
+  const ALIGN_NAMES = ["start", "center", "end"] as const;
+  const idxOf = (value: string | undefined) => Math.max(0, ALIGN_NAMES.indexOf((value ?? "start") as "start"));
+  const justifyIdx = idxOf(first.justify);
+  const alignIdx = idxOf(first.align);
+  const activeCol = direction === "row" ? justifyIdx : alignIdx;
+  const activeRow = direction === "row" ? alignIdx : justifyIdx;
+  const setAlign = (col: number, row: number) => {
+    const mainIdx = direction === "row" ? col : row;
+    const crossIdx = direction === "row" ? row : col;
+    applyLayout({ justify: ALIGN_NAMES[mainIdx], align: ALIGN_NAMES[crossIdx] });
+  };
+
   return (
     <InspectorSection id="auto-layout" title={t("inspector.autoLayout")}>
       <InspectorRow label={t("inspector.direction")}>
@@ -234,6 +247,30 @@ export function AutoLayoutSection({
           >
             <SquareDashed className="size-3.5" />
           </button>
+        </div>
+      </InspectorRow>
+
+      <InspectorRow label={t("inspector.alignment")}>
+        <div className="grid w-fit grid-cols-3 gap-px rounded border p-0.5">
+          {[0, 1, 2].map((row) =>
+            [0, 1, 2].map((col) => {
+              const active = !autoGap && activeCol === col && activeRow === row;
+              return (
+                <button
+                  key={`${col}-${row}`}
+                  type="button"
+                  disabled={readOnly}
+                  aria-pressed={active}
+                  aria-label={`${t("inspector.alignment")} ${col + 1},${row + 1}`}
+                  data-testid={`auto-layout-align-${col}-${row}`}
+                  className="flex size-4 items-center justify-center rounded-sm hover:bg-accent disabled:opacity-40"
+                  onClick={() => setAlign(col, row)}
+                >
+                  <span className={cn("size-1 rounded-full", active ? "bg-foreground" : "bg-muted-foreground/40")} />
+                </button>
+              );
+            }),
+          )}
         </div>
       </InspectorRow>
     </InspectorSection>

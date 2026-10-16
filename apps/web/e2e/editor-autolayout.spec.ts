@@ -176,3 +176,32 @@ test("T2.8.3/2.8.4 ED-081/082: panel gap (+Auto) & padding (H/V, per sisi)", asy
     })
     .toEqual([4, 16, 8, 16]);
 });
+
+test("T2.8.5 ED-083: alignment 9-titik mengatur justify/align", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Auto Layout Align")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: { base: { layout: { mode: "flex", direction: "row" }, size: sizeFixed(300, 200) } },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  const inspector = page.getByTestId("inspector");
+  const layoutOf = () =>
+    doc(page).then((d) => d.nodes[frame]?.style.base.layout as { justify?: string; align?: string } | undefined);
+
+  // Row: kolom = justify (horizontal), baris = align (vertikal). Sel (2,2) → end/end.
+  await inspector.getByTestId("auto-layout-align-2-2").click();
+  await expect.poll(async () => await layoutOf()).toMatchObject({ justify: "end", align: "end" });
+
+  // Sel (1,0) → justify center, align start.
+  await inspector.getByTestId("auto-layout-align-1-0").click();
+  await expect.poll(async () => await layoutOf()).toMatchObject({ justify: "center", align: "start" });
+});
