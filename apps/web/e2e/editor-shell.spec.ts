@@ -52,6 +52,29 @@ test("ID tidak valid → 404; bahasa mengikuti cookie NEXT_LOCALE", async ({ pag
   await expect(page.getByRole("heading", { name: "Website tidak ditemukan" })).toBeVisible();
 });
 
+test("ganti bahasa dari menu editor tanpa reload; tersimpan di profil (AC ED-221)", async ({ page }) => {
+  const siteId = await newUserWithSite(page, "Toko Kopi Sari");
+  await page.goto(`${APP_URL}/editor/${siteId}`);
+  await expect(page.getByRole("link", { name: "Back to dashboard" })).toBeVisible();
+  // Penanda di window: hilang bila halaman dimuat ulang.
+  await page.evaluate(() => {
+    (window as unknown as { __noReload: boolean }).__noReload = true;
+  });
+  await page.getByRole("button", { name: "Language" }).click();
+  await page.getByRole("menuitem", { name: "Bahasa Indonesia" }).click();
+  await expect(page.getByRole("link", { name: "Kembali ke dashboard" })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "id");
+  expect(await page.evaluate(() => (window as unknown as { __noReload?: boolean }).__noReload)).toBe(true);
+  await expect(page.getByTestId("editor-site-name")).toHaveText("Toko Kopi Sari");
+
+  // Tersimpan di profil: dashboard ikut berbahasa Indonesia.
+  await expect
+    .poll(async () => page.evaluate(async () => (await (await fetch("/api/v1/account/profile")).json()).data.locale))
+    .toBe("id");
+  await page.goto(`${APP_URL}/sites`);
+  await expect(page.getByRole("heading", { level: 1, name: "Website" })).toBeVisible();
+});
+
 test("sesi basi → editor mengarahkan ke login dengan next", async ({ context, page }) => {
   await context.addCookies([{ name: "platform.session_token", value: "basi", url: APP_URL }]);
   const siteId = "0199f0aa-1234-7abc-8def-0123456789ab";

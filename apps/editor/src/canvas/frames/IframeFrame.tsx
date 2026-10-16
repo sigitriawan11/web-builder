@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useT } from "../../app/i18n";
 import { loadSiteFont, SITE_FONT_WEIGHTS } from "../fonts/site-fonts";
 import { TEXT_EDITOR_CSS } from "../isolation";
 import type { FrameSpec } from "./frame-layout";
@@ -19,6 +20,7 @@ interface IframeFrameProps {
 }
 
 export function IframeFrame({ frame, siteFont, children }: IframeFrameProps) {
+  const t = useT();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [body, setBody] = useState<HTMLElement | null>(null);
   const [height, setHeight] = useState(900);
@@ -58,7 +60,7 @@ export function IframeFrame({ frame, siteFont, children }: IframeFrameProps) {
     <>
       <iframe
         ref={iframeRef}
-        title={frame.label}
+        title={t(`breakpoints.${frame.breakpoint}`)}
         className={`bp-frame bp-iframe bp-${frame.breakpoint}`}
         style={{
           position: "absolute",

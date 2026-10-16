@@ -10,7 +10,7 @@ export default function MarketingHome() {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="flex items-center justify-between px-6 py-4">
-        <span className="text-lg font-semibold">Platform</span>
+        <span className="text-lg font-semibold">{t("id", "common", "brand")}</span>
         <Button asChild variant="ghost">
           <a href={`${app}/login`}>{t("id", "common", "landing.login")}</a>
         </Button>

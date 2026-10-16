@@ -61,6 +61,16 @@
           }
         }
       }
+    },
+    {
+      "includes": [
+        "apps/editor/src/**/*.tsx",
+        "apps/web/src/**/*.tsx",
+        "packages/ui/src/**/*.tsx",
+        "!**/*.test.tsx",
+        "!apps/web/src/app/(app)/(dev)/**"
+      ],
+      "plugins": ["./tools/biome/jsx-literal.grit"]
     }
   ]
 }

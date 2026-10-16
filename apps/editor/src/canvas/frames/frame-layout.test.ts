@@ -3,7 +3,7 @@ import { FRAME_GAP, frameOptionsFromSearch, layoutFrames } from "./frame-layout"
 
 describe("layoutFrames (ED-034)", () => {
   it("default hanya Desktop di origin world", () => {
-    expect(layoutFrames(false)).toEqual([{ breakpoint: "base", label: "Desktop", width: 1440, x: 0 }]);
+    expect(layoutFrames(false)).toEqual([{ breakpoint: "base", width: 1440, x: 0 }]);
   });
 
   it("semua device berdampingan dengan jarak 100px world", () => {

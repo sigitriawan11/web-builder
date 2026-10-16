@@ -1,0 +1,21 @@
+// Lint kustom ACC-290 / ED-221: teks UI di JSX wajib lewat key i18n @platform/i18n (ID & EN). Menandai teks JSX,
+// atribut yang dibaca pengguna (aria-label, title, placeholder, alt), dan string literal di ekspresi JSX — minimal
+// 2 huruf (angka & tanda baca seperti "404", "·" lolos). Dipasang lewat `overrides` biome.json untuk apps/editor,
+// apps/web & packages/ui (tanpa test). Pengecualian per baris: `biome-ignore lint/plugin: <alasan>`.
+language js(typescript, jsx)
+
+or {
+  JsxText() as $node where { $node <: r"(?s).*\p{L}{2,}.*" },
+  JsxAttribute(name=$name, initializer=JsxAttributeInitializerClause(value=JsxString() as $node)) where {
+    $name <: or {
+      `aria-label`,
+      `title`,
+      `placeholder`,
+      `alt`
+    },
+    $node <: r"(?s).*\p{L}{2,}.*"
+  },
+  JsxExpressionChild(expression=JsStringLiteralExpression() as $node) where { $node <: r"(?s).*\p{L}{2,}.*" }
+} where {
+  register_diagnostic(span=$node, message="Teks UI literal di JSX — pakai key i18n @platform/i18n (ACC-290, ED-221).")
+}

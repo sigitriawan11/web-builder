@@ -8,17 +8,17 @@ export type FrameMode = (typeof FRAME_MODES)[number];
 
 export interface FrameSpec {
   breakpoint: Breakpoint;
-  label: string;
+  // Nama untuk pengguna dari i18n `editor.breakpoints.<breakpoint>` (ED-221).
   width: number;
   // Posisi kiri frame di world.
   x: number;
 }
 
 // DM-035: previewWidth default; ED-034: jarak antar frame 100px world.
-const PREVIEW_WIDTHS: { breakpoint: Breakpoint; label: string; width: number }[] = [
-  { breakpoint: "base", label: "Desktop", width: 1440 },
-  { breakpoint: "tablet", label: "Tablet", width: 768 },
-  { breakpoint: "mobile", label: "Mobile", width: 390 },
+const PREVIEW_WIDTHS: { breakpoint: Breakpoint; width: number }[] = [
+  { breakpoint: "base", width: 1440 },
+  { breakpoint: "tablet", width: 768 },
+  { breakpoint: "mobile", width: 390 },
 ];
 export const FRAME_GAP = 100;
 

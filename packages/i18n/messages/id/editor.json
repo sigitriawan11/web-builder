@@ -12,6 +12,12 @@
       "title": "Editor mengalami kesalahan",
       "description": "Muat ulang halaman untuk mencoba lagi.",
       "reload": "Muat ulang"
-    }
+    },
+    "language": "Bahasa"
+  },
+  "breakpoints": {
+    "base": "Desktop",
+    "tablet": "Tablet",
+    "mobile": "Mobile"
   }
 }

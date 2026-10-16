@@ -12,6 +12,12 @@
       "title": "The editor ran into a problem",
       "description": "Reload the page to try again.",
       "reload": "Reload"
-    }
+    },
+    "language": "Language"
+  },
+  "breakpoints": {
+    "base": "Desktop",
+    "tablet": "Tablet",
+    "mobile": "Mobile"
   }
 }

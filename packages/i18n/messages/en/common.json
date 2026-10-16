@@ -21,5 +21,6 @@
     "title": "Page not found",
     "description": "The link may be wrong or the page has moved.",
     "home": "Back to home"
-  }
+  },
+  "brand": "Platform"
 }

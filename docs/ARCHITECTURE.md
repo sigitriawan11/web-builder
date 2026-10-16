@@ -1475,7 +1475,7 @@ Detail & contoh di [CLAUDE.md](../CLAUDE.md).
 - **Error handling:** lempar `AppError(code, httpStatus, details?)` dari service; jangan `throw new Error('...')` untuk error yang diharapkan. Fungsi murni boleh mengembalikan `Result<T, E>`. Jangan menelan error tanpa log.
 - **Transaksi:** service membuka `db.transaction()`; enqueue job **setelah** commit (pola outbox sederhana: `afterCommit` hook) agar worker tidak membaca data yang belum ada.
 - **Async & side effects:** semua efek samping lambat (email, render, AI, HTTP keluar) lewat queue.
-- **Biome** untuk format + lint, **dependency-cruiser** untuk boundary, Conventional Commits.
+- **Biome** untuk format + lint, **dependency-cruiser** untuk boundary, Conventional Commits. Lint kustom i18n (ACC-290/ED-221): plugin GritQL `tools/biome/jsx-literal.grit` (lewat `overrides` biome.json untuk `apps/editor`, `apps/web`, `packages/ui`) menolak teks UI literal di JSX & atribut `aria-label`/`title`/`placeholder`/`alt`; pengecualian per baris `biome-ignore lint/plugin: <alasan>`, katalog dev `/dev/ui` dikecualikan. Kelengkapan katalog id/en: `pnpm i18n:check`.
 
 ---
 

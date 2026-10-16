@@ -5,6 +5,7 @@ import { Button } from "@platform/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import { useEffect } from "react";
 import { useT } from "./i18n";
+import { LanguageMenu, ProfileLocaleSync } from "./LanguageMenu";
 // Tailwind + token UI hanya dimuat rute produk (modul ini di-lazy-load): playground canvas M0 & mode isolasi
 // eksperimennya (prefix/none, ADR-012) tetap tanpa preflight global.
 import "../styles/app.css";
@@ -49,7 +50,11 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
         <h1 className="truncate text-sm font-semibold" data-testid="editor-site-name">
           {site.name}
         </h1>
+        <div className="ml-auto flex items-center gap-1">
+          <LanguageMenu />
+        </div>
       </header>
+      <ProfileLocaleSync />
       <main
         className="flex flex-1 items-center justify-center bg-muted/40 text-sm text-muted-foreground"
         data-testid="editor-canvas-slot"
