@@ -4,10 +4,12 @@ import type { UndoController } from "./undo-controller";
 import { undoShortcut } from "./undo-shortcut";
 
 // ED-197: shortcut undo/redo dokumen. Saat mengetik (edit teks inline), undo milik Tiptap yang berlaku.
-export function useUndoShortcuts(controller: UndoController): void {
+const ALWAYS = () => true;
+
+export function useUndoShortcuts(controller: UndoController, enabled: () => boolean = ALWAYS): void {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (isEditableEvent(event)) return;
+      if (isEditableEvent(event) || !enabled()) return;
       const action = undoShortcut(event);
       if (!action) return;
       event.preventDefault();
@@ -16,5 +18,5 @@ export function useUndoShortcuts(controller: UndoController): void {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [controller]);
+  }, [controller, enabled]);
 }

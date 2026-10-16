@@ -29,6 +29,8 @@ export function useEditorTestHook(session: DocumentSession, runtime: CanvasRunti
       unsaved: () => session.save.hasUnsaved(),
       pageIds: () => session.doc.getArray<string>(YDOC_KEYS.pageOrder).toArray(),
       renamePage: (pageId, title) => {
+        // Sama dengan UI: sesi read-only (lock/akses) tidak mengubah dokumen.
+        if (runtime.isReadOnly()) return false;
         // Aksi diskrit (seperti commit drag): tidak digabung captureTimeout dengan aksi sebelumnya.
         runtime.undo.stopCapturing();
         return runCommand(ctx, updatePage, { id: pageId, patch: { title } }).ok;

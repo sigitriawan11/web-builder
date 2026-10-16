@@ -45,5 +45,21 @@
   "panelError": {
     "title": "Panel ini mengalami masalah",
     "reload": "Muat ulang panel"
+  },
+  "lock": {
+    "title": "Sedang diedit oleh {name}",
+    "description": "Hanya satu orang yang bisa mengedit situs ini dalam satu waktu. Jika Anda mengambil alih, {name} beralih ke mode lihat saja.",
+    "takeover": "Ambil alih",
+    "viewOnly": "Lihat saja",
+    "banner": "Mode lihat saja — {name} sedang mengedit situs ini.",
+    "released": "{name} sudah selesai mengedit.",
+    "startEditing": "Mulai mengedit"
+  },
+  "access": {
+    "forbidden": "Akses edit Anda ke situs ini sudah tidak ada. Editor dalam mode lihat saja.",
+    "sessionTitle": "Sesi Anda berakhir",
+    "sessionDescription": "Perubahan tetap tersimpan di perangkat ini. Masuk lagi di tab baru, lalu sambungkan ulang.",
+    "login": "Masuk lagi",
+    "reconnect": "Sambungkan ulang"
   }
 }

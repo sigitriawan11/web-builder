@@ -45,5 +45,21 @@
   "panelError": {
     "title": "This panel ran into a problem",
     "reload": "Reload panel"
+  },
+  "lock": {
+    "title": "{name} is editing",
+    "description": "Only one person can edit this website at a time. If you take over, {name} switches to view-only mode.",
+    "takeover": "Take over",
+    "viewOnly": "View only",
+    "banner": "View-only mode — {name} is editing this website.",
+    "released": "{name} has finished editing.",
+    "startEditing": "Start editing"
+  },
+  "access": {
+    "forbidden": "You no longer have edit access to this website. The editor is view-only.",
+    "sessionTitle": "Your session has ended",
+    "sessionDescription": "Your changes are still kept on this device. Sign in again in a new tab, then reconnect.",
+    "login": "Sign in again",
+    "reconnect": "Reconnect"
   }
 }

@@ -1,5 +1,6 @@
 import { Redis } from "ioredis";
-import { E2E_REDIS_URL, MAILPIT_API } from "../../playwright.config";
+import pg from "pg";
+import { E2E_DATABASE_URL, E2E_REDIS_URL, MAILPIT_API } from "../../playwright.config";
 
 // Helper e2e untuk stack khusus (T1.14.4): reset rate limit di Redis e2e & baca email dari Mailpit.
 
@@ -51,4 +52,25 @@ export function linkIn(text: string, fragment: string): string {
   const url = (text.match(/https?:\/\/[^\s)>\]]+/g) ?? []).find((candidate) => candidate.includes(fragment));
   if (!url) throw new Error(`tautan ${fragment} tidak ada di email`);
   return url;
+}
+
+/**
+ * Jadikan user `email` anggota workspace (langsung di DB e2e) — undangan workspace belum ada di M1, padahal test
+ * lock butuh dua user pada satu situs.
+ */
+export async function addWorkspaceMember(workspaceId: string, email: string, role: "admin" | "editor" | "viewer") {
+  const client = new pg.Client({ connectionString: E2E_DATABASE_URL });
+  await client.connect();
+  try {
+    const user = await client.query<{ id: string }>("select id from users where email = $1", [email]);
+    const userId = user.rows[0]?.id;
+    if (!userId) throw new Error(`user ${email} tidak ada`);
+    await client.query("insert into workspace_members (workspace_id, user_id, role) values ($1, $2, $3)", [
+      workspaceId,
+      userId,
+      role,
+    ]);
+  } finally {
+    await client.end();
+  }
 }

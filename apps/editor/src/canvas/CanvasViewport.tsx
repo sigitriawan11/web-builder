@@ -52,7 +52,8 @@ function runtimeDeps(runtime: CanvasRuntime) {
     // Pelaporan ke Sentry menyusul (T1.15.16); sampai itu cukup log dengan ID node.
     reportNode: (id, error) => console.error(`editor: laporan node rusak "${id}"`, error),
   };
-  return { interaction, drag, select, nodeErrors };
+  const canEdit = () => !runtime.isReadOnly();
+  return { interaction, drag, select, nodeErrors, canEdit };
 }
 
 // Viewport canvas untuk satu dokumen (`runtime`): playground M0 (fixture) maupun editor situs (Y.Doc realtime).
@@ -62,7 +63,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   const deps = useMemo(() => runtimeDeps(runtime), [runtime]);
   const { setAppliedZoom } = runtime.geometry;
   useToolShortcuts();
-  useUndoShortcuts(runtime.undo);
+  useUndoShortcuts(runtime.undo, deps.canEdit);
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
   useTextEditingInteractions(viewportRef);

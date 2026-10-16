@@ -32,6 +32,9 @@ export interface CanvasRuntime {
   hitTest(clientX: number, clientY: number): HitResult | null;
   resolveTarget(hit: { nodeId: string; path: readonly string[] } | null): PressTarget;
   marquee: MarqueeContext;
+  // ED-229: sesi read-only (lock user lain / akses dicabut) — canvas & shortcut tidak boleh mengubah dokumen.
+  isReadOnly(): boolean;
+  setReadOnly(readOnly: boolean): void;
   destroy(): void;
 }
 
@@ -60,6 +63,7 @@ export function createCanvasRuntime(options: {
     exists,
   });
   const stopUiSync = syncUiWithDocument(doc, exists);
+  let readOnly = false;
 
   return {
     doc,
@@ -81,6 +85,10 @@ export function createCanvasRuntime(options: {
       pageId,
       camera: () => cameraStore.getState(),
       viewportOffset: () => document.getElementById("editor-viewport")?.getBoundingClientRect() ?? { left: 0, top: 0 },
+    },
+    isReadOnly: () => readOnly,
+    setReadOnly: (next) => {
+      readOnly = next;
     },
     destroy() {
       doc.off("afterTransaction", onTransaction);

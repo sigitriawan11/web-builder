@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 import { APP_URL, REALTIME_URL } from "../playwright.config";
 import { register } from "./support/auth";
 import "./support/editor";
-import { resetRateLimits, uniqueEmail } from "./support/stack";
+import { addWorkspaceMember, resetRateLimits, uniqueEmail } from "./support/stack";
 
 // T1.15.7: lifecycle Y.Doc editor — IndexedDB → token → Hocuspocus (stack e2e dengan realtime sungguhan).
 test.describe.configure({ mode: "serial" });
@@ -200,4 +200,85 @@ test("banner offline tampil saat jaringan mati dan hilang saat online (ED-201)",
   await expect(page.getByTestId("offline-banner")).toContainText("You're offline.");
   await context.setOffline(false);
   await expect(page.getByTestId("offline-banner")).toHaveCount(0, { timeout: 15_000 });
+});
+
+test("lock satu pengedit: user kedua → dialog takeover; ambil alih → user pertama jadi lihat saja (T1.15.14)", async ({
+  browser,
+  page,
+}) => {
+  const siteId = await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const workspaceId = await page.evaluate(
+    async () => ((await (await fetch("/api/v1/workspaces")).json()) as { data: { id: string }[] }).data[0]?.id ?? "",
+  );
+
+  // User kedua, anggota editor workspace yang sama.
+  const second = await browser.newContext({ locale: "en-US" });
+  const other = await second.newPage();
+  const otherEmail = uniqueEmail("lock");
+  await register(other, otherEmail, undefined, "Budi Santoso");
+  await expect(other).toHaveURL(/\/verify-email\?step=code/);
+  await addWorkspaceMember(workspaceId, otherEmail, "editor");
+  await other.goto(`${APP_URL}/editor/${siteId}`);
+
+  const dialog = other.getByTestId("takeover-dialog");
+  await expect(dialog).toContainText("Sari Wulandari is editing");
+  await expect(other.getByTestId("read-only-blocker")).toBeVisible();
+  const pageId = await other.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  // Mode lihat saja: perubahan ditolak di klien (server juga menolak koneksi read-only).
+  expect(await other.evaluate((id) => window.__editorTest?.renamePage(id, "Tidak boleh"), pageId)).toBe(false);
+
+  await dialog.getByRole("button", { name: "Take over" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(other.getByTestId("read-only-blocker")).toHaveCount(0);
+  // Pemegang lama dijadikan lihat saja + ditawari mengambil alih kembali.
+  await expect(page.getByTestId("takeover-dialog")).toContainText("Budi Santoso is editing");
+  await expect(page.getByTestId("read-only-blocker")).toBeVisible();
+  expect(await page.evaluate((id) => window.__editorTest?.renamePage(id, "Ditolak"), pageId)).toBe(false);
+
+  // Pengedit baru mengubah dokumen → tersinkron ke koneksi lihat saja.
+  expect(await other.evaluate((id) => window.__editorTest?.renamePage(id, "Diedit Budi"), pageId)).toBe(true);
+  await expect(page.getByTestId("document-pages").locator("li")).toHaveText(["Diedit Budi"]);
+
+  // "Lihat saja" menutup dialog, mode lihat saja tetap.
+  await page.getByTestId("takeover-dialog").getByRole("button", { name: "View only" }).click();
+  await expect(page.getByTestId("takeover-dialog")).toBeHidden();
+  await expect(page.getByTestId("lock-banner")).toContainText("View-only mode — Budi Santoso is editing");
+
+  // Budi menutup editor → lock dilepas → Sari ditawari mulai mengedit.
+  await second.close();
+  await expect(page.getByTestId("lock-banner")).toContainText("Budi Santoso has finished editing.");
+  await page.getByTestId("lock-banner").getByRole("button", { name: "Start editing" }).click();
+  await expect(page.getByTestId("lock-banner")).toHaveCount(0);
+  expect(await page.evaluate((id) => window.__editorTest?.renamePage(id, "Kembali ke Sari"), pageId)).toBe(true);
+});
+
+test("sesi habis saat mengedit (401 token realtime) → dialog login ulang tanpa meninggalkan editor (ED-229)", async ({
+  context,
+  page,
+}) => {
+  let sockets: { close: () => Promise<void> }[] = [];
+  await context.routeWebSocket(new RegExp(`^${REALTIME_URL}`), (ws) => {
+    const server = ws.connectToServer();
+    sockets.push({ close: () => ws.close() });
+    ws.onMessage((message) => server.send(message));
+    server.onMessage((message) => ws.send(message));
+  });
+  const siteId = await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+
+  // Sesi login hilang lalu koneksi realtime putus → sambung ulang meminta token baru → 401.
+  const cookies = await context.cookies();
+  await context.clearCookies();
+  for (const socket of sockets) await socket.close();
+  sockets = [];
+  const dialog = page.getByTestId("session-expired-dialog");
+  await expect(dialog).toContainText("Your session has ended", { timeout: 15_000 });
+  await expect(page).toHaveURL(new RegExp(`/editor/${siteId}`));
+
+  // Login lagi (di sini: cookie dipulihkan) → Sambungkan ulang → tersinkron, dialog hilang.
+  await context.addCookies(cookies);
+  await dialog.getByRole("button", { name: "Reconnect" }).click();
+  await expect(dialog).toBeHidden({ timeout: 15_000 });
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced", { timeout: 15_000 });
 });

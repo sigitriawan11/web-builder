@@ -9,6 +9,7 @@ import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
 import { discardLocalDocument } from "../collaboration/document-session";
+import { EditAccessGate, useEditAccess } from "../collaboration/EditAccessGate";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
@@ -75,6 +76,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
       </header>
       <ProfileLocaleSync />
       {session ? <SessionBanners session={session} status={status} /> : null}
+      {session ? <EditAccessGate session={session} /> : null}
       <div className="flex min-h-0 flex-1 bg-muted/40" data-testid="editor-canvas-slot" data-page-id={pageId ?? ""}>
         {session && status !== "loading" ? (
           <DocumentWorkspace session={session} pageId={pageId} />
@@ -90,6 +92,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
 // di dokumen, selain itu page pertama. Daftar page sementara (panel Pages = M2) juga bukti dokumen termuat.
 function DocumentWorkspace({ session, pageId }: { session: DocumentSession; pageId: string | null }) {
   const pageOrder = usePageOrder(session.doc);
+  const readOnly = useEditAccess(session).kind !== "editing";
   const activePageId = pageId && pageOrder.includes(pageId) ? pageId : (pageOrder[0] ?? null);
   // Dibuat di effect (bukan useMemo/useState): StrictMode menjalankan cleanup lalu effect lagi — runtime dari
   // useMemo akan sudah di-destroy (observer lepas) dan canvas berhenti mengikuti dokumen.
@@ -103,6 +106,7 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
       next.destroy();
     };
   }, [session, activePageId]);
+  useEffect(() => runtime?.setReadOnly(readOnly), [runtime, readOnly]);
   if (!runtime) return null;
   return (
     <NodeStoreContext.Provider value={runtime.nodeStore}>
@@ -118,6 +122,8 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
       </aside>
       <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
         <CanvasViewport runtime={runtime} />
+        {/* ED-229: mode lihat saja — pointer ke canvas ditahan (server juga menolak update koneksi read-only). */}
+        {readOnly ? <div className="absolute inset-0 z-10 cursor-not-allowed" data-testid="read-only-blocker" /> : null}
       </div>
     </NodeStoreContext.Provider>
   );
