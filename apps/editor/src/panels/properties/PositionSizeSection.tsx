@@ -2,6 +2,7 @@ import { type Node, resolveStyle, runCommand, updateStyle } from "@platform/docu
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useWorldRects } from "../../canvas/overlay/use-world-rects";
+import { AlignToolbar } from "./AlignToolbar";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { NumberInput, type NumberUpdate } from "./inputs/NumberInput";
 import { mixedValue } from "./mixed";
@@ -65,6 +66,7 @@ export function PositionSizeSection({
 
   return (
     <InspectorSection id="layout-box" title={t("inspector.positionSize")}>
+      <AlignToolbar runtime={runtime} selectedIds={ids} readOnly={readOnly} />
       <InspectorRow label={t("inspector.position")}>
         <div className="grid grid-cols-2 gap-1">
           <NumberInput

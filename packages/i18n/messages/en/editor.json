@@ -150,7 +150,20 @@
     "x": "X position",
     "y": "Y position",
     "width": "Width",
-    "height": "Height"
+    "height": "Height",
+    "align": {
+      "label": "Align & distribute",
+      "left": "Align left",
+      "hcenter": "Align horizontal centers",
+      "right": "Align right",
+      "top": "Align top",
+      "vcenter": "Align vertical centers",
+      "bottom": "Align bottom"
+    },
+    "distribute": {
+      "horizontal": "Distribute horizontally",
+      "vertical": "Distribute vertically"
+    }
   },
   "nodeType": {
     "page": "Page",

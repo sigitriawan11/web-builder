@@ -21,6 +21,7 @@ import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/sit
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch, layoutFrames } from "./frames/frame-layout";
 import { FramesContext, useFrameActivation } from "./frames/frames-context";
+import { useAlignShortcuts } from "./interactions/use-align-shortcuts";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLockHide } from "./interactions/use-lock-hide";
@@ -99,6 +100,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useSelectAll(runtime);
   useLockHide(runtime);
   useNudge(runtime);
+  useAlignShortcuts(runtime);
   useCreateTool(viewportRef, runtime);
   useEmptyTextCleanup(runtime);
   useTextEditingInteractions(viewportRef);

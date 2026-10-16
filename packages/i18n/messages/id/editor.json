@@ -150,7 +150,20 @@
     "x": "Posisi X",
     "y": "Posisi Y",
     "width": "Lebar",
-    "height": "Tinggi"
+    "height": "Tinggi",
+    "align": {
+      "label": "Ratakan & distribusi",
+      "left": "Ratakan kiri",
+      "hcenter": "Ratakan tengah horizontal",
+      "right": "Ratakan kanan",
+      "top": "Ratakan atas",
+      "vcenter": "Ratakan tengah vertikal",
+      "bottom": "Ratakan bawah"
+    },
+    "distribute": {
+      "horizontal": "Distribusi horizontal",
+      "vertical": "Distribusi vertikal"
+    }
   },
   "nodeType": {
     "page": "Page",
