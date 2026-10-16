@@ -139,3 +139,45 @@ test("AC ED-041/042: rectangle & ellipse tool → node shape; Shift = persegi; e
   expect((await doc(page)).nodes[ellipseId]?.type).toBe("shape");
   await expect(canvas.locator(`[data-node-id="${ellipseId}"]`)).toHaveCSS("border-radius", /50%|9999px/);
 });
+
+test("AC ED-044: text tool klik → ketik → Esc = text node auto-width dengan konten; teks kosong dihapus", async ({
+  page,
+}) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Text Tool Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+  const canvas = page.getByTestId("editor-canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("canvas tidak terlihat");
+  const pageId = await firstPageId(page);
+  const before = Object.keys((await doc(page)).nodes).length;
+
+  // Klik dengan text tool → node teks auto-width, langsung mode edit.
+  await page.keyboard.press("t");
+  await page.mouse.click(box.x + 80, box.y + 80);
+  const textId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  const node = (await doc(page)).nodes[textId];
+  expect(node?.type).toBe("text");
+  expect(node?.style.base.size?.width).toMatchObject({ mode: "hug" });
+
+  const editor = canvas.locator(`[data-node-id="${textId}"] .ProseMirror`);
+  await expect(editor).toBeFocused();
+  await page.keyboard.type("Halo dunia");
+  await page.keyboard.press("Escape");
+  expect(
+    await page.evaluate((id) => {
+      const docu = window.__editorTestApi?.getDoc() as
+        | { nodes: Record<string, { props?: { content?: unknown } }> }
+        | undefined;
+      return JSON.stringify(docu?.nodes[id]?.props?.content);
+    }, textId),
+  ).toContain("Halo dunia");
+
+  // Teks kosong: klik, langsung Esc → node dihapus (tanpa menambah jumlah).
+  await page.keyboard.press("t");
+  await page.mouse.click(box.x + 80, box.y + 160);
+  await page.keyboard.press("Escape");
+  await expect.poll(async () => Object.keys((await doc(page)).nodes).length).toBe(before + 1);
+  void pageId;
+});

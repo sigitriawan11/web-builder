@@ -30,6 +30,7 @@ import { useZoomShortcuts } from "./interactions/use-zoom-shortcuts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import { type NodeErrorActions, NodeErrorActionsContext } from "./render-root/NodeErrorBoundary";
 import { cameraForResize } from "./resize-camera";
+import { useEmptyTextCleanup } from "./text-editing/use-empty-text-cleanup";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
 
@@ -91,6 +92,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useZoomShortcuts(runtime);
   useSectionShortcuts(runtime);
   useCreateTool(viewportRef, runtime);
+  useEmptyTextCleanup(runtime);
   useTextEditingInteractions(viewportRef);
   useSelectTool(viewportRef, deps.select);
   useHoverHighlight(viewportRef, deps.select);

@@ -44,6 +44,34 @@ export function createFrame(context: CreateContext): string | null {
   return result.ok ? result.value : null;
 }
 
+/**
+ * ED-044: text node. Klik (moved=false) → auto width (hug); drag → fixed width selebar drag, tinggi hug. Konten
+ * awal kosong (langsung diedit; dihapus bila tetap kosong).
+ */
+export function createText(context: CreateContext, moved: boolean): string | null {
+  const size = moved
+    ? {
+        width: { mode: "fixed" as const, value: Math.max(24, Math.round(context.rect.width)), unit: "px" as const },
+        height: { mode: "hug" as const },
+      }
+    : { width: { mode: "hug" as const }, height: { mode: "hug" as const } };
+  const base = context.parentIsFlow
+    ? { size, typography: { $token: "type.body" } }
+    : {
+        size,
+        position: { type: "absolute" as const, x: Math.round(context.rect.x), y: Math.round(context.rect.y) },
+        typography: { $token: "type.body" },
+      };
+  const result = runCommand(ctxOf(context.runtime), createNode, {
+    parentId: context.parentId,
+    index: context.index,
+    type: "text",
+    props: { content: { type: "doc", content: [{ type: "paragraph" }] }, autoSize: moved ? "height" : "width" },
+    style: { base },
+  });
+  return result.ok ? result.value : null;
+}
+
 /** ED-041/042: shape (rect/ellipse) = node `shape`; fill default abu-abu. */
 export function createShape(shape: "rect" | "ellipse"): (context: CreateContext) => string | null {
   return (context) => {
