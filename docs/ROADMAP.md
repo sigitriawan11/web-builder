@@ -946,12 +946,15 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.5 — Selection
 
-- [ ] **T2.5.1** Multi-select Shift+klik (toggle) & bounding gabungan — ED-052 · `apps/editor/src/tools/select` · Verifikasi: e2e
-- [ ] **T2.5.2** Deep select `Mod+klik` (langsung ke node terdalam) — ED-054 · `apps/editor/src/tools/select` · Verifikasi: e2e
+- [x] **T2.5.1** Multi-select Shift+klik (toggle) & bounding gabungan — ED-052 · `apps/editor/src/tools/select` · Verifikasi: e2e
+  - Catatan: ✅ 2026-10-16 — state machine interaksi membawa `additive` (Shift) di efek `click` (dan sudah ada di marquee `commit`). `useSelectTool`: `additive` → toggle (node di seleksi → keluar; selain itu masuk), tanpa modifier → ganti seleksi. Bounding gabungan = `SelectionOverlay` multi-seleksi yang sudah ada (kotak union + outline per node, M0). Unit `interaction-machine.test` menambah assert `additive/deep` di state `pressing` & efek `click`; **e2e** `editor-selection.spec` (klik F1 → {F1}; Shift+klik F2 → {F1,F2}; Shift+klik F1 → {F2}).
+- [x] **T2.5.2** Deep select `Mod+klik` (langsung ke node terdalam) — ED-054 · `apps/editor/src/tools/select` · Verifikasi: e2e
+  - Catatan: ✅ 2026-10-16 — efek `click` membawa `deep` (`metaKey || ctrlKey`). `useSelectTool`: `deep && path.length > 0` → `path[0]` (node terdalam hit-test), abaikan aturan kedalaman ED-051. **e2e**: klik biasa di grandchild → pilih parent top-level (ED-051); Mod/Ctrl+klik di titik sama → langsung grandchild.
 - [ ] **T2.5.3** Select parent (`Shift+Enter`), child (`Enter`), sibling (Tab) — ED-055 · `apps/editor/src/commands` · Verifikasi: e2e
 - [ ] **T2.5.4** Select all (`Mod+A`) dalam konteks parent — ED-056 · `apps/editor/src/commands` · Verifikasi: e2e
 - [ ] **T2.5.5** Lock & hide (`Mod+Shift+L`, `Mod+Shift+H`): locked tidak bisa diklik di canvas tapi bisa di layers — ED-059 · `apps/editor` · Verifikasi: e2e
-- [ ] **T2.5.6** Command lock/permission di document-model (command menolak node locked kecuali `force`) — DM-075 · `packages/document-model/src/ops` · Verifikasi: unit test
+- [x] **T2.5.6** Command lock/permission di document-model (command menolak node locked kecuali `force`) — DM-075 · `packages/document-model/src/ops` · Verifikasi: unit test
+  - Catatan: ✅ 2026-10-16 — `runCommand` menolak command yang menargetkan node terkunci dengan error baru `LOCKED` (`details.nodeId`), kecuali `ctx.force === true` atau command dikecualikan (`setLocked`, `setVisible` + operasi page `createPage/updatePage/reorderPages/deletePage`) agar node tetap bisa dibuka/disembunyikan. Terkunci = **efektif**: node itu atau salah satu ancestor-nya `locked: true` (`isEffectivelyLocked` menelusuri `parentId` di `y-access.ts`). Target command dibaca dari input (`id` tunggal atau `ids` array) — jalur tunggal untuk editor, AI tools, template, migrasi. Guard berjalan sebelum `transact` (kontrak periksa-dulu, tanpa tulis parsial). `delete-nodes.test` "tumpang tindih" kini pakai `force: true` (node fixture `n_lvl4text001` memang terkunci). Verifikasi: `lock-guard.test` 4 kasus (updateStyle/rename/delete ditolak; `force` lolos; lock ancestor menular; unlock/hide tetap boleh); 609 unit document-model hijau.
 
 #### Epic 2.6 — Transformasi
 

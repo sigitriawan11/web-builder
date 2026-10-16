@@ -19,14 +19,21 @@ const node: PressTarget = { kind: "node", nodeId: "n_card000001", path: ["n_card
 const handle: PressTarget = { kind: "handle", nodeId: "n_card000001", handle: "se" };
 const empty: PressTarget = { kind: "empty", scopeId: null, path: [] };
 
-const down = (target: PressTarget, button = 0, panTool = false, pointerId = ID): InteractionEvent => ({
+const down = (
+  target: PressTarget,
+  button = 0,
+  panTool = false,
+  pointerId = ID,
+  modifiers: { additive?: boolean; deep?: boolean } = {},
+): InteractionEvent => ({
   type: "pointerDown",
   pointerId,
   button,
   point: origin,
   target,
   panTool,
-  additive: false,
+  additive: modifiers.additive ?? false,
+  deep: modifiers.deep ?? false,
 });
 const move = (point: { x: number; y: number }, pointerId = ID): InteractionEvent => ({
   type: "pointerMove",
@@ -58,6 +65,7 @@ describe("reduceInteraction — dari idle (ED-023)", () => {
       shiftKey: false,
       target: node,
       additive: false,
+      deep: false,
     });
   });
 
@@ -76,7 +84,7 @@ describe("reduceInteraction — pressing", () => {
     const { state, effects } = run(down(node), move(near), up(near));
 
     expect(state).toBe(IDLE);
-    expect(effects).toEqual([{ type: "click", target: node, point: near }]);
+    expect(effects).toEqual([{ type: "click", target: node, point: near, additive: false, deep: false }]);
   });
 
   it.each([

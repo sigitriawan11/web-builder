@@ -53,6 +53,7 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
         target,
         panTool: effectiveTool(toolStore.getState()) === "hand",
         additive: event.shiftKey,
+        deep: event.metaKey || event.ctrlKey,
       });
     };
     // ED-023: pointer capture dipasang saat tekan BERUBAH menjadi drag, bukan saat ditekan. Capture sejak

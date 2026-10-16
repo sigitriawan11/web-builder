@@ -32,7 +32,7 @@ interface PointerTrack {
 
 export type InteractionState =
   | { type: "idle" }
-  | ({ type: "pressing"; target: PressTarget; additive: boolean } & PointerTrack)
+  | ({ type: "pressing"; target: PressTarget; additive: boolean; deep: boolean } & PointerTrack)
   // `path`: rantai hit-test node yang ditekan, untuk menentukan node yang dipindah (ED-038/ED-051).
   | ({ type: "dragMove"; nodeId: string; path: readonly string[] } & PointerTrack)
   | ({ type: "dragResize"; nodeId: string; handle: ResizeHandle } & PointerTrack)
@@ -49,8 +49,10 @@ export type InteractionEvent =
       point: Point;
       target: PressTarget;
       panTool: boolean;
-      // Shift: marquee menambah ke seleksi (ED-053).
+      // Shift: marquee menambah ke seleksi (ED-053) / toggle multi-select (ED-052).
       additive: boolean;
+      // Mod (Ctrl/Meta): deep select node terdalam (ED-054).
+      deep: boolean;
     }
   | { type: "pointerMove"; pointerId: number; point: Point; shiftKey?: boolean }
   | { type: "pointerUp"; pointerId: number; point: Point }
@@ -60,7 +62,7 @@ export type InteractionEvent =
 
 export type InteractionEffect =
   // Tekan lalu lepas tanpa melewati threshold (seleksi: T0.5.4).
-  | { type: "click"; target: PressTarget; point: Point }
+  | { type: "click"; target: PressTarget; point: Point; additive: boolean; deep: boolean }
   // Drag selesai: perubahan preview di-commit ke dokumen sebagai satu transaksi (ED-024).
   | { type: "commit"; drag: DragState }
   // Drag dibatalkan (Esc, pointercancel, jendela kehilangan fokus): preview dibuang (ED-024).
@@ -125,6 +127,7 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
           shiftKey: event.additive,
           target: event.target,
           additive: event.additive,
+          deep: event.deep,
         },
         effects: [],
       };
@@ -147,7 +150,12 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
       if (state.type === "idle" || state.pointerId !== event.pointerId) return unchanged(state);
       if (state.type === "panning") return { state: IDLE, effects: [] };
       if (state.type === "pressing")
-        return { state: IDLE, effects: [{ type: "click", target: state.target, point: event.point }] };
+        return {
+          state: IDLE,
+          effects: [
+            { type: "click", target: state.target, point: event.point, additive: state.additive, deep: state.deep },
+          ],
+        };
       return { state: IDLE, effects: [{ type: "commit", drag: { ...state, current: event.point } }] };
     }
 

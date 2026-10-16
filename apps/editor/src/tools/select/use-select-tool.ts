@@ -38,10 +38,20 @@ export function useSelectTool(viewportRef: RefObject<HTMLElement | null>, deps: 
         return;
       }
       if (effect.type !== "click" || effect.target.kind === "handle") return;
-      // Latar frame yang dimasuki tetap membawa path, sehingga klik di sana memilih frame itu (ED-051).
-      const next = resolveClickSelection(effect.target.path, selectedIds, lookup);
-      if (next) select([next]);
-      else clear();
+      // ED-054: Mod+klik = node terdalam (abaikan aturan kedalaman). Selain itu aturan kedalaman ED-051.
+      const next =
+        effect.deep && effect.target.path.length > 0
+          ? (effect.target.path[0] ?? null)
+          : resolveClickSelection(effect.target.path, selectedIds, lookup);
+      // ED-052: Shift+klik = toggle di seleksi; tanpa Shift = ganti seleksi.
+      if (effect.additive) {
+        if (!next) return;
+        select(selectedIds.includes(next) ? selectedIds.filter((id) => id !== next) : [...selectedIds, next]);
+      } else if (next) {
+        select([next]);
+      } else {
+        clear();
+      }
     });
 
     const onDoubleClick = (event: MouseEvent) => {
