@@ -27,5 +27,11 @@
     "error": "Gagal menyimpan — mencoba lagi",
     "retry": "Coba sekarang",
     "autosaved": "Semua perubahan sudah tersimpan otomatis"
+  },
+  "session": {
+    "offline": "Anda sedang offline. Perubahan disimpan di perangkat ini dan dikirim otomatis saat online kembali.",
+    "recovered": "Kami memulihkan perubahan yang belum tersimpan.",
+    "noLocalPersistence": "Pemulihan offline tidak aktif di browser ini.",
+    "dismiss": "Tutup"
   }
 }

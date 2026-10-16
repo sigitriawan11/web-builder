@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { APP_URL } from "../playwright.config";
+import { APP_URL, REALTIME_URL } from "../playwright.config";
 import { register } from "./support/auth";
 import "./support/editor";
 import { resetRateLimits, uniqueEmail } from "./support/stack";
@@ -145,4 +145,59 @@ test("indikator autosave: edit → Tersimpan dikonfirmasi server; jaringan mati 
   // Mod+S tidak membuka dialog simpan browser; hanya memberi tahu.
   await page.keyboard.press("Control+s");
   await expect(page.getByRole("status").filter({ hasText: "All changes are saved automatically" })).toBeVisible();
+});
+
+test("crash recovery (ED-227): edit yang belum sampai server → tab ditutup paksa → dibuka lagi → dipulihkan & dikirim (T1.15.12)", async ({
+  browser,
+  context,
+  page,
+}) => {
+  // Proxy WebSocket realtime: saat `blocked`, pesan editor → server dibuang (seperti jaringan putus sebelum terkirim).
+  let blocked = false;
+  await context.routeWebSocket(new RegExp(`^${REALTIME_URL}`), (ws) => {
+    const server = ws.connectToServer();
+    ws.onMessage((message) => {
+      if (!blocked) server.send(message);
+    });
+    server.onMessage((message) => ws.send(message));
+  });
+  const siteId = await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+
+  blocked = true;
+  await page.evaluate((id) => window.__editorTest?.renamePage(id, "Dipulihkan"), pageId);
+  await expect(page.getByTestId("document-pages").locator("li")).toHaveText(["Dipulihkan"]);
+  // Melewati debounce flush realtime (200 ms): tetap belum terkonfirmasi → memang tidak sampai server.
+  await page.waitForTimeout(800);
+  expect(await page.evaluate(() => window.__editorTest?.unsaved())).toBe(true);
+  // Beri waktu tulis IndexedDB, lalu tutup tanpa beforeunload (≈ crash / tutup paksa).
+  await page.waitForTimeout(300);
+  await page.close({ runBeforeUnload: false });
+
+  blocked = false;
+  const reopened = await context.newPage();
+  await reopened.goto(`${APP_URL}/editor/${siteId}`);
+  await expect(reopened.getByTestId("document-pages").locator("li")).toHaveText(["Dipulihkan"]);
+  await expect(shell(reopened)).toHaveAttribute("data-connection-status", "synced");
+  await expect(reopened.getByTestId("recovery-banner")).toContainText("We recovered changes that hadn't been saved.");
+
+  // Server menerima perubahan: perangkat lain (IndexedDB kosong) melihatnya.
+  await reopened.waitForTimeout(1_500);
+  const other = await browser.newContext({ locale: "en-US", storageState: await context.storageState() });
+  const otherPage = await other.newPage();
+  await otherPage.goto(`${APP_URL}/editor/${siteId}`);
+  await expect(otherPage.getByTestId("document-pages").locator("li")).toHaveText(["Dipulihkan"]);
+  await expect(otherPage.getByTestId("recovery-banner")).toHaveCount(0);
+  await other.close();
+});
+
+test("banner offline tampil saat jaringan mati dan hilang saat online (ED-201)", async ({ page, context }) => {
+  await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  await expect(page.getByTestId("offline-banner")).toHaveCount(0);
+  await context.setOffline(true);
+  await expect(page.getByTestId("offline-banner")).toContainText("You're offline.");
+  await context.setOffline(false);
+  await expect(page.getByTestId("offline-banner")).toHaveCount(0, { timeout: 15_000 });
 });

@@ -27,5 +27,11 @@
     "error": "Couldn't save — retrying",
     "retry": "Try now",
     "autosaved": "All changes are saved automatically"
+  },
+  "session": {
+    "offline": "You're offline. Changes are kept on this device and sent automatically when you're back online.",
+    "recovered": "We recovered changes that hadn't been saved.",
+    "noLocalPersistence": "Offline recovery isn't available in this browser.",
+    "dismiss": "Dismiss"
   }
 }

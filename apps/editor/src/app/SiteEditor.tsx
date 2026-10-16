@@ -10,6 +10,7 @@ import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtim
 import type { DocumentSession } from "../collaboration/document-session";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
+import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
 import { NodeStoreContext, useNode } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
@@ -66,6 +67,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
         </div>
       </header>
       <ProfileLocaleSync />
+      {session ? <SessionBanners session={session} status={status} /> : null}
       <div className="flex min-h-0 flex-1 bg-muted/40" data-testid="editor-canvas-slot" data-page-id={pageId ?? ""}>
         {session && status !== "loading" ? (
           <DocumentWorkspace session={session} pageId={pageId} />
