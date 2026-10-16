@@ -45,6 +45,8 @@ export function buildCsp(surface: Exclude<Surface, "api">, env: SecurityEnv, non
     ["font-src", ["'self'", "data:"]],
     ["connect-src", connectSrc],
     ["worker-src", ["'self'", "blob:"]],
+    // Iframe Turnstile (ACC-004, halaman login).
+    ["frame-src", ["'self'", "https://challenges.cloudflare.com"]],
     ["object-src", ["'none'"]],
     ["base-uri", ["'self'"]],
     ["form-action", ["'self'"]],

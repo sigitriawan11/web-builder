@@ -1,3 +1,4 @@
+import type { WeakPasswordReason } from "@platform/shared/contracts";
 import COMMON_PASSWORD_LIST from "./common-passwords.json" with { type: "json" };
 
 // Kebijakan password ACC-001: 8–128 karakter, tanpa aturan komposisi, tolak password umum.
@@ -9,7 +10,7 @@ export const PASSWORD_MAX_LENGTH = 128;
 
 const COMMON_PASSWORDS: ReadonlySet<string> = new Set(COMMON_PASSWORD_LIST);
 
-export type PasswordProblem = "too_short" | "too_long" | "too_common";
+export type PasswordProblem = WeakPasswordReason;
 
 /** Masalah pertama pada password, atau `null` bila memenuhi kebijakan. Panjang dihitung seperti Better Auth. */
 export function checkPassword(password: string): PasswordProblem | null {

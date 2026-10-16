@@ -25,6 +25,7 @@ describe("platformRewrites & editorRewriteUrl (ARCHITECTURE §3.4)", () => {
       PUBLIC_API_URL: "http://api.localhost:4000",
       PUBLIC_REALTIME_URL: "ws://realtime.localhost:4100",
       PUBLIC_ASSETS_URL: "http://localhost:9000/assets",
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
     };
     expect(loadWebEnv(valid)).toEqual({ ...valid, APP_ENV: "local" });
     expect(() => loadWebEnv({ ...valid, EDITOR_ORIGIN: undefined })).toThrow(/EDITOR_ORIGIN/);

@@ -15,7 +15,8 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "db:seed": "tsx seed/index.ts",
     "db:reset": "tsx seed/reset.ts",
-    "db:check": "sh scripts/check-migrations.sh"
+    "db:check": "sh scripts/check-migrations.sh",
+    "db:prepare-e2e": "tsx test/prepare-e2e-db.ts"
   },
   "devDependencies": {
     "@faker-js/faker": "10.6.0",

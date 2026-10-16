@@ -17,6 +17,8 @@ export const WebEnvSchema = z.object({
   PUBLIC_REALTIME_URL: z.url(),
   PUBLIC_ASSETS_URL: z.url(),
   NEXT_PUBLIC_SENTRY_DSN: z.union([z.url(), z.literal("")]).optional(),
+  // Cloudflare Turnstile site key (publik, ACC-004); lokal = kunci uji Cloudflare.
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1),
 });
 export type WebEnv = z.infer<typeof WebEnvSchema>;
 

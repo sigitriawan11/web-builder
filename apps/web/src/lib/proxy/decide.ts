@@ -25,6 +25,7 @@ const APP_PREFIXES = [
   "/verify-email",
   "/forgot-password",
   "/reset-password",
+  "/consent",
   // Katalog komponen dev (T1.15.4; 404 di production).
   "/dev",
 ];

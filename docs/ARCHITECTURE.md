@@ -1217,6 +1217,8 @@ Runtime API juga melayani endpoint publik baca yang dapat di-cache (mis. daftar 
 
 **Factories:** `packages/db/test/factories` (`createUser`, `createWorkspace`, `createSite({ plan })`, `createCollection`, `createOrder`) memakai `@faker-js/faker` locale `id_ID`; document fixture di `packages/document-model/test/fixtures`. Factory menulis lewat query builder Drizzle (bukan SQL mentah) dan menegakkan aturan bisnis yang sama dengan produk (mis. user selalu punya personal workspace + owner, situs dibuat bersama dokumennya); repository API tidak bisa dipakai karena packages dilarang mengimport apps (§4.3). Dipakai paket lain lewat `@platform/db/testing` (`createTestDb`, factories).
 
+**E2E web dengan stack sungguhan** (`apps/web`, `pnpm --filter @platform/web test:e2e`): Playwright menjalankan launcher `e2e/stack/start-stack.mjs` — DB `platform_e2e` dibuat ulang dari migration (`pnpm --filter @platform/db db:prepare-e2e`, di Postgres test), Redis DB 5 dikosongkan, worker (queue `email`) lalu api dijalankan di port sendiri (api 4310, worker 4210, web 3110); Mailpit dipakai bersama (email unik per test). Tidak menyentuh DB/Redis/dev server owner. Rate limit per IP direset antar test (`e2e/support/stack.ts`).
+
 **Asersi waktu (kinerja indikatif):** test yang mengukur durasi memakai `expectDurationBelow()` (`@platform/config/vitest/perf`) — batas waktu hanya dinilai saat `PERF_ASSERT=1` lewat `pnpm test:perf` (paket berurutan, `--concurrency=1`); di `pnpm test` paralel jalur kodenya tetap dijalankan tanpa menilai waktu. Benchmark sungguhan tetap `pnpm bench`.
 
 **Aturan:** bug yang diperbaiki wajib punya test regresi; PR yang mengubah `document-model` atau `renderer` wajib lulus snapshot + visual regression.
