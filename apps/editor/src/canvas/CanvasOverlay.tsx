@@ -4,6 +4,7 @@ import { cameraStore } from "./camera-store";
 import { useCanvasRuntime } from "./canvas-runtime";
 import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
 import { MarqueeOverlay } from "./MarqueeOverlay";
+import { DrawPreview } from "./overlay/DrawPreview";
 import { FrameLabels } from "./overlay/FrameLabels";
 import { ReorderOverlay } from "./overlay/ReorderOverlay";
 import { SelectionOverlay } from "./overlay/SelectionOverlay";
@@ -26,6 +27,7 @@ export function CanvasOverlay() {
       <MarqueeOverlay />
       <ReorderOverlay />
       <FrameLabels />
+      <DrawPreview />
       <Toasts />
       <div className="overlay-zoom-indicator">{Math.round(zoom * 100)}%</div>
     </div>

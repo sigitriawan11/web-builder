@@ -16,6 +16,7 @@ import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
 import { type CanvasRuntime, CanvasRuntimeContext, usePageId } from "./canvas-runtime";
 import { type DragSessionDeps, useDragSessions } from "./drag/use-drag-sessions";
+import { useCreateTool } from "./draw/use-create-tool";
 import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch, layoutFrames } from "./frames/frame-layout";
@@ -89,6 +90,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useZoomInteractions(viewportRef);
   useZoomShortcuts(runtime);
   useSectionShortcuts(runtime);
+  useCreateTool(viewportRef, runtime);
   useTextEditingInteractions(viewportRef);
   useSelectTool(viewportRef, deps.select);
   useHoverHighlight(viewportRef, deps.select);

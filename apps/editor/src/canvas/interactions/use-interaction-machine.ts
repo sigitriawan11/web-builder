@@ -3,6 +3,7 @@ import { isEditableEvent } from "../../commands/is-editable-target";
 import { interactionStore } from "../../store/interaction-store";
 import { textEditingStore } from "../../store/text-editing-store";
 import { effectiveTool, toolStore } from "../../tools/tool-store";
+import { isCreatorTool } from "../draw/use-create-tool";
 import type { PressTarget, ResizeHandle } from "./interaction-machine";
 
 export interface InteractionAdapterDeps {
@@ -36,6 +37,8 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
     const point = (event: PointerEvent) => ({ x: event.clientX, y: event.clientY });
 
     const onPointerDown = (event: PointerEvent) => {
+      // Tool pembuat node menangani pointer sendiri (useCreateTool) — seleksi/marquee tidak dimulai.
+      if (isCreatorTool(effectiveTool(toolStore.getState()))) return;
       const hit = deps.hitTest(event.clientX, event.clientY);
       // Di dalam teks yang sedang diedit, pointer milik editor teks (seleksi teks dengan mouse).
       const { editingId } = textEditingStore.getState();
