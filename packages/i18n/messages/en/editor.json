@@ -179,7 +179,12 @@
     "paddingBottom": "Bottom padding",
     "paddingLeft": "Left padding",
     "paddingPerSide": "Padding per side",
-    "alignment": "Alignment"
+    "alignment": "Alignment",
+    "sizeFixed": "Fixed",
+    "sizeHug": "Hug contents",
+    "sizeFill": "Fill container",
+    "widthMode": "Width sizing",
+    "heightMode": "Height sizing"
   },
   "nodeType": {
     "page": "Page",

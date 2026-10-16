@@ -179,7 +179,12 @@
     "paddingBottom": "Padding bawah",
     "paddingLeft": "Padding kiri",
     "paddingPerSide": "Padding per sisi",
-    "alignment": "Perataan"
+    "alignment": "Perataan",
+    "sizeFixed": "Fixed",
+    "sizeHug": "Hug konten",
+    "sizeFill": "Fill kontainer",
+    "widthMode": "Mode lebar",
+    "heightMode": "Mode tinggi"
   },
   "nodeType": {
     "page": "Page",

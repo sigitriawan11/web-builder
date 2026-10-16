@@ -122,3 +122,61 @@ test("AC ED-070: edit W dengan ekspresi (100*2 → 200 Fixed) & X node absolute"
     )
     .toBe(60);
 });
+
+test("T2.8.6 ED-084: mode sizing per sumbu (Fixed/Hug/Fill)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Sizing Mode")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const flex = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            layout: { mode: "flex", direction: "row" },
+            position: { type: "absolute", x: 0, y: 0 },
+            size: {
+              width: { mode: "fixed", value: 300, unit: "px" },
+              height: { mode: "fixed", value: 120, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  const child = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: flex,
+        type: "frame",
+        style: {
+          base: {
+            size: { width: { mode: "fixed", value: 80, unit: "px" }, height: { mode: "fixed", value: 60, unit: "px" } },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), child);
+
+  const widthMode = () =>
+    page.evaluate((id) => {
+      const d = window.__editorTestApi?.getDoc() as {
+        nodes: Record<string, { style: { base: { size?: { width?: { mode?: string } } } } }>;
+      };
+      return d?.nodes[id]?.style.base.size?.width?.mode;
+    }, child);
+
+  const select = page.getByTestId("inspector").getByTestId("inspector-width-mode");
+  await expect(select).toHaveValue("fixed");
+  await select.selectOption("fill");
+  await expect.poll(widthMode).toBe("fill");
+  await select.selectOption("hug");
+  await expect.poll(widthMode).toBe("hug");
+  await select.selectOption("fixed");
+  await expect.poll(widthMode).toBe("fixed");
+});

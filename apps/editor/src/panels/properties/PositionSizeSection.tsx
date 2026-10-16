@@ -5,7 +5,7 @@ import { useWorldRects } from "../../canvas/overlay/use-world-rects";
 import { AlignToolbar } from "./AlignToolbar";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { NumberInput, type NumberUpdate } from "./inputs/NumberInput";
-import { mixedValue } from "./mixed";
+import { isMixed, mixedValue } from "./mixed";
 
 // ED-070: panel posisi & ukuran (X, Y, W, H) dengan input ekspresi. W/H dari rect terukur (apa yang terlihat),
 // diedit → ukuran Fixed. X/Y relatif parent; hanya node absolute yang bisa digeser lewat input (flow = auto-layout).
@@ -64,6 +64,23 @@ export function PositionSizeSection({
     runCommand(ctx(), updateStyle, { ids: [node.id], patch: { position: { [axis]: value } } });
   };
 
+  // ED-084: mode sizing per sumbu (Fixed / Hug / Fill). Fixed memakai nilai terukur sebagai titik awal.
+  const sizeModeValue = (axis: "width" | "height") =>
+    mixedValue(nodes.map((node) => resolveStyle(node.style, "base").size?.[axis]?.mode ?? "fixed"));
+  const setSizeMode = (axis: "width" | "height", mode: "fixed" | "hug" | "fill") => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runtime.doc.transact(() => {
+      nodes.forEach((node, index) => {
+        const rect = rects[index];
+        const fixedValue = rect ? round(axis === "width" ? rect.width : rect.height) : 100;
+        const patch = mode === "fixed" ? { mode, value: fixedValue, unit: "px" as const } : { mode };
+        runCommand(ctx(), updateStyle, { ids: [node.id], patch: { size: { [axis]: patch } } });
+      });
+    }, runtime.origin);
+    runtime.undo.stopCapturing();
+  };
+
   return (
     <InspectorSection id="layout-box" title={t("inspector.positionSize")}>
       <AlignToolbar runtime={runtime} selectedIds={ids} readOnly={readOnly} />
@@ -99,36 +116,76 @@ export function PositionSizeSection({
       </InspectorRow>
       <InspectorRow label={t("inspector.size")}>
         <div className="grid grid-cols-2 gap-1">
-          <NumberInput
-            label={t("inspector.width")}
-            scrubLabel="W"
-            value={widthValue}
-            min={1}
-            testId="inspector-width"
-            onCommit={(update) =>
-              commit(
-                update,
-                (_node, i) => rects[i]?.width,
-                (node, value) => setSize(node, "width", value),
-              )
-            }
-          />
-          <NumberInput
-            label={t("inspector.height")}
-            scrubLabel="H"
-            value={heightValue}
-            min={1}
-            testId="inspector-height"
-            onCommit={(update) =>
-              commit(
-                update,
-                (_node, i) => rects[i]?.height,
-                (node, value) => setSize(node, "height", value),
-              )
-            }
-          />
+          <div className="flex gap-1">
+            <NumberInput
+              label={t("inspector.width")}
+              scrubLabel="W"
+              value={widthValue}
+              min={1}
+              testId="inspector-width"
+              onCommit={(update) =>
+                commit(
+                  update,
+                  (_node, i) => rects[i]?.width,
+                  (node, value) => setSize(node, "width", value),
+                )
+              }
+            />
+            <SizeModeSelect axis="width" value={sizeModeValue("width")} readOnly={readOnly} onChange={setSizeMode} />
+          </div>
+          <div className="flex gap-1">
+            <NumberInput
+              label={t("inspector.height")}
+              scrubLabel="H"
+              value={heightValue}
+              min={1}
+              testId="inspector-height"
+              onCommit={(update) =>
+                commit(
+                  update,
+                  (_node, i) => rects[i]?.height,
+                  (node, value) => setSize(node, "height", value),
+                )
+              }
+            />
+            <SizeModeSelect axis="height" value={sizeModeValue("height")} readOnly={readOnly} onChange={setSizeMode} />
+          </div>
         </div>
       </InspectorRow>
     </InspectorSection>
+  );
+}
+
+// ED-084: pemilih mode sizing (Fixed/Hug/Fill) per sumbu.
+function SizeModeSelect({
+  axis,
+  value,
+  readOnly,
+  onChange,
+}: {
+  axis: "width" | "height";
+  value: ReturnType<typeof mixedValue>;
+  readOnly: boolean;
+  onChange: (axis: "width" | "height", mode: "fixed" | "hug" | "fill") => void;
+}) {
+  const t = useT();
+  return (
+    <select
+      aria-label={t(axis === "width" ? "inspector.widthMode" : "inspector.heightMode")}
+      data-testid={`inspector-${axis}-mode`}
+      disabled={readOnly}
+      value={isMixed(value) ? "" : String(value)}
+      onChange={(event) => onChange(axis, event.target.value as "fixed" | "hug" | "fill")}
+      className="h-7 min-w-0 shrink rounded border border-transparent bg-muted/50 px-1 text-xs hover:border-border focus:border-ring"
+    >
+      {isMixed(value) ? (
+        <option value="" disabled>
+          {t("inspector.mixed")}
+        </option>
+      ) : null}
+      <option value="fixed">{t("inspector.sizeFixed")}</option>
+      <option value="hug">{t("inspector.sizeHug")}</option>
+      <option value="fill">{t("inspector.sizeFill")}</option>
+    </select>
   );
 }
