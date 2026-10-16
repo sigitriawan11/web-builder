@@ -2,6 +2,8 @@
 // minimal karena app tidak boleh mengimpor app lain.
 export interface EditorTestApi {
   status: () => string;
+  // ED-200: ada perubahan lokal yang belum dikonfirmasi server (`saved`).
+  unsaved: () => boolean;
   pageIds: () => string[];
   renamePage: (pageId: string, title: string) => boolean;
 }

@@ -19,5 +19,13 @@
     "base": "Desktop",
     "tablet": "Tablet",
     "mobile": "Mobile"
+  },
+  "save": {
+    "saved": "Saved",
+    "saving": "Saving…",
+    "offline": "Offline — changes are kept on this device",
+    "error": "Couldn't save — retrying",
+    "retry": "Try now",
+    "autosaved": "All changes are saved automatically"
   }
 }

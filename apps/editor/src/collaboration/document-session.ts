@@ -1,6 +1,7 @@
 import { HocuspocusProvider, WebSocketStatus } from "@hocuspocus/provider";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
+import { createSaveTracker, type SaveTracker } from "./save-tracker";
 
 // Lifecycle Y.Doc editor (ARCHITECTURE §5.2, §7.3): (1) IndexedDB `doc:<docId>` dimuat dulu → canvas langsung tampil
 // dari cache lokal, juga saat offline; (2) token realtime dari api; (3) HocuspocusProvider — sync protocol Yjs
@@ -27,6 +28,8 @@ export interface DocumentSession {
   /** Selesai saat state IndexedDB sudah diterapkan (mungkin kosong untuk perangkat baru). */
   readonly whenLocalReady: Promise<void>;
   status(): ConnectionStatus;
+  /** ED-200: status autosave (dikonfirmasi server lewat `saved`). */
+  readonly save: SaveTracker;
   provider(): HocuspocusProvider | null;
   destroy(): Promise<void>;
 }
@@ -39,12 +42,26 @@ export function openDocumentSession(options: DocumentSessionOptions): DocumentSe
   let status: ConnectionStatus = "loading";
   let provider: HocuspocusProvider | null = null;
   let destroyed = false;
+  const save = createSaveTracker(doc);
 
   const setStatus = (next: ConnectionStatus) => {
     if (status === next || destroyed) return;
     status = next;
+    save.setOnline(next === "synced");
     options.onStatus?.(next);
   };
+
+  // Browser tahu lebih dulu bahwa jaringan putus (socket bisa baru tertutup setelah timeout); saat online lagi
+  // provider menyambung ulang dan `onSynced` mengembalikan status.
+  const onOffline = () => setStatus("offline");
+  const onOnline = () => {
+    if (!provider || status !== "offline") return;
+    // Socket masih hidup & tersinkron (putus singkat) → langsung kembali; selain itu sambung ulang.
+    if (provider.synced) setStatus("synced");
+    else void provider.connect();
+  };
+  window.addEventListener("offline", onOffline);
+  window.addEventListener("online", onOnline);
 
   const whenLocalReady = local.whenSynced.then(() => {
     setStatus("local");
@@ -73,6 +90,7 @@ export function openDocumentSession(options: DocumentSessionOptions): DocumentSe
           };
         })(),
         onSynced: () => setStatus("synced"),
+        onStateless: ({ payload }) => save.handleStateless(payload),
         onStatus: ({ status: socket }) => {
           if (socket === WebSocketStatus.Disconnected) setStatus("offline");
           else if (socket === WebSocketStatus.Connecting && status !== "synced") setStatus("connecting");
@@ -89,9 +107,13 @@ export function openDocumentSession(options: DocumentSessionOptions): DocumentSe
     doc,
     whenLocalReady,
     status: () => status,
+    save,
     provider: () => provider,
     async destroy() {
       destroyed = true;
+      window.removeEventListener("offline", onOffline);
+      window.removeEventListener("online", onOnline);
+      save.destroy();
       provider?.destroy();
       await local.destroy();
       doc.destroy();

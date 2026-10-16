@@ -8,6 +8,8 @@ import type { DocumentSession } from "./document-session";
 // (`import.meta.env.DEV`).
 export interface EditorTestApi {
   status: () => string;
+  // ED-200: ada perubahan lokal yang belum dikonfirmasi server (`saved`).
+  unsaved: () => boolean;
   pageIds: () => string[];
   renamePage: (pageId: string, title: string) => boolean;
 }
@@ -24,6 +26,7 @@ export function useEditorTestHook(session: DocumentSession, runtime: CanvasRunti
     const ctx = { doc: runtime.doc, origin: runtime.origin };
     window.__editorTest = {
       status: () => session.status(),
+      unsaved: () => session.save.hasUnsaved(),
       pageIds: () => session.doc.getArray<string>(YDOC_KEYS.pageOrder).toArray(),
       renamePage: (pageId, title) => {
         // Aksi diskrit (seperti commit drag): tidak digabung captureTimeout dengan aksi sebelumnya.

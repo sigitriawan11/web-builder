@@ -9,6 +9,7 @@ import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
+import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { useDocumentSession } from "../collaboration/use-document-session";
 import { NodeStoreContext, useNode } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
@@ -60,6 +61,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
           {site.name}
         </h1>
         <div className="ml-auto flex items-center gap-1">
+          {session ? <SaveIndicator session={session} /> : null}
           <LanguageMenu />
         </div>
       </header>

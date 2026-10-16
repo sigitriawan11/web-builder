@@ -114,3 +114,35 @@ test("undo hanya membatalkan perubahan sesi ini: setelah reload, Ctrl+Z tidak me
   await page.waitForTimeout(300);
   await expect(pages).toHaveText(["Sebelum Reload"]);
 });
+
+test("indikator autosave: edit → Tersimpan dikonfirmasi server; jaringan mati → Offline; hidup → Tersimpan (T1.15.11)", async ({
+  page,
+  context,
+}) => {
+  await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const indicator = page.getByTestId("save-status");
+  await expect(indicator).toHaveAttribute("data-status", "saved");
+  await expect(indicator).toHaveText("Saved");
+
+  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  await page.evaluate((id) => window.__editorTest?.renamePage(id, "Disimpan"), pageId);
+  // Flush server (debounce 200 ms di stack e2e) → `saved` dengan clock tab ini.
+  const unsaved = () => page.evaluate(() => window.__editorTest?.unsaved());
+  expect(await unsaved()).toBe(true);
+  await expect.poll(unsaved).toBe(false);
+  await expect(indicator).toHaveAttribute("data-status", "saved");
+
+  await context.setOffline(true);
+  await expect(indicator).toHaveAttribute("data-status", "offline");
+  await expect(indicator).toContainText("Offline — changes are kept on this device");
+  // Edit saat offline tetap di perangkat; kembali online → terkirim & dikonfirmasi.
+  await page.evaluate((id) => window.__editorTest?.renamePage(id, "Saat Offline"), pageId);
+  await context.setOffline(false);
+  await expect(indicator).toHaveAttribute("data-status", "saved", { timeout: 15_000 });
+  await expect.poll(unsaved, { timeout: 15_000 }).toBe(false);
+
+  // Mod+S tidak membuka dialog simpan browser; hanya memberi tahu.
+  await page.keyboard.press("Control+s");
+  await expect(page.getByRole("status").filter({ hasText: "All changes are saved automatically" })).toBeVisible();
+});

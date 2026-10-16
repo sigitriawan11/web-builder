@@ -19,5 +19,13 @@
     "base": "Desktop",
     "tablet": "Tablet",
     "mobile": "Mobile"
+  },
+  "save": {
+    "saved": "Tersimpan",
+    "saving": "Menyimpan…",
+    "offline": "Offline — perubahan disimpan di perangkat",
+    "error": "Gagal menyimpan — mencoba lagi",
+    "retry": "Coba sekarang",
+    "autosaved": "Semua perubahan sudah tersimpan otomatis"
   }
 }
