@@ -92,10 +92,10 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
       next.destroy();
     };
   }, [session, activePageId]);
-  useEditorTestHook(session);
   if (!runtime) return null;
   return (
     <NodeStoreContext.Provider value={runtime.nodeStore}>
+      <EditorTestHook session={session} runtime={runtime} />
       <aside className="w-48 shrink-0 overflow-y-auto border-r bg-background p-2 text-sm">
         <ul className="flex flex-col gap-1" data-testid="document-pages">
           {pageOrder.map((id) => (
@@ -108,6 +108,11 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
       </div>
     </NodeStoreContext.Provider>
   );
+}
+
+function EditorTestHook({ session, runtime }: { session: DocumentSession; runtime: CanvasRuntime }) {
+  useEditorTestHook(session, runtime);
+  return null;
 }
 
 // Origin transaksi lokal tab ini (DM-060): dilacak UndoManager; tab lain = sesi lain.

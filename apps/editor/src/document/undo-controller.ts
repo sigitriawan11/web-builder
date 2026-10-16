@@ -26,6 +26,9 @@ export interface UndoController {
   // ED-115: sesi edit teks. Selama grup terbuka, langkah tetap granular (Ctrl+Z di editor teks);
   // `end()` menggabungkan semua langkah sejak `beginGroup` menjadi satu langkah undo.
   beginGroup(): { end(): void };
+  // ED-197: origin tambahan milik user ini yang boleh di-undo — run AI yang DITERAPKAN user ini (`aiOrigin(runId)`,
+  // satu instance per run, DM-060). Origin system/remote tidak pernah didaftarkan.
+  trackOrigin(origin: unknown): void;
   readonly manager: Y.UndoManager;
   destroy(): void;
 }
@@ -123,6 +126,9 @@ export function createUndoController(
     canUndo: () => manager.undoStack.length > 0,
     canRedo: () => manager.redoStack.length > 0,
     stopCapturing: () => manager.stopCapturing(),
+    trackOrigin: (origin) => {
+      tracked.add(origin);
+    },
     beginGroup,
     manager,
     destroy: () => {

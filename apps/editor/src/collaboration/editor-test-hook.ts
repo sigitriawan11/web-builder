@@ -1,9 +1,11 @@
-import { runCommand, updatePage, userOrigin, YDOC_KEYS } from "@platform/document-model";
+import { runCommand, updatePage, YDOC_KEYS } from "@platform/document-model";
 import { useEffect } from "react";
+import type { CanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "./document-session";
 
 // Hook uji DEV ONLY (ED-242, dilengkapi T1.15.17): e2e mengubah dokumen lewat command document-model, bukan Y.Doc
-// langsung. Tidak pernah ada di build production (`import.meta.env.DEV`).
+// langsung, dengan origin lokal tab ini (dilacak undo — sama seperti aksi user). Tidak pernah ada di build production
+// (`import.meta.env.DEV`).
 export interface EditorTestApi {
   status: () => string;
   pageIds: () => string[];
@@ -16,18 +18,21 @@ declare global {
   }
 }
 
-export function useEditorTestHook(session: DocumentSession): void {
+export function useEditorTestHook(session: DocumentSession, runtime: CanvasRuntime): void {
   useEffect(() => {
     if (!import.meta.env.DEV) return;
-    const origin = userOrigin("e2e");
+    const ctx = { doc: runtime.doc, origin: runtime.origin };
     window.__editorTest = {
       status: () => session.status(),
       pageIds: () => session.doc.getArray<string>(YDOC_KEYS.pageOrder).toArray(),
-      renamePage: (pageId, title) =>
-        runCommand({ doc: session.doc, origin }, updatePage, { id: pageId, patch: { title } }).ok,
+      renamePage: (pageId, title) => {
+        // Aksi diskrit (seperti commit drag): tidak digabung captureTimeout dengan aksi sebelumnya.
+        runtime.undo.stopCapturing();
+        return runCommand(ctx, updatePage, { id: pageId, patch: { title } }).ok;
+      },
     };
     return () => {
       delete window.__editorTest;
     };
-  }, [session]);
+  }, [session, runtime]);
 }

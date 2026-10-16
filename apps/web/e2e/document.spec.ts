@@ -75,3 +75,42 @@ test("perangkat lain (IndexedDB kosong) memuat state terakhir dari server", asyn
   await expect(otherPage.getByTestId("document-pages").locator("li")).toHaveText(["Dari Perangkat A"]);
   await other.close();
 });
+
+test("undo hanya membatalkan perubahan sesi ini: setelah reload, Ctrl+Z tidak membatalkan perubahan sebelum reload (T1.15.10)", async ({
+  page,
+}) => {
+  await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const pages = page.getByTestId("document-pages").locator("li");
+  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  const rename = (title: string) =>
+    page.evaluate(({ id, value }) => window.__editorTest?.renamePage(id, value), { id: pageId, value: title });
+
+  // Kontrol positif: di sesi yang sama Ctrl+Z membatalkan rename.
+  await rename("Coba Undo");
+  await expect(pages).toHaveText(["Coba Undo"]);
+  await page.keyboard.press("Control+z");
+  await expect(pages).toHaveText(["Home"]);
+  await page.keyboard.press("Control+Shift+z");
+  await expect(pages).toHaveText(["Coba Undo"]);
+
+  await rename("Sebelum Reload");
+  await page.waitForTimeout(1_500);
+  await page.reload();
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  await expect(pages).toHaveText(["Sebelum Reload"]);
+
+  // Stack undo tidak dipersist antar sesi; isi dari IndexedDB/server bukan origin lokal → tidak ter-undo.
+  await page.keyboard.press("Control+z");
+  await page.waitForTimeout(300);
+  await expect(pages).toHaveText(["Sebelum Reload"]);
+
+  // Perubahan sesudah reload tetap bisa di-undo — sampai batas sesi ini saja.
+  await rename("Sesudah Reload");
+  await expect(pages).toHaveText(["Sesudah Reload"]);
+  await page.keyboard.press("Control+z");
+  await expect(pages).toHaveText(["Sebelum Reload"]);
+  await page.keyboard.press("Control+z");
+  await page.waitForTimeout(300);
+  await expect(pages).toHaveText(["Sebelum Reload"]);
+});

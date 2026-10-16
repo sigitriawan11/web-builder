@@ -1,4 +1,5 @@
 import {
+  aiOrigin,
   jsonToYDoc,
   moveNode,
   runCommand,
@@ -125,6 +126,23 @@ describe("UndoController (ED-197, DM-060)", () => {
     expect(doc.nodes[CARD]?.style.base.position).toMatchObject({ x: 80 });
     expect(doc.nodes[IMAGE]?.style.base.position).toMatchObject({ y: 999 });
     expect(editor.undo.canUndo()).toBe(false);
+  });
+
+  it("run AI yang diterapkan user ini (trackOrigin) bisa di-undo; run AI lain tidak", () => {
+    const editor = setup();
+    const applied = aiOrigin("run-diterapkan");
+    const other = aiOrigin("run-lain");
+    editor.undo.trackOrigin(applied);
+
+    runCommand({ doc: editor.doc, origin: other }, updateStyle, { ids: [IMAGE], patch: { position: { y: 7 } } });
+    expect(editor.undo.canUndo()).toBe(false);
+    runCommand({ doc: editor.doc, origin: applied }, updateStyle, { ids: [CARD], patch: { position: { x: 300 } } });
+    expect(editor.undo.canUndo()).toBe(true);
+
+    editor.undo.undo();
+    const doc = editor.read();
+    expect(doc.nodes[CARD]?.style.base.position).toMatchObject({ x: 80 });
+    expect(doc.nodes[IMAGE]?.style.base.position).toMatchObject({ y: 7 });
   });
 
   it("AC ED-197: 50 aksi beragam → 50× undo = state awal; 50× redo = state akhir", () => {
