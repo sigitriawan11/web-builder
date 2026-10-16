@@ -11,7 +11,9 @@
     "error": {
       "title": "Editor mengalami kesalahan",
       "description": "Muat ulang halaman untuk mencoba lagi.",
-      "reload": "Muat ulang"
+      "reload": "Muat ulang",
+      "openSaved": "Buka versi terakhir yang tersimpan",
+      "support": "Hubungi bantuan dan sebutkan ID error: {id}"
     },
     "language": "Bahasa"
   },
@@ -33,5 +35,15 @@
     "recovered": "Kami memulihkan perubahan yang belum tersimpan.",
     "noLocalPersistence": "Pemulihan offline tidak aktif di browser ini.",
     "dismiss": "Tutup"
+  },
+  "nodeError": {
+    "label": "Elemen tidak bisa ditampilkan",
+    "delete": "Hapus",
+    "report": "Laporkan",
+    "reported": "Terima kasih, sudah dilaporkan"
+  },
+  "panelError": {
+    "title": "Panel ini mengalami masalah",
+    "reload": "Muat ulang panel"
   }
 }

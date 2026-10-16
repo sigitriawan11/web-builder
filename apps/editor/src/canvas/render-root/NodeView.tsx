@@ -8,7 +8,7 @@ import {
 } from "@platform/renderer";
 import { createContext, memo, useCallback, useContext, useMemo } from "react";
 import { useStore } from "zustand";
-import { useNode } from "../../document/use-node";
+import { NodeStoreContext, useNode } from "../../document/use-node";
 import { previewStore } from "../../store/preview-store";
 import { textEditingStore } from "../../store/text-editing-store";
 import { GeometryContext } from "../geometry/geometry-context";
@@ -16,6 +16,7 @@ import { InlineTextEditor } from "../text-editing/InlineTextEditor";
 import { assetUrl } from "./asset-url";
 import { FrameContext } from "./breakpoint-context";
 import { editorNodeStyle } from "./editor-style";
+import { NodeErrorBoundary, NodePlaceholder } from "./NodeErrorBoundary";
 import { RenderEnvContext } from "./render-env";
 import { renderProbe } from "./render-probe";
 
@@ -35,8 +36,18 @@ interface NodeViewProps {
  */
 // Fungsi dalam sengaja tidak bernama `NodeView`: nama itu akan membayangi konstanta `memo` di bawah,
 // sehingga anak dirender lewat versi tanpa memo dan selalu ikut render ulang.
-export const NodeView = memo(function NodeViewRender({ id, parent, env: parentEnv }: NodeViewProps) {
+// ED-228: setiap node punya error boundary sendiri (di atas komponen yang bisa melempar).
+export const NodeView = memo(function NodeViewBoundary(props: NodeViewProps) {
+  return (
+    <NodeErrorBoundary id={props.id}>
+      <NodeViewRender {...props} />
+    </NodeErrorBoundary>
+  );
+});
+
+function NodeViewRender({ id, parent, env: parentEnv }: NodeViewProps) {
   const node = useNode(id);
+  const store = useContext(NodeStoreContext);
   const frame = useContext(FrameContext);
   const theme = useContext(ThemeContext);
   const rootEnv = useContext(RenderEnvContext);
@@ -63,7 +74,9 @@ export const NodeView = memo(function NodeViewRender({ id, parent, env: parentEn
   // Env anak stabil selama node & env tidak berubah (anak memo tidak ikut render ulang).
   const childEnv = useMemo(() => (node && env ? childRenderEnv(node, env) : null), [node, env]);
   renderProbe.onNodeRender?.(id);
-  if (!node || !style || !env || !theme || !childEnv) return null;
+  // ED-228: node ada tetapi datanya tidak valid → placeholder, bukan hilang diam-diam.
+  if (!node) return store?.isInvalid(id) ? <NodePlaceholder id={id} /> : null;
+  if (!style || !env || !theme || !childEnv) return null;
 
   const css = editorNodeStyle(node, style, { parent, theme, assetUrl, frameWidth: frame.width });
   const attributes = {
@@ -83,4 +96,4 @@ export const NodeView = memo(function NodeViewRender({ id, parent, env: parentEn
       ? node.children.map((childId) => <NodeView key={childId} id={childId} parent={childLayout} env={childEnv} />)
       : null;
   return renderNodeElement(node, nodeEnv, children);
-});
+}

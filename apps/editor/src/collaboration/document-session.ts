@@ -45,6 +45,17 @@ export const localStoreName = (docId: string) => `doc:${docId}`;
 // Penanda "ada perubahan belum terkonfirmasi" yang selamat dari crash/tutup paksa tab (ED-227).
 export const unsavedMarkerKey = (docId: string) => `platform.unsaved:${docId}`;
 
+/** ED-228 "Buka versi terakhir yang tersimpan": hapus cache lokal dokumen (IndexedDB + penanda) → dimuat dari server. */
+export async function discardLocalDocument(docId: string): Promise<void> {
+  writeMarker(unsavedMarkerKey(docId), false);
+  if (typeof indexedDB === "undefined") return;
+  await new Promise<void>((resolve) => {
+    const request = indexedDB.deleteDatabase(localStoreName(docId));
+    // Diblokir koneksi lain / gagal → tetap lanjut memuat ulang; data server tetap utuh.
+    request.onsuccess = request.onerror = request.onblocked = () => resolve();
+  });
+}
+
 function openLocalPersistence(docId: string, doc: Y.Doc): IndexeddbPersistence | null {
   try {
     if (typeof indexedDB === "undefined") return null;

@@ -1,3 +1,4 @@
+import { deleteNodes, runCommand } from "@platform/document-model";
 import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { UndoContext } from "../document/undo-context";
@@ -18,6 +19,7 @@ import { type InteractionAdapterDeps, useInteractionMachine } from "./interactio
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
+import { type NodeErrorActions, NodeErrorActionsContext } from "./render-root/NodeErrorBoundary";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
 
@@ -40,7 +42,17 @@ function runtimeDeps(runtime: CanvasRuntime) {
     undoBoundary: () => runtime.undo.stopCapturing(),
   };
   const select: SelectToolDeps = { nodeStore: runtime.nodeStore, hitTest: runtime.hitTest, marquee: runtime.marquee };
-  return { interaction, drag, select };
+  // ED-228: tombol placeholder node rusak.
+  const nodeErrors: NodeErrorActions = {
+    deleteNode: (id) => {
+      runtime.undo.stopCapturing();
+      const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, deleteNodes, { ids: [id] });
+      if (!result.ok) console.error(`editor: node rusak "${id}" gagal dihapus`, result);
+    },
+    // Pelaporan ke Sentry menyusul (T1.15.16); sampai itu cukup log dengan ID node.
+    reportNode: (id, error) => console.error(`editor: laporan node rusak "${id}"`, error),
+  };
+  return { interaction, drag, select, nodeErrors };
 }
 
 // Viewport canvas untuk satu dokumen (`runtime`): playground M0 (fixture) maupun editor situs (Y.Doc realtime).
@@ -102,15 +114,17 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
     <>
       <style>{canvasStyleSheet(isolation, siteCss)}</style>
       <NodeStoreContext.Provider value={runtime.nodeStore}>
-        <UndoContext.Provider value={runtime.undo}>
-          <CanvasFrames
-            pageId={runtime.pageId}
-            showAll={frameOptions.showAll}
-            mode={frameOptions.mode}
-            scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
-            siteFont={siteFont}
-          />
-        </UndoContext.Provider>
+        <NodeErrorActionsContext.Provider value={deps.nodeErrors}>
+          <UndoContext.Provider value={runtime.undo}>
+            <CanvasFrames
+              pageId={runtime.pageId}
+              showAll={frameOptions.showAll}
+              mode={frameOptions.mode}
+              scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
+              siteFont={siteFont}
+            />
+          </UndoContext.Provider>
+        </NodeErrorActionsContext.Provider>
       </NodeStoreContext.Provider>
     </>
   );

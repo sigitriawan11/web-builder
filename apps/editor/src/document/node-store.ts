@@ -14,6 +14,8 @@ type Listener = () => void;
 export class NodeStore {
   private readonly nodes: Y.Map<Y.Map<unknown>>;
   private readonly cache = new Map<string, Node | null>();
+  // Node yang ADA di Y.Doc tetapi gagal validasi (ED-228: dirender sebagai placeholder, bukan dihilangkan).
+  private readonly invalid = new Set<string>();
   private readonly listeners = new Map<string, Set<Listener>>();
 
   constructor(doc: Y.Doc) {
@@ -25,7 +27,14 @@ export class NodeStore {
     this.nodes.unobserveDeep(this.handleChanges);
     this.listeners.clear();
     this.cache.clear();
+    this.invalid.clear();
   }
+
+  /** ED-228: node ada tetapi datanya tidak valid (getNode → null). */
+  isInvalid = (id: string): boolean => {
+    this.getNode(id);
+    return this.invalid.has(id);
+  };
 
   // Referensi snapshot stabil sampai node berubah (syarat useSyncExternalStore & React.memo).
   getNode = (id: string): Node | null => {
@@ -54,11 +63,13 @@ export class NodeStore {
   };
 
   private read(id: string): Node | null {
+    this.invalid.delete(id);
     const yNode = this.nodes.get(id);
     if (!yNode) return null;
     // Y.Doc bisa berisi update remote, jadi divalidasi di boundary ini (CLAUDE.md: Zod di setiap boundary).
     const parsed = NodeSchema.safeParse(yNodeToJson(yNode));
     if (!parsed.success) {
+      this.invalid.add(id);
       console.error(`Node "${id}" di Y.Doc tidak valid; tidak dirender.`, parsed.error.issues);
       return null;
     }

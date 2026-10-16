@@ -8,14 +8,17 @@ import { useEffect, useState } from "react";
 import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
+import { discardLocalDocument } from "../collaboration/document-session";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
 import { NodeStoreContext, useNode } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
+import { AppErrorBoundary } from "./ErrorBoundary";
 import { useT } from "./i18n";
 import { LanguageMenu, ProfileLocaleSync } from "./LanguageMenu";
+import { PanelErrorBoundary } from "./PanelErrorBoundary";
 // Tailwind + token UI hanya dimuat rute produk (modul ini di-lazy-load): playground canvas M0 & mode isolasi
 // eksperimennya (prefix/none, ADR-012) tetap tanpa preflight global.
 import "../styles/app.css";
@@ -44,7 +47,11 @@ export function SiteEditor({ siteId, pageId }: { siteId: string; pageId: string 
   }
   if (status === 404 || status === 403) return <SiteNotFound />;
   if (site.error) throw site.error;
-  return <EditorShell site={site.data} pageId={pageId} />;
+  return (
+    <AppErrorBoundary recovery={{ openLastSaved: () => discardLocalDocument(site.data.documentId) }}>
+      <EditorShell site={site.data} pageId={pageId} />
+    </AppErrorBoundary>
+  );
 }
 
 function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
@@ -101,11 +108,13 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
     <NodeStoreContext.Provider value={runtime.nodeStore}>
       <EditorTestHook session={session} runtime={runtime} />
       <aside className="w-48 shrink-0 overflow-y-auto border-r bg-background p-2 text-sm">
-        <ul className="flex flex-col gap-1" data-testid="document-pages">
-          {pageOrder.map((id) => (
-            <PageItem key={id} id={id} active={id === runtime.pageId} />
-          ))}
-        </ul>
+        <PanelErrorBoundary name="pages">
+          <ul className="flex flex-col gap-1" data-testid="document-pages">
+            {pageOrder.map((id) => (
+              <PageItem key={id} id={id} active={id === runtime.pageId} />
+            ))}
+          </ul>
+        </PanelErrorBoundary>
       </aside>
       <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
         <CanvasViewport runtime={runtime} />

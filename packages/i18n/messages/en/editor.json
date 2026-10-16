@@ -11,7 +11,9 @@
     "error": {
       "title": "The editor ran into a problem",
       "description": "Reload the page to try again.",
-      "reload": "Reload"
+      "reload": "Reload",
+      "openSaved": "Open the last saved version",
+      "support": "Contact support and mention error ID: {id}"
     },
     "language": "Language"
   },
@@ -33,5 +35,15 @@
     "recovered": "We recovered changes that hadn't been saved.",
     "noLocalPersistence": "Offline recovery isn't available in this browser.",
     "dismiss": "Dismiss"
+  },
+  "nodeError": {
+    "label": "This element can't be displayed",
+    "delete": "Delete",
+    "report": "Report",
+    "reported": "Thanks, it has been reported"
+  },
+  "panelError": {
+    "title": "This panel ran into a problem",
+    "reload": "Reload panel"
   }
 }
