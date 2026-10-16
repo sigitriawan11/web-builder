@@ -1,6 +1,12 @@
 import type { Server } from "node:http";
 import { createDb } from "@platform/db";
-import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
+import {
+  contextLogFields,
+  createLogger,
+  type Logger,
+  type LoggerOptions,
+  telemetryFromEnv,
+} from "@platform/shared/node";
 import { Queue } from "bullmq";
 import { Redis } from "ioredis";
 import type { WorkerEnv } from "./config/env";
@@ -23,6 +29,7 @@ export interface RunningWorkerProcess {
 export function createWorkerLogger(
   env: Pick<WorkerEnv, "APP_ENV" | "LOG_LEVEL">,
   destination?: LoggerOptions["destination"],
+  onError?: LoggerOptions["onError"],
 ): Logger {
   return createLogger({
     service: "worker",
@@ -31,6 +38,7 @@ export function createWorkerLogger(
     pretty: env.APP_ENV === "local" && !destination,
     mixin: contextLogFields,
     ...(destination ? { destination } : {}),
+    ...(onError ? { onError } : {}),
   });
 }
 
@@ -68,7 +76,9 @@ export async function startWorkerProcess(
   env: WorkerEnv,
   options: { logger?: Logger; processors?: ProcessorRegistry; prefix?: string; shutdownTimeoutMs?: number } = {},
 ): Promise<RunningWorkerProcess> {
-  const logger = options.logger ?? createWorkerLogger(env);
+  // T1.16.3: `logger.error({ err })` (job gagal final/DLQ, jadwal gagal, …) → Sentry bila DSN diisi.
+  const telemetry = telemetryFromEnv("worker", env);
+  const logger = options.logger ?? createWorkerLogger(env, undefined, telemetry.enabled ? telemetry.report : undefined);
   const resources = options.processors ? undefined : createResources(env);
   const processors = options.processors ?? (resources as WorkerResources).processors;
   const queues = selectQueues(env.WORKER_QUEUES, processors);
@@ -107,6 +117,7 @@ export async function startWorkerProcess(
       redis.disconnect();
       resources?.emailProvider.close?.();
       await resources?.closeDb();
+      await telemetry.flush();
       logger.info("worker shutdown selesai");
     })();
     return closing;

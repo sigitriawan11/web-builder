@@ -3,7 +3,7 @@ import type { JobHandler } from "../types";
 import { insertDeadLetterJob } from "./dead-letter.repository";
 
 // Processor queue `dead-letter` (ARCHITECTURE §5.4): simpan job gagal final ke `dead_letter_jobs` lalu alert.
-// Alert = log level error ber-`alert: "dlq"` (aturan alert "DLQ bertambah", §13); Sentry menyusul (T1.16.3).
+// Alert = log level error ber-`alert: "dlq"` (aturan alert "DLQ bertambah", §13) → juga ke Sentry lewat hook logger (T1.16.3).
 
 export function createDeadLetterProcessor(deps: { db: Db }): JobHandler<"dead-letter"> {
   return async (payload, { logger }) => {

@@ -1,13 +1,11 @@
-import type { ErrorEvent } from "@sentry/react";
 import { describe, expect, it } from "vitest";
-import { scrubBreadcrumb, scrubEvent, stripUrl } from "./scrub";
+import { type EventLike, scrubBreadcrumb, scrubEvent, stripUrl } from "./index";
 
 // Teks dokumen user (judul, isi rich text, input form) yang TIDAK boleh sampai ke Sentry.
 const SECRET = "Kue Lapis Legit Bu Sari — rahasia resep 0812-3456-7890";
 
-const event = (overrides: Partial<ErrorEvent> = {}): ErrorEvent =>
+const event = (overrides: Partial<EventLike> = {}): EventLike =>
   ({
-    type: undefined,
     exception: { values: [{ type: "TypeError", value: "Cannot read properties of undefined" }] },
     tags: { site: "a1b2c3d4", area: "node" },
     contexts: {
@@ -30,9 +28,9 @@ const event = (overrides: Partial<ErrorEvent> = {}): ErrorEvent =>
       { category: "editor", data: { action: "undo", origin: "user", payload: SECRET } },
     ],
     ...overrides,
-  }) as ErrorEvent;
+  }) as EventLike;
 
-describe("scrubber Sentry (ED-231)", () => {
+describe("scrubber Sentry browser (ED-231)", () => {
   it("AC: payload yang dikirim tidak memuat isi teks dokumen / input user", () => {
     const scrubbed = scrubEvent(event());
     expect(JSON.stringify(scrubbed)).not.toContain("Lapis");
@@ -42,7 +40,7 @@ describe("scrubber Sentry (ED-231)", () => {
 
   it("yang berguna untuk debugging tetap ada: exception, tag, konteks browser/react, user ter-hash, URL tanpa query", () => {
     const scrubbed = scrubEvent(event());
-    expect(scrubbed.exception?.values?.[0]?.type).toBe("TypeError");
+    expect((scrubbed.exception as { values: { type: string }[] }).values[0]?.type).toBe("TypeError");
     expect(scrubbed.tags).toEqual({ site: "a1b2c3d4", area: "node" });
     expect(Object.keys(scrubbed.contexts ?? {}).sort()).toEqual(["browser", "react"]);
     expect(scrubbed.user).toEqual({ id: "hash123" });

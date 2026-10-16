@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 
 // Middleware 12 (ARCHITECTURE §5.3): semua error → envelope `{ error: { code, message, details?, requestId } }`.
 // Pesan untuk user dari katalog i18n berdasarkan `Accept-Language`; detail internal (stack, pesan exception)
-// tidak pernah dikirim ke klien. Error tak terduga → 500 + `reportError` (Sentry dipasang di T1.16.3).
+// tidak pernah dikirim ke klien. Error tak terduga → 500 + log error (hook logger → Sentry, T1.16.3) + `reportError` opsional.
 
 export type ErrorReporter = (error: unknown, context: { requestId: string; method: string; path: string }) => void;
 

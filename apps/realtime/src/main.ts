@@ -1,5 +1,5 @@
 import { createDb, sql } from "@platform/db";
-import { createLogger } from "@platform/shared/node";
+import { createLogger, telemetryFromEnv } from "@platform/shared/node";
 import { Redis } from "ioredis";
 import { loadRealtimeEnv } from "./config/env";
 import { InternalHttpExtension } from "./extensions/internal-http";
@@ -14,11 +14,14 @@ import { createRealtimeServer } from "./server";
 const env = loadRealtimeEnv();
 // ARCHITECTURE §5.5: TTL 30 s, diperpanjang heartbeat (10 s) selama pemegang tersambung.
 const LOCK_TTL_MS = 30_000;
+// T1.16.3: `logger.error({ err })` (flush/snapshot gagal, update bus rusak, …) → Sentry bila DSN diisi.
+const telemetry = telemetryFromEnv("realtime", env);
 const logger = createLogger({
   service: "realtime",
   env: env.APP_ENV,
   level: env.LOG_LEVEL,
   pretty: env.APP_ENV === "local",
+  ...(telemetry.enabled ? { onError: telemetry.report } : {}),
 });
 const { db, close: closeDb } = createDb({ connectionString: env.DATABASE_URL, maxConnections: env.DATABASE_POOL_MAX });
 const redis = new Redis(env.REDIS_URL, { maxRetriesPerRequest: 2 });
@@ -59,6 +62,7 @@ for (const signal of ["SIGTERM", "SIGINT"] as const) {
       .destroy()
       .then(() => closeDb())
       .then(() => redis.quit())
+      .then(() => telemetry.flush())
       .then(() => process.exit(0))
       .catch((error: unknown) => {
         logger.error({ err: error }, "shutdown gagal");

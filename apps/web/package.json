@@ -25,10 +25,14 @@
     "vitest": "5.0.4"
   },
   "dependencies": {
+    "@opentelemetry/core": "2.11.0",
+    "@opentelemetry/sdk-trace-base": "2.11.0",
     "@platform/i18n": "workspace:^",
     "@platform/sdk": "workspace:*",
     "@platform/shared": "workspace:^",
     "@platform/ui": "workspace:^",
+    "@sentry/node": "10.75.3",
+    "@sentry/react": "10.75.3",
     "lucide-react": "1.49.0",
     "next": "16.3.8",
     "next-intl": "4.14.8",

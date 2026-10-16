@@ -58,10 +58,34 @@ export interface LoggerOptions {
   mixin?: () => Record<string, unknown>;
   // Untuk test: tujuan selain stdout.
   destination?: DestinationStream;
+  // T1.16.3: setiap log level ≥ error yang membawa `err` dilaporkan (Sentry) dengan tag ID konteks (tanpa isi log).
+  onError?: (error: unknown, tags: Record<string, string>) => void;
+}
+
+// Field konteks yang aman dijadikan tag error (ID, bukan konten) → nama tag snake_case.
+const TAG_FIELDS: Readonly<Record<string, string>> = {
+  requestId: "request_id",
+  workspaceId: "workspace_id",
+  siteId: "site_id",
+  docId: "doc_id",
+  queue: "queue",
+  jobId: "job_id",
+  alert: "alert",
+};
+
+function errorTags(...sources: ReadonlyArray<Record<string, unknown> | undefined>): Record<string, string> {
+  const tags: Record<string, string> = {};
+  for (const source of sources) {
+    for (const [field, tag] of Object.entries(TAG_FIELDS)) {
+      const value = source?.[field];
+      if (typeof value === "string" || typeof value === "number") tags[tag] = String(value);
+    }
+  }
+  return tags;
 }
 
 export function createLogger(options: LoggerOptions): Logger {
-  const { service, env, level = "info", pretty = false, mixin, destination } = options;
+  const { service, env, level = "info", pretty = false, mixin, destination, onError } = options;
   const config = {
     level,
     base: { service, env },
@@ -72,6 +96,36 @@ export function createLogger(options: LoggerOptions): Logger {
       log: (object: Record<string, unknown>) => redactSensitive(object) as Record<string, unknown>,
     },
     ...(mixin ? { mixin } : {}),
+    ...(onError
+      ? {
+          hooks: {
+            logMethod(
+              this: Logger,
+              args: Parameters<Logger["error"]>,
+              method: (...rest: unknown[]) => void,
+              level: number,
+            ) {
+              const [first] = args as unknown[];
+              // pino: level 50 = error, 60 = fatal.
+              if (level >= 50 && first !== null && typeof first === "object") {
+                const fields = first as Record<string, unknown>;
+                const error = first instanceof Error ? first : fields.err;
+                // Log akses HTTP (pino-http: `responseTime`) membawa error sintetis "failed with status code 5xx";
+                // error aslinya sudah dilaporkan oleh error handler → jangan dilaporkan dua kali.
+                const accessLog = !(first instanceof Error) && "responseTime" in fields;
+                if (error !== undefined && !accessLog) {
+                  try {
+                    onError(error, errorTags(this.bindings(), mixin?.(), first instanceof Error ? undefined : fields));
+                  } catch {
+                    // Pelaporan tidak boleh menggagalkan logging.
+                  }
+                }
+              }
+              method.apply(this, args as unknown[]);
+            },
+          },
+        }
+      : {}),
   };
   if (destination) return pino(config, destination);
   if (pretty) return pino({ ...config, transport: { target: "pino-pretty", options: { colorize: true } } });

@@ -1,8 +1,9 @@
-import { envField, parseEnv } from "@platform/shared/env";
+import { envField, parseEnv, telemetryEnvSchema } from "@platform/shared/env";
 import { z } from "zod";
 
 // Env apps/realtime (ARCHITECTURE §5.5, §15.4), divalidasi saat boot. Variabel ditambah seiring extension.
 export const realtimeEnvSchema = {
+  ...telemetryEnvSchema,
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   APP_ENV: z.enum(["local", "staging", "production"]),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),

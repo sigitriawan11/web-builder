@@ -18,6 +18,15 @@ export {
   updateContext,
 } from "./request-context";
 export {
+  initServerTelemetry,
+  redactPath,
+  type ServerReporter,
+  type ServerService,
+  type ServerTelemetryOptions,
+  scrubServerEvent,
+  telemetryFromEnv,
+} from "./telemetry";
+export {
   MIN_SECRET_LENGTH,
   type SignTokenOptions,
   signToken,

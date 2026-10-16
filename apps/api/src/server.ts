@@ -1,6 +1,12 @@
 import type { Server } from "node:http";
 import { createDb, sql } from "@platform/db";
-import { contextLogFields, createLogger, type Logger, type LoggerOptions } from "@platform/shared/node";
+import {
+  contextLogFields,
+  createLogger,
+  type Logger,
+  type LoggerOptions,
+  telemetryFromEnv,
+} from "@platform/shared/node";
 import { createApp } from "./app";
 import { createAuth } from "./auth/auth";
 import { turnstileVerifier } from "./auth/captcha";
@@ -24,6 +30,7 @@ export interface RunningServer {
 export function createApiLogger(
   env: Pick<ApiEnv, "APP_ENV" | "LOG_LEVEL">,
   destination?: LoggerOptions["destination"],
+  onError?: LoggerOptions["onError"],
 ): Logger {
   return createLogger({
     service: "api",
@@ -32,6 +39,7 @@ export function createApiLogger(
     pretty: env.APP_ENV === "local" && !destination,
     mixin: contextLogFields,
     ...(destination ? { destination } : {}),
+    ...(onError ? { onError } : {}),
   });
 }
 
@@ -39,7 +47,9 @@ export async function startServer(
   env: ApiEnv,
   options: { redisConnectTimeoutMs?: number } = {},
 ): Promise<RunningServer> {
-  const logger = createApiLogger(env);
+  // T1.16.3: setiap `logger.error({ err })` (termasuk error tak terduga di errorHandler) → Sentry bila DSN diisi.
+  const telemetry = telemetryFromEnv("api", env);
+  const logger = createApiLogger(env, undefined, telemetry.enabled ? telemetry.report : undefined);
   const { db, close: closeDb } = createDb({
     connectionString: env.DATABASE_URL,
     maxConnections: env.DATABASE_POOL_MAX,
@@ -133,6 +143,7 @@ export async function startServer(
       await queues.close();
       await closeDb();
       redis.disconnect();
+      await telemetry.flush();
       logger.info("api shutdown selesai");
     })();
     return closing;

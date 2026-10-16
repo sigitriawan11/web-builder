@@ -1,5 +1,5 @@
+import { scrubBreadcrumb, scrubEvent } from "@platform/shared/telemetry";
 import * as Sentry from "@sentry/react";
-import { scrubBreadcrumb, scrubEvent } from "./scrub";
 
 // ED-231: pelaporan error editor ke Sentry. Tanpa `VITE_SENTRY_DSN` (dev lokal) semua fungsi no-op kecuali log.
 // Tag: `site` & user = hash (bukan ID mentah), `request_id` dari error api, `error_id` = ID yang ditampilkan ke user.

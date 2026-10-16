@@ -75,6 +75,28 @@ describe("errorHandler + notFound (ARCHITECTURE §5.3)", () => {
     ).toBe(true);
   });
 
+  it("T1.16.3: error tak terduga sampai ke Sentry lewat hook logger (onError) dengan tag request_id; 4xx tidak", async () => {
+    const reports: { error: unknown; tags: Record<string, string> }[] = [];
+    const app = createApp({
+      logger: createApiLogger({ APP_ENV: "staging", LOG_LEVEL: "info" }, { write: () => {} }, (error, tags) =>
+        reports.push({ error, tags }),
+      ),
+      mountRoutes: (app) => {
+        app.get("/boom", () => {
+          throw new Error("contoh error api");
+        });
+        app.get("/limit", () => {
+          throw new AppError("PLAN_LIMIT_REACHED");
+        });
+      },
+    });
+    const response = await request(app).get("/boom");
+    await request(app).get("/limit");
+    expect(reports).toHaveLength(1);
+    expect(reports[0]?.error).toMatchObject({ message: "contoh error api" });
+    expect(reports[0]?.tags).toMatchObject({ request_id: response.headers["x-request-id"] });
+  });
+
   it("rute tidak dikenal → 404 NOT_FOUND dengan envelope", async () => {
     const response = await request(setup().app).get("/tidak-ada");
     expect(response.status).toBe(404);

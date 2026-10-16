@@ -89,3 +89,57 @@ describe("logger (ARCHITECTURE §13)", () => {
     expect(lines[0]).toMatchObject({ err: { message: "db timeout", type: "Error" } });
   });
 });
+
+describe("logger onError (T1.16.3)", () => {
+  function reporting() {
+    const reports: { error: unknown; tags: Record<string, string> }[] = [];
+    const lines: Record<string, unknown>[] = [];
+    const logger = createLogger({
+      service: "worker",
+      env: "local",
+      destination: { write: (line: string) => void lines.push(JSON.parse(line)) },
+      mixin: () => ({ requestId: "req-9" }),
+      onError: (error, tags) => reports.push({ error, tags }),
+    });
+    return { logger, reports, lines };
+  }
+
+  it("log error dengan `err` dilaporkan sekali dengan tag ID dari field, child binding, & mixin; log tetap ditulis", () => {
+    const { logger, reports, lines } = reporting();
+    const error = new Error("flush gagal");
+    logger.child({ queue: "email" }).error({ err: error, docId: "doc-1", password: "rahasia" }, "flush dokumen gagal");
+    expect(reports).toHaveLength(1);
+    expect(reports[0]?.error).toBe(error);
+    expect(reports[0]?.tags).toEqual({ request_id: "req-9", queue: "email", doc_id: "doc-1" });
+    expect(lines[0]).toMatchObject({ msg: "flush dokumen gagal", queue: "email", password: REDACTED });
+  });
+
+  it("level di bawah error / tanpa err tidak dilaporkan; fatal & Error langsung dilaporkan", () => {
+    const { logger, reports } = reporting();
+    logger.warn({ err: new Error("x") }, "peringatan");
+    logger.error("tanpa objek");
+    logger.error({ docId: "d" }, "tanpa err");
+    logger.fatal(new Error("mati"));
+    expect(reports.map((report) => (report.error instanceof Error ? report.error.message : null))).toEqual(["mati"]);
+  });
+
+  it("log akses HTTP (pino-http, ada responseTime) tidak dilaporkan — error asli dilaporkan error handler", () => {
+    const { logger, reports } = reporting();
+    logger.error({ err: new Error("failed with status code 500"), responseTime: 12 }, "request errored");
+    expect(reports).toEqual([]);
+  });
+
+  it("pelapor yang melempar tidak mengganggu logging", () => {
+    const lines: unknown[] = [];
+    const logger = createLogger({
+      service: "api",
+      env: "local",
+      destination: { write: (line: string) => void lines.push(line) },
+      onError: () => {
+        throw new Error("sentry mati");
+      },
+    });
+    logger.error({ err: new Error("x") }, "tetap tertulis");
+    expect(lines).toHaveLength(1);
+  });
+});

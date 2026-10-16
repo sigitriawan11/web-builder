@@ -1,8 +1,9 @@
-import { envField, parseEnv } from "@platform/shared/env";
+import { envField, parseEnv, telemetryEnvSchema } from "@platform/shared/env";
 import { z } from "zod";
 
 // Env apps/api (ARCHITECTURE §15.4), divalidasi saat boot. Variabel ditambah seiring fitur (auth, Redis, S3, …).
 export const apiEnvSchema = {
+  ...telemetryEnvSchema,
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   APP_ENV: z.enum(["local", "staging", "production"]),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),

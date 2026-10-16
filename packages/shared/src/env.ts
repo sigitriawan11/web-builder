@@ -77,3 +77,10 @@ export function parseEnv<S extends z.ZodRawShape>(app: string, shape: S, source:
     })),
   );
 }
+
+/** Env Sentry app server (ARCHITECTURE §13, T1.16.3); kosong = pelaporan nonaktif. `SENTRY_RELEASE` = git SHA dari CI. */
+export const telemetryEnvSchema = {
+  SENTRY_DSN: envField.url().optional(),
+  SENTRY_ENVIRONMENT: envField.string().optional(),
+  SENTRY_RELEASE: envField.string().optional(),
+};

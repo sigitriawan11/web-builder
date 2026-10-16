@@ -48,7 +48,8 @@ export interface AppDeps {
   readinessChecks?: Readonly<Record<string, ReadinessCheck>>;
   // Untuk test & komposisi: router tambahan dipasang sebelum handler 404/error.
   mountRoutes?: (app: Express) => void;
-  // Pelapor error tak terduga (Sentry, T1.16.3); default hanya log.
+  // Pelapor error tak terduga tambahan (test/komposisi). Sentry dipasang lewat hook logger (`logger.error({ err })`,
+  // T1.16.3), jadi tidak perlu diisi untuk produksi.
   reportError?: ErrorReporter;
 }
 
