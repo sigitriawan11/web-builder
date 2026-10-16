@@ -107,6 +107,52 @@ test("AC ED-055: Enter pilih anak, Shift+Enter pilih parent (page root di ujung)
   expect(await selection(page)).toEqual([b]);
 });
 
+const nodeField = (page: Page, id: string, field: "locked" | "visible") =>
+  page.evaluate(
+    ({ id, field }) => {
+      const docu = window.__editorTestApi?.getDoc() as
+        | { nodes: Record<string, { locked?: boolean; visible?: boolean }> }
+        | undefined;
+      return docu?.nodes[id]?.[field];
+    },
+    { id, field },
+  );
+
+test("AC ED-059: Mod+Shift+L kunci (tak bisa diklik di canvas) & Mod+Shift+H sembunyikan", async ({ page }) => {
+  await openEditor(page, "Lock Hide");
+  const pageId = await firstPageId(page);
+  const frame = await createFrame(page, pageId, { x: 40, y: 40, width: 200, height: 160 });
+  const canvas = page.getByTestId("editor-canvas");
+
+  // Klik memilih frame, lalu Mod+Shift+L mengunci.
+  await clickNodeCenter(page, frame);
+  expect(await selection(page)).toEqual([frame]);
+  await page.keyboard.press("ControlOrMeta+Shift+KeyL");
+  expect(await nodeField(page, frame, "locked")).toBe(true);
+
+  // Node terkunci tidak bisa dipilih lewat klik canvas (klik → latar → seleksi kosong).
+  await page.evaluate(() => window.__editorTestApi?.select([]));
+  await clickNodeCenter(page, frame);
+  expect(await selection(page)).toEqual([]);
+
+  // Masih bisa dipilih "lewat layers" (API) → Mod+Shift+L membuka kunci; klik canvas berfungsi lagi.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  await page.keyboard.press("ControlOrMeta+Shift+KeyL");
+  expect(await nodeField(page, frame, "locked")).toBe(false);
+  await page.evaluate(() => window.__editorTestApi?.select([]));
+  await clickNodeCenter(page, frame);
+  expect(await selection(page)).toEqual([frame]);
+
+  // Mod+Shift+H menyembunyikan (hidden di editor, tetap terseleksi); lagi → tampil.
+  await page.keyboard.press("ControlOrMeta+Shift+KeyH");
+  expect(await nodeField(page, frame, "visible")).toBe(false);
+  expect(await selection(page)).toEqual([frame]);
+  await expect(canvas.locator(`[data-node-id="${frame}"]`)).toBeHidden();
+  await page.keyboard.press("ControlOrMeta+Shift+KeyH");
+  expect(await nodeField(page, frame, "visible")).toBe(true);
+  await expect(canvas.locator(`[data-node-id="${frame}"]`)).toBeVisible();
+});
+
 test("AC ED-056: Mod+A memilih semua sibling dalam konteks (grid), tanpa seleksi = section page root", async ({
   page,
 }) => {

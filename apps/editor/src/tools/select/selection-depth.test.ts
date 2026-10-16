@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type NodeInfo, resolveClickSelection, resolveDoubleClick } from "./selection-depth";
+import { isEffectivelyLocked, type NodeInfo, resolveClickSelection, resolveDoubleClick } from "./selection-depth";
 
 // Pohon mirip fixture landing: page > section Hero > Row > Copy > Title/Button>Label, Row > Photo;
 // page > section Fitur > Grid > Card(card) > Foto/Judul.
@@ -101,5 +101,30 @@ describe("node yang tidak dikenal (dokumen sedang berubah)", () => {
   it("seleksi berisi node yang sudah tidak ada diabaikan", () => {
     expect(resolveClickSelection(pathTo("title"), ["ghost"], lookup)).toBe("hero");
     expect(resolveDoubleClick(pathTo("title"), ["ghost"], lookup)).toEqual({ type: "none" });
+  });
+});
+
+describe("isEffectivelyLocked (ED-059)", () => {
+  const lockedLookup = (locked: Set<string>) => (id: string) => {
+    const info = TREE[id];
+    return info ? { ...info, locked: locked.has(id) } : null;
+  };
+
+  it("node terkunci langsung → true", () => {
+    expect(isEffectivelyLocked("card", lockedLookup(new Set(["card"])))).toBe(true);
+  });
+
+  it("descendant dari ancestor terkunci → true", () => {
+    const lk = lockedLookup(new Set(["grid"]));
+    expect(isEffectivelyLocked("card", lk)).toBe(true);
+    expect(isEffectivelyLocked("cardTitle", lk)).toBe(true);
+  });
+
+  it("node tanpa ancestor terkunci → false", () => {
+    expect(isEffectivelyLocked("cardTitle", lockedLookup(new Set(["hero"])))).toBe(false);
+  });
+
+  it("node tidak dikenal → false", () => {
+    expect(isEffectivelyLocked("ghost", lockedLookup(new Set()))).toBe(false);
   });
 });

@@ -6,7 +6,7 @@ import { textEditingStore } from "../../store/text-editing-store";
 import { effectiveTool, toolStore } from "../tool-store";
 import { type MarqueeContext, marqueeSelection } from "./marquee-selection";
 import { nodeLookupFrom } from "./node-lookup";
-import { resolveClickSelection, resolveDoubleClick } from "./selection-depth";
+import { isEffectivelyLocked, resolveClickSelection, resolveDoubleClick } from "./selection-depth";
 
 export interface SelectToolDeps {
   nodeStore: NodeStore;
@@ -33,16 +33,21 @@ export function useSelectTool(viewportRef: RefObject<HTMLElement | null>, deps: 
       const { selectedIds, select, clear } = selectionStore.getState();
 
       if (effect.type === "commit" && effect.drag.type === "marquee") {
-        const hits = marqueeSelection(effect.drag, deps.marquee);
+        // ED-059: marquee tidak memilih node terkunci.
+        const hits = marqueeSelection(effect.drag, deps.marquee).filter((id) => !isEffectivelyLocked(id, lookup));
         select(effect.drag.additive ? [...selectedIds, ...hits.filter((id) => !selectedIds.includes(id))] : hits);
         return;
       }
       if (effect.type !== "click" || effect.target.kind === "handle") return;
+      // ED-059: node terkunci (& turunannya) transparan terhadap klik canvas — jatuh ke ancestor/latar.
+      const path = effect.target.path;
+      const pageId = path.at(-1) ?? null;
+      const visiblePath = path.filter((id) => !isEffectivelyLocked(id, lookup));
       // ED-054: Mod+klik = node terdalam (abaikan aturan kedalaman). Selain itu aturan kedalaman ED-051.
       const next =
-        effect.deep && effect.target.path.length > 0
-          ? (effect.target.path[0] ?? null)
-          : resolveClickSelection(effect.target.path, selectedIds, lookup);
+        effect.deep && visiblePath.length > 0 && visiblePath[0] !== pageId
+          ? (visiblePath[0] ?? null)
+          : resolveClickSelection(visiblePath, selectedIds, lookup);
       // ED-052: Shift+klik = toggle di seleksi; tanpa Shift = ganti seleksi.
       if (effect.additive) {
         if (!next) return;

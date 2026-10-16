@@ -6,6 +6,11 @@ export function nodeLookupFrom(nodeStore: NodeStore): NodeLookup {
   return (id) => {
     const node = nodeStore.getNode(id);
     if (!node) return null;
-    return { type: node.type, parentId: node.parentId, role: node.type === "frame" ? node.props.role : undefined };
+    return {
+      type: node.type,
+      parentId: node.parentId,
+      role: node.type === "frame" ? node.props.role : undefined,
+      locked: node.locked,
+    };
   };
 }

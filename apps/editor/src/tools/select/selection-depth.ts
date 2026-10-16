@@ -5,9 +5,25 @@ export interface NodeInfo {
   parentId: string | null;
   // Petunjuk semantik frame (DM-011); "section" tidak kena pengecualian teks/gambar.
   role?: string | undefined;
+  // ED-059: node (atau ancestor) terkunci → tidak bisa dipilih/digeser di canvas.
+  locked?: boolean | undefined;
 }
 
 export type NodeLookup = (id: string) => NodeInfo | null;
+
+/** ED-059: node terkunci efektif bila dirinya atau salah satu ancestor `locked`. */
+export function isEffectivelyLocked(id: string, lookup: NodeLookup): boolean {
+  let current: string | null = id;
+  const seen = new Set<string>();
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    const node = lookup(current);
+    if (!node) return false;
+    if (node.locked) return true;
+    current = node.parentId;
+  }
+  return false;
+}
 
 // Hasil: node yang dipilih, atau null = kosongkan seleksi.
 export type ClickSelection = string | null;
