@@ -9,5 +9,17 @@
     "label": "Bahasa",
     "id": "Bahasa Indonesia",
     "en": "English"
+  },
+  "landing": {
+    "tagline": "Bikin website bisnis Anda tanpa ngoding.",
+    "description": "Mulai dari template, susun sendiri di kanvas, atau minta bantuan asisten AI — lalu terbitkan di subdomain atau domain sendiri.",
+    "register": "Daftar gratis",
+    "login": "Masuk",
+    "footer": "© {year} Platform"
+  },
+  "notFound": {
+    "title": "Halaman tidak ditemukan",
+    "description": "Tautan mungkin salah atau halamannya sudah dipindahkan.",
+    "home": "Kembali ke beranda"
   }
 }

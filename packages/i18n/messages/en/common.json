@@ -9,5 +9,17 @@
     "label": "Language",
     "id": "Bahasa Indonesia",
     "en": "English"
+  },
+  "landing": {
+    "tagline": "Build your business website without code.",
+    "description": "Start from a template, design on the canvas yourself, or let the AI assistant help — then publish on a subdomain or your own domain.",
+    "register": "Sign up free",
+    "login": "Sign in",
+    "footer": "© {year} Platform"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The link may be wrong or the page has moved.",
+    "home": "Back to home"
   }
 }
