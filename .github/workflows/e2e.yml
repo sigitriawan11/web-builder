@@ -1,0 +1,58 @@
+# E2E (ARCHITECTURE §16.1, T1.16.2): push ke main + nightly. Stack e2e sungguhan (api, worker, realtime, Next, editor
+# Vite — dijalankan oleh playwright.config masing-masing) di atas docker compose + seed; artefak trace saat gagal.
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 19:00 UTC = 02:00 WIB.
+    - cron: "0 19 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  TURBO_TELEMETRY_DISABLED: "1"
+  CI: "true"
+
+jobs:
+  e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [web, editor]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: cp .env.example .env
+      - run: pnpm install --frozen-lockfile
+      - name: Infrastruktur + migration + seed
+        run: |
+          pnpm infra:up
+          pnpm db:migrate
+          pnpm db:seed
+      - name: Browser Playwright
+        run: pnpm --filter @platform/${{ matrix.app }} exec playwright install --with-deps chromium firefox
+      - name: Playwright (${{ matrix.app }})
+        run: pnpm --filter @platform/${{ matrix.app }} test:e2e
+      - name: Artefak trace & screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ matrix.app }}
+          path: |
+            apps/${{ matrix.app }}/test-results/
+            apps/${{ matrix.app }}/playwright-report/
+          retention-days: 14

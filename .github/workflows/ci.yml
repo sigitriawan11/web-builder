@@ -1,0 +1,72 @@
+# CI (ARCHITECTURE §16.1, T1.16.1): lint + aturan dependensi + typecheck + unit test (hanya paket terdampak) →
+# integration test dengan Postgres/Redis/MinIO → build → migration check.
+# Infrastruktur memakai docker compose yang sama dengan lokal (`pnpm infra:up`, port & konfigurasi dari .env.example)
+# agar tidak ada dua sumber konfigurasi (service container GitHub vs compose).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TURBO_TELEMETRY_DISABLED: "1"
+
+jobs:
+  checks:
+    name: Lint, typecheck, unit test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # `--affected` membandingkan dengan commit dasar → butuh riwayat.
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: cp .env.example .env
+      - run: pnpm install --frozen-lockfile
+      - name: Lint, lint:deps, typecheck, test (paket terdampak)
+        run: pnpm exec dotenv -e .env -- turbo run lint lint:deps typecheck test --affected
+        env:
+          # PR: dasar = base branch; push: commit sebelum push (turbo fallback ke semua paket bila tidak ada).
+          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          TURBO_SCM_HEAD: ${{ github.sha }}
+      - name: Katalog i18n id/en
+        run: pnpm i18n:check
+
+  integration:
+    name: Integration, build, migration check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: cp .env.example .env
+      - run: pnpm install --frozen-lockfile
+      - name: Infrastruktur (Postgres, Redis, MinIO, Mailpit)
+        run: pnpm infra:up
+      - name: Migration check — schema Drizzle & file migration sinkron
+        run: pnpm db:check
+      - name: Semua migration ke database kosong
+        run: pnpm db:migrate
+      - name: Integration test (Postgres asli, termasuk isolasi tenant)
+        run: pnpm test:integration
+      - name: Build
+        run: pnpm build
+      - name: Tidak ada file ter-generate yang belum di-commit
+        run: git diff --exit-code

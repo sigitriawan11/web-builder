@@ -1,0 +1,27 @@
+# Audit keamanan mingguan (ARCHITECTURE §16.1, T1.16.5): `pnpm audit` atas dependency production & dev.
+# CodeQL = P1. Bisa dipicu manual dari tab Actions.
+name: Security
+
+on:
+  schedule:
+    # Senin 01:00 UTC = 08:00 WIB.
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: pnpm audit (high & critical)
+        run: pnpm audit --audit-level high
