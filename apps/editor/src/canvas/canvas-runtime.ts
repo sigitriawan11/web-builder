@@ -5,6 +5,7 @@ import type * as Y from "yjs";
 import { NodeStore } from "../document/node-store";
 import { createUndoController, type UndoController } from "../document/undo-controller";
 import { selectionStore } from "../store/selection-store";
+import { syncUiWithDocument } from "../store/selection-sync";
 import { resolvePressTarget } from "../tools/select/marquee";
 import type { MarqueeContext } from "../tools/select/marquee-selection";
 import { nodeLookupFrom } from "../tools/select/node-lookup";
@@ -52,11 +53,13 @@ export function createCanvasRuntime(options: {
   const lookup = nodeLookupFrom(nodeStore);
 
   // Undo/redo dokumen (ED-197): origin lokal saja (command canvas + ketikan Tiptap), seleksi ikut dipulihkan.
+  const exists = (id: string) => nodeStore.getNode(id) !== null;
   const undo = createUndoController(doc, [origin, ySyncPluginKey], {
     get: () => selectionStore.getState().selectedIds,
     restore: (ids) => selectionStore.getState().select(ids),
-    exists: (id) => nodeStore.getNode(id) !== null,
+    exists,
   });
+  const stopUiSync = syncUiWithDocument(doc, exists);
 
   return {
     doc,
@@ -81,6 +84,7 @@ export function createCanvasRuntime(options: {
     },
     destroy() {
       doc.off("afterTransaction", onTransaction);
+      stopUiSync();
       undo.destroy();
       geometry.destroy();
       nodeStore.destroy();
