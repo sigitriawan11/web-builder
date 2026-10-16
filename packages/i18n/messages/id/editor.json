@@ -66,5 +66,13 @@
     "title": "Editor perlu diperbarui",
     "description": "Situs ini disimpan oleh versi editor yang lebih baru. Muat ulang untuk memakai versi editor terbaru.",
     "reload": "Muat ulang"
+  },
+  "devTools": {
+    "label": "Alat dev (sementara)",
+    "frame": "Tambah frame",
+    "text": "Tambah teks",
+    "image": "Tambah gambar",
+    "imageUnavailable": "Butuh aset gambar di situs — upload gambar hadir di M2",
+    "newText": "Teks baru"
   }
 }

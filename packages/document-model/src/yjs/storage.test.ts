@@ -12,6 +12,9 @@ import { jsonToYDoc, YDOC_KEYS, yDocToJson } from "./mapping";
 import { createDocumentUndoManager, systemOrigin, userOrigin } from "./origin";
 import { compactState, createJsonSnapshot, loadDocument, restoreDocument, stateSizeAfterUpdate } from "./storage";
 
+// Ribuan operasi Yjs: ~2–5 s sendiri, bisa melewati batas default 5 s saat seluruh monorepo diuji paralel.
+const HEAVY_TEST_TIMEOUT_MS = 30_000;
+
 // T1.9.3: encoding & penyimpanan (DM-061) + GC (DM-062).
 const read = (doc: Y.Doc) => SiteDocumentSchema.parse(yDocToJson(doc));
 const user = userOrigin("sesi-storage");
@@ -68,42 +71,46 @@ describe("snapshot + update (DM-061)", () => {
 });
 
 describe("GC (DM-062)", () => {
-  it("10.000 edit acak + compaction → state ≤ 3× JSON; compaction membuang konten terhapus", () => {
-    const live = jsonToYDoc(landing200());
-    const updates = recordUpdates(live);
-    const base = Y.encodeStateAsUpdate(live);
-    const frames = Object.values(read(live).nodes)
-      .filter((node) => node.type === "frame")
-      .map((node) => node.id);
-    let seed = 42;
-    const random = () => {
-      seed = (seed * 1103515245 + 12345) % 2147483648;
-      return seed / 2147483648;
-    };
-    const created: string[] = [];
-    for (let i = 0; i < 10_000; i++) {
-      const roll = random();
-      if (roll < 0.1) {
-        const result = runCommand({ doc: live, origin: user }, createNode, {
-          parentId: frames[Math.floor(random() * frames.length)] ?? "pg_bench00001",
-          type: "text",
-        });
-        if (result.ok) created.push(result.value);
-      } else if (roll < 0.18 && created.length > 0) {
-        const id = created.splice(Math.floor(random() * created.length), 1)[0];
-        if (id) runCommand({ doc: live, origin: user }, deleteNodes, { ids: [id] });
-      } else {
-        const id = frames[Math.floor(random() * frames.length)];
-        if (id) setGap(live, id, Math.floor(random() * 64));
+  it(
+    "10.000 edit acak + compaction → state ≤ 3× JSON; compaction membuang konten terhapus",
+    () => {
+      const live = jsonToYDoc(landing200());
+      const updates = recordUpdates(live);
+      const base = Y.encodeStateAsUpdate(live);
+      const frames = Object.values(read(live).nodes)
+        .filter((node) => node.type === "frame")
+        .map((node) => node.id);
+      let seed = 42;
+      const random = () => {
+        seed = (seed * 1103515245 + 12345) % 2147483648;
+        return seed / 2147483648;
+      };
+      const created: string[] = [];
+      for (let i = 0; i < 10_000; i++) {
+        const roll = random();
+        if (roll < 0.1) {
+          const result = runCommand({ doc: live, origin: user }, createNode, {
+            parentId: frames[Math.floor(random() * frames.length)] ?? "pg_bench00001",
+            type: "text",
+          });
+          if (result.ok) created.push(result.value);
+        } else if (roll < 0.18 && created.length > 0) {
+          const id = created.splice(Math.floor(random() * created.length), 1)[0];
+          if (id) runCommand({ doc: live, origin: user }, deleteNodes, { ids: [id] });
+        } else {
+          const id = frames[Math.floor(random() * frames.length)];
+          if (id) setGap(live, id, Math.floor(random() * 64));
+        }
       }
-    }
 
-    const compacted = compactState(base, updates);
-    const jsonBytes = new TextEncoder().encode(JSON.stringify(read(live))).byteLength;
-    expect(compacted.byteLength / jsonBytes).toBeLessThanOrEqual(3);
-    expect(compacted.byteLength).toBeLessThan(Y.mergeUpdates([base, ...updates]).byteLength);
-    expect(read(loadDocument(compacted, []))).toEqual(read(live));
-  });
+      const compacted = compactState(base, updates);
+      const jsonBytes = new TextEncoder().encode(JSON.stringify(read(live))).byteLength;
+      expect(compacted.byteLength / jsonBytes).toBeLessThanOrEqual(3);
+      expect(compacted.byteLength).toBeLessThan(Y.mergeUpdates([base, ...updates]).byteLength);
+      expect(read(loadDocument(compacted, []))).toEqual(read(live));
+    },
+    HEAVY_TEST_TIMEOUT_MS,
+  );
 });
 
 describe("snapshot JSON (DM-061)", () => {

@@ -66,5 +66,13 @@
     "title": "The editor needs an update",
     "description": "This website was saved by a newer version of the editor. Reload to use the latest editor.",
     "reload": "Reload"
+  },
+  "devTools": {
+    "label": "Dev tools (temporary)",
+    "frame": "Add frame",
+    "text": "Add text",
+    "image": "Add image",
+    "imageUnavailable": "Needs an image asset in the site — image upload arrives in M2",
+    "newText": "New text"
   }
 }

@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { APP_URL, REALTIME_URL, SENTRY_E2E_ORIGIN } from "../playwright.config";
 import { register } from "./support/auth";
-import { editorCommand, firstPageId, renamePage } from "./support/editor";
+import { editorCommand, firstPageId, renamePage, unsaved } from "./support/editor";
 import { addWorkspaceMember, resetRateLimits, uniqueEmail } from "./support/stack";
 
 // T1.15.7: lifecycle Y.Doc editor — IndexedDB → token → Hocuspocus (stack e2e dengan realtime sungguhan).
@@ -359,4 +359,29 @@ test("test API editor (ED-242): setup cepat lewat runCommand, seleksi, kamera, g
   await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 40, y: 20, zoom: 0.5 }));
   expect(await page.evaluate(() => window.__editorTestApi?.getCamera())).toEqual({ x: 40, y: 20, zoom: 0.5 });
   await expect(page.locator("#world")).toHaveAttribute("style", /translate3d\(40px, 20px, 0px\) scale\(0\.5\)/);
+});
+
+test("tombol dev tambah frame/teks → tersimpan → reload → tetap ada (T1.15.18)", async ({ page }) => {
+  await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const canvas = page.getByTestId("editor-canvas");
+  const nodeIds = async () =>
+    Object.keys(((await page.evaluate(() => window.__editorTestApi?.getDoc())) as { nodes: object }).nodes);
+  const before = await nodeIds();
+
+  await page.getByTestId("dev-insert-frame").click();
+  const [frameId] = await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []);
+  expect(frameId).toBeTruthy();
+  // Frame terseleksi → teks dibuat di dalamnya.
+  await page.getByTestId("dev-insert-text").click();
+  const [textId] = await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []);
+  await expect(canvas.locator(`[data-node-id="${frameId}"] [data-node-id="${textId}"]`)).toHaveText("New text");
+  // Situs baru belum punya aset gambar (upload = M2) → tombol gambar nonaktif.
+  await expect(page.getByTestId("dev-insert-image")).toBeDisabled();
+  expect((await nodeIds()).length).toBe(before.length + 2);
+
+  await expect.poll(() => unsaved(page)).toBe(false);
+  await page.reload();
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  await expect(canvas.locator(`[data-node-id="${frameId}"] [data-node-id="${textId}"]`)).toHaveText("New text");
 });

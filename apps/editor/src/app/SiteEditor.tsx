@@ -14,6 +14,7 @@ import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
+import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
 import { NodeStoreContext, useNode } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
@@ -132,6 +133,11 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
       </aside>
       <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
         <CanvasViewport runtime={runtime} />
+        {devToolsEnabled() ? (
+          <div className="absolute top-2 left-1/2 z-20 -translate-x-1/2 rounded-md border bg-background p-1 shadow-sm">
+            <DevInsertBar runtime={runtime} readOnly={readOnly} />
+          </div>
+        ) : null}
         {/* ED-229: mode lihat saja — pointer ke canvas ditahan (server juga menolak update koneksi read-only). */}
         {readOnly ? <div className="absolute inset-0 z-10 cursor-not-allowed" data-testid="read-only-blocker" /> : null}
       </div>

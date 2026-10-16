@@ -13,6 +13,9 @@ import { renameNode, reorderNode, setLocked, setTag, setVisible } from "./node-f
 import { duplicateNodes, insertSubtree, type Subtree } from "./subtree";
 import { updateStyle } from "./update-style";
 
+// Ribuan operasi Yjs: ~2–5 s sendiri, bisa melewati batas default 5 s saat seluruh monorepo diuji paralel.
+const HEAVY_TEST_TIMEOUT_MS = 30_000;
+
 // T1.9.5: command node & tree (DM-074, DM-007).
 const text = (parentId: string, value: string, extra: Record<string, unknown> = {}) => ({
   type: "text",
@@ -297,52 +300,58 @@ describe("property-based: urutan command acak tetap valid (fast-check)", () => {
     fc.record({ kind: fc.constant("insert" as const), parent: fc.nat() }),
   );
 
-  it("setiap command berhasil/gagal tanpa merusak dokumen", () => {
-    fc.assert(
-      fc.property(fc.array(action, { maxLength: 25 }), (actions) => {
-        const { ctx, read } = setupDoc(nestedDocument());
-        for (const act of actions) {
-          const doc = read();
-          const all = Object.values(doc.nodes);
-          const nonPages = all.filter((node) => node.type !== "page");
-          const containers = all.filter((node) => "children" in node);
-          const pick = <T>(list: readonly T[], index: number): T | undefined => list[index % Math.max(1, list.length)];
-          const node = "node" in act ? pick(nonPages, act.node) : undefined;
-          const parent = "parent" in act ? pick(containers, act.parent) : undefined;
-          switch (act.kind) {
-            case "create":
-              if (parent) runCommand(ctx, createNode, { parentId: parent.id, type: act.type });
-              break;
-            case "move":
-              if (node && parent) runCommand(ctx, moveNode, { id: node.id, newParentId: parent.id, index: act.index });
-              break;
-            case "delete":
-              if (node) runCommand(ctx, deleteNodes, { ids: [node.id] });
-              break;
-            case "duplicate":
-              if (node) runCommand(ctx, duplicateNodes, { ids: [node.id] });
-              break;
-            case "reorder":
-              if (node) runCommand(ctx, reorderNode, { id: node.id, index: act.index });
-              break;
-            case "visible":
-              if (node) runCommand(ctx, setVisible, { ids: [node.id], visible: act.value });
-              break;
-            case "insert":
-              if (parent) {
-                runCommand(ctx, insertSubtree, {
-                  parentId: parent.id,
-                  subtree: { rootIds: ["tmp_a"], nodes: { tmp_a: text("tmp_x", "Halo") } },
-                });
-              }
-              break;
+  it(
+    "setiap command berhasil/gagal tanpa merusak dokumen",
+    () => {
+      fc.assert(
+        fc.property(fc.array(action, { maxLength: 25 }), (actions) => {
+          const { ctx, read } = setupDoc(nestedDocument());
+          for (const act of actions) {
+            const doc = read();
+            const all = Object.values(doc.nodes);
+            const nonPages = all.filter((node) => node.type !== "page");
+            const containers = all.filter((node) => "children" in node);
+            const pick = <T>(list: readonly T[], index: number): T | undefined =>
+              list[index % Math.max(1, list.length)];
+            const node = "node" in act ? pick(nonPages, act.node) : undefined;
+            const parent = "parent" in act ? pick(containers, act.parent) : undefined;
+            switch (act.kind) {
+              case "create":
+                if (parent) runCommand(ctx, createNode, { parentId: parent.id, type: act.type });
+                break;
+              case "move":
+                if (node && parent)
+                  runCommand(ctx, moveNode, { id: node.id, newParentId: parent.id, index: act.index });
+                break;
+              case "delete":
+                if (node) runCommand(ctx, deleteNodes, { ids: [node.id] });
+                break;
+              case "duplicate":
+                if (node) runCommand(ctx, duplicateNodes, { ids: [node.id] });
+                break;
+              case "reorder":
+                if (node) runCommand(ctx, reorderNode, { id: node.id, index: act.index });
+                break;
+              case "visible":
+                if (node) runCommand(ctx, setVisible, { ids: [node.id], visible: act.value });
+                break;
+              case "insert":
+                if (parent) {
+                  runCommand(ctx, insertSubtree, {
+                    parentId: parent.id,
+                    subtree: { rootIds: ["tmp_a"], nodes: { tmp_a: text("tmp_x", "Halo") } },
+                  });
+                }
+                break;
+            }
+            // `read()` mem-parse SiteDocumentSchema penuh (struktur + invariant) — melempar bila rusak.
+            const result = validateDocument(read(), { mode: "edit" });
+            if (!result.ok) throw new Error(JSON.stringify(result.errors.slice(0, 3)));
           }
-          // `read()` mem-parse SiteDocumentSchema penuh (struktur + invariant) — melempar bila rusak.
-          const result = validateDocument(read(), { mode: "edit" });
-          if (!result.ok) throw new Error(JSON.stringify(result.errors.slice(0, 3)));
-        }
-      }),
-      { numRuns: 60, seed: 20261014 },
-    );
-  });
+        }),
+        { numRuns: 60, seed: 20261014 },
+      );
+    },
+    HEAVY_TEST_TIMEOUT_MS,
+  );
 });
