@@ -22,6 +22,7 @@ import { ResizeHandle } from "./ResizeHandle";
 interface LeftSidebarProps {
   pages: ReactNode;
   layers?: ReactNode;
+  insert?: ReactNode;
 }
 
 export function useLeftSidebarShortcuts(): void {
@@ -51,7 +52,7 @@ export function useLeftSidebarShortcuts(): void {
   }, []);
 }
 
-export function LeftSidebar({ pages, layers }: LeftSidebarProps) {
+export function LeftSidebar({ pages, layers, insert }: LeftSidebarProps) {
   const t = useT();
   const profile = useProfile();
   const userId = profile.data?.id ?? null;
@@ -123,6 +124,8 @@ export function LeftSidebar({ pages, layers }: LeftSidebarProps) {
               </PanelErrorBoundary>
             </section>
           </>
+        ) : leftTab === "insert" && insert ? (
+          <PanelErrorBoundary name="insert">{insert}</PanelErrorBoundary>
         ) : (
           <p className="p-3 text-xs text-muted-foreground" data-testid={`left-placeholder-${leftTab}`}>
             {t("sidebar.comingSoon")}

@@ -19,6 +19,7 @@ import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
 import { NodeStoreContext, useNodeFromStore } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
+import { InsertPanel } from "../panels/insert/InsertPanel";
 import { LeftSidebar } from "../panels/LeftSidebar";
 import { PageSettings } from "../panels/pages/PageSettings";
 import { PagesPanel } from "../panels/pages/PagesPanel";
@@ -191,6 +192,7 @@ function DocumentWorkspace({
       {/* ED-242: test API hanya di build dev (ter-tree-shake dari production). */}
       {import.meta.env.DEV ? <EditorTestHook session={session} runtime={runtime} /> : null}
       <LeftSidebar
+        insert={<InsertPanel runtime={runtime} readOnly={readOnly} />}
         pages={
           <PagesPanel
             runtime={runtime}
