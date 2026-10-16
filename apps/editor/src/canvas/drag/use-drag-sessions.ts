@@ -1,5 +1,6 @@
 import {
   type CommandContext,
+  duplicateNodes,
   moveNode,
   type PositionStyle,
   resolveStyle,
@@ -95,6 +96,8 @@ export function useDragSessions(deps: DragSessionDeps): void {
     // anak auto-layout memakai reorder (T0.6.5).
     const lookup = nodeLookupFrom(deps.nodeStore);
     let moving: MoveItem[] | null = null;
+    // ED-071: Alt ditahan saat mulai drag → lepas = duplikat di posisi tujuan (bukan memindah asli).
+    let moveAlt = false;
 
     let reordering: ReorderSession | null = null;
 
@@ -263,6 +266,7 @@ export function useDragSessions(deps: DragSessionDeps): void {
           const ids = draggedIds(state);
           reordering = beginReorder(ids);
           moving = reordering ? [] : beginMove(ids);
+          moveAlt = !reordering && state.altKey;
         }
         if (reordering) {
           updateReorder(reordering, state);
@@ -289,21 +293,35 @@ export function useDragSessions(deps: DragSessionDeps): void {
 
       if (drag.type === "dragMove") {
         const items = moving ?? [];
+        const alt = moveAlt;
         if (effect.type === "commit" && items.length > 0) {
           const delta = deltaFor(drag);
-          // Semua node dalam SATU transaksi (= satu update Yjs & satu langkah undo, ED-024).
           deps.undoBoundary();
-          deps.opContext.doc.transact(() => {
-            for (const item of items) {
-              runCommand(deps.opContext, updateStyle, {
-                ids: [item.id],
-                patch: { position: movedPosition(item.start, delta) },
-              });
+          if (alt) {
+            // ED-071: Alt+drag → duplikat node (asli tetap) digeser ke posisi tujuan; satu command = satu undo.
+            const result = runCommand(deps.opContext, duplicateNodes, {
+              ids: items.map((item) => item.id),
+              offset: { x: Math.round(delta.dx), y: Math.round(delta.dy) },
+            });
+            if (result.ok) {
+              const idMap = (result.value as { idMap: Record<string, string> }).idMap;
+              selectionStore.getState().select(items.map((item) => idMap[item.id] ?? item.id));
             }
-          }, deps.opContext.origin);
+          } else {
+            // Semua node dalam SATU transaksi (= satu update Yjs & satu langkah undo, ED-024).
+            deps.opContext.doc.transact(() => {
+              for (const item of items) {
+                runCommand(deps.opContext, updateStyle, {
+                  ids: [item.id],
+                  patch: { position: movedPosition(item.start, delta) },
+                });
+              }
+            }, deps.opContext.origin);
+          }
           deps.undoBoundary();
         }
         endMove();
+        moveAlt = false;
         return;
       }
 

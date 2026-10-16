@@ -48,10 +48,11 @@ async function dragBy(
   id: string,
   dx: number,
   dy: number,
-  options: { shift?: boolean; escape?: boolean } = {},
+  options: { shift?: boolean; escape?: boolean; alt?: boolean } = {},
 ) {
   const box = await boxOf(nodeLocator(page, id));
   const start = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  if (options.alt) await page.keyboard.down("Alt");
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   if (options.shift) await page.keyboard.down("Shift");
@@ -59,6 +60,7 @@ async function dragBy(
   if (options.escape) await page.keyboard.press("Escape");
   await page.mouse.up();
   if (options.shift) await page.keyboard.up("Shift");
+  if (options.alt) await page.keyboard.up("Alt");
 }
 
 for (const zoom of [0.5, 1, 2]) {
@@ -140,4 +142,31 @@ test("node bukan absolute (anak auto-layout) tidak mendapat posisi absolute dari
   await dragBy(page, "n_heroimg001", 80, 40);
 
   expect(await updates(page)).toBe(0);
+});
+
+test("AC ED-071: Alt+drag menduplikat (asli tetap), salinan terpilih, 1 langkah undo", async ({ page }) => {
+  await open(page, 1);
+  const BOARD = "n_board00001";
+  const childCount = () =>
+    page.evaluate((id) => {
+      const node = (window as unknown as { __spike: Spike }).__spike.doc.getMap("nodes").get(id);
+      return (node.get("children") as { toJSON(): string[] }).toJSON().length;
+    }, BOARD);
+
+  await nodeLocator(page, CARD).dblclick();
+  expect(await selectedIds(page)).toEqual([CARD]);
+  const before = await childCount();
+
+  await dragBy(page, CARD, 100, 50, { alt: true });
+
+  // Asli tetap di (80,80); satu anak baru di board; salinan (= seleksi) di (180,130).
+  expect(await positionOf(page, CARD)).toMatchObject({ x: 80, y: 80 });
+  expect(await childCount()).toBe(before + 1);
+  const copy = (await selectedIds(page))[0] as string;
+  expect(copy).not.toBe(CARD);
+  expect(await positionOf(page, copy)).toMatchObject({ x: 180, y: 130 });
+
+  // Satu langkah undo membatalkan duplikat + geser.
+  await page.evaluate(() => (window as unknown as { __spike: Spike }).__spike.undoManager.undo());
+  expect(await childCount()).toBe(before);
 });
