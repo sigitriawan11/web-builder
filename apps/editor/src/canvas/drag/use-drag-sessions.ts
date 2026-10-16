@@ -4,6 +4,8 @@ import {
   type PositionStyle,
   resolveStyle,
   runCommand,
+  runCommands,
+  step,
   updateStyle,
 } from "@platform/document-model";
 import { useEffect } from "react";
@@ -18,7 +20,7 @@ import { screenDeltaToWorld, screenPoint, screenToWorld } from "../geometry/coor
 import type { GeometryStore, WorldRect } from "../geometry/geometry-store";
 import type { InteractionState } from "../interactions/interaction-machine";
 import { moveDelta, movedPosition } from "./move";
-import { type ChildBox, insertionMarker, reorderIndex } from "./reorder";
+import { absoluteDropPosition, type ChildBox, insertionMarker, reorderIndex } from "./reorder";
 import { resizePatch, resizeRect } from "./resize";
 import { clearPreviewTranslate, setPreviewTranslate } from "./transform-preview";
 
@@ -43,12 +45,17 @@ interface MoveItem {
   element: Element | null;
 }
 
+// Tujuan drop reorder: ke container auto-layout (indeks) atau ke parent freeform (absolute, keepVisualPosition).
+type ReorderTarget =
+  | { kind: "flex"; parentId: string; index: number }
+  | { kind: "absolute"; parentId: string; local: { x: number; y: number } };
+
 // ED-063: satu anak auto-layout yang di-drag untuk diubah urutan/parent-nya.
 interface ReorderSession {
   id: string;
   start: WorldRect;
   element: Element | null;
-  target: { parentId: string; index: number } | null;
+  target: ReorderTarget | null;
 }
 
 /**
@@ -118,10 +125,11 @@ export function useDragSessions(deps: DragSessionDeps): void {
       return { id, start, element, target: null };
     };
 
-    // Container flex terdalam di bawah pointer yang bukan node yang di-drag atau turunannya. Section
-    // (role DM-011) hanya bisa berada di page: section selebar page selalu "di dalam" section lain,
-    // sehingga tanpa aturan ini section tidak pernah bisa diurutkan ulang (edge case ED-063).
-    const dropTarget = (session: ReorderSession, state: MoveState) => {
+    // Container terdalam di bawah pointer yang bukan node yang di-drag atau turunannya: flex → reorder,
+    // freeform (page / frame non-flex) → absolute (keepVisualPosition). Section (role DM-011) hanya bisa
+    // berada di page: section selebar page selalu "di dalam" section lain, sehingga tanpa aturan ini
+    // section tidak pernah bisa diurutkan ulang (edge case ED-063).
+    const dropContainer = (session: ReorderSession, state: MoveState) => {
       const hit = deps.hitTest(state.current.x, state.current.y);
       if (!hit) return null;
       const dragged = deps.nodeStore.getNode(session.id);
@@ -129,9 +137,17 @@ export function useDragSessions(deps: DragSessionDeps): void {
       const draggedIndex = hit.path.indexOf(session.id);
       const below = draggedIndex >= 0 ? hit.path.slice(draggedIndex + 1) : hit.path;
       const candidates = isSection ? below.filter((id) => deps.nodeStore.getNode(id)?.type === "page") : below;
+      // Utamakan container auto-layout terdalam (reorder). Node non-flex transparan agar reorder ke parent
+      // flex-nya tetap jalan (mis. drag di atas box kosong anak wrap).
       for (const containerId of candidates) {
         const flex = flexLayoutOf(containerId);
-        if (flex) return { containerId, ...flex };
+        if (flex) return { kind: "flex" as const, containerId, ...flex };
+      }
+      // Tidak ada parent auto-layout di jalur → keluar ke container freeform terdalam (page / frame non-flex)
+      // sebagai absolute (keepVisualPosition).
+      for (const containerId of candidates) {
+        const node = deps.nodeStore.getNode(containerId);
+        if (node && "children" in node) return { kind: "absolute" as const, containerId };
       }
       return null;
     };
@@ -139,13 +155,25 @@ export function useDragSessions(deps: DragSessionDeps): void {
     const updateReorder = (session: ReorderSession, state: MoveState) => {
       const delta = deltaFor(state);
       const ghost = { ...session.start, x: session.start.x + delta.dx, y: session.start.y + delta.dy };
-      const target = dropTarget(session, state);
-      const containerRect = target ? deps.geometry.peekRect(target.containerId) : null;
-      if (!target || !containerRect) {
+      const previewGhostOnly = () => {
         session.target = null;
+        previewStore.getState().setReorder({ ghost, marker: null });
+      };
+      const target = dropContainer(session, state);
+      const containerRect = target ? deps.geometry.peekRect(target.containerId) : null;
+      if (!target || !containerRect) return previewGhostOnly();
+
+      // Keluar auto-layout ke parent freeform → absolute di posisi visual, tanpa marker.
+      if (target.kind === "absolute") {
+        session.target = {
+          kind: "absolute",
+          parentId: target.containerId,
+          local: absoluteDropPosition(ghost, containerRect),
+        };
         previewStore.getState().setReorder({ ghost, marker: null });
         return;
       }
+
       const siblings: ChildBox[] = target.node.children
         .filter((childId) => childId !== session.id)
         .flatMap((childId) => {
@@ -158,11 +186,43 @@ export function useDragSessions(deps: DragSessionDeps): void {
         deps.viewportOffset(),
       );
       const index = reorderIndex(siblings, pointer, target.direction, target.wrap);
-      session.target = { parentId: target.containerId, index };
+      session.target = { kind: "flex", parentId: target.containerId, index };
       previewStore.getState().setReorder({
         ghost,
         marker: insertionMarker(siblings, index, target.direction, target.wrap, containerRect),
       });
+    };
+
+    // Commit drop reorder dalam SATU langkah undo (ED-024). Flex → moveNode ke indeks; absolute (keluar ke
+    // freeform) → moveNode + updateStyle posisi absolute (keepVisualPosition) sebagai satu batch atomik.
+    const commitReorder = (id: string, target: ReorderTarget) => {
+      if (target.kind === "flex") {
+        const node = deps.nodeStore.getNode(id);
+        const parent = node?.parentId ? deps.nodeStore.getNode(node.parentId) : null;
+        // Indeks akhir moveNode = indeks semula bila parent sama → drop di tempat asal tidak membuat
+        // update Yjs maupun langkah undo kosong.
+        const unchanged =
+          target.parentId === node?.parentId &&
+          parent &&
+          "children" in parent &&
+          parent.children.indexOf(id) === target.index;
+        if (unchanged) return;
+        deps.undoBoundary();
+        runCommand(deps.opContext, moveNode, { id, newParentId: target.parentId, index: target.index });
+        deps.undoBoundary();
+        return;
+      }
+      const newParent = deps.nodeStore.getNode(target.parentId);
+      const index = newParent && "children" in newParent ? newParent.children.length : 0;
+      deps.undoBoundary();
+      runCommands(deps.opContext, [
+        step(moveNode, { id, newParentId: target.parentId, index }),
+        step(updateStyle, {
+          ids: [id],
+          patch: { position: { type: "absolute", x: target.local.x, y: target.local.y } },
+        }),
+      ]);
+      deps.undoBoundary();
     };
 
     const endReorder = () => {
@@ -217,21 +277,7 @@ export function useDragSessions(deps: DragSessionDeps): void {
 
       if (drag.type === "dragMove" && reordering) {
         const { id, target } = reordering;
-        const node = deps.nodeStore.getNode(id);
-        const parent = node?.parentId ? deps.nodeStore.getNode(node.parentId) : null;
-        // Indeks akhir moveNode = indeks semula bila parent sama → drop di tempat asal tidak membuat
-        // update Yjs maupun langkah undo kosong.
-        const unchanged =
-          target?.parentId === node?.parentId &&
-          parent &&
-          "children" in parent &&
-          parent.children.indexOf(id) === target?.index;
-        // Satu moveNode = satu transaksi (ED-024); indeks = posisi akhir di parent tujuan.
-        if (effect.type === "commit" && target && !unchanged) {
-          deps.undoBoundary();
-          runCommand(deps.opContext, moveNode, { id, newParentId: target.parentId, index: target.index });
-          deps.undoBoundary();
-        }
+        if (effect.type === "commit" && target) commitReorder(id, target);
         endReorder();
         moving = null;
         return;

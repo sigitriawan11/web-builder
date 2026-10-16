@@ -67,6 +67,18 @@ export function reorderIndex(
   return row.start + row.items.filter((child) => centerX(child.rect) < pointer.x).length;
 }
 
+/**
+ * ED-063: keluar auto-layout ke parent freeform. Posisi absolute node (relatif parent) agar tetap di
+ * tempat visualnya saat dilepas (keepVisualPosition): world top-left ghost dikurangi world top-left parent,
+ * dibulatkan ke pixel (snap pixel default seperti `movedPosition`).
+ */
+export function absoluteDropPosition(
+  ghost: { x: number; y: number },
+  parent: { x: number; y: number },
+): { x: number; y: number } {
+  return { x: Math.round(ghost.x - parent.x), y: Math.round(ghost.y - parent.y) };
+}
+
 // Garis penanda sisip (world): tegak lurus arah layout. Ketebalan digambar overlay (2px screen).
 export interface InsertionMarker {
   x: number;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type ChildBox, insertionMarker, reorderIndex } from "./reorder";
+import { absoluteDropPosition, type ChildBox, insertionMarker, reorderIndex } from "./reorder";
 
 // Baris: tiga anak 100×50 dengan gap 20 mulai x=0.
 const row: ChildBox[] = [0, 1, 2].map((i) => ({ id: `r${i}`, rect: { x: i * 120, y: 0, width: 100, height: 50 } }));
@@ -115,5 +115,15 @@ describe("insertionMarker — ujung awal & akhir", () => {
       length: 300,
       orientation: "vertical",
     });
+  });
+});
+
+describe("absoluteDropPosition (ED-063 keepVisualPosition)", () => {
+  it("posisi lokal = ghost world − parent world, dibulatkan", () => {
+    expect(absoluteDropPosition({ x: 220.4, y: 130.6 }, { x: 40, y: 40 })).toEqual({ x: 180, y: 91 });
+  });
+
+  it("parent di origin → posisi = ghost", () => {
+    expect(absoluteDropPosition({ x: 50, y: 60 }, { x: 0, y: 0 })).toEqual({ x: 50, y: 60 });
   });
 });
