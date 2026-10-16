@@ -149,7 +149,9 @@
     "page": "Page",
     "frame": "Frame",
     "text": "Teks",
-    "image": "Gambar"
+    "image": "Gambar",
+    "shape": "Bentuk",
+    "icon": "Ikon"
   },
   "bottomBar": {
     "label": "Bar bawah",

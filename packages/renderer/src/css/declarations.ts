@@ -284,6 +284,10 @@ export function nodeDeclarations(node: Node, style: Style): Declaration[] {
     }
   }
   if (node.type === "image") out.push(["display", "block"], ["object-fit", node.props.fit]);
+  // DM-016: shape ellipse = lingkaran/oval lewat border-radius; rect/line memakai radius/stroke dari style.
+  if (node.type === "shape" && node.props.shape === "ellipse") out.push(["border-radius", "50%"]);
+  // DM-015: ikon = elemen inline-flex square (ukuran dari style), warna currentColor.
+  if (node.type === "icon") out.push(["display", "inline-flex"], ["line-height", "0"]);
   return out;
 }
 

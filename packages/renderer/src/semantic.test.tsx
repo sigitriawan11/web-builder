@@ -1,5 +1,5 @@
 import type { Node, SiteDocument } from "@platform/document-model";
-import { heroDocument } from "@platform/document-model/fixtures";
+import { heroDocument, minimalDocument } from "@platform/document-model/fixtures";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { RenderContext } from "./context";
@@ -136,5 +136,66 @@ describe("tanpa elemen interaktif bersarang (DM-009)", () => {
     expect(sectionHtml).toMatch(/<img [^>]*src="https:\/\/cdn\.test\/ast_cake000001"/);
     // Link di luar frame berlink tetap <a>.
     expect(output).toContain('<a href="#n_title00001"><span>Menu</span></a>');
+  });
+});
+
+describe("shape & icon (DM-015/DM-016)", () => {
+  const ctx = (): RenderContext => ({
+    pageId: "pg_home000001",
+    breakpoint: "base",
+    mode: "publish",
+    assetUrl: (id) => `/a/${id}`,
+  });
+  const shapeNode = (shape: "rect" | "ellipse"): SiteDocument => {
+    const doc = minimalDocument();
+    const pageId = doc.pageOrder[0] ?? "";
+    doc.nodes.n_shape00001 = {
+      id: "n_shape00001",
+      type: "shape",
+      parentId: pageId,
+      visible: true,
+      locked: false,
+      style: {
+        base: {
+          size: { width: { mode: "fixed", value: 80, unit: "px" }, height: { mode: "fixed", value: 80, unit: "px" } },
+          fills: [{ type: "solid", color: "#D9D9D9" }],
+        },
+      },
+      props: { shape },
+    } as never;
+    (doc.nodes[pageId] as { children: string[] }).children = ["n_shape00001"];
+    return doc;
+  };
+
+  it("rect = div tanpa SVG (AC ED-041)", () => {
+    const html = renderToStaticMarkup(render(shapeNode("rect"), ctx()));
+    expect(html).toContain("<div");
+    expect(html).not.toContain("<svg");
+  });
+
+  it("ellipse = div border-radius 50% (AC ED-042)", () => {
+    const { css } = buildPageStyles(shapeNode("ellipse"), { pageId: "pg_home000001", assetUrl: (id) => `/a/${id}` });
+    expect(css).toContain("border-radius:50%");
+  });
+
+  it("icon = span berisi SVG dari ctx.icon", () => {
+    const doc = minimalDocument();
+    const pageId = doc.pageOrder[0] ?? "";
+    doc.nodes.n_icon000001 = {
+      id: "n_icon000001",
+      type: "icon",
+      parentId: pageId,
+      visible: true,
+      locked: false,
+      style: {
+        base: {
+          size: { width: { mode: "fixed", value: 24, unit: "px" }, height: { mode: "fixed", value: 24, unit: "px" } },
+        },
+      },
+      props: { set: "lucide", name: "phone" },
+    } as never;
+    (doc.nodes[pageId] as { children: string[] }).children = ["n_icon000001"];
+    const html = renderToStaticMarkup(render(doc, { ...ctx(), icon: (name) => <svg data-icon={name} /> }));
+    expect(html).toMatch(/<span[^>]*><svg data-icon="phone">/);
   });
 });

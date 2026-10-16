@@ -149,7 +149,9 @@
     "page": "Page",
     "frame": "Frame",
     "text": "Text",
-    "image": "Image"
+    "image": "Image",
+    "shape": "Shape",
+    "icon": "Icon"
   },
   "bottomBar": {
     "label": "Bottom bar",

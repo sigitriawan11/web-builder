@@ -7,7 +7,7 @@ import { defineCommand, fail } from "./command";
 import { exceeds, locate, pageNodeCount } from "./limits";
 import { childrenOf, nodesMap } from "./y-access";
 
-const CreatableTypeSchema = z.enum(["frame", "text", "image"]);
+const CreatableTypeSchema = z.enum(["frame", "text", "image", "shape", "icon"]);
 type CreatableType = z.infer<typeof CreatableTypeSchema>;
 
 const MAX_ID_ATTEMPTS = 5;
@@ -17,6 +17,11 @@ const DEFAULT_BASE_STYLE: Record<CreatableType, Style> = {
   frame: { size: { width: { mode: "fill" }, height: { mode: "hug" } } },
   text: { size: { width: { mode: "fill" }, height: { mode: "hug" } } },
   image: { size: { width: { mode: "fill" }, height: { mode: "fixed", value: 240, unit: "px" } } },
+  // Shape & icon: ukuran dari drag/klik (pemanggil) — default kecil bila tidak diberi.
+  shape: {
+    size: { width: { mode: "fixed", value: 100, unit: "px" }, height: { mode: "fixed", value: 100, unit: "px" } },
+  },
+  icon: { size: { width: { mode: "fixed", value: 24, unit: "px" }, height: { mode: "fixed", value: 24, unit: "px" } } },
 };
 
 // Image tidak punya default props karena asset wajib dipilih pemanggil.
@@ -24,9 +29,19 @@ const DEFAULT_PROPS: Record<CreatableType, Record<string, unknown>> = {
   frame: {},
   text: { content: { type: "doc", content: [{ type: "paragraph" }] } },
   image: {},
+  // Shape & icon props wajib dari pemanggil (shape: rect/ellipse/line; icon: set/name) — default rect/ikon kosong
+  // diisi pemanggil; dibiarkan {} agar validasi menuntun bila tidak diberi.
+  shape: { shape: "rect" },
+  icon: { set: "lucide", name: "square" },
 };
 
-const DEFAULT_NAME: Record<CreatableType, string> = { frame: "Frame", text: "Text", image: "Image" };
+const DEFAULT_NAME: Record<CreatableType, string> = {
+  frame: "Frame",
+  text: "Text",
+  image: "Image",
+  shape: "Shape",
+  icon: "Icon",
+};
 
 export const createNode = defineCommand({
   name: "createNode",

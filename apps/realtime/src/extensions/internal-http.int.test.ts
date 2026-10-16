@@ -131,7 +131,7 @@ describe("GET /internal/documents/:id/state", () => {
     expect(response.headers.get("content-type")).toBe("application/octet-stream");
     expect(response.headers.get(DOCUMENT_STATE_HEADERS.source)).toBe("db");
     expect(response.headers.get(DOCUMENT_STATE_HEADERS.seq)).toBe("1");
-    expect(response.headers.get(DOCUMENT_STATE_HEADERS.schemaVersion)).toBe("1");
+    expect(response.headers.get(DOCUMENT_STATE_HEADERS.schemaVersion)).toBe("2");
     expect(await stateJson(response)).toEqual(SiteDocumentSchema.parse(yDocToJson(source)));
   });
 

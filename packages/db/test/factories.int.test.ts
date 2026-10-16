@@ -48,7 +48,7 @@ describe("factories (ARCHITECTURE §14)", () => {
     const { workspace } = await createUser(testDb.db);
     const { site, document } = await createSite(testDb.db, { workspace });
     expect(site).toMatchObject({ workspaceId: workspace.id, status: "draft", documentId: document.id });
-    expect(document).toMatchObject({ siteId: site.id, kind: "site", schemaVersion: 1 });
+    expect(document).toMatchObject({ siteId: site.id, kind: "site", schemaVersion: 2 });
     const [stored] = await testDb.db.select().from(documents).where(eq(documents.id, document.id));
     expect(stored?.siteId).toBe(site.id);
   });

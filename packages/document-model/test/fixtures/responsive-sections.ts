@@ -307,7 +307,7 @@ export function responsiveSectionsDocument(): { document: SiteDocument; sections
 
   return {
     document: {
-      schemaVersion: 1,
+      schemaVersion: 2,
       meta: { title: "Uji responsif", createdWith: "template" },
       settings: defaultSiteSettings({ title: "Uji responsif" }),
       theme: defaultTheme(),

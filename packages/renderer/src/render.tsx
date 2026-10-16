@@ -10,7 +10,14 @@ import { renderRichText } from "./rich-text";
 // menyediakan render per node (`renderNodeElement`) + lingkungan (`RenderEnv`) yang diisi lookup — bukan dokumen JSON
 // penuh. `render()` (publish/SSR) dibangun dari fungsi yang sama sehingga kedua mode tidak bisa menyimpang.
 
-const DEFAULT_TAG: Record<Node["type"], string> = { page: "main", frame: "div", text: "p", image: "img" };
+const DEFAULT_TAG: Record<Node["type"], string> = {
+  page: "main",
+  frame: "div",
+  text: "p",
+  image: "img",
+  shape: "div",
+  icon: "span",
+};
 
 export interface RenderEnv {
   ctx: RenderContext;
@@ -126,6 +133,24 @@ export function renderNodeElement(
         />
       );
       return imageAttributes ? <Link attributes={{ ...attributes, ...imageAttributes }}>{element}</Link> : element;
+    }
+    case "shape": {
+      // DM-016: rect/ellipse = <div> + CSS (fills/strokes/radius/border-radius). Line (P1) = SVG — sampai itu div.
+      const shapeLink = node.props.link ? linkOf(node.props.link, env) : null;
+      if (shapeLink) return <Link attributes={{ ...attributes, ...shapeLink }}>{null}</Link>;
+      return <Box tag={node.tag ?? DEFAULT_TAG.shape} attributes={attributes} />;
+    }
+    case "icon": {
+      // DM-015: ikon Lucide sebagai inline SVG. Definisi path diambil dari peta ikon renderer (ctx.icon); bila tak
+      // tersedia (mis. editor menyuntik SVG sendiri lewat `content`), render kosong.
+      const svg = options.content ?? ctx.icon?.(node.props.name, node.props.strokeWidth);
+      const iconLink = node.props.link ? linkOf(node.props.link, env) : null;
+      const span = (
+        <Box tag={node.tag ?? DEFAULT_TAG.icon} attributes={iconLink ? {} : attributes}>
+          {svg ?? null}
+        </Box>
+      );
+      return iconLink ? <Link attributes={{ ...attributes, ...iconLink }}>{span}</Link> : span;
     }
   }
 }

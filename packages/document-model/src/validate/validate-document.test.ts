@@ -7,6 +7,9 @@ import { emptyTheme } from "../defaults/top-level";
 import { REFERENCE_ISSUE_CODES, STRUCTURE_ISSUE_CODES } from "./issues";
 import { validateDocument } from "./validate-document";
 
+// Fixture 5.000 node: generasi + 5 putaran validasi bisa > 5 s saat run dingin/paralel (ambang 250 ms diukur di dalam).
+const HEAVY_TEST_TIMEOUT_MS = 30_000;
+
 // T1.8.14: mode validasi (DM-068) & invariant per kode (DM-069).
 const codes = (result: ReturnType<typeof validateDocument>) => result.errors.map((issue) => issue.code);
 
@@ -89,16 +92,20 @@ describe("mode validasi (DM-068)", () => {
     expect(validateDocument({ ...minimalDocument(), theme: emptyTheme() }, { mode: "publish" }).ok).toBe(true);
   });
 
-  it("validasi 5.000 node < 100 ms (AC DM-068, indikatif)", () => {
-    const doc = fixtures.generateLandingDocument({ nodeCount: 5000 });
-    expect(validateDocument(doc, { mode: "publish" }).errors).toEqual([]);
-    // Ambil yang tercepat dari 5 putaran: test file berjalan paralel, satu pengukuran tunggal terlalu bising.
-    let fastest = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < 5; i++) {
-      const start = performance.now();
-      validateDocument(doc, { mode: "publish" });
-      fastest = Math.min(fastest, performance.now() - start);
-    }
-    expectDurationBelow(fastest, 250);
-  });
+  it(
+    "validasi 5.000 node < 100 ms (AC DM-068, indikatif)",
+    () => {
+      const doc = fixtures.generateLandingDocument({ nodeCount: 5000 });
+      expect(validateDocument(doc, { mode: "publish" }).errors).toEqual([]);
+      // Ambil yang tercepat dari 5 putaran: test file berjalan paralel, satu pengukuran tunggal terlalu bising.
+      let fastest = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < 5; i++) {
+        const start = performance.now();
+        validateDocument(doc, { mode: "publish" });
+        fastest = Math.min(fastest, performance.now() - start);
+      }
+      expectDurationBelow(fastest, 250);
+    },
+    HEAVY_TEST_TIMEOUT_MS,
+  );
 });

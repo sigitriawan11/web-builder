@@ -72,7 +72,8 @@ export async function createWorkspace(db: Db, options: { owner: UserRow; name?: 
 
 /**
  * Situs + dokumennya dalam satu transaksi (FK dua arah, ARCHITECTURE §6.3): dokumen → situs → `documents.site_id`.
- * `schemaVersion` default 1 (db hanya boleh import type-only dari document-model).
+ * `schemaVersion` default 2 = CURRENT_SCHEMA_VERSION (db hanya boleh import type-only dari document-model, jadi
+ * angka ini disalin; naikkan bersama bump schema agar factory menyeed dokumen versi terkini, bukan memicu migrasi).
  */
 export async function createSite(
   db: Db,
@@ -81,7 +82,7 @@ export async function createSite(
   return db.transaction(async (tx) => {
     const [created] = await tx
       .insert(documents)
-      .values({ workspaceId: options.workspace.id, kind: "site", schemaVersion: options.schemaVersion ?? 1 })
+      .values({ workspaceId: options.workspace.id, kind: "site", schemaVersion: options.schemaVersion ?? 2 })
       .returning();
     if (!created) throw new Error("createSite: insert dokumen gagal");
     const [site] = await tx

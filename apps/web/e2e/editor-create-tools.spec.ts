@@ -100,3 +100,42 @@ test("AC ED-040: section tool menyisipkan section > div.container di page root, 
   // Section kedua (Y lebih kecil) tersisip sebelum yang pertama.
   expect((await doc(page)).nodes[pageId]?.children).toEqual([second, first]);
 });
+
+test("AC ED-041/042: rectangle & ellipse tool → node shape; Shift = persegi; ellipse border-radius 50%", async ({
+  page,
+}) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Shape Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+  const canvas = page.getByTestId("editor-canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("canvas tidak terlihat");
+
+  // Rectangle (shortcut R) dengan Shift (persegi): drag 120×60 → 120×120.
+  await canvas.click({ position: { x: 5, y: 5 } });
+  await page.keyboard.press("r");
+  await expect(page.getByTestId("tool-shape")).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.down("Shift");
+  await page.mouse.move(box.x + 30, box.y + 30);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 150, box.y + 90, { steps: 6 });
+  await page.mouse.up();
+  await page.keyboard.up("Shift");
+  const rectId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  const rect = (await doc(page)).nodes[rectId];
+  expect(rect?.type).toBe("shape");
+  expect(rect?.style.base.size?.width?.value).toBe(120);
+  expect(rect?.style.base.size?.height?.value).toBe(120);
+  await expect(canvas.locator(`[data-node-id="${rectId}"]`)).toHaveJSProperty("tagName", "DIV");
+
+  // Ellipse (shortcut O): border-radius 50%.
+  await page.keyboard.press("o");
+  await page.mouse.move(box.x + 200, box.y + 40);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 320, box.y + 120, { steps: 6 });
+  await page.mouse.up();
+  const ellipseId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  expect((await doc(page)).nodes[ellipseId]?.type).toBe("shape");
+  await expect(canvas.locator(`[data-node-id="${ellipseId}"]`)).toHaveCSS("border-radius", /50%|9999px/);
+});

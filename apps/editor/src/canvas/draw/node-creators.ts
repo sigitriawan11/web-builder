@@ -44,6 +44,20 @@ export function createFrame(context: CreateContext): string | null {
   return result.ok ? result.value : null;
 }
 
+/** ED-041/042: shape (rect/ellipse) = node `shape`; fill default abu-abu. */
+export function createShape(shape: "rect" | "ellipse"): (context: CreateContext) => string | null {
+  return (context) => {
+    const result = runCommand(ctxOf(context.runtime), createNode, {
+      parentId: context.parentId,
+      index: context.index,
+      type: "shape",
+      props: { shape },
+      style: boxStyle(context, { fills: [{ type: "solid", color: "#D9D9D9" }] }),
+    });
+    return result.ok ? result.value : null;
+  };
+}
+
 /**
  * ED-040: section full-width di page root + inner container (struktur `section > div.container`), auto-layout
  * vertikal. Satu transaksi (createNode section → createNode container). Mengembalikan ID section.

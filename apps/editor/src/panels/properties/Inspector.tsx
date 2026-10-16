@@ -33,7 +33,14 @@ function Value({ value, format }: { value: unknown; format?: (value: never) => R
   return <>{format ? format(value as never) : String(value)}</>;
 }
 
-const DEFAULT_TAG: Record<Node["type"], string> = { page: "main", frame: "div", text: "p", image: "img" };
+const DEFAULT_TAG: Record<Node["type"], string> = {
+  page: "main",
+  frame: "div",
+  text: "p",
+  image: "img",
+  shape: "div",
+  icon: "span",
+};
 
 function DesignTab({ pageId, nodes }: { pageId: string; nodes: readonly Node[] }) {
   const t = useT();

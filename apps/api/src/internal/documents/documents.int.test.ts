@@ -75,7 +75,7 @@ describe("GET /internal/v1/documents/:id/state", () => {
     expect(response.status).toBe(200);
     expect(response.headers["content-type"]).toBe("application/octet-stream");
     expect(response.headers[DOCUMENT_STATE_HEADERS.seq]).toBe("2");
-    expect(response.headers[DOCUMENT_STATE_HEADERS.schemaVersion]).toBe("1");
+    expect(response.headers[DOCUMENT_STATE_HEADERS.schemaVersion]).toBe("2");
     expect(response.headers[DOCUMENT_STATE_HEADERS.source]).toBe("db");
     const json = siteDocumentFromState(new Uint8Array(response.body as Buffer));
     expect(SiteDocumentSchema.parse(json).meta.title).toBe("Seq 2");

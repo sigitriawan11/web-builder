@@ -7,7 +7,7 @@ import type { CanvasRuntime } from "../canvas-runtime";
 import { screenPoint, screenToWorld } from "../geometry/coordinates";
 import { drawRectFrom } from "./draw-geometry";
 import { type DrawRect, drawStore } from "./draw-store";
-import { type CreateContext, createFrame, createSection } from "./node-creators";
+import { type CreateContext, createFrame, createSection, createShape } from "./node-creators";
 
 // ED-037/039/040: tool pembuat node berbasis drag. Aktif hanya saat tool creator dipilih; select/pan/marquee sudah
 // di-gate ke toolnya sendiri sehingga tidak bentrok. Klik (< threshold) → ukuran default; drag → ukuran drag.
@@ -16,11 +16,18 @@ import { type CreateContext, createFrame, createSection } from "./node-creators"
 const CLICK_THRESHOLD_PX = 2;
 const DEFAULT_SIZE: Record<string, { width: number; height: number }> = {
   frame: { width: 100, height: 100 },
+  rectangle: { width: 100, height: 100 },
+  ellipse: { width: 100, height: 100 },
   section: { width: 0, height: 0 }, // section = full-width, tinggi preset (tidak dari drag)
 };
 
 type Creator = (context: CreateContext) => string | null;
-const CREATORS: Partial<Record<ToolId, Creator>> = { frame: createFrame, section: createSection };
+const CREATORS: Partial<Record<ToolId, Creator>> = {
+  frame: createFrame,
+  section: createSection,
+  rectangle: createShape("rect"),
+  ellipse: createShape("ellipse"),
+};
 
 export const isCreatorTool = (tool: ToolId): boolean => tool in CREATORS;
 

@@ -56,6 +56,32 @@ export const ImagePropsSchema = z.strictObject({
   link: LinkValueSchema.optional(),
 });
 
+// DM-016: shape (rect/ellipse/line). Rect/ellipse dirender div + CSS; line (P1) = inline SVG. Warna/isi dari
+// `style.fills`/`strokes`/`radius`.
+export const ShapePropsSchema = z.strictObject({
+  shape: z.enum(["rect", "ellipse", "line"]),
+  line: z
+    .strictObject({
+      cap: z.enum(["butt", "round", "square"]),
+      arrowStart: z.boolean().optional(),
+      arrowEnd: z.boolean().optional(),
+    })
+    .optional(),
+  link: LinkValueSchema.optional(),
+});
+
+// DM-015: ikon Lucide. Warna = `style.color`, ukuran = `style.size` (square).
+export const IconPropsSchema = z.strictObject({
+  set: z.literal("lucide"),
+  name: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-z][a-z0-9-]*$/, "nama ikon kebab-case"),
+  strokeWidth: z.number().positive().max(8).optional(),
+  link: LinkValueSchema.optional(),
+});
+
 // ── Node (DM-008, DM-009) ──────────────────────────────────────────────────
 
 // Anchor publik (`#tentang-kami`): slug diawali huruf, unik per page (invariant di document.ts).
@@ -139,15 +165,38 @@ export const ImageNodeSchema = z.strictObject({
   props: ImagePropsSchema,
 });
 
+export const ShapeNodeSchema = z.strictObject({
+  ...baseShape,
+  id: ChildIdSchema,
+  type: z.literal("shape"),
+  parentId: NodeIdSchema,
+  // Shape = elemen non-semantik; tag tetap div (line dirender svg oleh renderer, tanpa pilihan tag).
+  tag: z.enum(["div"]).optional(),
+  props: ShapePropsSchema,
+});
+
+export const IconNodeSchema = z.strictObject({
+  ...baseShape,
+  id: ChildIdSchema,
+  type: z.literal("icon"),
+  parentId: NodeIdSchema,
+  tag: z.enum(["span"]).optional(),
+  props: IconPropsSchema,
+});
+
 export const NodeSchema = z.discriminatedUnion("type", [
   PageNodeSchema,
   FrameNodeSchema,
   TextNodeSchema,
   ImageNodeSchema,
+  ShapeNodeSchema,
+  IconNodeSchema,
 ]);
 
 export type PageNode = z.infer<typeof PageNodeSchema>;
 export type FrameNode = z.infer<typeof FrameNodeSchema>;
+export type ShapeNode = z.infer<typeof ShapeNodeSchema>;
+export type IconNode = z.infer<typeof IconNodeSchema>;
 export type TextNode = z.infer<typeof TextNodeSchema>;
 export type ImageNode = z.infer<typeof ImageNodeSchema>;
 export type Node = z.infer<typeof NodeSchema>;
