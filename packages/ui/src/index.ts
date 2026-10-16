@@ -22,7 +22,13 @@ export {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "./components/DropdownMenu";
 export { Input } from "./components/Input";
@@ -30,6 +36,7 @@ export { Label } from "./components/Label";
 export { NativeSelect } from "./components/NativeSelect";
 export { Separator } from "./components/Separator";
 export { ThemeSwitcher, type ThemeSwitcherProps } from "./components/ThemeSwitcher";
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./components/Tooltip";
 export { cn } from "./lib/cn";
 export {
   applyThemePreference,

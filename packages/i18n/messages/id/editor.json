@@ -75,5 +75,41 @@
     "image": "Tambah gambar",
     "imageUnavailable": "Butuh aset gambar di situs — upload gambar hadir di M2",
     "newText": "Teks baru"
+  },
+  "toolbar": {
+    "menu": "Menu utama",
+    "backToDashboard": "Kembali ke dashboard",
+    "edit": "Edit",
+    "view": "Tampilan",
+    "preferences": "Preferensi",
+    "help": "Bantuan",
+    "shortcutSheet": "Pintasan keyboard",
+    "undo": "Urungkan",
+    "redo": "Ulangi",
+    "tools": "Alat",
+    "tool": {
+      "select": "Pindah",
+      "frame": "Frame",
+      "section": "Section",
+      "rectangle": "Persegi",
+      "ellipse": "Elips",
+      "line": "Garis",
+      "text": "Teks",
+      "image": "Gambar",
+      "icon": "Ikon",
+      "hand": "Tangan"
+    },
+    "shape": "Bentuk",
+    "page": "Page",
+    "device": "Perangkat",
+    "zoom": "Zoom {percent}%",
+    "zoomIn": "Perbesar",
+    "zoomOut": "Perkecil",
+    "zoomPreset": "Zoom ke {percent}%",
+    "preview": "Preview",
+    "publish": "Publish",
+    "mode": "Mode desain",
+    "comingSoon": "Menyusul",
+    "narrowScreen": "Editor paling optimal di layar ≥ 1280px."
   }
 }

@@ -75,5 +75,41 @@
     "image": "Add image",
     "imageUnavailable": "Needs an image asset in the site — image upload arrives in M2",
     "newText": "New text"
+  },
+  "toolbar": {
+    "menu": "Main menu",
+    "backToDashboard": "Back to dashboard",
+    "edit": "Edit",
+    "view": "View",
+    "preferences": "Preferences",
+    "help": "Help",
+    "shortcutSheet": "Keyboard shortcuts",
+    "undo": "Undo",
+    "redo": "Redo",
+    "tools": "Tools",
+    "tool": {
+      "select": "Move",
+      "frame": "Frame",
+      "section": "Section",
+      "rectangle": "Rectangle",
+      "ellipse": "Ellipse",
+      "line": "Line",
+      "text": "Text",
+      "image": "Image",
+      "icon": "Icon",
+      "hand": "Hand"
+    },
+    "shape": "Shape",
+    "page": "Page",
+    "device": "Device",
+    "zoom": "Zoom {percent}%",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomPreset": "Zoom to {percent}%",
+    "preview": "Preview",
+    "publish": "Publish",
+    "mode": "Design mode",
+    "comingSoon": "Coming soon",
+    "narrowScreen": "The editor works best on screens 1280px or wider."
   }
 }

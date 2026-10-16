@@ -1,6 +1,7 @@
 import type { Locale } from "@platform/i18n";
 import { createApiClient, createPlatformApi, type PlatformApi } from "@platform/sdk";
 import { PlatformApiProvider } from "@platform/sdk/react";
+import { TooltipProvider } from "@platform/ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useRef, useState } from "react";
 import { I18nProvider } from "./i18n";
@@ -32,7 +33,8 @@ export function AppProviders({ locale, children }: { locale: Locale; children: R
             localeRef.current = next;
           }}
         >
-          {children}
+          {/* ED-006: satu provider tooltip (delay bersama untuk tombol toolbar & panel). */}
+          <TooltipProvider delayDuration={300}>{children}</TooltipProvider>
         </I18nProvider>
       </PlatformApiProvider>
     </QueryClientProvider>

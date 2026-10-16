@@ -1,8 +1,19 @@
 import { createStore } from "zustand/vanilla";
 
-// Tool M0. Tool pembuat node (frame, text, image, …) menyusul di M2 bersama aturan
-// "kembali ke Move setelah membuat node" dan tool lock (ED-037).
-export const TOOL_IDS = ["select", "hand"] as const;
+// ED-006: semua tool toolbar M2. Perilaku tool pembuat node (frame, section, shape, text, image, icon) di Epic 2.4,
+// termasuk aturan "kembali ke Move setelah membuat node" (ED-037).
+export const TOOL_IDS = [
+  "select",
+  "frame",
+  "section",
+  "rectangle",
+  "ellipse",
+  "line",
+  "text",
+  "image",
+  "icon",
+  "hand",
+] as const;
 export type ToolId = (typeof TOOL_IDS)[number];
 
 export interface ToolState {

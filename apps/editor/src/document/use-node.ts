@@ -25,3 +25,16 @@ export function useChildren(id: string): readonly string[] {
   const node = useNode(id);
   return node && "children" in node ? node.children : NO_CHILDREN;
 }
+
+const NO_SUBSCRIPTION = () => () => {};
+const NO_NODE = () => null;
+
+/** Seperti `useNode`, untuk komponen di luar NodeStoreContext (mis. toolbar); store/id boleh belum ada. */
+export function useNodeFromStore(store: NodeStore | null, id: string | null): Node | null {
+  const subscribe = useCallback(
+    (listener: () => void) => (store && id ? store.subscribe(id, listener) : NO_SUBSCRIPTION()),
+    [store, id],
+  );
+  const getSnapshot = useCallback(() => (store && id ? store.getNode(id) : NO_NODE()), [store, id]);
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}

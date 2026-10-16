@@ -1,7 +1,6 @@
 import { LOCALES, type Locale, t as translate } from "@platform/i18n";
 import { useProfile, useUpdateProfile } from "@platform/sdk/react";
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -10,6 +9,7 @@ import {
 } from "@platform/ui";
 import { CheckIcon, LanguagesIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { ToolbarButton } from "./chrome/ToolbarButton";
 import { useLocale, useSetLocale, useT } from "./i18n";
 
 // ED-221: bahasa UI editor bisa diganti cepat dari menu tanpa reload; pilihan disimpan ke profil (ACC-009) sehingga
@@ -22,9 +22,7 @@ export function LanguageMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t("app.language")} title={t("app.language")}>
-          <LanguagesIcon />
-        </Button>
+        <ToolbarButton label={t("app.language")} icon={<LanguagesIcon />} data-testid="toolbar-language" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>{t("app.language")}</DropdownMenuLabel>

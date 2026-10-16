@@ -3,22 +3,23 @@ import { isApiError } from "@platform/sdk";
 import { useSite } from "@platform/sdk/react";
 import type { Site } from "@platform/shared/contracts";
 import { Button } from "@platform/ui";
-import { ArrowLeftIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import * as Y from "yjs";
 import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
 import { discardLocalDocument } from "../collaboration/document-session";
-import { EditAccessGate, useEditAccess } from "../collaboration/EditAccessGate";
+import { EditAccessGate } from "../collaboration/EditAccessGate";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
 import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
-import { NodeStoreContext, useNode } from "../document/use-node";
+import { NodeStoreContext, useNode, useNodeFromStore } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
 import { setTelemetryScope } from "../telemetry/telemetry";
+import { Toolbar } from "./chrome/Toolbar";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { useT } from "./i18n";
 import { LanguageMenu, ProfileLocaleSync } from "./LanguageMenu";
@@ -64,28 +65,30 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
     void setTelemetryScope({ siteId: site.id });
   }, [site.id]);
   const { session, status } = useDocumentSession(site.documentId);
+  const workspace = useWorkspaceRuntime(session, pageId);
+  const pageNode = useNodeFromStore(workspace.runtime?.nodeStore ?? null, workspace.runtime?.pageId ?? null);
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-connection-status={status}>
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b px-3" data-testid="editor-header">
-        <Button asChild variant="ghost" size="icon" aria-label={t("app.back")} title={t("app.back")}>
-          <a href="/sites">
-            <ArrowLeftIcon />
-          </a>
-        </Button>
-        <h1 className="truncate text-sm font-semibold" data-testid="editor-site-name">
-          {site.name}
-        </h1>
-        <div className="ml-auto flex items-center gap-1">
-          {session ? <SaveIndicator session={session} /> : null}
-          <LanguageMenu />
-        </div>
-      </header>
+      <Toolbar
+        siteName={site.name}
+        pageTitle={pageNode?.type === "page" ? pageNode.props.title : null}
+        runtime={workspace.runtime}
+        status={session ? <SaveIndicator session={session} /> : null}
+        language={<LanguageMenu />}
+      />
+      {/* ED-006 edge: layar < 1024px tetap bisa dipakai, dengan pemberitahuan. */}
+      <p
+        className="hidden border-b bg-muted px-3 py-1 text-xs text-muted-foreground max-lg:block"
+        data-testid="narrow-screen-banner"
+      >
+        {t("toolbar.narrowScreen")}
+      </p>
       <ProfileLocaleSync />
       {session ? <SessionBanners session={session} status={status} /> : null}
       {session ? <EditAccessGate session={session} /> : null}
       <div className="flex min-h-0 flex-1 bg-muted/40" data-testid="editor-canvas-slot" data-page-id={pageId ?? ""}>
         {session && status !== "loading" ? (
-          <DocumentWorkspace session={session} pageId={pageId} />
+          <DocumentWorkspace session={session} workspace={workspace} />
         ) : (
           <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
         )}
@@ -94,19 +97,30 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
   );
 }
 
-// T1.15.8: canvas (renderer mode editor + interaksi M0) untuk dokumen dari realtime; page aktif = `?page=` bila ada
-// di dokumen, selain itu page pertama. Daftar page sementara (panel Pages = M2) juga bukti dokumen termuat.
-function DocumentWorkspace({ session, pageId }: { session: DocumentSession; pageId: string | null }) {
-  const pageOrder = usePageOrder(session.doc);
-  const schemaVersion = useDocumentSchemaVersion(session.doc);
+interface WorkspaceRuntime {
+  runtime: CanvasRuntime | null;
+  pageOrder: readonly string[];
+  schemaVersion: number | null;
+  outdated: boolean;
+  readOnly: boolean;
+}
+
+const NO_DOC = new Y.Doc();
+
+// T1.15.8: runtime canvas untuk dokumen dari realtime; page aktif = `?page=` bila ada di dokumen, selain itu page
+// pertama. Dipakai toolbar (undo, nama page) & workspace (canvas, panel).
+function useWorkspaceRuntime(session: DocumentSession | null, pageId: string | null): WorkspaceRuntime {
+  const doc = session?.doc ?? NO_DOC;
+  const pageOrder = usePageOrder(doc);
+  const schemaVersion = useDocumentSchemaVersion(doc);
   const outdated = isNewerThanEditor(schemaVersion);
-  const readOnly = useEditAccess(session).kind !== "editing";
+  const readOnly = useEditAccessOrEditing(session) !== "editing";
   const activePageId = pageId && pageOrder.includes(pageId) ? pageId : (pageOrder[0] ?? null);
   // Dibuat di effect (bukan useMemo/useState): StrictMode menjalankan cleanup lalu effect lagi — runtime dari
   // useMemo akan sudah di-destroy (observer lepas) dan canvas berhenti mengikuti dokumen.
   const [runtime, setRuntime] = useState<CanvasRuntime | null>(null);
   useEffect(() => {
-    if (!activePageId || outdated) return;
+    if (!session || !activePageId || outdated) return;
     const next = createCanvasRuntime({ doc: session.doc, pageId: activePageId, origin: TAB_ORIGIN });
     setRuntime(next);
     return () => {
@@ -115,6 +129,17 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
     };
   }, [session, activePageId, outdated]);
   useEffect(() => runtime?.setReadOnly(readOnly), [runtime, readOnly]);
+  return { runtime, pageOrder, schemaVersion, outdated, readOnly };
+}
+
+function useEditAccessOrEditing(session: DocumentSession | null): string {
+  const subscribe = useCallback((listener: () => void) => session?.subscribeAccess(listener) ?? (() => {}), [session]);
+  const read = useCallback(() => session?.access().kind ?? "editing", [session]);
+  return useSyncExternalStore(subscribe, read, read);
+}
+
+function DocumentWorkspace({ session, workspace }: { session: DocumentSession; workspace: WorkspaceRuntime }) {
+  const { runtime, pageOrder, schemaVersion, outdated, readOnly } = workspace;
   // ED-230: dokumen dari editor yang lebih baru → tidak ada canvas/runtime (tidak bisa diedit).
   if (outdated && schemaVersion !== null) return <EditorOutdated version={schemaVersion} />;
   if (!runtime) return null;
