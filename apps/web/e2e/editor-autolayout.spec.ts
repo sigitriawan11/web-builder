@@ -118,3 +118,61 @@ test("T2.8.2 ED-080: panel arah auto-layout (vertical/horizontal/wrap)", async (
     | undefined;
   expect(layout).toMatchObject({ direction: "row", wrap: true });
 });
+
+test("T2.8.3/2.8.4 ED-081/082: panel gap (+Auto) & padding (H/V, per sisi)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Auto Layout Spacing")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: { base: { layout: { mode: "flex", direction: "row" }, size: sizeFixed(300, 200) } },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  const inspector = page.getByTestId("inspector");
+  const layoutOf = () =>
+    doc(page).then(
+      (d) =>
+        d.nodes[frame]?.style.base.layout as
+          | { gap?: { value?: number }; justify?: string; padding?: Record<string, { value?: number }> }
+          | undefined,
+    );
+
+  // Gap = 24.
+  await inspector.getByTestId("auto-layout-gap").fill("24");
+  await inspector.getByTestId("auto-layout-gap").press("Enter");
+  await expect.poll(async () => (await layoutOf())?.gap?.value).toBe(24);
+
+  // Auto gap → justify space-between.
+  await inspector.getByTestId("auto-layout-gap-auto").click();
+  await expect.poll(async () => (await layoutOf())?.justify).toBe("spaceBetween");
+
+  // Padding H=16 → left & right; V=8 → top & bottom.
+  await inspector.getByTestId("auto-layout-padding-h").fill("16");
+  await inspector.getByTestId("auto-layout-padding-h").press("Enter");
+  await inspector.getByTestId("auto-layout-padding-v").fill("8");
+  await inspector.getByTestId("auto-layout-padding-v").press("Enter");
+  await expect
+    .poll(async () => {
+      const p = (await layoutOf())?.padding;
+      return [p?.left?.value, p?.right?.value, p?.top?.value, p?.bottom?.value];
+    })
+    .toEqual([16, 16, 8, 8]);
+
+  // Per sisi: ubah hanya top → 4; 3 nilai independen tetap.
+  await inspector.getByTestId("auto-layout-padding-per-side").click();
+  await inspector.getByTestId("auto-layout-padding-top").fill("4");
+  await inspector.getByTestId("auto-layout-padding-top").press("Enter");
+  await expect
+    .poll(async () => {
+      const p = (await layoutOf())?.padding;
+      return [p?.top?.value, p?.right?.value, p?.bottom?.value, p?.left?.value];
+    })
+    .toEqual([4, 16, 8, 16]);
+});

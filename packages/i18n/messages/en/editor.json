@@ -168,7 +168,17 @@
     "direction": "Direction",
     "direction_column": "Vertical",
     "direction_row": "Horizontal",
-    "direction_wrap": "Wrap"
+    "direction_wrap": "Wrap",
+    "gap": "Gap",
+    "gapAuto": "Auto (space between)",
+    "padding": "Padding",
+    "paddingHorizontal": "Horizontal padding",
+    "paddingVertical": "Vertical padding",
+    "paddingTop": "Top padding",
+    "paddingRight": "Right padding",
+    "paddingBottom": "Bottom padding",
+    "paddingLeft": "Left padding",
+    "paddingPerSide": "Padding per side"
   },
   "nodeType": {
     "page": "Page",
