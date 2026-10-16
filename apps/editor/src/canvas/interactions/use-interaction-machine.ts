@@ -54,6 +54,7 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
         panTool: effectiveTool(toolStore.getState()) === "hand",
         additive: event.shiftKey,
         deep: event.metaKey || event.ctrlKey,
+        altKey: event.altKey,
       });
     };
     // ED-023: pointer capture dipasang saat tekan BERUBAH menjadi drag, bukan saat ditekan. Capture sejak
@@ -61,7 +62,13 @@ export function useInteractionMachine(viewportRef: RefObject<HTMLElement | null>
     // ke node (temuan T0.5.3).
     const onPointerMove = (event: PointerEvent) => {
       const before = interactionStore.getState().state.type;
-      dispatch({ type: "pointerMove", pointerId: event.pointerId, point: point(event), shiftKey: event.shiftKey });
+      dispatch({
+        type: "pointerMove",
+        pointerId: event.pointerId,
+        point: point(event),
+        shiftKey: event.shiftKey,
+        altKey: event.altKey,
+      });
       const after = interactionStore.getState().state.type;
       if (before === "pressing" && after !== "pressing" && after !== "idle")
         viewport.setPointerCapture(event.pointerId);

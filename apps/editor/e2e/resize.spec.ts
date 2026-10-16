@@ -29,13 +29,15 @@ const baseStyle = (page: Page, id: string) =>
     };
   }, id);
 
-async function dragHandle(page: Page, handle: string, dx: number, dy: number) {
+async function dragHandle(page: Page, handle: string, dx: number, dy: number, modifiers: ("Shift" | "Alt")[] = []) {
   const box = await boxOf(page.locator(`.overlay-handle[data-handle="${handle}"]`));
   const start = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  for (const key of modifiers) await page.keyboard.down(key);
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   await page.mouse.move(start.x + dx, start.y + dy, { steps: 6 });
   await page.mouse.up();
+  for (const key of modifiers) await page.keyboard.up(key);
 }
 
 const cases: [string, { x: number; y: number; width: number; height: number }][] = [
@@ -58,6 +60,34 @@ for (const [handle, expected] of cases) {
     expect({ x: position?.x, y: position?.y, width: size.width?.value, height: size.height?.value }).toEqual(expected);
   });
 }
+
+test("AC ED-066: Alt (dari pusat) handle kanan +20 → W +40, X −20", async ({ page }) => {
+  await open(page, "freeform", CARD);
+  await dragHandle(page, "e", 20, 0, ["Alt"]);
+
+  const { size, position } = await baseStyle(page, CARD);
+  // CARD 240×160 di (80,80): W 240→280, X 80→60, tinggi & Y tetap.
+  expect({ x: position?.x, y: position?.y, width: size.width?.value, height: size.height?.value }).toEqual({
+    x: 60,
+    y: 80,
+    width: 280,
+    height: 160,
+  });
+});
+
+test("ED-066: Shift (aspect) handle sudut menjaga rasio 3:2", async ({ page }) => {
+  await open(page, "freeform", CARD);
+  await dragHandle(page, "se", 60, 10, ["Shift"]);
+
+  const { size, position } = await baseStyle(page, CARD);
+  // dw=60 > dh=10 → W 300, H = 300 / (240/160) = 200; sudut se → kiri & atas tetap (80,80).
+  expect({ x: position?.x, y: position?.y, width: size.width?.value, height: size.height?.value }).toEqual({
+    x: 80,
+    y: 80,
+    width: 300,
+    height: 200,
+  });
+});
 
 test("AC ED-065: handle kiri tidak menggeser tepi kanan (DOM, ±0.5px)", async ({ page }) => {
   await open(page, "freeform", CARD);

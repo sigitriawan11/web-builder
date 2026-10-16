@@ -63,6 +63,7 @@ describe("reduceInteraction — dari idle (ED-023)", () => {
       origin,
       current: origin,
       shiftKey: false,
+      altKey: false,
       target: node,
       additive: false,
       deep: false,
@@ -111,6 +112,11 @@ describe("reduceInteraction — pressing", () => {
       nodeId: "n_card000001",
       handle: "se",
     });
+  });
+
+  it("dragResize membawa Shift (aspect) & Alt (dari pusat) dari pointerMove (ED-066)", () => {
+    const modMove = { type: "pointerMove", pointerId: ID, point: far, shiftKey: true, altKey: true } as const;
+    expect(run(down(handle), modMove).state).toMatchObject({ type: "dragResize", shiftKey: true, altKey: true });
   });
 
   it.each([

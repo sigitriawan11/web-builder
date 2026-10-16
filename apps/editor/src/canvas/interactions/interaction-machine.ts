@@ -26,8 +26,10 @@ interface PointerTrack {
   // Titik screen saat ditekan & posisi terakhir.
   origin: Point;
   current: Point;
-  // Shift saat gerakan terakhir: kunci sumbu saat pindah (ED-062).
+  // Shift saat gerakan terakhir: kunci sumbu saat pindah (ED-062) / aspect saat resize (ED-066).
   shiftKey: boolean;
+  // Alt saat gerakan terakhir: resize simetris dari pusat (ED-066).
+  altKey: boolean;
 }
 
 export type InteractionState =
@@ -53,8 +55,10 @@ export type InteractionEvent =
       additive: boolean;
       // Mod (Ctrl/Meta): deep select node terdalam (ED-054).
       deep: boolean;
+      // Alt saat ditekan: resize dari pusat (ED-066).
+      altKey?: boolean;
     }
-  | { type: "pointerMove"; pointerId: number; point: Point; shiftKey?: boolean }
+  | { type: "pointerMove"; pointerId: number; point: Point; shiftKey?: boolean; altKey?: boolean }
   | { type: "pointerUp"; pointerId: number; point: Point }
   | { type: "pointerCancel"; pointerId: number }
   | { type: "escape" }
@@ -89,8 +93,9 @@ function startDrag(
   pressing: Extract<InteractionState, { type: "pressing" }>,
   point: Point,
   shiftKey: boolean,
+  altKey: boolean,
 ): DragState {
-  const track = { pointerId: pressing.pointerId, origin: pressing.origin, current: point, shiftKey };
+  const track = { pointerId: pressing.pointerId, origin: pressing.origin, current: point, shiftKey, altKey };
   switch (pressing.target.kind) {
     case "node":
       return { type: "dragMove", nodeId: pressing.target.nodeId, path: pressing.target.path, ...track };
@@ -125,6 +130,7 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
           origin: event.point,
           current: event.point,
           shiftKey: event.additive,
+          altKey: event.altKey ?? false,
           target: event.target,
           additive: event.additive,
           deep: event.deep,
@@ -137,13 +143,14 @@ export function reduceInteraction(state: InteractionState, event: InteractionEve
       if (state.type === "idle" || state.type === "panning" || state.pointerId !== event.pointerId)
         return unchanged(state);
       const shiftKey = event.shiftKey ?? state.shiftKey;
+      const altKey = event.altKey ?? state.altKey;
       if (state.type === "pressing") {
         if (distance(state.origin, event.point) < DRAG_THRESHOLD_PX) {
-          return { state: { ...state, current: event.point, shiftKey }, effects: [] };
+          return { state: { ...state, current: event.point, shiftKey, altKey }, effects: [] };
         }
-        return { state: startDrag(state, event.point, shiftKey), effects: [] };
+        return { state: startDrag(state, event.point, shiftKey, altKey), effects: [] };
       }
-      return { state: { ...state, current: event.point, shiftKey }, effects: [] };
+      return { state: { ...state, current: event.point, shiftKey, altKey }, effects: [] };
     }
 
     case "pointerUp": {

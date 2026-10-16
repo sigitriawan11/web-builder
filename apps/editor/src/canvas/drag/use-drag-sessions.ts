@@ -82,7 +82,11 @@ export function useDragSessions(deps: DragSessionDeps): void {
         state.current.y - state.origin.y,
         cameraStore.getState().zoom,
       );
-      const next = resizeRect(resizing.start, state.handle, delta);
+      // ED-066: Shift = aspect ratio, Alt = resize simetris dari pusat.
+      const next = resizeRect(resizing.start, state.handle, delta, {
+        aspect: state.shiftKey,
+        fromCenter: state.altKey,
+      });
       return resizePatch(resizing.start, next, state.handle, resizing.position);
     };
 
