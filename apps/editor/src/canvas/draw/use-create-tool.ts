@@ -6,6 +6,7 @@ import { toolStore } from "../../tools/tool-store";
 import { cameraStore } from "../camera-store";
 import type { CanvasRuntime } from "../canvas-runtime";
 import { screenPoint, screenToWorld } from "../geometry/coordinates";
+import { isCreatorTool } from "./creator-tools";
 import { drawRectFrom } from "./draw-geometry";
 import { type DrawRect, drawStore } from "./draw-store";
 import { type CreateContext, createFrame, createSection, createShape, createText } from "./node-creators";
@@ -31,8 +32,6 @@ const CREATORS: Partial<Record<ToolId, Creator>> = {
   ellipse: createShape("ellipse"),
   text: createText,
 };
-
-export const isCreatorTool = (tool: ToolId): boolean => tool in CREATORS;
 
 export function useCreateTool(viewportRef: RefObject<HTMLElement | null>, runtime: CanvasRuntime): void {
   useEffect(() => {

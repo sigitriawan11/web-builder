@@ -3,7 +3,7 @@ import { isEditableEvent } from "../../commands/is-editable-target";
 import { interactionStore } from "../../store/interaction-store";
 import { textEditingStore } from "../../store/text-editing-store";
 import { effectiveTool, toolStore } from "../../tools/tool-store";
-import { isCreatorTool } from "../draw/use-create-tool";
+import { isCreatorTool } from "../draw/creator-tools";
 import type { PressTarget, ResizeHandle } from "./interaction-machine";
 
 export interface InteractionAdapterDeps {
