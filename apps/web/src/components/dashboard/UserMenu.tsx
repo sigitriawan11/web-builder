@@ -20,7 +20,7 @@ import {
 import { CheckIcon, LogOutIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { apiPost } from "../../lib/auth/client";
-import { setLocaleCookie } from "../../lib/locale-cookie";
+import { setLocaleCookie } from "../../lib/preference-cookies";
 
 const LANGUAGES: readonly Locale[] = ["id", "en"];
 

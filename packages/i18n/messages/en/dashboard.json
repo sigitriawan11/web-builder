@@ -70,5 +70,44 @@
     "cancel": "Cancel",
     "forbidden": "You don't have permission to create websites in this workspace.",
     "limit": "You've reached the website limit on your plan."
+  },
+  "account": {
+    "title": "Account",
+    "description": "Manage your profile, language, and the devices signed in to your account.",
+    "profile": {
+      "title": "Profile",
+      "name": "Name",
+      "save": "Save",
+      "saved": "Profile saved.",
+      "email": "Email",
+      "emailUnverified": "Not verified",
+      "changeEmail": "Change email",
+      "newEmail": "New email",
+      "password": "Current password",
+      "sendChange": "Send confirmation link",
+      "changeSent": "We sent a confirmation link to the new email. Your current email stays active until the link is clicked.",
+      "reauthPassword": "Incorrect password. Enter your account password.",
+      "reauthFresh": "For your security, sign out and sign in again before changing your email."
+    },
+    "preferences": {
+      "title": "Language & time zone",
+      "language": "Language",
+      "timezone": "Time zone",
+      "useDevice": "Use this device's time zone ({timezone})",
+      "save": "Save preferences",
+      "hint": "The language is used for the interface and emails. The time zone is used for all dates in the dashboard."
+    },
+    "sessions": {
+      "title": "Active sessions",
+      "description": "Devices currently signed in to your account.",
+      "current": "This device",
+      "unknownDevice": "Unknown device",
+      "lastActive": "Last active {time}",
+      "signedIn": "Signed in {time}",
+      "revoke": "Sign out",
+      "revokeOthers": "Sign out of all other devices",
+      "revokedOthers": "{count, plural, =0 {No other devices.} one {# other device signed out.} other {# other devices signed out.}}",
+      "empty": "No other sessions."
+    }
   }
 }

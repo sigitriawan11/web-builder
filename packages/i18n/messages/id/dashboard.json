@@ -70,5 +70,44 @@
     "cancel": "Batal",
     "forbidden": "Anda tidak punya izin membuat website di workspace ini.",
     "limit": "Batas jumlah website di paket Anda sudah tercapai."
+  },
+  "account": {
+    "title": "Akun",
+    "description": "Kelola profil, bahasa, dan perangkat yang masuk ke akun Anda.",
+    "profile": {
+      "title": "Profil",
+      "name": "Nama",
+      "save": "Simpan",
+      "saved": "Profil disimpan.",
+      "email": "Email",
+      "emailUnverified": "Belum terverifikasi",
+      "changeEmail": "Ganti email",
+      "newEmail": "Email baru",
+      "password": "Password saat ini",
+      "sendChange": "Kirim tautan konfirmasi",
+      "changeSent": "Kami mengirim tautan konfirmasi ke email baru. Email lama tetap dipakai sampai tautan diklik.",
+      "reauthPassword": "Password salah. Masukkan password akun Anda.",
+      "reauthFresh": "Demi keamanan, keluar lalu masuk lagi sebelum mengganti email."
+    },
+    "preferences": {
+      "title": "Bahasa & zona waktu",
+      "language": "Bahasa",
+      "timezone": "Zona waktu",
+      "useDevice": "Pakai zona waktu perangkat ({timezone})",
+      "save": "Simpan preferensi",
+      "hint": "Bahasa dipakai untuk tampilan dan email. Zona waktu dipakai untuk semua tanggal di dashboard."
+    },
+    "sessions": {
+      "title": "Sesi aktif",
+      "description": "Perangkat yang sedang masuk ke akun Anda.",
+      "current": "Perangkat ini",
+      "unknownDevice": "Perangkat tidak dikenal",
+      "lastActive": "Aktif terakhir {time}",
+      "signedIn": "Masuk {time}",
+      "revoke": "Keluar",
+      "revokeOthers": "Keluar dari semua perangkat lain",
+      "revokedOthers": "{count, plural, =0 {Tidak ada perangkat lain.} other {# perangkat lain dikeluarkan.}}",
+      "empty": "Tidak ada sesi lain."
+    }
   }
 }

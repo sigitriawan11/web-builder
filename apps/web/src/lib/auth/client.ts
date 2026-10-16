@@ -32,7 +32,7 @@ export function toFailure(status: number, body: unknown, retryAfter: string | nu
 }
 
 async function request<T>(
-  method: "GET" | "POST",
+  method: "GET" | "POST" | "PATCH" | "DELETE",
   path: string,
   body?: unknown,
   headers?: HeadersInit,
@@ -62,6 +62,8 @@ async function request<T>(
 export const apiPost = <T = unknown>(path: string, body: unknown, headers?: HeadersInit) =>
   request<T>("POST", path, body, headers);
 export const apiGet = <T = unknown>(path: string) => request<T>("GET", path);
+export const apiPatch = <T = unknown>(path: string, body: unknown) => request<T>("PATCH", path, body);
+export const apiDelete = <T = unknown>(path: string) => request<T>("DELETE", path);
 
 export interface SessionUser {
   id: string;

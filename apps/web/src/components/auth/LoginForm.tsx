@@ -5,7 +5,7 @@ import { Alert, AlertDescription, Button, Checkbox, Input, Label } from "@platfo
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { apiGet, apiPost } from "../../lib/auth/client";
-import { setLocaleCookie } from "../../lib/locale-cookie";
+import { setLocaleCookie, setTimeZoneCookie } from "../../lib/preference-cookies";
 import { Turnstile } from "./Turnstile";
 import { useFailureMessage } from "./use-failure-message";
 
@@ -19,8 +19,11 @@ interface ConsentStatus {
  */
 export async function continueAfterSignIn(next: string): Promise<void> {
   // Bahasa akun (users.locale) menjadi bahasa UI sejak login (ACC-009).
-  const profile = await apiGet<{ data: { locale: Locale } }>("/v1/account/profile");
-  if (profile.ok) setLocaleCookie(profile.data.data.locale);
+  const profile = await apiGet<{ data: { locale: Locale; timezone: string } }>("/v1/account/profile");
+  if (profile.ok) {
+    setLocaleCookie(profile.data.data.locale);
+    setTimeZoneCookie(profile.data.data.timezone);
+  }
   const consents = await apiGet<ConsentStatus>("/v1/account/consents");
   const needsConsent = consents.ok && !(consents.data.data.terms.accepted && consents.data.data.privacy.accepted);
   window.location.assign(needsConsent ? `/consent?next=${encodeURIComponent(next)}` : next);

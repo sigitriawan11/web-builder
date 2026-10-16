@@ -27,6 +27,7 @@ export {
 } from "./components/DropdownMenu";
 export { Input } from "./components/Input";
 export { Label } from "./components/Label";
+export { NativeSelect } from "./components/NativeSelect";
 export { Separator } from "./components/Separator";
 export { ThemeSwitcher, type ThemeSwitcherProps } from "./components/ThemeSwitcher";
 export { cn } from "./lib/cn";
