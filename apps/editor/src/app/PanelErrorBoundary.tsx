@@ -1,5 +1,6 @@
 import { Button } from "@platform/ui";
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { reportError } from "../telemetry/telemetry";
 import { useT } from "./i18n";
 
 function PanelError({ onReload }: { onReload: () => void }) {
@@ -26,7 +27,8 @@ export class PanelErrorBoundary extends Component<
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error(`editor: panel "${this.props.name}" gagal dirender`, error, info.componentStack);
+    reportError(error, { area: `panel:${this.props.name}` });
+    console.error(info.componentStack);
   }
 
   override render(): ReactNode {

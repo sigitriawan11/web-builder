@@ -1,10 +1,11 @@
 import { Button } from "@platform/ui";
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { reportError } from "../telemetry/telemetry";
 import { useT } from "./i18n";
 
 // Error boundary aplikasi (ARCHITECTURE §5.2, ED-228): kesalahan render tak terduga → layar pemulihan, bukan halaman
 // putih. Di editor situs, layar ini juga menawarkan "Buka versi terakhir yang tersimpan" (buang cache lokal, muat dari
-// server) dan ID error untuk bantuan. Pelaporan Sentry = T1.15.16.
+// server) dan ID error untuk bantuan (tag `error_id` di Sentry, T1.15.16).
 export interface RecoveryOptions {
   // Buang data lokal dokumen (IndexedDB) lalu muat ulang dari server.
   openLastSaved?: () => Promise<void>;
@@ -52,7 +53,8 @@ export class AppErrorBoundary extends Component<Props, { errorId: string | null 
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error(`editor: kesalahan render [${this.state.errorId ?? "?"}]`, error, info.componentStack);
+    reportError(error, { area: "app", ...(this.state.errorId ? { errorId: this.state.errorId } : {}) });
+    console.error(info.componentStack);
   }
 
   override render(): ReactNode {

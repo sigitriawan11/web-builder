@@ -11,6 +11,7 @@ import {
 import { useT } from "../../app/i18n";
 import type { NodeStore } from "../../document/node-store";
 import { NodeStoreContext } from "../../document/use-node";
+import { reportError } from "../../telemetry/telemetry";
 
 // ED-228: aksi placeholder node rusak. Disediakan canvas (butuh command & origin); tanpa provider (test, render
 // statis) tombol tidak ditampilkan.
@@ -120,7 +121,8 @@ export class NodeErrorBoundary extends Component<BoundaryProps, { error: unknown
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error(`editor: node "${this.props.id}" gagal dirender`, error, info.componentStack);
+    reportError(error, { area: "node" });
+    console.error(`editor: node "${this.props.id}" gagal dirender`, info.componentStack);
   }
 
   override render(): ReactNode {

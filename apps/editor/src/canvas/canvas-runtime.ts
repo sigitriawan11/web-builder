@@ -6,6 +6,7 @@ import { NodeStore } from "../document/node-store";
 import { createUndoController, type UndoController } from "../document/undo-controller";
 import { selectionStore } from "../store/selection-store";
 import { syncUiWithDocument } from "../store/selection-sync";
+import { recordEditorAction } from "../telemetry/telemetry";
 import { resolvePressTarget } from "../tools/select/marquee";
 import type { MarqueeContext } from "../tools/select/marquee-selection";
 import { nodeLookupFrom } from "../tools/select/node-lookup";
@@ -38,6 +39,13 @@ export interface CanvasRuntime {
   destroy(): void;
 }
 
+function originKind(origin: unknown): string {
+  if (typeof origin === "object" && origin !== null && "kind" in origin && typeof origin.kind === "string") {
+    return origin.kind;
+  }
+  return "other";
+}
+
 export function createCanvasRuntime(options: {
   doc: Y.Doc;
   pageId: string;
@@ -47,7 +55,11 @@ export function createCanvasRuntime(options: {
   const nodeStore = new NodeStore(doc);
   const geometry = createDomGeometry();
   // ED-019: transaksi dokumen bisa menggeser node tanpa mengubah ukurannya → ukur ulang semua (lazy).
-  const onTransaction = () => geometry.store.invalidateAll();
+  const onTransaction = (transaction: Y.Transaction) => {
+    geometry.store.invalidateAll();
+    // ED-231: jejak transaksi dokumen untuk Sentry — hanya jenis origin, tanpa isi.
+    if (transaction.local) recordEditorAction("transaction", originKind(transaction.origin));
+  };
   doc.on("afterTransaction", onTransaction);
 
   // ED-020: node terkunci (atau ancestor-nya terkunci) tidak bisa dipilih di canvas.

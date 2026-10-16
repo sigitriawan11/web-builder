@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { APP_URL, REALTIME_URL } from "../playwright.config";
+import { APP_URL, REALTIME_URL, SENTRY_E2E_ORIGIN } from "../playwright.config";
 import { register } from "./support/auth";
 import "./support/editor";
 import { addWorkspaceMember, resetRateLimits, uniqueEmail } from "./support/stack";
@@ -297,4 +297,35 @@ test("dokumen dari editor versi lebih baru (schemaVersion+1) → reload dipaksa 
   await expect(page.getByTestId("editor-canvas")).toHaveCount(0);
   await page.waitForTimeout(1_000);
   await expect(page.getByTestId("editor-outdated")).toBeVisible();
+});
+
+test("telemetri (ED-231): kesalahan render → layar pemulihan + event Sentry ber-tag tanpa isi dokumen (T1.15.16)", async ({
+  page,
+}) => {
+  const envelopes: string[] = [];
+  await page.route(`${SENTRY_E2E_ORIGIN}/**`, async (route) => {
+    envelopes.push(route.request().postData() ?? "");
+    await route.fulfill({ status: 200, body: "{}" });
+  });
+  const siteId = await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const secret = "Resep Rahasia Kue Lapis Bu Sari";
+  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  await page.evaluate(({ id, title }) => window.__editorTest?.renamePage(id, title), { id: pageId, title: secret });
+
+  await page.evaluate(() => window.__editorTest?.crash());
+  const errorId = (await page.getByTestId("error-id").textContent())?.match(/: (\w+)$/)?.[1];
+  expect(errorId).toBeTruthy();
+  await expect(page.getByRole("button", { name: "Open the last saved version" })).toBeVisible();
+
+  await expect
+    .poll(() => envelopes.find((body) => body.includes('"type":"event"')) ?? "")
+    .toContain("e2e: kesalahan render disengaja");
+  const event = envelopes.find((body) => body.includes('"type":"event"')) ?? "";
+  expect(event).toContain(`"error_id":"${errorId}"`);
+  expect(event).toContain('"area":"app"');
+  expect(event).toMatch(/"site":"[0-9a-f]{16}"/);
+  // ID situs & isi dokumen tidak dikirim mentah.
+  expect(event).not.toContain(siteId);
+  expect(envelopes.join("\n")).not.toContain("Rahasia");
 });

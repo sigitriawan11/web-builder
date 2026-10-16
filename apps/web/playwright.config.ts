@@ -12,6 +12,9 @@ const PORT = 3110;
 const API_PORT = 4310;
 const WORKER_HEALTH_PORT = 4210;
 const REALTIME_PORT = 4410;
+// DSN Sentry palsu: tidak ada server di port ini; test telemetri mencegat envelope lewat `page.route`.
+export const SENTRY_E2E_ORIGIN = "http://sentry.localhost:4610";
+const SENTRY_DSN = "http://e2ekey@sentry.localhost:4610/1";
 export const REALTIME_URL = `ws://realtime.localhost:${REALTIME_PORT}`;
 // Editor SUNGGUHAN (Vite dev, base /editor/) — port & HMR sendiri, terpisah dari `pnpm dev` (5173).
 const EDITOR_PORT = 5998;
@@ -89,6 +92,7 @@ export default defineConfig({
         PUBLIC_MARKETING_URL: MARKETING_URL,
         API_INTERNAL_URL: `http://127.0.0.1:${API_PORT}`,
         PUBLIC_REALTIME_URL: REALTIME_URL,
+        NEXT_PUBLIC_SENTRY_DSN: SENTRY_DSN,
         EDITOR_ORIGIN: `http://localhost:${EDITOR_PORT}`,
         APP_ENV: "local",
         NEXT_DIST_DIR: ".next-e2e",
@@ -99,7 +103,12 @@ export default defineConfig({
       url: `http://localhost:${EDITOR_PORT}/editor/`,
       reuseExistingServer: false,
       timeout: 120_000,
-      env: { ...(process.env as Record<string, string>), EDITOR_PORT: String(EDITOR_PORT) },
+      env: {
+        ...(process.env as Record<string, string>),
+        EDITOR_PORT: String(EDITOR_PORT),
+        VITE_SENTRY_DSN: SENTRY_DSN,
+        VITE_SENTRY_ENVIRONMENT: "e2e",
+      },
     },
   ],
 });

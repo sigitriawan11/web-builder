@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { isEditableEvent } from "../commands/is-editable-target";
+import { recordEditorAction } from "../telemetry/telemetry";
 import type { UndoController } from "./undo-controller";
 import { undoShortcut } from "./undo-shortcut";
 
@@ -13,6 +14,7 @@ export function useUndoShortcuts(controller: UndoController, enabled: () => bool
       const action = undoShortcut(event);
       if (!action) return;
       event.preventDefault();
+      recordEditorAction(action);
       if (action === "undo") controller.undo();
       else controller.redo();
     };

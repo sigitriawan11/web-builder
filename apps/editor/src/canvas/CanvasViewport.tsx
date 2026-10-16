@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { UndoContext } from "../document/undo-context";
 import { NodeStoreContext } from "../document/use-node";
 import { useUndoShortcuts } from "../document/use-undo-shortcuts";
+import { recordEditorAction, reportError } from "../telemetry/telemetry";
 import { useHoverHighlight } from "../tools/select/use-hover-highlight";
 import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-tool";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
@@ -45,12 +46,13 @@ function runtimeDeps(runtime: CanvasRuntime) {
   // ED-228: tombol placeholder node rusak.
   const nodeErrors: NodeErrorActions = {
     deleteNode: (id) => {
+      recordEditorAction("deleteBrokenNode");
       runtime.undo.stopCapturing();
       const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, deleteNodes, { ids: [id] });
       if (!result.ok) console.error(`editor: node rusak "${id}" gagal dihapus`, result);
     },
-    // Pelaporan ke Sentry menyusul (T1.15.16); sampai itu cukup log dengan ID node.
-    reportNode: (id, error) => console.error(`editor: laporan node rusak "${id}"`, error),
+    // Laporan user (ED-228) → Sentry; ID node bukan konten, isi node tidak dikirim.
+    reportNode: (id, error) => reportError(error, { area: `node-report:${id}` }),
   };
   const canEdit = () => !runtime.isReadOnly();
   return { interaction, drag, select, nodeErrors, canEdit };

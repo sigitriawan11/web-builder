@@ -17,6 +17,7 @@ import { useDocumentSession } from "../collaboration/use-document-session";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
 import { NodeStoreContext, useNode } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
+import { setTelemetryScope } from "../telemetry/telemetry";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { useT } from "./i18n";
 import { LanguageMenu, ProfileLocaleSync } from "./LanguageMenu";
@@ -58,6 +59,9 @@ export function SiteEditor({ siteId, pageId }: { siteId: string; pageId: string 
 
 function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
   const t = useT();
+  useEffect(() => {
+    void setTelemetryScope({ siteId: site.id });
+  }, [site.id]);
   const { session, status } = useDocumentSession(site.documentId);
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-connection-status={status}>
@@ -155,7 +159,10 @@ function EditorOutdated({ version }: { version: number }) {
 }
 
 function EditorTestHook({ session, runtime }: { session: DocumentSession; runtime: CanvasRuntime }) {
-  useEditorTestHook(session, runtime);
+  // Seam e2e (ED-231): kesalahan render sungguhan → error boundary → pelaporan.
+  const [crash, setCrash] = useState(false);
+  useEditorTestHook(session, runtime, () => setCrash(true));
+  if (crash) throw new Error("e2e: kesalahan render disengaja");
   return null;
 }
 

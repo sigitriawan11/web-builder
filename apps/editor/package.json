@@ -22,6 +22,7 @@
     "@platform/sdk": "workspace:*",
     "@platform/shared": "workspace:*",
     "@platform/ui": "workspace:*",
+    "@sentry/react": "10.75.3",
     "@tanstack/react-query": "5.104.0",
     "@tiptap/pm": "3.31.4",
     "@tiptap/react": "3.31.4",

@@ -14,6 +14,8 @@ export interface EditorTestApi {
   renamePage: (pageId: string, title: string) => boolean;
   // ED-230: simulasi dokumen yang disimpan editor versi lebih baru (tidak ada command untuk meta — seam test saja).
   setSchemaVersion: (version: number) => void;
+  // ED-231: picu kesalahan render (error boundary + pelaporan Sentry).
+  crash: () => void;
 }
 
 declare global {
@@ -22,7 +24,7 @@ declare global {
   }
 }
 
-export function useEditorTestHook(session: DocumentSession, runtime: CanvasRuntime): void {
+export function useEditorTestHook(session: DocumentSession, runtime: CanvasRuntime, crash: () => void): void {
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     const ctx = { doc: runtime.doc, origin: runtime.origin };
@@ -37,6 +39,7 @@ export function useEditorTestHook(session: DocumentSession, runtime: CanvasRunti
         runtime.undo.stopCapturing();
         return runCommand(ctx, updatePage, { id: pageId, patch: { title } }).ok;
       },
+      crash,
       setSchemaVersion: (version) => {
         runtime.doc.transact(() => runtime.doc.getMap(YDOC_KEYS.meta).set("schemaVersion", version), runtime.origin);
       },
@@ -44,5 +47,5 @@ export function useEditorTestHook(session: DocumentSession, runtime: CanvasRunti
     return () => {
       delete window.__editorTest;
     };
-  }, [session, runtime]);
+  }, [session, runtime, crash]);
 }

@@ -4,7 +4,10 @@ import { App } from "./app/App";
 import { initialLocale } from "./app/i18n";
 import { applyThemeFromCookie } from "./app/theme";
 import "./styles/global.css";
+import { initTelemetry } from "./telemetry/telemetry";
 
+// Sebelum render: error bootstrap pun tercatat (ED-231).
+initTelemetry();
 applyThemeFromCookie();
 document.documentElement.lang = initialLocale();
 const rootElement = document.getElementById("root");

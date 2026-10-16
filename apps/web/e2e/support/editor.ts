@@ -7,6 +7,7 @@ export interface EditorTestApi {
   pageIds: () => string[];
   renamePage: (pageId: string, title: string) => boolean;
   setSchemaVersion: (version: number) => void;
+  crash: () => void;
 }
 
 declare global {
