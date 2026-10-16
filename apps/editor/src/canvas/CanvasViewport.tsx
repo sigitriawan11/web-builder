@@ -25,6 +25,7 @@ import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
+import { useSelectionNav } from "./interactions/use-selection-nav";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 import { useZoomShortcuts } from "./interactions/use-zoom-shortcuts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
@@ -91,6 +92,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useZoomInteractions(viewportRef);
   useZoomShortcuts(runtime);
   useSectionShortcuts(runtime);
+  useSelectionNav(runtime);
   useCreateTool(viewportRef, runtime);
   useEmptyTextCleanup(runtime);
   useTextEditingInteractions(viewportRef);

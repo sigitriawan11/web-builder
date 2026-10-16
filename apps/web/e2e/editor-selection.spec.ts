@@ -74,6 +74,39 @@ test("AC ED-052: Shift+klik toggle multi-select & bounding gabungan", async ({ p
   expect(await selection(page)).toEqual([f2]);
 });
 
+test("AC ED-055: Enter pilih anak, Shift+Enter pilih parent (page root di ujung), Tab sibling wrap", async ({
+  page,
+}) => {
+  await openEditor(page, "Selection Nav");
+  const pageId = await firstPageId(page);
+  const parent = await createFrame(page, pageId, { x: 40, y: 40, width: 400, height: 300 });
+  const a = await createFrame(page, parent, { x: 20, y: 20, width: 120, height: 80 });
+  const b = await createFrame(page, parent, { x: 160, y: 20, width: 120, height: 80 });
+
+  // Enter pada parent → pilih semua anak langsung.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), parent);
+  await page.keyboard.press("Enter");
+  expect([...(await selection(page))].sort()).toEqual([a, b].sort());
+
+  // Shift+Enter pada anak → parent; lanjut → page root; di page root tidak berubah.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), a);
+  await page.keyboard.press("Shift+Enter");
+  expect(await selection(page)).toEqual([parent]);
+  await page.keyboard.press("Shift+Enter");
+  expect(await selection(page)).toEqual([pageId]);
+  await page.keyboard.press("Shift+Enter");
+  expect(await selection(page)).toEqual([pageId]);
+
+  // Tab / Shift+Tab berpindah sibling dengan wrap-around.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), a);
+  await page.keyboard.press("Tab");
+  expect(await selection(page)).toEqual([b]);
+  await page.keyboard.press("Tab");
+  expect(await selection(page)).toEqual([a]);
+  await page.keyboard.press("Shift+Tab");
+  expect(await selection(page)).toEqual([b]);
+});
+
 test("AC ED-054: Mod+klik memilih node terdalam langsung", async ({ page }) => {
   await openEditor(page, "Deep Select");
   const pageId = await firstPageId(page);
