@@ -61,5 +61,10 @@
     "sessionDescription": "Perubahan tetap tersimpan di perangkat ini. Masuk lagi di tab baru, lalu sambungkan ulang.",
     "login": "Masuk lagi",
     "reconnect": "Sambungkan ulang"
+  },
+  "schema": {
+    "title": "Editor perlu diperbarui",
+    "description": "Situs ini disimpan oleh versi editor yang lebih baru. Muat ulang untuk memakai versi editor terbaru.",
+    "reload": "Muat ulang"
   }
 }

@@ -282,3 +282,19 @@ test("sesi habis saat mengedit (401 token realtime) → dialog login ulang tanpa
   await expect(dialog).toBeHidden({ timeout: 15_000 });
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced", { timeout: 15_000 });
 });
+
+test("dokumen dari editor versi lebih baru (schemaVersion+1) → reload dipaksa sekali, lalu layar perlu diperbarui (T1.15.15)", async ({
+  page,
+}) => {
+  await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  // Server menyimpan dokumen ber-schemaVersion lebih baru (disimulasikan lewat seam test, lalu dikonfirmasi server).
+  const reloaded = page.waitForEvent("load");
+  await page.evaluate(() => window.__editorTest?.setSchemaVersion(2));
+  await reloaded;
+  // Setelah reload otomatis dokumen masih lebih baru → tidak reload lagi; canvas tidak dipasang.
+  await expect(page.getByTestId("editor-outdated")).toContainText("The editor needs an update");
+  await expect(page.getByTestId("editor-canvas")).toHaveCount(0);
+  await page.waitForTimeout(1_000);
+  await expect(page.getByTestId("editor-outdated")).toBeVisible();
+});

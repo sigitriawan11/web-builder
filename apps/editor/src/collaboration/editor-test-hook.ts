@@ -12,6 +12,8 @@ export interface EditorTestApi {
   unsaved: () => boolean;
   pageIds: () => string[];
   renamePage: (pageId: string, title: string) => boolean;
+  // ED-230: simulasi dokumen yang disimpan editor versi lebih baru (tidak ada command untuk meta — seam test saja).
+  setSchemaVersion: (version: number) => void;
 }
 
 declare global {
@@ -34,6 +36,9 @@ export function useEditorTestHook(session: DocumentSession, runtime: CanvasRunti
         // Aksi diskrit (seperti commit drag): tidak digabung captureTimeout dengan aksi sebelumnya.
         runtime.undo.stopCapturing();
         return runCommand(ctx, updatePage, { id: pageId, patch: { title } }).ok;
+      },
+      setSchemaVersion: (version) => {
+        runtime.doc.transact(() => runtime.doc.getMap(YDOC_KEYS.meta).set("schemaVersion", version), runtime.origin);
       },
     };
     return () => {

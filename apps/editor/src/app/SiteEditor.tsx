@@ -14,6 +14,7 @@ import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
+import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
 import { NodeStoreContext, useNode } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
 import { AppErrorBoundary } from "./ErrorBoundary";
@@ -92,21 +93,25 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
 // di dokumen, selain itu page pertama. Daftar page sementara (panel Pages = M2) juga bukti dokumen termuat.
 function DocumentWorkspace({ session, pageId }: { session: DocumentSession; pageId: string | null }) {
   const pageOrder = usePageOrder(session.doc);
+  const schemaVersion = useDocumentSchemaVersion(session.doc);
+  const outdated = isNewerThanEditor(schemaVersion);
   const readOnly = useEditAccess(session).kind !== "editing";
   const activePageId = pageId && pageOrder.includes(pageId) ? pageId : (pageOrder[0] ?? null);
   // Dibuat di effect (bukan useMemo/useState): StrictMode menjalankan cleanup lalu effect lagi — runtime dari
   // useMemo akan sudah di-destroy (observer lepas) dan canvas berhenti mengikuti dokumen.
   const [runtime, setRuntime] = useState<CanvasRuntime | null>(null);
   useEffect(() => {
-    if (!activePageId) return;
+    if (!activePageId || outdated) return;
     const next = createCanvasRuntime({ doc: session.doc, pageId: activePageId, origin: TAB_ORIGIN });
     setRuntime(next);
     return () => {
       setRuntime(null);
       next.destroy();
     };
-  }, [session, activePageId]);
+  }, [session, activePageId, outdated]);
   useEffect(() => runtime?.setReadOnly(readOnly), [runtime, readOnly]);
+  // ED-230: dokumen dari editor yang lebih baru → tidak ada canvas/runtime (tidak bisa diedit).
+  if (outdated && schemaVersion !== null) return <EditorOutdated version={schemaVersion} />;
   if (!runtime) return null;
   return (
     <NodeStoreContext.Provider value={runtime.nodeStore}>
@@ -126,6 +131,26 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
         {readOnly ? <div className="absolute inset-0 z-10 cursor-not-allowed" data-testid="read-only-blocker" /> : null}
       </div>
     </NodeStoreContext.Provider>
+  );
+}
+
+function EditorOutdated({ version }: { version: number }) {
+  const t = useT();
+  const [reloading, setReloading] = useState(false);
+  useEffect(() => {
+    if (reloadOnceForSchema(version, () => window.location.reload())) setReloading(true);
+  }, [version]);
+  if (reloading) return null;
+  return (
+    <div
+      role="alert"
+      className="m-auto flex max-w-sm flex-col items-center gap-3 p-6 text-center"
+      data-testid="editor-outdated"
+    >
+      <h2 className="text-lg font-semibold">{t("schema.title")}</h2>
+      <p className="text-sm text-muted-foreground">{t("schema.description")}</p>
+      <Button onClick={() => window.location.reload()}>{t("schema.reload")}</Button>
+    </div>
   );
 }
 

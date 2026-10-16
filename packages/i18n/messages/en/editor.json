@@ -61,5 +61,10 @@
     "sessionDescription": "Your changes are still kept on this device. Sign in again in a new tab, then reconnect.",
     "login": "Sign in again",
     "reconnect": "Reconnect"
+  },
+  "schema": {
+    "title": "The editor needs an update",
+    "description": "This website was saved by a newer version of the editor. Reload to use the latest editor.",
+    "reload": "Reload"
   }
 }
