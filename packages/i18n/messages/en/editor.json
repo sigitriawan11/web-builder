@@ -111,5 +111,16 @@
     "mode": "Design mode",
     "comingSoon": "Coming soon",
     "narrowScreen": "The editor works best on screens 1280px or wider."
+  },
+  "sidebar": {
+    "label": "Left panel",
+    "tab": {
+      "layers": "Layers",
+      "assets": "Assets",
+      "insert": "Insert"
+    },
+    "pages": "Pages",
+    "resize": "Resize panel",
+    "comingSoon": "Coming soon."
   }
 }

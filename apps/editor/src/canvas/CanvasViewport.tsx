@@ -21,6 +21,7 @@ import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import { type NodeErrorActions, NodeErrorActionsContext } from "./render-root/NodeErrorBoundary";
+import { cameraForResize } from "./resize-camera";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
 
@@ -75,6 +76,24 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useInteractionMachine(viewportRef, deps.interaction);
   useBrowserGuards(viewportRef);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");
+
+  // AC ED-007: viewport berubah ukuran (sidebar, jendela) → pusat viewport tetap di titik world yang sama.
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    let previous = { width: viewport.clientWidth, height: viewport.clientHeight };
+    const observer = new ResizeObserver(() => {
+      const next = { width: viewport.clientWidth, height: viewport.clientHeight };
+      if (next.width === previous.width && next.height === previous.height) return;
+      // Ukuran awal 0 (belum ter-layout) bukan resize sungguhan.
+      if (previous.width > 0 && previous.height > 0) {
+        cameraStore.getState().setCamera(cameraForResize(cameraStore.getState(), previous, next));
+      }
+      previous = next;
+    });
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, []);
 
   // T0.4.7: FontFace di document.fonts juga berlaku di dalam shadow root canvas.
   useEffect(() => {

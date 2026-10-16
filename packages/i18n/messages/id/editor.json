@@ -111,5 +111,16 @@
     "mode": "Mode desain",
     "comingSoon": "Menyusul",
     "narrowScreen": "Editor paling optimal di layar ≥ 1280px."
+  },
+  "sidebar": {
+    "label": "Panel kiri",
+    "tab": {
+      "layers": "Layers",
+      "assets": "Aset",
+      "insert": "Sisipkan"
+    },
+    "pages": "Pages",
+    "resize": "Ubah lebar panel",
+    "comingSoon": "Segera hadir."
   }
 }

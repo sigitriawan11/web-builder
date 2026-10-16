@@ -18,12 +18,12 @@ import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
 import { NodeStoreContext, useNode, useNodeFromStore } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
+import { LeftSidebar } from "../panels/LeftSidebar";
 import { setTelemetryScope } from "../telemetry/telemetry";
 import { Toolbar } from "./chrome/Toolbar";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { useT } from "./i18n";
 import { LanguageMenu, ProfileLocaleSync } from "./LanguageMenu";
-import { PanelErrorBoundary } from "./PanelErrorBoundary";
 // Tailwind + token UI hanya dimuat rute produk (modul ini di-lazy-load): playground canvas M0 & mode isolasi
 // eksperimennya (prefix/none, ADR-012) tetap tanpa preflight global.
 import "../styles/app.css";
@@ -147,15 +147,15 @@ function DocumentWorkspace({ session, workspace }: { session: DocumentSession; w
     <NodeStoreContext.Provider value={runtime.nodeStore}>
       {/* ED-242: test API hanya di build dev (ter-tree-shake dari production). */}
       {import.meta.env.DEV ? <EditorTestHook session={session} runtime={runtime} /> : null}
-      <aside className="w-48 shrink-0 overflow-y-auto border-r bg-background p-2 text-sm">
-        <PanelErrorBoundary name="pages">
+      <LeftSidebar
+        pages={
           <ul className="flex flex-col gap-1" data-testid="document-pages">
             {pageOrder.map((id) => (
               <PageItem key={id} id={id} active={id === runtime.pageId} />
             ))}
           </ul>
-        </PanelErrorBoundary>
-      </aside>
+        }
+      />
       <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
         <CanvasViewport runtime={runtime} />
         {devToolsEnabled() ? (
