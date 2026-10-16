@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { APP_URL } from "../playwright.config";
+import { login, PASSWORD, register } from "./support/auth";
 import { linkIn, resetRateLimits, uniqueEmail, waitForEmail } from "./support/stack";
 
 // T1.14.4: halaman auth melawan stack e2e sungguhan (api + worker + DB `platform_e2e` + Mailpit) — ACC-001/003/004/005.
@@ -8,25 +9,8 @@ test.describe.configure({ mode: "serial" });
 test.use({ locale: "en-US" });
 test.beforeEach(resetRateLimits);
 
-const PASSWORD = "Kopi-Susu-Gula-Aren-42";
 // Komponen Alert @platform/ui (Next dev juga punya `role="alert"`: pengumum rute).
 const formAlert = (page: Page) => page.locator('[data-slot="alert"]');
-
-async function register(page: Page, email: string, password = PASSWORD) {
-  await page.goto(`${APP_URL}/register`);
-  await page.getByLabel("Name").fill("Sari Wulandari");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(password);
-  await page.getByRole("checkbox", { name: /I agree to the/ }).check();
-  await page.getByRole("button", { name: "Sign up" }).click();
-}
-
-async function login(page: Page, email: string, password: string, next?: string) {
-  await page.goto(`${APP_URL}/login${next ? `?next=${encodeURIComponent(next)}` : ""}`);
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-}
 
 test("alur lengkap: daftar → kode verifikasi dari Mailpit → masuk → lupa password → reset → masuk (AC T1.14.4)", async ({
   page,

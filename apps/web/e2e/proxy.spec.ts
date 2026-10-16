@@ -13,10 +13,12 @@ test("/editor/:id tanpa login → login dengan next berisi path & query", async 
   await expect(page).toHaveURL(`${APP_URL}/login?next=${encodeURIComponent("/editor/0199f0aa?page=pg_1")}`);
 });
 
-test("dengan cookie sesi → /sites tidak dialihkan; x-request-id dikembalikan", async ({ context, page }) => {
+test("dengan cookie sesi → proxy tidak mengalihkan; x-request-id dikembalikan", async ({ context, page }) => {
+  // Proxy hanya memeriksa KEBERADAAN cookie; `/editor` (fixture origin) tidak memvalidasi sesi, jadi URL tetap.
+  // Halaman dashboard memvalidasi sesi ke api (cookie palsu → login) — diuji di dashboard.spec.ts.
   await context.addCookies([{ name: "platform.session_token", value: "dummy", url: APP_URL }]);
-  const response = await page.goto(`${APP_URL}/sites`);
-  await expect(page).toHaveURL(`${APP_URL}/sites`);
+  const response = await page.goto(`${APP_URL}/editor/0199abc`);
+  await expect(page).toHaveURL(`${APP_URL}/editor/0199abc`);
   expect(response?.headers()["x-request-id"]).toMatch(/^[0-9a-f-]{36}$/);
 });
 

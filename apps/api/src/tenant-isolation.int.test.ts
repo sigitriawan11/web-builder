@@ -31,6 +31,8 @@ const NON_TENANT_ROUTES: Record<string, string> = {
   "GET /v1/account/sessions": "data user login",
   "POST /v1/account/sessions/revoke-others": "data user login",
   "DELETE /v1/account/sessions/:sessionId": "data user login — diuji isolasi di bawah",
+  "GET /v1/workspaces":
+    "daftar keanggotaan user login (scope userId sesi) — isolasi diuji di workspaces-list.int.test.ts",
   "POST /v1/realtime/token": "ID dokumen di body; akses dicek service — diuji isolasi di bawah",
   "GET /internal/v1/ping": "service token",
   "GET /internal/v1/documents/:id/state": "service token (worker/realtime), lintas tenant via systemScope",

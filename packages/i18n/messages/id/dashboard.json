@@ -1,1 +1,27 @@
-{}
+{
+  "nav": {
+    "label": "Navigasi utama",
+    "sites": "Website",
+    "account": "Akun"
+  },
+  "workspace": {
+    "label": "Workspace",
+    "personal": "Pribadi",
+    "team": "Tim",
+    "switchSoon": "Pindah workspace segera hadir"
+  },
+  "userMenu": {
+    "label": "Menu akun",
+    "theme": "Tema",
+    "language": "Bahasa",
+    "logout": "Keluar"
+  },
+  "verifyBanner": {
+    "text": "Verifikasi email Anda untuk mempublikasikan website.",
+    "resend": "Kirim ulang email",
+    "sent": "Email verifikasi dikirim ulang. Periksa kotak masuk Anda."
+  },
+  "sites": {
+    "title": "Website"
+  }
+}

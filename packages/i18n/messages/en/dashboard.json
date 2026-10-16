@@ -1,1 +1,27 @@
-{}
+{
+  "nav": {
+    "label": "Main navigation",
+    "sites": "Websites",
+    "account": "Account"
+  },
+  "workspace": {
+    "label": "Workspace",
+    "personal": "Personal",
+    "team": "Team",
+    "switchSoon": "Switching workspaces is coming soon"
+  },
+  "userMenu": {
+    "label": "Account menu",
+    "theme": "Theme",
+    "language": "Language",
+    "logout": "Sign out"
+  },
+  "verifyBanner": {
+    "text": "Verify your email to publish websites.",
+    "resend": "Resend email",
+    "sent": "Verification email sent again. Check your inbox."
+  },
+  "sites": {
+    "title": "Websites"
+  }
+}

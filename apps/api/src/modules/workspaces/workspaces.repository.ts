@@ -1,4 +1,4 @@
-import { and, type DbExecutor, eq, isNull, ne, schema, sql } from "@platform/db";
+import { and, asc, type DbExecutor, eq, isNull, ne, schema, sql } from "@platform/db";
 
 // Workspace milik user (ACC-030). Pembuatan personal workspace dipanggil hook registrasi dalam transaksi user.
 
@@ -86,4 +86,20 @@ export async function findWorkspaceSummary(executor: DbExecutor, workspaceId: st
     .from(schema.workspaces)
     .where(eq(schema.workspaces.id, workspaceId));
   return row;
+}
+
+/** Semua workspace aktif tempat user menjadi anggota (switcher, T1.14.5): personal dulu, lalu nama. */
+export async function listUserWorkspaces(executor: DbExecutor, userId: string) {
+  return executor
+    .select({
+      id: schema.workspaces.id,
+      slug: schema.workspaces.slug,
+      name: schema.workspaces.name,
+      type: schema.workspaces.type,
+      role: schema.workspaceMembers.role,
+    })
+    .from(schema.workspaceMembers)
+    .innerJoin(schema.workspaces, eq(schema.workspaces.id, schema.workspaceMembers.workspaceId))
+    .where(and(eq(schema.workspaceMembers.userId, userId), activeWorkspace))
+    .orderBy(sql`${schema.workspaces.type} = 'personal' desc`, asc(schema.workspaces.name));
 }

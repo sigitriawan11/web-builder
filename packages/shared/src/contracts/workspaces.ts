@@ -16,3 +16,13 @@ export const WorkspaceMeSchema = z.object({
   permissions: z.array(z.string()),
 });
 export type WorkspaceMe = z.infer<typeof WorkspaceMeSchema>;
+
+// `GET /v1/workspaces` (T1.14.5): workspace aktif tempat user menjadi anggota (switcher dashboard). Personal dulu.
+export const WorkspaceListItemSchema = z.object({
+  id: z.uuid(),
+  slug: z.string(),
+  name: z.string(),
+  type: z.enum(["personal", "team"]),
+  role: WorkspaceRoleSchema,
+});
+export type WorkspaceListItem = z.infer<typeof WorkspaceListItemSchema>;

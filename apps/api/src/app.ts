@@ -20,7 +20,7 @@ import { createAccountService } from "./modules/account/account.service";
 import { createRealtimeTokenRouter } from "./modules/realtime-token/realtime-token.routes";
 import { createRealtimeTokenService } from "./modules/realtime-token/realtime-token.service";
 import { createSiteScopeRouter } from "./modules/sites/site-scope.routes";
-import { createWorkspaceRouter } from "./modules/workspaces/workspaces.routes";
+import { createWorkspaceRouter, createWorkspacesListRouter } from "./modules/workspaces/workspaces.routes";
 import type { QueueProducer } from "./queues/producer";
 
 // createApp(): susunan middleware + router (ARCHITECTURE §5.3). Tanpa `listen` agar bisa diuji dengan supertest.
@@ -128,6 +128,15 @@ export function createApp(deps: AppDeps): Express {
   }
 
   if (deps.auth && deps.db) {
+    mountAt(
+      app,
+      "/v1/workspaces",
+      createWorkspacesListRouter({
+        db: deps.db,
+        ...(deps.redis ? { redis: deps.redis } : {}),
+        ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
+      }),
+    );
     mountAt(
       app,
       "/v1/workspaces/:workspaceId",

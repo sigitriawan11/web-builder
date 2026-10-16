@@ -4,5 +4,10 @@
     "system": "Ikuti sistem",
     "light": "Terang",
     "dark": "Gelap"
+  },
+  "language": {
+    "label": "Bahasa",
+    "id": "Bahasa Indonesia",
+    "en": "English"
   }
 }
