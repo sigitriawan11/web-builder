@@ -136,6 +136,20 @@ describe("createPlatformApi", () => {
     expect(call(fetchMock).url).toBe(`/api/v1/workspaces/${SITE.workspaceId}/sites?sort=name&q=kue`);
   });
 
+  it("workspaces.list → daftar keanggotaan tervalidasi kontrak", async () => {
+    const workspace = {
+      id: SITE.workspaceId,
+      slug: "ws_sari",
+      name: "Workspace Sari",
+      type: "personal",
+      role: "owner",
+    };
+    const fetchMock = mockFetch(json({ data: [workspace], meta: { requestId: "r", nextCursor: null } }));
+    const api = createPlatformApi(createApiClient({ baseUrl: "/api", fetch: fetchMock }));
+    expect(await api.workspaces.list()).toEqual([workspace]);
+    expect(call(fetchMock).url).toBe("/api/v1/workspaces");
+  });
+
   it("sites.get memakai rute level situs dan membuka envelope", async () => {
     const fetchMock = mockFetch(json({ data: SITE, meta: { requestId: "r" } }));
     const api = createPlatformApi(createApiClient({ baseUrl: "/api", fetch: fetchMock }));

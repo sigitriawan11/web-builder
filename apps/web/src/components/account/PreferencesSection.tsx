@@ -4,7 +4,7 @@ import type { Locale } from "@platform/i18n";
 import { Alert, AlertDescription, Button, Card, CardContent, CardHeader, Label, NativeSelect } from "@platform/ui";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import { apiPatch } from "../../lib/auth/client";
+import { asFailure, browserApi } from "../../lib/api/browser";
 import { setLocaleCookie, setTimeZoneCookie } from "../../lib/preference-cookies";
 import { useFailureMessage } from "../auth/use-failure-message";
 
@@ -39,10 +39,11 @@ export function PreferencesSection({ locale, timeZone }: { locale: Locale; timeZ
             const nextLocale = String(form.get("locale")) as Locale;
             setPending(true);
             setError(null);
-            const result = await apiPatch("/v1/account/profile", { locale: nextLocale, timezone: zone });
-            if (!result.ok) {
+            try {
+              await browserApi().account.updateProfile({ locale: nextLocale, timezone: zone });
+            } catch (failure) {
               setPending(false);
-              setError(failureMessage(result));
+              setError(failureMessage(asFailure(failure)));
               return;
             }
             setLocaleCookie(nextLocale);

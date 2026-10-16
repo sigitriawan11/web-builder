@@ -30,6 +30,7 @@ function useMutations() {
   return useMemo(() => createMutations(api, queryClient), [api, queryClient]);
 }
 
+export const useWorkspaces = () => useQuery(useQueries().workspaces());
 export const useWorkspaceMe = (workspaceId: string) => useQuery(useQueries().workspaceMe(workspaceId));
 export const useSites = (workspaceId: string, query: Partial<ListSitesQuery> = {}) =>
   useQuery(useQueries().sites(workspaceId, query));

@@ -247,6 +247,9 @@ importers:
       '@platform/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
+      '@platform/sdk':
+        specifier: workspace:^
+        version: link:../../packages/sdk
       '@platform/shared':
         specifier: workspace:^
         version: link:../../packages/shared

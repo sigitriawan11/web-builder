@@ -11,6 +11,7 @@ import {
   SiteSchema,
   type UpdateProfileBody,
   type UpdateSiteBody,
+  WorkspaceListItemSchema,
   WorkspaceMeSchema,
 } from "@platform/shared/contracts";
 import { z } from "zod";
@@ -24,6 +25,9 @@ const unwrap = <T>(envelope: { data: T }) => envelope.data;
 export function createPlatformApi(client: ApiClient) {
   return {
     workspaces: {
+      /** Workspace aktif tempat user menjadi anggota (switcher dashboard), personal dulu. */
+      list: () =>
+        client.request("GET", "/v1/workspaces", { schema: listEnvelope(WorkspaceListItemSchema) }).then(unwrap),
       /** Role & izin user di workspace (ACC-033). */
       me: (workspaceId: string) =>
         client

@@ -13,6 +13,7 @@ export {
   useSites,
   useUpdateProfile,
   useWorkspaceMe,
+  useWorkspaces,
 } from "./hooks";
 export {
   createMutations,

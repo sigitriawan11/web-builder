@@ -5,7 +5,7 @@ import { Alert, AlertDescription, Badge, Button, Card, CardContent, CardHeader }
 import { MonitorSmartphoneIcon } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
-import { apiDelete, apiGet, apiPost } from "../../lib/auth/client";
+import { asFailure, browserApi } from "../../lib/api/browser";
 import { formatIp } from "../../lib/ip";
 import { summarizeUserAgent } from "../../lib/user-agent";
 import { useFailureMessage } from "../auth/use-failure-message";
@@ -21,8 +21,11 @@ export function SessionsSection({ initial }: { initial: SessionInfo[] }) {
   const [pending, setPending] = useState(false);
 
   async function reload() {
-    const result = await apiGet<{ data: SessionInfo[] }>("/v1/account/sessions");
-    if (result.ok) setSessions(result.data.data);
+    try {
+      setSessions(await browserApi().account.sessions());
+    } catch (error) {
+      setNotice({ kind: "error", text: failureMessage(asFailure(error)) });
+    }
   }
 
   const others = sessions.filter((session) => !session.current);
@@ -68,9 +71,12 @@ export function SessionsSection({ initial }: { initial: SessionInfo[] }) {
                   disabled={pending}
                   onClick={async () => {
                     setPending(true);
-                    const result = await apiDelete(`/v1/account/sessions/${session.id}`);
+                    try {
+                      await browserApi().account.revokeSession(session.id);
+                    } catch (error) {
+                      setNotice({ kind: "error", text: failureMessage(asFailure(error)) });
+                    }
                     setPending(false);
-                    if (!result.ok) setNotice({ kind: "error", text: failureMessage(result) });
                     await reload();
                   }}
                 >
@@ -87,13 +93,13 @@ export function SessionsSection({ initial }: { initial: SessionInfo[] }) {
             disabled={pending}
             onClick={async () => {
               setPending(true);
-              const result = await apiPost<{ data: { revoked: number } }>("/v1/account/sessions/revoke-others", {});
+              try {
+                const { revoked } = await browserApi().account.revokeOtherSessions();
+                setNotice({ kind: "success", text: t("revokedOthers", { count: revoked }) });
+              } catch (error) {
+                setNotice({ kind: "error", text: failureMessage(asFailure(error)) });
+              }
               setPending(false);
-              setNotice(
-                result.ok
-                  ? { kind: "success", text: t("revokedOthers", { count: result.data.data.revoked }) }
-                  : { kind: "error", text: failureMessage(result) },
-              );
               await reload();
             }}
           >

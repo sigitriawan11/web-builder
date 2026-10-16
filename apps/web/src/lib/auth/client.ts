@@ -1,6 +1,7 @@
-// Klien HTTP halaman auth (browser → `/api/*` same-origin, ARCHITECTURE §3.4). Endpoint Better Auth mengembalikan
-// error `{ code, message }`, sedangkan guard api (WEAK_PASSWORD, CAPTCHA_REQUIRED, RATE_LIMITED, …) memakai envelope
-// `{ error: { code, message, details } }` — keduanya diseragamkan di sini.
+// Klien HTTP endpoint Better Auth `/api/auth/*` (browser, same-origin). Endpoint Platform API `/v1/*` memakai
+// `@platform/sdk` (`lib/api/browser.ts`, ARCHITECTURE §5.1). Klien ini terpisah karena Better Auth mengembalikan error
+// `{ code, message }` (bukan envelope api), sedangkan guard api di depannya (WEAK_PASSWORD, CAPTCHA_REQUIRED,
+// RATE_LIMITED, …) memakai envelope `{ error: { code, message, details } }` — keduanya diseragamkan di sini.
 
 export type ApiFailure = {
   ok: false;
@@ -32,7 +33,7 @@ export function toFailure(status: number, body: unknown, retryAfter: string | nu
 }
 
 async function request<T>(
-  method: "GET" | "POST" | "PATCH" | "DELETE",
+  method: "GET" | "POST",
   path: string,
   body?: unknown,
   headers?: HeadersInit,
@@ -62,8 +63,6 @@ async function request<T>(
 export const apiPost = <T = unknown>(path: string, body: unknown, headers?: HeadersInit) =>
   request<T>("POST", path, body, headers);
 export const apiGet = <T = unknown>(path: string) => request<T>("GET", path);
-export const apiPatch = <T = unknown>(path: string, body: unknown) => request<T>("PATCH", path, body);
-export const apiDelete = <T = unknown>(path: string) => request<T>("DELETE", path);
 
 export interface SessionUser {
   id: string;

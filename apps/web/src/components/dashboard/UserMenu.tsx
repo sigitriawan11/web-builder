@@ -19,6 +19,7 @@ import {
 } from "@platform/ui";
 import { CheckIcon, LogOutIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { browserApi } from "../../lib/api/browser";
 import { apiPost } from "../../lib/auth/client";
 import { setLocaleCookie } from "../../lib/preference-cookies";
 
@@ -40,12 +41,9 @@ export function UserMenu({
     if (next === locale) return;
     // Cookie dulu: walau PATCH gagal, bahasa sesi ini tetap berganti; profil dipakai saat login berikutnya & email.
     setLocaleCookie(next);
-    await fetch("/api/v1/account/profile", {
-      method: "PATCH",
-      credentials: "same-origin",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ locale: next }),
-    }).catch(() => undefined);
+    await browserApi()
+      .account.updateProfile({ locale: next })
+      .catch(() => undefined);
     window.location.reload();
   }
 

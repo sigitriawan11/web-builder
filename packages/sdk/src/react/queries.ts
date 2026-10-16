@@ -6,6 +6,7 @@ import type { PlatformApi } from "../endpoints";
 // Server Component dan dites dengan QueryClient biasa. Key hierarkis: invalidasi `sites` membersihkan list & detail.
 
 export const queryKeys = {
+  workspaces: ["workspaces", "list"] as const,
   workspaceMe: (workspaceId: string) => ["workspaces", workspaceId, "me"] as const,
   sites: {
     all: ["sites"] as const,
@@ -22,6 +23,7 @@ export const queryKeys = {
 
 export function createQueries(api: PlatformApi) {
   return {
+    workspaces: () => queryOptions({ queryKey: queryKeys.workspaces, queryFn: () => api.workspaces.list() }),
     workspaceMe: (workspaceId: string) =>
       queryOptions({ queryKey: queryKeys.workspaceMe(workspaceId), queryFn: () => api.workspaces.me(workspaceId) }),
     sites: (workspaceId: string, query: Partial<ListSitesQuery> = {}) =>

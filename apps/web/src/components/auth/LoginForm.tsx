@@ -1,31 +1,28 @@
 "use client";
 
-import type { Locale } from "@platform/i18n";
 import { Alert, AlertDescription, Button, Checkbox, Input, Label } from "@platform/ui";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { apiGet, apiPost } from "../../lib/auth/client";
+import { browserApi } from "../../lib/api/browser";
+import { apiPost } from "../../lib/auth/client";
 import { setLocaleCookie, setTimeZoneCookie } from "../../lib/preference-cookies";
 import { Turnstile } from "./Turnstile";
 import { useFailureMessage } from "./use-failure-message";
 
-interface ConsentStatus {
-  data: { terms: { accepted: boolean }; privacy: { accepted: boolean } };
-}
-
 /**
- * Setelah masuk: bila S&K/privasi versi berlaku belum disetujui (ACC-313), lewati layar persetujuan dulu.
- * Navigasi penuh (bukan router klien) agar komponen server membaca cookie sesi baru.
+ * Setelah masuk: bahasa & zona waktu akun (users.locale/timezone) menjadi preferensi tampilan (ACC-009), lalu bila
+ * S&K/privasi versi berlaku belum disetujui (ACC-313) lewati layar persetujuan dulu. Navigasi penuh (bukan router
+ * klien) agar komponen server membaca cookie sesi baru.
  */
 export async function continueAfterSignIn(next: string): Promise<void> {
-  // Bahasa akun (users.locale) menjadi bahasa UI sejak login (ACC-009).
-  const profile = await apiGet<{ data: { locale: Locale; timezone: string } }>("/v1/account/profile");
-  if (profile.ok) {
-    setLocaleCookie(profile.data.data.locale);
-    setTimeZoneCookie(profile.data.data.timezone);
+  const api = browserApi();
+  const [profile, consents] = await Promise.allSettled([api.account.profile(), api.account.consents()]);
+  if (profile.status === "fulfilled") {
+    setLocaleCookie(profile.value.locale);
+    setTimeZoneCookie(profile.value.timezone);
   }
-  const consents = await apiGet<ConsentStatus>("/v1/account/consents");
-  const needsConsent = consents.ok && !(consents.data.data.terms.accepted && consents.data.data.privacy.accepted);
+  const needsConsent =
+    consents.status === "fulfilled" && !(consents.value.terms.accepted && consents.value.privacy.accepted);
   window.location.assign(needsConsent ? `/consent?next=${encodeURIComponent(next)}` : next);
 }
 

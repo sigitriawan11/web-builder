@@ -1,9 +1,8 @@
-import type { Site } from "@platform/shared/contracts";
 import { Badge, Button, Card } from "@platform/ui";
 import { GlobeIcon } from "lucide-react";
 import { getFormatter, getNow, getTranslations } from "next-intl/server";
 import { CreateSiteDialog } from "../../../../components/dashboard/CreateSiteDialog";
-import { apiServerGet } from "../../../../lib/api/server";
+import { withSession } from "../../../../lib/api/server";
 import { getDashboardSession } from "../../../../lib/workspace/current";
 
 const STATUS_VARIANT = {
@@ -23,13 +22,9 @@ export default async function SitesPage({
 }) {
   const { cursor } = await searchParams;
   const { current } = await getDashboardSession();
-  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
-  const result = await apiServerGet<{ data: Site[]; meta: { nextCursor: string | null } }>(
-    `/v1/workspaces/${current.id}/sites${query}`,
-  );
-  if (!result.body) throw new Error(`daftar situs gagal dimuat (${result.status})`);
-  const sites = result.body.data;
-  const nextCursor = result.body.meta.nextCursor;
+  const page = await withSession((api) => api.sites.list(current.id, cursor ? { cursor } : {}));
+  const sites = page.items;
+  const nextCursor = page.nextCursor;
   const t = await getTranslations("dashboard.sites");
   const format = await getFormatter();
   const now = await getNow();

@@ -4,7 +4,8 @@ import type { Profile } from "@platform/shared/contracts";
 import { Alert, AlertDescription, Badge, Button, Card, CardContent, CardHeader, Input, Label } from "@platform/ui";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { apiPatch, apiPost } from "../../lib/auth/client";
+import { asFailure, browserApi } from "../../lib/api/browser";
+import { apiPost } from "../../lib/auth/client";
 import { useFailureMessage } from "../auth/use-failure-message";
 
 type Notice = { kind: "success" | "error"; text: string } | null;
@@ -40,11 +41,13 @@ export function ProfileSection({ profile }: { profile: Profile }) {
             event.preventDefault();
             setPending(true);
             const name = String(new FormData(event.currentTarget).get("name") ?? "").trim();
-            const result = await apiPatch("/v1/account/profile", { name });
+            try {
+              await browserApi().account.updateProfile({ name });
+              setNameNotice({ kind: "success", text: t("saved") });
+            } catch (error) {
+              setNameNotice({ kind: "error", text: failureMessage(asFailure(error)) });
+            }
             setPending(false);
-            setNameNotice(
-              result.ok ? { kind: "success", text: t("saved") } : { kind: "error", text: failureMessage(result) },
-            );
           }}
         >
           <Label htmlFor="account-name">{t("name")}</Label>

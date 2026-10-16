@@ -20,7 +20,7 @@ import {
 import { FileIcon, LayoutTemplateIcon, PlusIcon, SparklesIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { apiPost } from "../../lib/auth/client";
+import { asFailure, browserApi } from "../../lib/api/browser";
 import { useFailureMessage } from "../auth/use-failure-message";
 
 const OPTIONS = [
@@ -41,17 +41,16 @@ export function CreateSiteDialog({ workspaceId }: { workspaceId: string }) {
   async function create(form: FormData) {
     setPending(true);
     setError(null);
-    const result = await apiPost<{ data: { id: string } }>(`/v1/workspaces/${workspaceId}/sites`, {
-      name: String(form.get("name") ?? "").trim(),
-    });
-    if (result.ok) {
-      window.location.assign(`/editor/${result.data.data.id}`);
-      return;
+    try {
+      const site = await browserApi().sites.create(workspaceId, { name: String(form.get("name") ?? "").trim() });
+      window.location.assign(`/editor/${site.id}`);
+    } catch (error) {
+      setPending(false);
+      const failure = asFailure(error);
+      if (failure.status === 403) setError(t("forbidden"));
+      else if (failure.code === "PLAN_LIMIT_REACHED") setError(t("limit"));
+      else setError(failureMessage(failure));
     }
-    setPending(false);
-    if (result.status === 403) setError(t("forbidden"));
-    else if (result.code === "PLAN_LIMIT_REACHED") setError(t("limit"));
-    else setError(failureMessage(result));
   }
 
   return (

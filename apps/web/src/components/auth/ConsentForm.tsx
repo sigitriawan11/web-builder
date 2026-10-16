@@ -3,7 +3,7 @@
 import { Alert, AlertDescription, Button, Checkbox, Label } from "@platform/ui";
 import { useTranslations } from "next-intl";
 import { type ReactNode, useState } from "react";
-import { apiPost } from "../../lib/auth/client";
+import { asFailure, browserApi } from "../../lib/api/browser";
 import { useFailureMessage } from "./use-failure-message";
 
 // ACC-002/ACC-313: layar persetujuan S&K + privasi (user Google baru, atau versi legal naik) → `POST /v1/account/consents`.
@@ -29,16 +29,16 @@ export function ConsentForm({ next, termsUrl, privacyUrl }: { next: string; term
         }
         setPending(true);
         setError(null);
-        const result = await apiPost("/v1/account/consents", {
-          acceptTerms: true,
-          marketingOptIn: form.get("marketingOptIn") === "on",
-        });
-        if (result.ok) {
+        try {
+          await browserApi().account.acceptConsents({
+            acceptTerms: true,
+            marketingOptIn: form.get("marketingOptIn") === "on",
+          });
           window.location.assign(next);
-          return;
+        } catch (failure) {
+          setPending(false);
+          setError(failureMessage(asFailure(failure)));
         }
-        setPending(false);
-        setError(failureMessage(result));
       }}
     >
       {error ? (

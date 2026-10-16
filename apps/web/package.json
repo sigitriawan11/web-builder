@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@platform/i18n": "workspace:^",
+    "@platform/sdk": "workspace:*",
     "@platform/shared": "workspace:^",
     "@platform/ui": "workspace:^",
     "lucide-react": "1.49.0",
