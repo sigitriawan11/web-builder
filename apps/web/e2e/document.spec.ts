@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { APP_URL, REALTIME_URL, SENTRY_E2E_ORIGIN } from "../playwright.config";
 import { register } from "./support/auth";
-import "./support/editor";
+import { editorCommand, firstPageId, renamePage } from "./support/editor";
 import { addWorkspaceMember, resetRateLimits, uniqueEmail } from "./support/stack";
 
 // T1.15.7: lifecycle Y.Doc editor — IndexedDB → token → Hocuspocus (stack e2e dengan realtime sungguhan).
@@ -37,7 +37,7 @@ test("dokumen situs dimuat dari server lewat realtime (page awal tampil, status 
 test("canvas merender page aktif dokumen situs lewat @platform/renderer (T1.15.8)", async ({ page }) => {
   await openNewSite(page);
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
-  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  const pageId = await firstPageId(page);
   // Locator CSS Playwright menembus shadow root canvas (ADR-012).
   const pageNode = page.getByTestId("editor-canvas").locator(`[data-node-id="${pageId}"]`);
   await expect(pageNode).toBeAttached();
@@ -50,8 +50,8 @@ test("canvas merender page aktif dokumen situs lewat @platform/renderer (T1.15.8
 test("ubah dokumen → reload menampilkan state terakhir (AC T1.15.7)", async ({ page }) => {
   await openNewSite(page);
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
-  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
-  expect(await page.evaluate((id) => window.__editorTest?.renamePage(id, "Beranda Baru"), pageId)).toBe(true);
+  const pageId = await firstPageId(page);
+  expect(await renamePage(page, pageId, "Beranda Baru")).toBe(true);
   await expect(page.getByTestId("document-pages").locator("li")).toHaveText(["Beranda Baru"]);
 
   // Tersimpan ke server (flush realtime) lalu dimuat ulang.
@@ -64,8 +64,8 @@ test("ubah dokumen → reload menampilkan state terakhir (AC T1.15.7)", async ({
 test("perangkat lain (IndexedDB kosong) memuat state terakhir dari server", async ({ browser, page }) => {
   const siteId = await openNewSite(page);
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
-  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
-  await page.evaluate((id) => window.__editorTest?.renamePage(id, "Dari Perangkat A"), pageId);
+  const pageId = await firstPageId(page);
+  await renamePage(page, pageId, "Dari Perangkat A");
   await page.waitForTimeout(1_500);
 
   // Perangkat lain (IndexedDB kosong, cookie sesi sama) → state server.
@@ -82,9 +82,8 @@ test("undo hanya membatalkan perubahan sesi ini: setelah reload, Ctrl+Z tidak me
   await openNewSite(page);
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
   const pages = page.getByTestId("document-pages").locator("li");
-  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
-  const rename = (title: string) =>
-    page.evaluate(({ id, value }) => window.__editorTest?.renamePage(id, value), { id: pageId, value: title });
+  const pageId = await firstPageId(page);
+  const rename = (title: string) => renamePage(page, pageId, title);
 
   // Kontrol positif: di sesi yang sama Ctrl+Z membatalkan rename.
   await rename("Coba Undo");
@@ -125,10 +124,10 @@ test("indikator autosave: edit → Tersimpan dikonfirmasi server; jaringan mati 
   await expect(indicator).toHaveAttribute("data-status", "saved");
   await expect(indicator).toHaveText("Saved");
 
-  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
-  await page.evaluate((id) => window.__editorTest?.renamePage(id, "Disimpan"), pageId);
+  const pageId = await firstPageId(page);
+  await renamePage(page, pageId, "Disimpan");
   // Flush server (debounce 200 ms di stack e2e) → `saved` dengan clock tab ini.
-  const unsaved = () => page.evaluate(() => window.__editorTest?.unsaved());
+  const unsaved = () => page.evaluate(() => window.__editorTestApi?.unsaved());
   expect(await unsaved()).toBe(true);
   await expect.poll(unsaved).toBe(false);
   await expect(indicator).toHaveAttribute("data-status", "saved");
@@ -137,7 +136,7 @@ test("indikator autosave: edit → Tersimpan dikonfirmasi server; jaringan mati 
   await expect(indicator).toHaveAttribute("data-status", "offline");
   await expect(indicator).toContainText("Offline — changes are kept on this device");
   // Edit saat offline tetap di perangkat; kembali online → terkirim & dikonfirmasi.
-  await page.evaluate((id) => window.__editorTest?.renamePage(id, "Saat Offline"), pageId);
+  await renamePage(page, pageId, "Saat Offline");
   await context.setOffline(false);
   await expect(indicator).toHaveAttribute("data-status", "saved", { timeout: 15_000 });
   await expect.poll(unsaved, { timeout: 15_000 }).toBe(false);
@@ -163,14 +162,14 @@ test("crash recovery (ED-227): edit yang belum sampai server → tab ditutup pak
   });
   const siteId = await openNewSite(page);
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
-  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  const pageId = await firstPageId(page);
 
   blocked = true;
-  await page.evaluate((id) => window.__editorTest?.renamePage(id, "Dipulihkan"), pageId);
+  await renamePage(page, pageId, "Dipulihkan");
   await expect(page.getByTestId("document-pages").locator("li")).toHaveText(["Dipulihkan"]);
   // Melewati debounce flush realtime (200 ms): tetap belum terkonfirmasi → memang tidak sampai server.
   await page.waitForTimeout(800);
-  expect(await page.evaluate(() => window.__editorTest?.unsaved())).toBe(true);
+  expect(await page.evaluate(() => window.__editorTestApi?.unsaved())).toBe(true);
   // Beri waktu tulis IndexedDB, lalu tutup tanpa beforeunload (≈ crash / tutup paksa).
   await page.waitForTimeout(300);
   await page.close({ runBeforeUnload: false });
@@ -224,9 +223,9 @@ test("lock satu pengedit: user kedua → dialog takeover; ambil alih → user pe
   const dialog = other.getByTestId("takeover-dialog");
   await expect(dialog).toContainText("Sari Wulandari is editing");
   await expect(other.getByTestId("read-only-blocker")).toBeVisible();
-  const pageId = await other.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  const pageId = await firstPageId(other);
   // Mode lihat saja: perubahan ditolak di klien (server juga menolak koneksi read-only).
-  expect(await other.evaluate((id) => window.__editorTest?.renamePage(id, "Tidak boleh"), pageId)).toBe(false);
+  expect(await renamePage(other, pageId, "Tidak boleh")).toBe(false);
 
   await dialog.getByRole("button", { name: "Take over" }).click();
   await expect(dialog).toBeHidden();
@@ -234,10 +233,10 @@ test("lock satu pengedit: user kedua → dialog takeover; ambil alih → user pe
   // Pemegang lama dijadikan lihat saja + ditawari mengambil alih kembali.
   await expect(page.getByTestId("takeover-dialog")).toContainText("Budi Santoso is editing");
   await expect(page.getByTestId("read-only-blocker")).toBeVisible();
-  expect(await page.evaluate((id) => window.__editorTest?.renamePage(id, "Ditolak"), pageId)).toBe(false);
+  expect(await renamePage(page, pageId, "Ditolak")).toBe(false);
 
   // Pengedit baru mengubah dokumen → tersinkron ke koneksi lihat saja.
-  expect(await other.evaluate((id) => window.__editorTest?.renamePage(id, "Diedit Budi"), pageId)).toBe(true);
+  expect(await renamePage(other, pageId, "Diedit Budi")).toBe(true);
   await expect(page.getByTestId("document-pages").locator("li")).toHaveText(["Diedit Budi"]);
 
   // "Lihat saja" menutup dialog, mode lihat saja tetap.
@@ -250,7 +249,7 @@ test("lock satu pengedit: user kedua → dialog takeover; ambil alih → user pe
   await expect(page.getByTestId("lock-banner")).toContainText("Budi Santoso has finished editing.");
   await page.getByTestId("lock-banner").getByRole("button", { name: "Start editing" }).click();
   await expect(page.getByTestId("lock-banner")).toHaveCount(0);
-  expect(await page.evaluate((id) => window.__editorTest?.renamePage(id, "Kembali ke Sari"), pageId)).toBe(true);
+  expect(await renamePage(page, pageId, "Kembali ke Sari")).toBe(true);
 });
 
 test("sesi habis saat mengedit (401 token realtime) → dialog login ulang tanpa meninggalkan editor (ED-229)", async ({
@@ -290,7 +289,7 @@ test("dokumen dari editor versi lebih baru (schemaVersion+1) → reload dipaksa 
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
   // Server menyimpan dokumen ber-schemaVersion lebih baru (disimulasikan lewat seam test, lalu dikonfirmasi server).
   const reloaded = page.waitForEvent("load");
-  await page.evaluate(() => window.__editorTest?.setSchemaVersion(2));
+  await page.evaluate(() => window.__editorTestApi?.setSchemaVersion(2));
   await reloaded;
   // Setelah reload otomatis dokumen masih lebih baru → tidak reload lagi; canvas tidak dipasang.
   await expect(page.getByTestId("editor-outdated")).toContainText("The editor needs an update");
@@ -310,10 +309,10 @@ test("telemetri (ED-231): kesalahan render → layar pemulihan + event Sentry be
   const siteId = await openNewSite(page);
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
   const secret = "Resep Rahasia Kue Lapis Bu Sari";
-  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
-  await page.evaluate(({ id, title }) => window.__editorTest?.renamePage(id, title), { id: pageId, title: secret });
+  const pageId = await firstPageId(page);
+  await renamePage(page, pageId, secret);
 
-  await page.evaluate(() => window.__editorTest?.crash());
+  await page.evaluate(() => window.__editorTestApi?.crash());
   const errorId = (await page.getByTestId("error-id").textContent())?.match(/: (\w+)$/)?.[1];
   expect(errorId).toBeTruthy();
   await expect(page.getByRole("button", { name: "Open the last saved version" })).toBeVisible();
@@ -328,4 +327,36 @@ test("telemetri (ED-231): kesalahan render → layar pemulihan + event Sentry be
   // ID situs & isi dokumen tidak dikirim mentah.
   expect(event).not.toContain(siteId);
   expect(envelopes.join("\n")).not.toContain("Rahasia");
+});
+
+test("test API editor (ED-242): setup cepat lewat runCommand, seleksi, kamera, geometri (T1.15.17)", async ({
+  page,
+}) => {
+  await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const pageId = await firstPageId(page);
+
+  // Setup dokumen tanpa klik UI: section + teks di dalamnya.
+  const section = await editorCommand(page, "createNode", { parentId: pageId, type: "frame" });
+  expect(section.ok).toBe(true);
+  const sectionId = String(section.value);
+  const text = await editorCommand(page, "createNode", { parentId: sectionId, type: "text" });
+  expect(text.ok).toBe(true);
+  const unknown = await editorCommand(page, "bukanCommand", {});
+  expect(unknown).toMatchObject({ ok: false, error: { code: "UNKNOWN_COMMAND" } });
+
+  const canvas = page.getByTestId("editor-canvas");
+  await expect(canvas.locator(`[data-node-id="${sectionId}"]`)).toBeAttached();
+  await expect(canvas.locator(`[data-node-id="${String(text.value)}"]`)).toBeAttached();
+  const doc = (await page.evaluate(() => window.__editorTestApi?.getDoc())) as { nodes: Record<string, unknown> };
+  expect(Object.keys(doc.nodes)).toEqual(expect.arrayContaining([pageId, sectionId, String(text.value)]));
+
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), sectionId);
+  expect(await page.evaluate(() => window.__editorTestApi?.getSelection())).toEqual([sectionId]);
+  const rect = await page.evaluate((id) => window.__editorTestApi?.getGeometry(id), sectionId);
+  expect(rect?.width).toBeGreaterThan(0);
+
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 40, y: 20, zoom: 0.5 }));
+  expect(await page.evaluate(() => window.__editorTestApi?.getCamera())).toEqual({ x: 40, y: 20, zoom: 0.5 });
+  await expect(page.locator("#world")).toHaveAttribute("style", /translate3d\(40px, 20px, 0px\) scale\(0\.5\)/);
 });

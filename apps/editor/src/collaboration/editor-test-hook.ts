@@ -1,26 +1,39 @@
-import { runCommand, updatePage, YDOC_KEYS } from "@platform/document-model";
+import { COMMANDS, runCommand, YDOC_KEYS, yDocToJson } from "@platform/document-model";
 import { useEffect } from "react";
+import type { Camera } from "../canvas/camera-store";
+import { cameraStore } from "../canvas/camera-store";
 import type { CanvasRuntime } from "../canvas/canvas-runtime";
+import type { WorldRect } from "../canvas/geometry/geometry-store";
+import { selectionStore } from "../store/selection-store";
 import type { DocumentSession } from "./document-session";
 
-// Hook uji DEV ONLY (ED-242, dilengkapi T1.15.17): e2e mengubah dokumen lewat command document-model, bukan Y.Doc
-// langsung, dengan origin lokal tab ini (dilacak undo — sama seperti aksi user). Tidak pernah ada di build production
-// (`import.meta.env.DEV`).
+/**
+ * ED-242: test API editor — DEV ONLY (`import.meta.env.DEV`, tidak pernah ada di build production). Perubahan dokumen
+ * lewat registry command document-model (`runCommand(nama, args)`) dengan origin lokal tab ini — jalur yang sama
+ * dengan aksi user & AI, jadi assertion e2e berlaku untuk keduanya.
+ */
 export interface EditorTestApi {
+  /** JSON dokumen saat ini (`yDocToJson`). */
+  getDoc: () => unknown;
+  select: (ids: string[]) => void;
+  getSelection: () => readonly string[];
+  getCamera: () => Camera;
+  setCamera: (camera: Partial<Camera>) => void;
+  /** Rect world node di frame aktif (null bila tidak ter-mount). */
+  getGeometry: (id: string) => WorldRect | null;
+  /** Jalankan command document-model by name; hasil `CommandResult` (ok/value atau error). */
+  runCommand: (name: string, args: unknown) => unknown;
+  // Status sesi (T1.15.7/T1.15.11).
   status: () => string;
-  // ED-200: ada perubahan lokal yang belum dikonfirmasi server (`saved`).
   unsaved: () => boolean;
-  pageIds: () => string[];
-  renamePage: (pageId: string, title: string) => boolean;
-  // ED-230: simulasi dokumen yang disimpan editor versi lebih baru (tidak ada command untuk meta — seam test saja).
+  // Seam test: dokumen dari editor lebih baru (ED-230; `meta` tidak punya command) & kesalahan render (ED-231).
   setSchemaVersion: (version: number) => void;
-  // ED-231: picu kesalahan render (error boundary + pelaporan Sentry).
   crash: () => void;
 }
 
 declare global {
   interface Window {
-    __editorTest?: EditorTestApi;
+    __editorTestApi?: EditorTestApi;
   }
 }
 
@@ -28,24 +41,34 @@ export function useEditorTestHook(session: DocumentSession, runtime: CanvasRunti
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     const ctx = { doc: runtime.doc, origin: runtime.origin };
-    window.__editorTest = {
-      status: () => session.status(),
-      unsaved: () => session.save.hasUnsaved(),
-      pageIds: () => session.doc.getArray<string>(YDOC_KEYS.pageOrder).toArray(),
-      renamePage: (pageId, title) => {
+    window.__editorTestApi = {
+      getDoc: () => yDocToJson(runtime.doc),
+      select: (ids) => selectionStore.getState().select(ids),
+      getSelection: () => selectionStore.getState().selectedIds,
+      getCamera: () => {
+        const { x, y, zoom } = cameraStore.getState();
+        return { x, y, zoom };
+      },
+      setCamera: (camera) => cameraStore.getState().setCamera(camera),
+      getGeometry: (id) => runtime.geometry.store.getRect(id),
+      runCommand: (name, args) => {
+        const command = (COMMANDS as Record<string, Parameters<typeof runCommand>[1]>)[name];
+        if (!command) return { ok: false, error: { code: "UNKNOWN_COMMAND", name } };
         // Sama dengan UI: sesi read-only (lock/akses) tidak mengubah dokumen.
-        if (runtime.isReadOnly()) return false;
+        if (runtime.isReadOnly()) return { ok: false, error: { code: "READ_ONLY" } };
         // Aksi diskrit (seperti commit drag): tidak digabung captureTimeout dengan aksi sebelumnya.
         runtime.undo.stopCapturing();
-        return runCommand(ctx, updatePage, { id: pageId, patch: { title } }).ok;
+        return runCommand(ctx, command, args);
       },
-      crash,
+      status: () => session.status(),
+      unsaved: () => session.save.hasUnsaved(),
       setSchemaVersion: (version) => {
         runtime.doc.transact(() => runtime.doc.getMap(YDOC_KEYS.meta).set("schemaVersion", version), runtime.origin);
       },
+      crash,
     };
     return () => {
-      delete window.__editorTest;
+      delete window.__editorTestApi;
     };
   }, [session, runtime, crash]);
 }

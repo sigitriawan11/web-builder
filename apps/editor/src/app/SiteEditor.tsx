@@ -65,7 +65,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
   const { session, status } = useDocumentSession(site.documentId);
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-connection-status={status}>
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b px-3">
+      <header className="flex h-12 shrink-0 items-center gap-3 border-b px-3" data-testid="editor-header">
         <Button asChild variant="ghost" size="icon" aria-label={t("app.back")} title={t("app.back")}>
           <a href="/sites">
             <ArrowLeftIcon />
@@ -119,7 +119,8 @@ function DocumentWorkspace({ session, pageId }: { session: DocumentSession; page
   if (!runtime) return null;
   return (
     <NodeStoreContext.Provider value={runtime.nodeStore}>
-      <EditorTestHook session={session} runtime={runtime} />
+      {/* ED-242: test API hanya di build dev (ter-tree-shake dari production). */}
+      {import.meta.env.DEV ? <EditorTestHook session={session} runtime={runtime} /> : null}
       <aside className="w-48 shrink-0 overflow-y-auto border-r bg-background p-2 text-sm">
         <PanelErrorBoundary name="pages">
           <ul className="flex flex-col gap-1" data-testid="document-pages">
