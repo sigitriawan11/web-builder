@@ -98,6 +98,21 @@ describe("hook editor", () => {
     });
   });
 
+  it("style inline dari nodeAttributes digabung dengan style milik teks & gambar (tidak saling menimpa)", () => {
+    const doc = heroDocument();
+    const withFocal = {
+      ...doc.nodes.n_heroimg001,
+      props: { ...(doc.nodes.n_heroimg001 as Extract<Node, { type: "image" }>).props },
+    } as Extract<Node, { type: "image" }>;
+    withFocal.props.image = { ...withFocal.props.image, focalPoint: { x: 0.25, y: 0.75 } };
+    doc.nodes.n_heroimg001 = withFocal;
+    const html = renderToStaticMarkup(
+      render(doc, editorCtx({ nodeAttributes: (node) => ({ "data-node-id": node.id, style: { color: "red" } }) })),
+    );
+    expect(html).toMatch(/<h1 data-node-id="n_herottl001" style="color:red;text-align:center">/);
+    expect(html).toMatch(/<img data-node-id="n_heroimg001" [^>]*style="color:red;object-position:25% 75%"/);
+  });
+
   it("visible:false di publish → null", () => {
     const doc = heroDocument();
     const image = doc.nodes.n_heroimg001 as Node;

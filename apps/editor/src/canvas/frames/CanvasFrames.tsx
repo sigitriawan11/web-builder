@@ -1,9 +1,14 @@
+import { type AssetEntry, AssetEntrySchema, YDOC_KEYS } from "@platform/document-model";
+import { useMemo } from "react";
+import * as Y from "yjs";
+import { useDocTheme } from "../../document/use-doc-theme";
+import { type CanvasRuntime, useCanvasRuntime } from "../canvas-runtime";
 import { siteFontStack } from "../fonts/site-fonts";
 import { GeometryContext } from "../geometry/geometry-context";
-import { spikeGeometry } from "../geometry/spike-geometry";
 import { FrameContext } from "../render-root/breakpoint-context";
-import { NodeView } from "../render-root/NodeView";
+import { NodeView, ThemeContext } from "../render-root/NodeView";
 import { RenderScope } from "../render-root/RenderRoot";
+import { createEditorRenderEnv, RenderEnvContext } from "../render-root/render-env";
 import { type FrameMode, type FrameSpec, layoutFrames } from "./frame-layout";
 import { IframeFrame } from "./IframeFrame";
 
@@ -22,6 +27,16 @@ interface FrameContentProps {
   siteFont: string | null;
 }
 
+// Registry asset dari Y.Doc (ukuran intrinsik <img>); divalidasi seperti node (update remote).
+function assetLookup(runtime: CanvasRuntime): (id: string) => AssetEntry | undefined {
+  const assets = runtime.doc.getMap<unknown>(YDOC_KEYS.assets);
+  return (id) => {
+    const value = assets.get(id);
+    const parsed = AssetEntrySchema.safeParse(value instanceof Y.Map ? value.toJSON() : value);
+    return parsed.success ? parsed.data : undefined;
+  };
+}
+
 function FrameContent({
   frame,
   pageId,
@@ -29,12 +44,34 @@ function FrameContent({
   siteFont,
   measured,
 }: FrameContentProps & { measured: boolean }) {
+  const runtime = useCanvasRuntime();
+  const theme = useDocTheme(runtime.doc);
+  const env = useMemo(
+    () =>
+      createEditorRenderEnv({
+        pageId,
+        breakpoint: frame.breakpoint,
+        node: (id) => runtime.nodeStore.getNode(id) ?? undefined,
+        asset: assetLookup(runtime),
+      }),
+    [runtime, pageId, frame.breakpoint],
+  );
+  const frameValue = useMemo(() => ({ breakpoint: frame.breakpoint, width: frame.width }), [frame]);
   return (
-    <GeometryContext.Provider value={measured ? spikeGeometry : null}>
-      <FrameContext.Provider value={{ breakpoint: frame.breakpoint, width: frame.width }}>
-        <RenderScope className={scopeClassName} fontStack={siteFontStack(siteFont)}>
-          <NodeView id={pageId} parent="block" />
-        </RenderScope>
+    <GeometryContext.Provider value={measured ? runtime.geometry.store : null}>
+      <FrameContext.Provider value={frameValue}>
+        <ThemeContext.Provider value={theme}>
+          <RenderEnvContext.Provider value={env}>
+            <RenderScope
+              theme={theme}
+              breakpoint={frame.breakpoint}
+              className={scopeClassName}
+              fontStack={siteFontStack(siteFont)}
+            >
+              <NodeView id={pageId} parent="block" />
+            </RenderScope>
+          </RenderEnvContext.Provider>
+        </ThemeContext.Provider>
       </FrameContext.Provider>
     </GeometryContext.Provider>
   );
@@ -53,7 +90,7 @@ export function CanvasFrames({ pageId, showAll, mode, scopeClassName, siteFont }
         className={`bp-frame bp-${frame.breakpoint}`}
         style={{ position: "absolute", left: frame.x, top: 0, width: frame.width }}
       >
-        {/* ED-019: geometry diukur untuk frame aktif saja (spike: Desktop). */}
+        {/* ED-019: geometry diukur untuk frame aktif saja (Desktop). */}
         <FrameContent
           frame={frame}
           pageId={pageId}

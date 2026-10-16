@@ -1,7 +1,7 @@
 import { type HitResult, hitTestNode } from "./hit-test";
 
 /**
- * Hit-test canvas untuk semua mode spike: isolasi shadow/prefix (Opsi A/B) dan frame class/iframe (T0.4.6).
+ * Hit-test canvas untuk semua mode: isolasi shadow/prefix (Opsi A/B) dan frame class/iframe (T0.4.6).
  * Mode iframe dipertahankan sampai keputusan T0.8.2; logika aturannya tetap di `hitTestNode`.
  */
 export function hitTestCanvas(

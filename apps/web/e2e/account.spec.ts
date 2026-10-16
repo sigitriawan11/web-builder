@@ -32,7 +32,10 @@ test("ganti bahasa ke Indonesia → UI ID & tersimpan di profil (AC T1.14.8)", a
 test("zona waktu & nama tersimpan", async ({ page, context }) => {
   await openAccountAsNewUser(page);
   await page.getByLabel("Time zone").selectOption("Asia/Makassar");
+  // Simpan → cookie → halaman dimuat ulang; tunggu muat ulang itu (cek cookie sebelum respons api = flaky).
+  const reloaded = page.waitForEvent("load");
   await page.getByRole("button", { name: "Save preferences" }).click();
+  await reloaded;
   await expect(page.getByLabel("Time zone")).toHaveValue("Asia/Makassar");
   const zone = (await context.cookies()).find((cookie) => cookie.name === "NEXT_TIMEZONE");
   expect(decodeURIComponent(zone?.value ?? "")).toBe("Asia/Makassar");

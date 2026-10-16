@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { UndoContext } from "../document/undo-context";
 import { NodeStoreContext } from "../document/use-node";
@@ -8,26 +8,16 @@ import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-t
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
 import { CanvasOverlay } from "./CanvasOverlay";
 import { cameraStore, cameraTransform } from "./camera-store";
+import { type CanvasRuntime, CanvasRuntimeContext } from "./canvas-runtime";
 import { type DragSessionDeps, useDragSessions } from "./drag/use-drag-sessions";
 import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch } from "./frames/frame-layout";
-import { setAppliedZoom, spikeGeometry } from "./geometry/spike-geometry";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
-import {
-  LOCAL_ORIGIN,
-  resolveSpikeTarget,
-  spikeDoc,
-  spikeHitTest,
-  spikeMarqueeContext,
-  spikeNodeStore,
-  spikePageId,
-  spikeUndo,
-} from "./spike-document";
 import { useTextEditingInteractions } from "./text-editing/use-text-editing-interactions";
 import { useShadowRoot } from "./use-shadow-root";
 
@@ -38,33 +28,36 @@ const isolation = isolationFromSearch(window.location.search);
 const siteCss = siteCssFromSearch(window.location.search);
 const frameOptions = frameOptionsFromSearch(window.location.search);
 const siteFont = siteFontFromSearch(window.location.search);
-const interactionDeps: InteractionAdapterDeps = { hitTest: spikeHitTest, resolveTarget: resolveSpikeTarget };
-const dragSessionDeps: DragSessionDeps = {
-  opContext: { doc: spikeDoc, origin: LOCAL_ORIGIN },
-  geometry: spikeGeometry,
-  nodeStore: spikeNodeStore,
-  hitTest: spikeHitTest,
-  viewportOffset: spikeMarqueeContext.viewportOffset,
-  undoBoundary: () => spikeUndo.stopCapturing(),
-};
-const selectToolDeps: SelectToolDeps = {
-  nodeStore: spikeNodeStore,
-  hitTest: spikeHitTest,
-  marquee: spikeMarqueeContext,
-};
 
-export function CanvasViewport() {
+function runtimeDeps(runtime: CanvasRuntime) {
+  const interaction: InteractionAdapterDeps = { hitTest: runtime.hitTest, resolveTarget: runtime.resolveTarget };
+  const drag: DragSessionDeps = {
+    opContext: { doc: runtime.doc, origin: runtime.origin },
+    geometry: runtime.geometry.store,
+    nodeStore: runtime.nodeStore,
+    hitTest: runtime.hitTest,
+    viewportOffset: runtime.marquee.viewportOffset,
+    undoBoundary: () => runtime.undo.stopCapturing(),
+  };
+  const select: SelectToolDeps = { nodeStore: runtime.nodeStore, hitTest: runtime.hitTest, marquee: runtime.marquee };
+  return { interaction, drag, select };
+}
+
+// Viewport canvas untuk satu dokumen (`runtime`): playground M0 (fixture) maupun editor situs (Y.Doc realtime).
+export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   const viewportRef = useRef<HTMLElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
+  const deps = useMemo(() => runtimeDeps(runtime), [runtime]);
+  const { setAppliedZoom } = runtime.geometry;
   useToolShortcuts();
-  useUndoShortcuts(spikeUndo);
+  useUndoShortcuts(runtime.undo);
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
   useTextEditingInteractions(viewportRef);
-  useSelectTool(viewportRef, selectToolDeps);
-  useHoverHighlight(viewportRef, selectToolDeps);
-  useDragSessions(dragSessionDeps);
-  useInteractionMachine(viewportRef, interactionDeps);
+  useSelectTool(viewportRef, deps.select);
+  useHoverHighlight(viewportRef, deps.select);
+  useDragSessions(deps.drag);
+  useInteractionMachine(viewportRef, deps.interaction);
   useBrowserGuards(viewportRef);
   const shadowRoot = useShadowRoot(worldRef, isolation === "shadow");
 
@@ -103,15 +96,15 @@ export function CanvasViewport() {
       cancelAnimationFrame(frame);
       clearTimeout(idleTimer);
     };
-  }, []);
+  }, [setAppliedZoom]);
 
   const content = (
     <>
       <style>{canvasStyleSheet(isolation, siteCss)}</style>
-      <NodeStoreContext.Provider value={spikeNodeStore}>
-        <UndoContext.Provider value={spikeUndo}>
+      <NodeStoreContext.Provider value={runtime.nodeStore}>
+        <UndoContext.Provider value={runtime.undo}>
           <CanvasFrames
-            pageId={spikePageId}
+            pageId={runtime.pageId}
             showAll={frameOptions.showAll}
             mode={frameOptions.mode}
             scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
@@ -123,13 +116,15 @@ export function CanvasViewport() {
   );
 
   return (
-    <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
-      {/* `#world` tetap menerima transform kamera; isinya di shadow root atau langsung (ED-016). */}
-      <div id="world" ref={worldRef} data-isolation={isolation}>
-        {isolation !== "shadow" && content}
-      </div>
-      {shadowRoot && createPortal(content, shadowRoot)}
-      <CanvasOverlay />
-    </main>
+    <CanvasRuntimeContext.Provider value={runtime}>
+      <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
+        {/* `#world` tetap menerima transform kamera; isinya di shadow root atau langsung (ED-016). */}
+        <div id="world" ref={worldRef} data-isolation={isolation}>
+          {isolation !== "shadow" && content}
+        </div>
+        {shadowRoot && createPortal(content, shadowRoot)}
+        <CanvasOverlay />
+      </main>
+    </CanvasRuntimeContext.Provider>
   );
 }

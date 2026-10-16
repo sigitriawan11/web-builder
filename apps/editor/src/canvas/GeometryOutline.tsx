@@ -1,7 +1,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { useStore } from "zustand";
 import { cameraStore } from "./camera-store";
-import { spikeGeometry } from "./geometry/spike-geometry";
+import { useCanvasRuntime } from "./canvas-runtime";
 
 // Outline 1px dari geometry store: debug `?outline=<nodeId>` (T0.5.1) & seleksi dasar (T0.5.4).
 // Handle, label ukuran & hover menyusul di T0.5.6.
@@ -12,9 +12,10 @@ export function GeometryOutline({
   nodeId: string;
   className?: string;
 }) {
-  const subscribe = useCallback((listener: () => void) => spikeGeometry.subscribe(nodeId, listener), [nodeId]);
+  const geometry = useCanvasRuntime().geometry.store;
+  const subscribe = useCallback((listener: () => void) => geometry.subscribe(nodeId, listener), [geometry, nodeId]);
   // peekRect: baca cache tanpa memaksa layout (AC ED-019).
-  const rect = useSyncExternalStore(subscribe, () => spikeGeometry.peekRect(nodeId));
+  const rect = useSyncExternalStore(subscribe, () => geometry.peekRect(nodeId));
   const camera = useStore(cameraStore);
   if (!rect) return null;
 

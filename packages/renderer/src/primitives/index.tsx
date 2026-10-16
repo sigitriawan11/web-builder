@@ -5,6 +5,13 @@ import { type CSSProperties, createElement, type ReactNode } from "react";
 
 type Attributes = Record<string, unknown>;
 
+// Mode editor bisa membawa `style` inline lewat atribut node (T1.15.8); style milik primitive digabung, bukan menimpa.
+function withStyle(attributes: Attributes, style: CSSProperties | undefined): Attributes {
+  if (!style) return attributes;
+  const own = attributes.style as CSSProperties | undefined;
+  return { ...attributes, style: own ? { ...own, ...style } : style };
+}
+
 export interface BoxProps {
   tag: string;
   attributes: Attributes;
@@ -23,7 +30,7 @@ export interface TextProps {
 }
 
 export function Text({ tag, attributes, style, children }: TextProps) {
-  return createElement(tag, style ? { ...attributes, style } : attributes, children);
+  return createElement(tag, withStyle(attributes, style), children);
 }
 
 export interface ImageProps {
@@ -37,8 +44,10 @@ export interface ImageProps {
 }
 
 export function Image({ attributes, src, alt, width, height, loading, objectPosition }: ImageProps) {
+  // `style` tetap atribut terakhir: urutan atribut HTML publish tidak berubah (snapshot deterministik).
+  const { style, ...rest } = withStyle(attributes, objectPosition ? { objectPosition } : undefined);
   return createElement("img", {
-    ...attributes,
+    ...rest,
     src,
     alt,
     // Ukuran intrinsik dari registry asset mencegah layout shift (CLS) saat gambar dimuat.
@@ -46,7 +55,7 @@ export function Image({ attributes, src, alt, width, height, loading, objectPosi
     ...(height ? { height } : {}),
     loading,
     decoding: "async",
-    ...(objectPosition ? { style: { objectPosition } } : {}),
+    ...(style ? { style } : {}),
   });
 }
 

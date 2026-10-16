@@ -34,6 +34,19 @@ test("dokumen situs dimuat dari server lewat realtime (page awal tampil, status 
   await expect(page.getByTestId("document-pages").locator("li")).toHaveText(["Home"]);
 });
 
+test("canvas merender page aktif dokumen situs lewat @platform/renderer (T1.15.8)", async ({ page }) => {
+  await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  const pageId = await page.evaluate(() => window.__editorTest?.pageIds()[0] ?? "");
+  // Locator CSS Playwright menembus shadow root canvas (ADR-012).
+  const pageNode = page.getByTestId("editor-canvas").locator(`[data-node-id="${pageId}"]`);
+  await expect(pageNode).toBeAttached();
+  expect(await pageNode.evaluate((element) => element.tagName)).toBe("MAIN");
+  // Page selebar frame Desktop (1440) di world canvas.
+  await expect(pageNode).toHaveCSS("width", "1440px");
+  await expect(page.locator("#world")).toBeAttached();
+});
+
 test("ubah dokumen → reload menampilkan state terakhir (AC T1.15.7)", async ({ page }) => {
   await openNewSite(page);
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");

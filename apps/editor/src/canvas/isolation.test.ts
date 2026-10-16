@@ -1,3 +1,4 @@
+import { BASE_CSS } from "@platform/renderer";
 import { describe, expect, it } from "vitest";
 import {
   canvasStyleSheet,
@@ -42,22 +43,31 @@ describe("scopeCss (Opsi B)", () => {
 describe("canvasStyleSheet", () => {
   const siteCss = "* { font-family: serif; }";
 
-  it("shadow: reset :host, CSS editor teks, lalu CSS situs apa adanya", () => {
+  it("shadow: reset :host, reset renderer (= publish), CSS editor teks, lalu CSS situs apa adanya", () => {
     expect(canvasStyleSheet("shadow", siteCss).split("\n")).toEqual([
       ":host { all: initial; display: block; }",
+      BASE_CSS,
       TEXT_EDITOR_CSS,
       siteCss,
     ]);
   });
 
   it("prefix: reset .pf-root, lalu CSS editor teks & CSS situs di-scope", () => {
-    const [reset, editorCss, scopedSite] = canvasStyleSheet("prefix", siteCss).split("\n");
+    const [reset, baseCss, editorCss, scopedSite] = canvasStyleSheet("prefix", siteCss).split("\n");
     expect(reset).toBe(".pf-root { all: initial; display: block; }");
+    expect(baseCss).toContain(".pf-root, .pf-root *, .pf-root *::before, .pf-root *::after {box-sizing:border-box}");
     expect(editorCss).toContain(".pf-root .ProseMirror {");
     expect(scopedSite).toBe(".pf-root, .pf-root * { font-family: serif; }");
   });
 
-  it("none: CSS situs global tanpa perlindungan", () => {
-    expect(canvasStyleSheet("none", siteCss).split("\n")).toEqual([TEXT_EDITOR_CSS, siteCss]);
+  it("none: CSS situs global tanpa perlindungan (hanya reset renderer yang di-scope ke isi canvas)", () => {
+    const [baseCss, ...rest] = canvasStyleSheet("none", siteCss).split("\n");
+    expect(baseCss).toContain(
+      ".render-root, .render-root * {box-sizing:border-box}".replace(
+        " {",
+        ", .render-root *::before, .render-root *::after {",
+      ),
+    );
+    expect(rest).toEqual([TEXT_EDITOR_CSS, siteCss]);
   });
 });

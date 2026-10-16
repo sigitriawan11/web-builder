@@ -1,3 +1,4 @@
+import { BASE_CSS } from "@platform/renderer";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useT } from "../../app/i18n";
@@ -5,13 +6,13 @@ import { loadSiteFont, SITE_FONT_WEIGHTS } from "../fonts/site-fonts";
 import { TEXT_EDITOR_CSS } from "../isolation";
 import type { FrameSpec } from "./frame-layout";
 
-const IFRAME_BASE_CSS = `html, body { margin: 0; } ${TEXT_EDITOR_CSS}`;
+const IFRAME_BASE_CSS = `html, body { margin: 0; } ${BASE_CSS} ${TEXT_EDITOR_CSS}`;
 
 /**
  * Opsi (b) ED-034: satu iframe per breakpoint frame; isi dirender ke dokumen iframe lewat portal.
  * Dokumen iframe sudah terisolasi sendiri, jadi mode shadow/prefix tidak berlaku di dalamnya.
  * `pointer-events: none`: event pointer di dalam iframe tidak sampai ke viewport (pan/zoom/klik),
- * sehingga hit-test harus menerjemahkan koordinat sendiri (lihat hit-test/spike-hit-test.ts).
+ * sehingga hit-test harus menerjemahkan koordinat sendiri (lihat hit-test/canvas-hit-test.ts).
  */
 interface IframeFrameProps {
   frame: FrameSpec;

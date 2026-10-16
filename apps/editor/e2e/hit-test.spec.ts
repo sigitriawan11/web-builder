@@ -75,12 +75,16 @@ for (const isolation of ["shadow", "prefix"]) {
     });
 
     test("anak yang terpotong clip parent tidak bisa dikenai di luar area parent (AC ED-020)", async ({ page }) => {
-      // Gambar dibuat lebih lebar dari hero (1440px world) sehingga meluber ke kanan.
+      // Gambar digeser absolute ke tepi kanan hero (1440px world) sehingga meluber ke kanan. Bukan dengan lebar
+      // > hero: reset renderer `img{max-width:100%}` (sama dengan publish) membatasi lebar gambar ke parent.
       await page.evaluate(() => {
         const spike = (window as unknown as { __spike: Spike }).__spike;
         spike.run(spike.ops.updateStyle, {
           ids: ["n_heroimg001"],
-          patch: { size: { width: { mode: "fixed", value: 3000, unit: "px" } } },
+          patch: {
+            position: { type: "absolute", x: 1200, y: 0 },
+            size: { width: { mode: "fixed", value: 600, unit: "px" } },
+          },
         });
       });
       const image = await node(page, "n_heroimg001").boundingBox();

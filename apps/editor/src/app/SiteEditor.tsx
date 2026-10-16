@@ -1,13 +1,15 @@
+import { userOrigin } from "@platform/document-model";
 import { isApiError } from "@platform/sdk";
 import { useSite } from "@platform/sdk/react";
 import type { Site } from "@platform/shared/contracts";
 import { Button } from "@platform/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CanvasViewport } from "../canvas/CanvasViewport";
+import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { useDocumentSession } from "../collaboration/use-document-session";
-import { NodeStore } from "../document/node-store";
 import { NodeStoreContext, useNode } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
 import { useT } from "./i18n";
@@ -18,7 +20,7 @@ import "../styles/app.css";
 
 // Editor satu situs (`/editor/:siteId`): situs dimuat lewat api (izin & isolasi tenant ditegakkan server). Tidak ada
 // / bukan milik user → layar "tidak ditemukan" (api 404 untuk keduanya, tidak membocorkan keberadaan). Sesi basi →
-// login. Dokumen Y.Doc & canvas renderer dipasang T1.15.7–T1.15.8.
+// login. Dokumen: Y.Doc lokal (IndexedDB) → realtime (T1.15.7), canvas renderer (T1.15.8).
 export function SiteEditor({ siteId, pageId }: { siteId: string; pageId: string | null }) {
   const t = useT();
   const site = useSite(siteId);
@@ -62,45 +64,63 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
         </div>
       </header>
       <ProfileLocaleSync />
-      <main
-        className="flex flex-1 items-center justify-center bg-muted/40 text-sm text-muted-foreground"
-        data-testid="editor-canvas-slot"
-        data-page-id={pageId ?? ""}
-      >
-        {session && status !== "loading" ? <DocumentPages session={session} /> : t("app.loading")}
-      </main>
+      <div className="flex min-h-0 flex-1 bg-muted/40" data-testid="editor-canvas-slot" data-page-id={pageId ?? ""}>
+        {session && status !== "loading" ? (
+          <DocumentWorkspace session={session} pageId={pageId} />
+        ) : (
+          <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
+        )}
+      </div>
     </div>
   );
 }
 
-// Sementara sebelum canvas renderer (T1.15.8): daftar page dari dokumen — bukti dokumen termuat (lokal/server).
-function DocumentPages({ session }: { session: DocumentSession }) {
-  // Dibuat di effect (bukan useMemo): StrictMode menjalankan cleanup lalu effect lagi — store dari useMemo akan
-  // sudah di-destroy (observer lepas) dan UI berhenti mengikuti dokumen.
-  const [store, setStore] = useState<NodeStore | null>(null);
-  useEffect(() => {
-    const next = new NodeStore(session.doc);
-    setStore(next);
-    return () => next.destroy();
-  }, [session]);
-  useEditorTestHook(session);
+// T1.15.8: canvas (renderer mode editor + interaksi M0) untuk dokumen dari realtime; page aktif = `?page=` bila ada
+// di dokumen, selain itu page pertama. Daftar page sementara (panel Pages = M2) juga bukti dokumen termuat.
+function DocumentWorkspace({ session, pageId }: { session: DocumentSession; pageId: string | null }) {
   const pageOrder = usePageOrder(session.doc);
-  if (!store) return null;
+  const activePageId = pageId && pageOrder.includes(pageId) ? pageId : (pageOrder[0] ?? null);
+  // Dibuat di effect (bukan useMemo/useState): StrictMode menjalankan cleanup lalu effect lagi — runtime dari
+  // useMemo akan sudah di-destroy (observer lepas) dan canvas berhenti mengikuti dokumen.
+  const [runtime, setRuntime] = useState<CanvasRuntime | null>(null);
+  useEffect(() => {
+    if (!activePageId) return;
+    const next = createCanvasRuntime({ doc: session.doc, pageId: activePageId, origin: TAB_ORIGIN });
+    setRuntime(next);
+    return () => {
+      setRuntime(null);
+      next.destroy();
+    };
+  }, [session, activePageId]);
+  useEditorTestHook(session);
+  if (!runtime) return null;
   return (
-    <NodeStoreContext.Provider value={store}>
-      <ul className="flex flex-col gap-1" data-testid="document-pages">
-        {pageOrder.map((id) => (
-          <PageItem key={id} id={id} />
-        ))}
-      </ul>
+    <NodeStoreContext.Provider value={runtime.nodeStore}>
+      <aside className="w-48 shrink-0 overflow-y-auto border-r bg-background p-2 text-sm">
+        <ul className="flex flex-col gap-1" data-testid="document-pages">
+          {pageOrder.map((id) => (
+            <PageItem key={id} id={id} active={id === runtime.pageId} />
+          ))}
+        </ul>
+      </aside>
+      <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
+        <CanvasViewport runtime={runtime} />
+      </div>
     </NodeStoreContext.Provider>
   );
 }
 
-function PageItem({ id }: { id: string }) {
+// Origin transaksi lokal tab ini (DM-060): dilacak UndoManager; tab lain = sesi lain.
+const TAB_ORIGIN = userOrigin(crypto.randomUUID());
+
+function PageItem({ id, active }: { id: string; active: boolean }) {
   const node = useNode(id);
   if (node?.type !== "page") return null;
-  return <li data-page-id={id}>{node.props.title}</li>;
+  return (
+    <li data-page-id={id} aria-current={active ? "page" : undefined} className={active ? "font-semibold" : undefined}>
+      {node.props.title}
+    </li>
+  );
 }
 
 export function SiteNotFound() {

@@ -1,5 +1,7 @@
 import { lazy, Suspense } from "react";
 import { CanvasViewport } from "../canvas/CanvasViewport";
+import type { CanvasRuntime } from "../canvas/canvas-runtime";
+import { createPlaygroundRuntime } from "../canvas/playground-runtime";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { initialLocale } from "./i18n";
 import { AppProviders } from "./providers";
@@ -34,5 +36,14 @@ function Playground() {
     window.location.replace("/sites");
     return null;
   }
-  return <CanvasViewport />;
+  return <PlaygroundCanvas />;
+}
+
+// Satu per muat halaman (fixture dari `?fixture=`), hidup selama tab. Bukan initializer useState: StrictMode
+// memanggilnya dua kali sehingga `__spike` bisa menunjuk runtime yang dibuang.
+let playgroundRuntime: CanvasRuntime | null = null;
+
+function PlaygroundCanvas() {
+  playgroundRuntime ??= createPlaygroundRuntime(window.location.search);
+  return <CanvasViewport runtime={playgroundRuntime} />;
 }

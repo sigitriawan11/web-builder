@@ -1,3 +1,5 @@
+import { BASE_CSS } from "@platform/renderer";
+
 // Spike M0 (ED-016, ❓ OPEN 02#2): cara mengisolasi CSS situs dari chrome editor.
 // - "shadow": isi canvas di shadow root `#world` (Opsi A, T0.4.3).
 // - "prefix": isi canvas di `.pf-root`, CSS situs di-scope ke sana (Opsi B, T0.4.4).
@@ -50,13 +52,19 @@ export const TEXT_EDITOR_CSS =
 export function canvasStyleSheet(mode: IsolationMode, siteCss: string): string {
   switch (mode) {
     case "shadow":
-      return [SHADOW_HOST_CSS, TEXT_EDITOR_CSS, siteCss].join("\n");
+      return [SHADOW_HOST_CSS, BASE_CSS, TEXT_EDITOR_CSS, siteCss].join("\n");
     case "prefix": {
       const scope = `.${PREFIX_ROOT_CLASS}`;
-      return [PREFIX_ROOT_CSS, scopeCss(TEXT_EDITOR_CSS, scope), scopeCss(siteCss, scope)].join("\n");
+      return [
+        PREFIX_ROOT_CSS,
+        scopeCss(BASE_CSS, scope),
+        scopeCss(TEXT_EDITOR_CSS, scope),
+        scopeCss(siteCss, scope),
+      ].join("\n");
     }
     case "none":
-      return [TEXT_EDITOR_CSS, siteCss].join("\n");
+      // Reset renderer (sama dengan publish) di-scope ke isi canvas agar chrome editor tidak terkena.
+      return [scopeCss(BASE_CSS, ".render-root"), TEXT_EDITOR_CSS, siteCss].join("\n");
   }
 }
 

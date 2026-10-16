@@ -11,13 +11,17 @@ import {
   yDocToJson,
 } from "@platform/document-model";
 import { landing200 } from "@platform/document-model/fixtures";
+import { render } from "@platform/renderer";
 import { act, Profiler } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { NodeStore } from "../../document/node-store";
 import { NodeStoreContext } from "../../document/use-node";
-import { RenderRoot, RenderScope } from "./RenderRoot";
-import { renderNode } from "./render-node";
+import { assetUrl } from "./asset-url";
+import { DESKTOP_FRAME, FrameContext } from "./breakpoint-context";
+import { NodeView, ThemeContext } from "./NodeView";
+import { RenderScope } from "./RenderRoot";
+import { createEditorRenderEnv, RenderEnvContext } from "./render-env";
 import { renderProbe } from "./render-probe";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -44,7 +48,22 @@ function mount(fixture: SiteDocument) {
     root.render(
       <Profiler id="canvas" onRender={() => commits++}>
         <NodeStoreContext.Provider value={store}>
-          <RenderRoot pageId={pageId} />
+          <FrameContext.Provider value={DESKTOP_FRAME}>
+            <ThemeContext.Provider value={fixture.theme}>
+              <RenderEnvContext.Provider
+                value={createEditorRenderEnv({
+                  pageId,
+                  breakpoint: "base",
+                  node: (id) => store.getNode(id) ?? undefined,
+                  asset: (id) => fixture.assets[id],
+                })}
+              >
+                <RenderScope theme={fixture.theme} breakpoint="base">
+                  <NodeView id={pageId} parent="block" />
+                </RenderScope>
+              </RenderEnvContext.Provider>
+            </ThemeContext.Provider>
+          </FrameContext.Provider>
         </NodeStoreContext.Provider>
       </Profiler>,
     );
@@ -75,9 +94,15 @@ function mount(fixture: SiteDocument) {
 
 const element = (container: HTMLElement, id: string) => container.querySelector<HTMLElement>(`[data-node-id="${id}"]`);
 
-// Struktur DOM (tag + id node, urut dokumen) untuk membandingkan render live vs statis.
+// Struktur DOM (tag + atribut selain style/class + teks, urut dokumen) untuk membandingkan canvas vs renderer.
 function structureOf(root: ParentNode): string[] {
-  return [...root.querySelectorAll("[data-node-id]")].map((el) => `${el.tagName}#${el.getAttribute("data-node-id")}`);
+  return [...root.querySelectorAll("[data-node-id]")].map((el) => {
+    const attributes = [...el.attributes]
+      .filter((attribute) => !["style", "class", "draggable"].includes(attribute.name))
+      .map((attribute) => `${attribute.name}=${attribute.value}`)
+      .sort();
+    return `${el.tagName}[${attributes.join(",")}]${el.children.length === 0 ? el.textContent : ""}`;
+  });
 }
 
 function descendantsOf(doc: SiteDocument, id: string): string[] {
@@ -169,7 +194,7 @@ describe("NodeView — rendering inkremental (ED-018, T0.4.2)", () => {
     expect(element(editor.container, card.id)).toBeNull();
   });
 
-  it("DOM live selalu sama strukturnya dengan render statis dari JSON dokumen", () => {
+  it("ED-017: DOM canvas = output @platform/renderer mode editor (tag, atribut, teks) setelah edit", () => {
     const fixture = landing200();
     const card = firstCard(fixture);
     const editor = mount(fixture);
@@ -187,7 +212,14 @@ describe("NodeView — rendering inkremental (ED-018, T0.4.2)", () => {
 function renderToStaticString(doc: SiteDocument): string {
   const container = document.createElement("div");
   const root = createRoot(container);
-  act(() => root.render(<RenderScope>{renderNode(doc, doc.pageOrder[0] ?? "")}</RenderScope>));
+  const ctx = {
+    pageId: doc.pageOrder[0] ?? "",
+    breakpoint: "base" as const,
+    mode: "editor" as const,
+    assetUrl,
+    nodeAttributes: (node: { id: string }) => ({ "data-node-id": node.id }),
+  };
+  act(() => root.render(render(doc, ctx)));
   const html = container.innerHTML;
   act(() => root.unmount());
   return html;
