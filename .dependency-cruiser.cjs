@@ -122,6 +122,18 @@ module.exports = {
     },
     ...allowedInternalRules,
     {
+      name: "editor-store-ui-only",
+      comment:
+        "Zustand store editor = UI state saja; dokumen tidak pernah di Zustand (ARCHITECTURE §5.2, T2.1.6): store tidak boleh import runtime document-model (type-only boleh); yjs dijaga test.",
+      severity: "error",
+      from: { path: "^apps/editor/src/store/", pathNot: "\\.test\\.tsx?$" },
+      to: {
+        // Import runtime `yjs` tidak tercatat parser swc depcruise → dijaga test `store/store-ui-only.test.ts`.
+        path: "^packages/document-model/",
+        dependencyTypesNot: ["type-only"],
+      },
+    },
+    {
       name: "not-to-unresolvable",
       comment: "Import yang tidak bisa di-resolve (salah path / dependency belum dipasang).",
       severity: "error",
