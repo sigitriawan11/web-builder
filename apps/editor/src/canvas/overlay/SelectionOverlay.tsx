@@ -68,8 +68,10 @@ export function SelectionOverlay({ nodeStore, geometry }: SelectionOverlayProps)
   };
   const single = selectedIds.length === 1 && selectedIds[0] ? describeSingle(nodeStore, selectedIds[0]) : null;
   const label = sizeLabel(world, single?.modes ?? { width: "fixed", height: "fixed" }, single?.inAutoLayout ?? false);
-  // Handle resize hanya untuk satu node (resize multi-seleksi menyusul bersama transform, M2).
-  const handleNode = selectedIds.length === 1 ? selectedIds[0] : undefined;
+  // Handle resize hanya untuk satu node (resize multi-seleksi menyusul bersama transform, M2); page root tidak
+  // bisa di-resize lebar (ED-036) → tanpa handle.
+  const onlyId = selectedIds.length === 1 ? selectedIds[0] : undefined;
+  const handleNode = onlyId && nodeStore.getNode(onlyId)?.type !== "page" ? onlyId : undefined;
 
   return (
     <>
