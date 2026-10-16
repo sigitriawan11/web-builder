@@ -44,6 +44,23 @@ describe("snapshot & determinisme", () => {
   });
 });
 
+describe("font dasar konten (WYSIWYG editor = publish)", () => {
+  it("teks tanpa typography mewarisi token fontFamily.body — variabel selalu ikut walau tidak dirujuk node", () => {
+    const html = page(heroDocument());
+    expect(html).toContain("body{font-family:var(--t-fontFamily-body,system-ui,sans-serif)}");
+    expect(html).toMatch(/--t-fontFamily-body:"Inter", sans-serif/);
+  });
+
+  it("theme tanpa fontFamily.body → tanpa variabel; fallback system-ui", () => {
+    const doc = heroDocument();
+    const { body: _body, ...rest } = doc.theme.tokens.fontFamily ?? {};
+    doc.theme.tokens.fontFamily = rest;
+    const html = page(doc);
+    expect(html).not.toContain("--t-fontFamily-body:");
+    expect(html).toContain("var(--t-fontFamily-body,system-ui,sans-serif)");
+  });
+});
+
 describe("kerangka HTML (spec 07 §4.1)", () => {
   it("doctype, lang, charset/viewport, CSS inline, skip link ke <main id=main>", () => {
     const html = page(heroDocument());

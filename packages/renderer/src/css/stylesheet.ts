@@ -1,4 +1,10 @@
-import { type AutoRuleId, type BreakpointDef, resolveStyle, type SiteDocument } from "@platform/document-model";
+import {
+  type AutoRuleId,
+  type BreakpointDef,
+  resolveStyle,
+  type SiteDocument,
+  tokenEntry,
+} from "@platform/document-model";
 import { type AutoResponsiveOptions, applyAutoResponsive } from "../responsive/auto-responsive";
 import {
   childLayoutOf,
@@ -8,6 +14,7 @@ import {
   styleDeclarations,
 } from "./declarations";
 import { tokenDeclarations, usedTokens } from "./tokens";
+import { tokenVarName } from "./values";
 
 // PUB-026 (rekomendasi OPEN #2): class per style-signature — deklarasi node diserialisasi kanonik → hash pendek →
 // `s-<hash6>`; node dengan deklarasi identik berbagi class (dedup). Hash berbasis isi → nama class stabil antar publish.
@@ -59,11 +66,18 @@ export function declarationsToCss(selector: string, declarations: readonly Decla
   return `${selector}{${declarations.map(([property, value]) => `${property}:${value}`).join(";")}}`;
 }
 
+// Font dasar konten situs: teks tanpa `typography` mewarisi token `fontFamily.body` (default theme "Inter"), bukan font
+// bawaan browser (sering serif). Sama di editor (RenderScope) & publish (`body`) — WYSIWYG. Hanya font-family: ukuran
+// & line-height tetap bawaan agar layout yang ada tidak bergeser. Fallback bila theme tanpa token itu.
+export const BASE_FONT_TOKEN = "fontFamily.body";
+export const BASE_FONT_FAMILY = `var(${tokenVarName(BASE_FONT_TOKEN)},system-ui,sans-serif)`;
+
 /** Reset minimal global (PUB-026 `global.css`): border-box agar stroke inside tidak mengubah ukuran (DM-030). */
 export const BASE_CSS =
   "*,*::before,*::after{box-sizing:border-box}" +
   "body,h1,h2,h3,h4,h5,h6,p,figure,blockquote,ul,ol{margin:0}" +
-  "img{max-width:100%}";
+  "img{max-width:100%}" +
+  `body{font-family:${BASE_FONT_FAMILY}}`;
 
 // Properti terakhir menang (sama dengan cascade dalam satu aturan).
 const asMap = (declarations: readonly Declaration[]) => new Map(declarations);
@@ -144,7 +158,10 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
   visit(options.pageId, { base: "block", tablet: "block", mobile: "block" });
 
   // Variabel token: base di root; varian responsif di breakpoint (token tidak perlu re-render node, PUB-043).
-  const tokens = tokenDeclarations(doc.theme, usedTokens(doc));
+  const used = usedTokens(doc);
+  // Font dasar (BASE_FONT_FAMILY) selalu merujuk token ini → variabelnya wajib ikut walau tidak dirujuk node.
+  if (tokenEntry(doc.theme, BASE_FONT_TOKEN) !== undefined) used.add(BASE_FONT_TOKEN);
+  const tokens = tokenDeclarations(doc.theme, used);
   const rootSelector = options.rootSelector ?? ":root";
   const tokenRule = (bp: Breakpoint) => {
     if (tokens[bp].length === 0) return "";

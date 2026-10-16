@@ -11,6 +11,8 @@ export {
 } from "./css/declarations";
 export {
   BASE_CSS,
+  BASE_FONT_FAMILY,
+  BASE_FONT_TOKEN,
   breakpointScopeClasses,
   buildPageStyles,
   declarationsToCss,

@@ -11,7 +11,7 @@ import {
   yDocToJson,
 } from "@platform/document-model";
 import { landing200 } from "@platform/document-model/fixtures";
-import { render } from "@platform/renderer";
+import { BASE_FONT_FAMILY, render } from "@platform/renderer";
 import { act, Profiler } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
@@ -119,6 +119,13 @@ function firstCard(doc: SiteDocument) {
 }
 
 describe("NodeView — rendering inkremental (ED-018, T0.4.2)", () => {
+  it("font dasar canvas = font dasar publish (token fontFamily.body, WYSIWYG)", () => {
+    const { container } = mount(landing200());
+    const scope = container.querySelector<HTMLElement>(".render-root");
+    expect(scope?.style.fontFamily).toBe(BASE_FONT_FAMILY);
+    expect(scope?.style.getPropertyValue("--t-fontFamily-body")).toContain("Inter");
+  });
+
   it("render awal merender setiap node tepat sekali", () => {
     const fixture = landing200();
     const { initialRenders } = mount(fixture);
