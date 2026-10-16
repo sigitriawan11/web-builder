@@ -9,12 +9,14 @@ import { FrameContext } from "../render-root/breakpoint-context";
 import { NodeView, ThemeContext } from "../render-root/NodeView";
 import { RenderScope } from "../render-root/RenderRoot";
 import { createEditorRenderEnv, RenderEnvContext } from "../render-root/render-env";
-import { type FrameMode, type FrameSpec, layoutFrames } from "./frame-layout";
+import type { FrameMode, FrameSpec } from "./frame-layout";
 import { IframeFrame } from "./IframeFrame";
 
 interface CanvasFramesProps {
   pageId: string;
-  showAll: boolean;
+  frames: readonly FrameSpec[];
+  // ED-019/ED-034: geometry (seleksi, hit overlay) diukur untuk frame breakpoint aktif.
+  activeBreakpoint: FrameSpec["breakpoint"];
   mode: FrameMode;
   scopeClassName?: string | undefined;
   siteFont: string | null;
@@ -78,8 +80,8 @@ function FrameContent({
 }
 
 // ED-034: page dirender di satu atau beberapa breakpoint frame berdampingan.
-export function CanvasFrames({ pageId, showAll, mode, scopeClassName, siteFont }: CanvasFramesProps) {
-  return layoutFrames(showAll).map((frame) =>
+export function CanvasFrames({ pageId, frames, activeBreakpoint, mode, scopeClassName, siteFont }: CanvasFramesProps) {
+  return frames.map((frame) =>
     mode === "iframe" ? (
       <IframeFrame key={frame.breakpoint} frame={frame} siteFont={siteFont}>
         <FrameContent frame={frame} pageId={pageId} siteFont={siteFont} measured={false} />
@@ -88,15 +90,28 @@ export function CanvasFrames({ pageId, showAll, mode, scopeClassName, siteFont }
       <div
         key={frame.breakpoint}
         className={`bp-frame bp-${frame.breakpoint}`}
-        style={{ position: "absolute", left: frame.x, top: 0, width: frame.width }}
+        data-breakpoint={frame.breakpoint}
+        style={{ position: "absolute", left: frame.x, top: 0, width: frame.width, minHeight: frame.minHeight }}
       >
-        {/* ED-019: geometry diukur untuk frame aktif saja (Desktop). */}
         <FrameContent
           frame={frame}
           pageId={pageId}
           scopeClassName={scopeClassName}
           siteFont={siteFont}
-          measured={frame.breakpoint === "base"}
+          measured={frame.breakpoint === activeBreakpoint}
+        />
+        {/* ED-034: garis "fold" = tinggi viewport preset (bukan konten situs; tidak menerima pointer). */}
+        <div
+          aria-hidden
+          data-fold=""
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: frame.minHeight,
+            borderTop: "1px dashed rgba(100, 116, 139, 0.6)",
+            pointerEvents: "none",
+          }}
         />
       </div>
     ),

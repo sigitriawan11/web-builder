@@ -19,6 +19,7 @@ import {
 import {
   ChevronDownIcon,
   CircleIcon,
+  Columns3Icon,
   EyeIcon,
   FrameIcon,
   HandIcon,
@@ -94,6 +95,7 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
   const breakpoint = useStore(breakpointStore, (state) => state.active);
   const zoom = useStore(cameraStore, (state) => state.zoom);
   const bottomBarHidden = useStore(uiPreferencesStore, (state) => state.bottomBarHidden);
+  const showAllFrames = useStore(uiPreferencesStore, (state) => state.showAllFrames);
   // Sub-tool shape terakhir dipakai tampil di tombol grup (seperti Figma).
   const [shape, setShape] = useState<ToolId>("rectangle");
   const selectTool = (tool: ToolId) => toolStore.getState().dispatch({ type: "selectTool", tool });
@@ -286,6 +288,13 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
               />
             );
           })}
+          <ToolbarButton
+            label={t("toolbar.showAllDevices")}
+            pressed={showAllFrames}
+            icon={<Columns3Icon />}
+            data-testid="toggle-all-devices"
+            onClick={() => uiPreferencesStore.getState().update({ showAllFrames: !showAllFrames })}
+          />
         </div>
         <DropdownMenu>
           <Tooltip>

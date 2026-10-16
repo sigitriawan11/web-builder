@@ -145,3 +145,48 @@ body,
     12px / 1.6 system-ui,
     sans-serif;
 }
+
+/* ED-034: label frame breakpoint di atas frame (screen space). Satu-satunya elemen overlay selain handle yang
+   menerima pointer. */
+.overlay-frame-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 4px;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font:
+    11px / 1.4 system-ui,
+    sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.overlay-frame-label:hover {
+  color: #0f172a;
+}
+
+/* ED-036/ED-070: toast ringan di atas canvas. */
+.overlay-toasts {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.overlay-toast {
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgb(15 23 42 / 92%);
+  color: #ffffff;
+  font:
+    12px / 1.4 system-ui,
+    sans-serif;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+}

@@ -1,9 +1,13 @@
 import { deleteNodes, runCommand } from "@platform/document-model";
 import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useStore } from "zustand";
 import { UndoContext } from "../document/undo-context";
 import { NodeStoreContext } from "../document/use-node";
+import { usePreviewWidths } from "../document/use-preview-widths";
 import { useUndoShortcuts } from "../document/use-undo-shortcuts";
+import { breakpointStore } from "../store/breakpoint-store";
+import { uiPreferencesStore } from "../store/ui-preferences";
 import { recordEditorAction, reportError } from "../telemetry/telemetry";
 import { useHoverHighlight } from "../tools/select/use-hover-highlight";
 import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-tool";
@@ -14,10 +18,12 @@ import { type CanvasRuntime, CanvasRuntimeContext, usePageId } from "./canvas-ru
 import { type DragSessionDeps, useDragSessions } from "./drag/use-drag-sessions";
 import { loadSiteFont, SITE_FONT_WEIGHTS, siteFontFromSearch } from "./fonts/site-fonts";
 import { CanvasFrames } from "./frames/CanvasFrames";
-import { frameOptionsFromSearch } from "./frames/frame-layout";
+import { frameOptionsFromSearch, layoutFrames } from "./frames/frame-layout";
+import { FramesContext, useFrameActivation } from "./frames/frames-context";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
+import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 import { useZoomShortcuts } from "./interactions/use-zoom-shortcuts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
@@ -66,12 +72,23 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   const worldRef = useRef<HTMLDivElement>(null);
   const deps = useMemo(() => runtimeDeps(runtime), [runtime]);
   const pageId = usePageId(runtime);
+  // ED-034: frame breakpoint — semua device (preferensi / `?frames=all` playground) atau fokus breakpoint aktif.
+  const activeBreakpoint = useStore(breakpointStore, (state) => state.active);
+  const showAllPreference = useStore(uiPreferencesStore, (state) => state.showAllFrames);
+  const widths = usePreviewWidths(runtime.doc);
+  const showAll = frameOptions.showAll || showAllPreference;
+  const frames = useMemo(
+    () => layoutFrames(showAll, { widths, focus: activeBreakpoint }),
+    [showAll, widths, activeBreakpoint],
+  );
+  useFrameActivation(viewportRef, frames);
   const { setAppliedZoom } = runtime.geometry;
   useToolShortcuts();
   useUndoShortcuts(runtime.undo, deps.canEdit);
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
   useZoomShortcuts(runtime);
+  useSectionShortcuts(runtime);
   useTextEditingInteractions(viewportRef);
   useSelectTool(viewportRef, deps.select);
   useHoverHighlight(viewportRef, deps.select);
@@ -143,7 +160,8 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
           <UndoContext.Provider value={runtime.undo}>
             <CanvasFrames
               pageId={pageId}
-              showAll={frameOptions.showAll}
+              frames={frames}
+              activeBreakpoint={activeBreakpoint}
               mode={frameOptions.mode}
               scopeClassName={isolation === "prefix" ? PREFIX_ROOT_CLASS : undefined}
               siteFont={siteFont}
@@ -156,14 +174,16 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
 
   return (
     <CanvasRuntimeContext.Provider value={runtime}>
-      <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
-        {/* `#world` tetap menerima transform kamera; isinya di shadow root atau langsung (ED-016). */}
-        <div id="world" ref={worldRef} data-isolation={isolation}>
-          {isolation !== "shadow" && content}
-        </div>
-        {shadowRoot && createPortal(content, shadowRoot)}
-        <CanvasOverlay />
-      </main>
+      <FramesContext.Provider value={frames}>
+        <main id="editor-viewport" data-testid="editor-viewport" ref={viewportRef}>
+          {/* `#world` tetap menerima transform kamera; isinya di shadow root atau langsung (ED-016). */}
+          <div id="world" ref={worldRef} data-isolation={isolation}>
+            {isolation !== "shadow" && content}
+          </div>
+          {shadowRoot && createPortal(content, shadowRoot)}
+          <CanvasOverlay />
+        </main>
+      </FramesContext.Provider>
     </CanvasRuntimeContext.Provider>
   );
 }

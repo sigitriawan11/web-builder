@@ -110,7 +110,8 @@
     "publish": "Publish",
     "mode": "Design mode",
     "comingSoon": "Coming soon",
-    "narrowScreen": "The editor works best on screens 1280px or wider."
+    "narrowScreen": "The editor works best on screens 1280px or wider.",
+    "showAllDevices": "Show all devices"
   },
   "sidebar": {
     "label": "Left panel",
@@ -197,5 +198,8 @@
       "homeIsRoot": "The home page must be at /.",
       "rootIsHome": "/ is reserved for the home page."
     }
+  },
+  "sections": {
+    "pageNotDeletable": "The page can't be deleted from here. Use the Pages panel."
   }
 }

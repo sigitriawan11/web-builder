@@ -12,24 +12,39 @@ export interface FrameSpec {
   width: number;
   // Posisi kiri frame di world.
   x: number;
+  // ED-034: tinggi minimal = tinggi viewport preset (garis "fold" ditampilkan di sini).
+  minHeight: number;
 }
 
-// DM-035: previewWidth default; ED-034: jarak antar frame 100px world.
-const PREVIEW_WIDTHS: { breakpoint: Breakpoint; width: number }[] = [
-  { breakpoint: "base", width: 1440 },
-  { breakpoint: "tablet", width: 768 },
-  { breakpoint: "mobile", width: 390 },
-];
+// DM-035: previewWidth default (dipakai bila dokumen tidak memberi `settings.breakpoints`); ED-034: jarak 100px.
+export const DEFAULT_PREVIEW_WIDTHS: Readonly<Record<Breakpoint, number>> = { base: 1440, tablet: 768, mobile: 390 };
+// ED-034: tinggi viewport preset Desktop 900, Tablet 1024, Mobile 812.
+export const VIEWPORT_HEIGHTS: Readonly<Record<Breakpoint, number>> = { base: 900, tablet: 1024, mobile: 812 };
+const ORDER: readonly Breakpoint[] = ["base", "tablet", "mobile"];
 export const FRAME_GAP = 100;
 
-export function layoutFrames(showAll: boolean): FrameSpec[] {
-  const frames = showAll ? PREVIEW_WIDTHS : PREVIEW_WIDTHS.slice(0, 1);
+export interface FrameLayoutOptions {
+  // Lebar preview per breakpoint (`settings.breakpoints[].previewWidth`).
+  widths?: Readonly<Record<Breakpoint, number>> | undefined;
+  // Mode fokus (tidak semua device): frame breakpoint ini saja, di origin world.
+  focus?: Breakpoint | undefined;
+}
+
+/** ED-034: frame breakpoint berdampingan (semua device) atau satu frame (fokus). */
+export function layoutFrames(showAll: boolean, options: FrameLayoutOptions = {}): FrameSpec[] {
+  const widths = options.widths ?? DEFAULT_PREVIEW_WIDTHS;
+  const breakpoints = showAll ? ORDER : [options.focus ?? "base"];
   let x = 0;
-  return frames.map((frame) => {
-    const spec = { ...frame, x };
-    x += frame.width + FRAME_GAP;
+  return breakpoints.map((breakpoint) => {
+    const spec = { breakpoint, width: widths[breakpoint], x, minHeight: VIEWPORT_HEIGHTS[breakpoint] };
+    x += spec.width + FRAME_GAP;
     return spec;
   });
+}
+
+/** Frame di bawah titik world x (null = di luar/di antara frame). */
+export function frameAtWorldX(frames: readonly FrameSpec[], worldX: number): FrameSpec | null {
+  return frames.find((frame) => worldX >= frame.x && worldX <= frame.x + frame.width) ?? null;
 }
 
 export function frameOptionsFromSearch(search: string): { showAll: boolean; mode: FrameMode } {

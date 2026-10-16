@@ -110,7 +110,8 @@
     "publish": "Publish",
     "mode": "Mode desain",
     "comingSoon": "Menyusul",
-    "narrowScreen": "Editor paling optimal di layar ≥ 1280px."
+    "narrowScreen": "Editor paling optimal di layar ≥ 1280px.",
+    "showAllDevices": "Tampilkan semua device"
   },
   "sidebar": {
     "label": "Panel kiri",
@@ -197,5 +198,8 @@
       "homeIsRoot": "Page beranda harus di /.",
       "rootIsHome": "/ khusus page beranda."
     }
+  },
+  "sections": {
+    "pageNotDeletable": "Halaman tidak bisa dihapus dari sini. Gunakan panel Pages."
   }
 }

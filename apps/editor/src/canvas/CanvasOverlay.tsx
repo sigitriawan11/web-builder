@@ -4,8 +4,10 @@ import { cameraStore } from "./camera-store";
 import { useCanvasRuntime } from "./canvas-runtime";
 import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
 import { MarqueeOverlay } from "./MarqueeOverlay";
+import { FrameLabels } from "./overlay/FrameLabels";
 import { ReorderOverlay } from "./overlay/ReorderOverlay";
 import { SelectionOverlay } from "./overlay/SelectionOverlay";
+import { Toasts } from "./overlay/Toasts";
 
 const outlineNodeId = outlineNodeFromSearch(window.location.search);
 
@@ -23,6 +25,8 @@ export function CanvasOverlay() {
       <SelectionOverlay nodeStore={runtime.nodeStore} geometry={runtime.geometry.store} />
       <MarqueeOverlay />
       <ReorderOverlay />
+      <FrameLabels />
+      <Toasts />
       <div className="overlay-zoom-indicator">{Math.round(zoom * 100)}%</div>
     </div>
   );

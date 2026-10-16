@@ -29,6 +29,8 @@ const PreferencesSchema = z.object({
   collapsedSections: z.array(z.string().max(40)).max(50).catch([]),
   // ED-009: bar bawah bisa disembunyikan lewat menu View.
   bottomBarHidden: z.boolean().catch(false),
+  // ED-034: tampilkan semua frame device berdampingan (selain itu mode fokus: breakpoint aktif saja).
+  showAllFrames: z.boolean().catch(false),
 });
 export type UiPreferences = z.infer<typeof PreferencesSchema>;
 
@@ -41,6 +43,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   rightWidth: RIGHT_SIDEBAR_DEFAULT,
   collapsedSections: [],
   bottomBarHidden: false,
+  showAllFrames: false,
 };
 
 export const clampSidebarWidth = (width: number) =>
