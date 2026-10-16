@@ -16,24 +16,33 @@
   },
   "dependencies": {
     "@platform/document-model": "workspace:*",
+    "@platform/i18n": "workspace:*",
     "@platform/renderer": "workspace:*",
+    "@platform/sdk": "workspace:*",
+    "@platform/shared": "workspace:*",
+    "@platform/ui": "workspace:*",
+    "@tanstack/react-query": "5.104.0",
     "@tiptap/pm": "3.31.4",
     "@tiptap/react": "3.31.4",
     "@tiptap/starter-kit": "3.31.4",
     "@tiptap/y-tiptap": "3.0.9",
+    "lucide-react": "1.49.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "yjs": "13.6.33",
+    "zod": "4.6.7",
     "zustand": "5.0.15"
   },
   "devDependencies": {
     "@platform/config": "workspace:*",
     "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "4.3.3",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
     "@vitest/coverage-v8": "5.0.4",
     "jsdom": "30.1.2",
+    "tailwindcss": "4.3.3",
     "vite": "8.3.4",
     "vitest": "5.0.4"
   }

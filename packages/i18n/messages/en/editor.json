@@ -1,1 +1,17 @@
-{}
+{
+  "app": {
+    "loading": "Loading editor…",
+    "back": "Back to dashboard",
+    "canvasPending": "The page canvas will appear here.",
+    "notFound": {
+      "title": "Website not found",
+      "description": "This website doesn't exist or you don't have access to it.",
+      "back": "Back to websites"
+    },
+    "error": {
+      "title": "The editor ran into a problem",
+      "description": "Reload the page to try again.",
+      "reload": "Reload"
+    }
+  }
+}

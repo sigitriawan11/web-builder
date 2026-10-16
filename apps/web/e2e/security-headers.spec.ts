@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { APP_URL, MARKETING_URL } from "../playwright.config";
 
 // T1.14.3 / PUB-211: header keamanan platform pada halaman Next (nonce) & editor (lewat rewrite).
+test.use({ locale: "en-US" });
 
 test("halaman app: CSP nonce + strict-dynamic, script Next membawa nonce, tanpa pelanggaran CSP", async ({ page }) => {
   const violations: string[] = [];
@@ -45,7 +46,8 @@ test("editor (rewrite): CSP script-src 'self' tanpa nonce, script eksternal berj
   expect(headers["content-security-policy"]).toMatch(/script-src 'self'( 'unsafe-inline')?;/);
   expect(headers["content-security-policy"]).not.toContain("nonce-");
   expect(headers["x-frame-options"]).toBe("DENY");
-  await expect(page.locator("body")).toHaveAttribute("data-editor-script", "ok");
+  // Editor sungguhan berjalan di bawah CSP itu (ID bukan situs → layar "tidak ditemukan" dirender aplikasi).
+  await expect(page.getByRole("heading", { name: "Website not found" })).toBeVisible();
 });
 
 test("editor tidak bisa di-iframe, bahkan oleh origin sendiri (AC PUB-211)", async ({ context, page }) => {
@@ -65,7 +67,9 @@ test("editor tidak bisa di-iframe, bahkan oleh origin sendiri (AC PUB-211)", asy
   const child = page.frames().find((frame) => frame !== page.mainFrame());
   // …tetapi browser menolak merendernya di frame: dokumen frame bukan editor dan script editor tidak berjalan.
   expect(child?.url()).not.toBe(target);
-  const ran = await child?.evaluate(() => document.body?.dataset.editorScript ?? "tidak").catch(() => "tidak");
+  const ran = await child
+    ?.evaluate(() => ((document.getElementById("root")?.childElementCount ?? 0) > 0 ? "ya" : "tidak"))
+    .catch(() => "tidak");
   expect(ran).toBe("tidak");
 });
 

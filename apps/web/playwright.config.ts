@@ -11,7 +11,8 @@ if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 const PORT = 3110;
 const API_PORT = 4310;
 const WORKER_HEALTH_PORT = 4210;
-const EDITOR_FIXTURE_PORT = 5998;
+// Editor SUNGGUHAN (Vite dev, base /editor/) — port & HMR sendiri, terpisah dari `pnpm dev` (5173).
+const EDITOR_PORT = 5998;
 export const APP_URL = `http://app.localhost:${PORT}`;
 export const MARKETING_URL = `http://localhost:${PORT}`;
 export const MAILPIT_API = `http://localhost:${process.env.MAILPIT_UI_PORT ?? "8025"}/api/v1`;
@@ -70,15 +71,17 @@ export default defineConfig({
         PUBLIC_APP_URL: APP_URL,
         PUBLIC_MARKETING_URL: MARKETING_URL,
         API_INTERNAL_URL: `http://127.0.0.1:${API_PORT}`,
-        EDITOR_ORIGIN: `http://127.0.0.1:${EDITOR_FIXTURE_PORT}`,
+        EDITOR_ORIGIN: `http://localhost:${EDITOR_PORT}`,
         APP_ENV: "local",
         NEXT_DIST_DIR: ".next-e2e",
       },
     },
     {
-      command: `node e2e/fixtures/editor-origin.mjs ${EDITOR_FIXTURE_PORT}`,
-      url: `http://127.0.0.1:${EDITOR_FIXTURE_PORT}/editor/`,
+      command: "pnpm --filter @platform/editor exec vite --strictPort",
+      url: `http://localhost:${EDITOR_PORT}/editor/`,
       reuseExistingServer: false,
+      timeout: 120_000,
+      env: { ...(process.env as Record<string, string>), EDITOR_PORT: String(EDITOR_PORT) },
     },
   ],
 });

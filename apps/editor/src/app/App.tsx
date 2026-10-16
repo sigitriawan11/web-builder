@@ -1,5 +1,38 @@
+import { lazy, Suspense } from "react";
 import { CanvasViewport } from "../canvas/CanvasViewport";
+import { AppErrorBoundary } from "./ErrorBoundary";
+import { initialLocale } from "./i18n";
+import { AppProviders } from "./providers";
+import { parseEditorRoute } from "./router";
 
+// Rute produk dimuat terpisah (membawa CSS Tailwind/token UI) — lihat SiteEditor.tsx.
+const SiteEditor = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteEditor })));
+const SiteNotFound = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteNotFound })));
+
+// Bootstrap editor (ARCHITECTURE §5.2): providers → error boundary → rute.
 export function App() {
+  const route = parseEditorRoute(window.location.pathname, window.location.search);
+  return (
+    <AppProviders locale={initialLocale()}>
+      <AppErrorBoundary>
+        <Suspense fallback={null}>
+          {route.kind === "site" ? (
+            <SiteEditor siteId={route.siteId} pageId={route.pageId} />
+          ) : route.kind === "playground" ? (
+            <Playground />
+          ) : (
+            <SiteNotFound />
+          )}
+        </Suspense>
+      </AppErrorBoundary>
+    </AppProviders>
+  );
+}
+// Playground canvas M0 (fixture & parameter `?…` untuk e2e/benchmark canvas) hanya di dev; production → dashboard.
+function Playground() {
+  if (!import.meta.env.DEV) {
+    window.location.replace("/sites");
+    return null;
+  }
   return <CanvasViewport />;
 }

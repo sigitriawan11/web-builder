@@ -1,1 +1,17 @@
-{}
+{
+  "app": {
+    "loading": "Memuat editor…",
+    "back": "Kembali ke dashboard",
+    "canvasPending": "Kanvas halaman akan tampil di sini.",
+    "notFound": {
+      "title": "Website tidak ditemukan",
+      "description": "Website ini tidak ada atau Anda tidak punya akses ke website ini.",
+      "back": "Kembali ke daftar website"
+    },
+    "error": {
+      "title": "Editor mengalami kesalahan",
+      "description": "Muat ulang halaman untuk mencoba lagi.",
+      "reload": "Muat ulang"
+    }
+  }
+}

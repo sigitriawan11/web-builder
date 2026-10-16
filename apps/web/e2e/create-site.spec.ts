@@ -30,7 +30,7 @@ test("buat website kosong → URL editor situs baru; situs muncul di daftar (AC 
   await dialog.getByRole("button", { name: "Create and open editor" }).click();
   await expect(page).toHaveURL(/\/editor\/[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/);
   const siteId = page.url().split("/editor/")[1];
-  await expect(page.locator("body")).toHaveAttribute("data-editor-script", "ok");
+  await expect(page.getByTestId("editor-site-name")).toHaveText("Toko Kue Bu Sri");
 
   await page.goto(`${APP_URL}/sites`);
   await expect(page.getByRole("link", { name: "Open Toko Kue Bu Sri in the editor" })).toHaveAttribute(
