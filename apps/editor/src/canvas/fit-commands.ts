@@ -1,4 +1,5 @@
 import { selectionStore } from "../store/selection-store";
+import { animateCamera } from "./camera-animation";
 import { cameraStore } from "./camera-store";
 import type { CanvasRuntime } from "./canvas-runtime";
 import { fitCamera, selectionCamera, unionRects, type ViewportSize } from "./fit";
@@ -19,7 +20,7 @@ export function zoomToFit(runtime: CanvasRuntime): void {
   if (!size) return;
   const page = runtime.nodeStore.getNode(runtime.pageId);
   const hasContent = page !== null && "children" in page && page.children.length > 0;
-  cameraStore.getState().setCamera(fitCamera(hasContent ? unionRects(rectsOf(runtime, [runtime.pageId])) : null, size));
+  animateCamera(fitCamera(hasContent ? unionRects(rectsOf(runtime, [runtime.pageId])) : null, size));
 }
 
 /** Zoom to selection; tanpa seleksi → tidak berubah. */
@@ -27,5 +28,16 @@ export function zoomToSelection(runtime: CanvasRuntime): void {
   const size = viewportSize();
   const rect = unionRects(rectsOf(runtime, selectionStore.getState().selectedIds));
   if (!size || !rect) return;
-  cameraStore.getState().setCamera(selectionCamera(rect, size));
+  animateCamera(selectionCamera(rect, size));
+}
+
+/** ED-028: 100% berpusat di tengah viewport saat ini (Shift+0 / Mod+0). */
+export function zoomTo100(): void {
+  const size = viewportSize();
+  if (!size) return;
+  const { x, y, zoom } = cameraStore.getState();
+  const cx = size.width / 2;
+  const cy = size.height / 2;
+  const center = { x: (cx - x) / zoom, y: (cy - y) / zoom };
+  animateCamera({ zoom: 1, x: cx - center.x, y: cy - center.y });
 }

@@ -14,7 +14,7 @@ import { useStore } from "zustand";
 import { zoomStep, zoomTo } from "../../canvas/camera-commands";
 import { cameraStore } from "../../canvas/camera-store";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
-import { zoomToFit, zoomToSelection } from "../../canvas/fit-commands";
+import { zoomTo100, zoomToFit, zoomToSelection } from "../../canvas/fit-commands";
 import type { ConnectionStatus } from "../../collaboration/document-session";
 import { useNodes } from "../../document/use-node";
 import { usePageNodeCount } from "../../document/use-page-node-count";
@@ -140,7 +140,7 @@ export function BottomBar({ runtime, connection }: { runtime: CanvasRuntime; con
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => zoomTo(0.5)}>{t("toolbar.zoomPreset", { percent: 50 })}</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => zoomTo(1)}>
+            <DropdownMenuItem onSelect={() => zoomTo100()}>
               {t("toolbar.zoomPreset", { percent: 100 })}
               <DropdownMenuShortcut>{formatShortcut(ZOOM_100_SHIFT)}</DropdownMenuShortcut>
             </DropdownMenuItem>

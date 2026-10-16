@@ -19,6 +19,7 @@ import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
+import { useZoomShortcuts } from "./interactions/use-zoom-shortcuts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
 import { type NodeErrorActions, NodeErrorActionsContext } from "./render-root/NodeErrorBoundary";
 import { cameraForResize } from "./resize-camera";
@@ -69,6 +70,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useUndoShortcuts(runtime.undo, deps.canEdit);
   usePanInteractions(viewportRef);
   useZoomInteractions(viewportRef);
+  useZoomShortcuts(runtime);
   useTextEditingInteractions(viewportRef);
   useSelectTool(viewportRef, deps.select);
   useHoverHighlight(viewportRef, deps.select);

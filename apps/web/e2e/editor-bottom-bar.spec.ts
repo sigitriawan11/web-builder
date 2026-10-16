@@ -78,10 +78,11 @@ test("menu zoom: fit & ke seleksi (≤ 400%); info seleksi tipe/nama/W×H; jumla
 
   await bar.getByTestId("zoom-menu").click();
   await page.getByRole("menuitem", { name: /Zoom to selection/ }).click();
-  expect((await camera(page))?.zoom).toBe(4);
+  // Transisi kamera 200 ms (ED-028) → tunggu nilai akhir.
+  await expect.poll(async () => (await camera(page))?.zoom).toBe(4);
   await bar.getByTestId("zoom-menu").click();
   await page.getByRole("menuitem", { name: /Zoom to fit/ }).click();
-  expect((await camera(page))?.zoom).toBeLessThan(1);
+  await expect.poll(async () => (await camera(page))?.zoom).toBeLessThan(1);
 
   await context.setOffline(true);
   await expect(bar.getByTestId("connection-indicator")).toHaveText("Offline");

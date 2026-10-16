@@ -903,7 +903,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.2 — Navigasi canvas
 
-- [ ] **T2.2.1** Zoom to fit (`Shift+1`), zoom to selection (`Shift+2`), 100% (`Mod+0`), zoom in/out bertahap — ED-028 · `apps/editor/src/canvas` · Verifikasi: unit test perhitungan fit; e2e shortcut
+- [x] **T2.2.1** Zoom to fit (`Shift+1`), zoom to selection (`Shift+2`), 100% (`Mod+0`), zoom in/out bertahap — ED-028 · `apps/editor/src/canvas` · Verifikasi: unit test perhitungan fit; e2e shortcut
+  - Catatan: ✅ 2026-10-16 — `use-zoom-shortcuts.ts`: `Shift+1` fit, `Shift+2` seleksi, `Shift+0` & `Mod+0` 100% berpusat di viewport (zoom bertahap `Mod+=`/`Mod+-` dari M0). Transisi kamera 200 ms ease-out (`camera-animation.ts` + `camera-interpolation.ts` murni: zoom logaritmik, titik pusat bergerak lurus; animasi baru membatalkan yang lama), otomatis tanpa animasi bila `prefers-reduced-motion` (toggle Preferences = Epic 2.16). Menu bottom bar memakai perintah yang sama. Double-click label frame breakpoint → fit frame menyusul T2.3.3 (label belum ada). Verifikasi: unit interpolasi (2) + fit (T2.1.4); **e2e** `editor-zoom.spec` (**AC** page kosong → 100% di origin; node 4×4 → 400%; fit konten < 1; Shift+0 & Ctrl+0 → 100%; Ctrl+= / Ctrl+- preset; transisi punya nilai antara & berakhir tepat di target); web 83, editor 234. Catatan: `sites.spec` "lebih dari 24 situs" sekali flaky di full run (tidak bisa direproduksi 3× terisolasi; kode situs tidak berubah) — dipantau.
 - [ ] **T2.2.2** (P1) Rulers dengan marker seleksi — ED-029 · `apps/editor/src/canvas/overlay` · Verifikasi: e2e screenshot ruler
 - [ ] **T2.2.3** (P1) Navigasi keyboard antar node & pencarian node — ED-031 · `apps/editor/src/commands` · Verifikasi: e2e Tab/Shift+Tab memilih sibling
 - [ ] **T2.2.4** (P1) Virtualisasi & culling node di luar viewport — ED-021 · `apps/editor/src/canvas` · Verifikasi: benchmark 2.000 node pan ≥ 60 fps
