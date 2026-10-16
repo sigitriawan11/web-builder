@@ -15,6 +15,7 @@
     "bench:canvas": "playwright test --config playwright.bench.config.ts canvas.bench"
   },
   "dependencies": {
+    "@hocuspocus/provider": "4.7.0",
     "@platform/document-model": "workspace:*",
     "@platform/i18n": "workspace:*",
     "@platform/renderer": "workspace:*",
@@ -29,6 +30,7 @@
     "lucide-react": "1.49.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "y-indexeddb": "9.0.12",
     "yjs": "13.6.33",
     "zod": "4.6.7",
     "zustand": "5.0.15"

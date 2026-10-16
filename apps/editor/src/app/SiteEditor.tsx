@@ -3,7 +3,13 @@ import { useSite } from "@platform/sdk/react";
 import type { Site } from "@platform/shared/contracts";
 import { Button } from "@platform/ui";
 import { ArrowLeftIcon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { DocumentSession } from "../collaboration/document-session";
+import { useEditorTestHook } from "../collaboration/editor-test-hook";
+import { useDocumentSession } from "../collaboration/use-document-session";
+import { NodeStore } from "../document/node-store";
+import { NodeStoreContext, useNode } from "../document/use-node";
+import { usePageOrder } from "../document/use-page-order";
 import { useT } from "./i18n";
 import { LanguageMenu, ProfileLocaleSync } from "./LanguageMenu";
 // Tailwind + token UI hanya dimuat rute produk (modul ini di-lazy-load): playground canvas M0 & mode isolasi
@@ -39,8 +45,9 @@ export function SiteEditor({ siteId, pageId }: { siteId: string; pageId: string 
 
 function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
   const t = useT();
+  const { session, status } = useDocumentSession(site.documentId);
   return (
-    <div className="flex h-full flex-col bg-background text-foreground">
+    <div className="flex h-full flex-col bg-background text-foreground" data-connection-status={status}>
       <header className="flex h-12 shrink-0 items-center gap-3 border-b px-3">
         <Button asChild variant="ghost" size="icon" aria-label={t("app.back")} title={t("app.back")}>
           <a href="/sites">
@@ -60,10 +67,40 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
         data-testid="editor-canvas-slot"
         data-page-id={pageId ?? ""}
       >
-        {t("app.canvasPending")}
+        {session && status !== "loading" ? <DocumentPages session={session} /> : t("app.loading")}
       </main>
     </div>
   );
+}
+
+// Sementara sebelum canvas renderer (T1.15.8): daftar page dari dokumen — bukti dokumen termuat (lokal/server).
+function DocumentPages({ session }: { session: DocumentSession }) {
+  // Dibuat di effect (bukan useMemo): StrictMode menjalankan cleanup lalu effect lagi — store dari useMemo akan
+  // sudah di-destroy (observer lepas) dan UI berhenti mengikuti dokumen.
+  const [store, setStore] = useState<NodeStore | null>(null);
+  useEffect(() => {
+    const next = new NodeStore(session.doc);
+    setStore(next);
+    return () => next.destroy();
+  }, [session]);
+  useEditorTestHook(session);
+  const pageOrder = usePageOrder(session.doc);
+  if (!store) return null;
+  return (
+    <NodeStoreContext.Provider value={store}>
+      <ul className="flex flex-col gap-1" data-testid="document-pages">
+        {pageOrder.map((id) => (
+          <PageItem key={id} id={id} />
+        ))}
+      </ul>
+    </NodeStoreContext.Provider>
+  );
+}
+
+function PageItem({ id }: { id: string }) {
+  const node = useNode(id);
+  if (node?.type !== "page") return null;
+  return <li data-page-id={id}>{node.props.title}</li>;
 }
 
 export function SiteNotFound() {

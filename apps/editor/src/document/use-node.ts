@@ -17,3 +17,11 @@ export function useNode(id: string): Node | null {
   const getSnapshot = useCallback(() => store.getNode(id), [store, id]);
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
+
+const NO_CHILDREN: readonly string[] = [];
+
+/** ED-018: ID anak node `id` (urutan DOM); referensi stabil selama node tidak berubah. */
+export function useChildren(id: string): readonly string[] {
+  const node = useNode(id);
+  return node && "children" in node ? node.children : NO_CHILDREN;
+}

@@ -11,6 +11,8 @@ if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 const PORT = 3110;
 const API_PORT = 4310;
 const WORKER_HEALTH_PORT = 4210;
+const REALTIME_PORT = 4410;
+export const REALTIME_URL = `ws://realtime.localhost:${REALTIME_PORT}`;
 // Editor SUNGGUHAN (Vite dev, base /editor/) — port & HMR sendiri, terpisah dari `pnpm dev` (5173).
 const EDITOR_PORT = 5998;
 export const APP_URL = `http://app.localhost:${PORT}`;
@@ -31,7 +33,21 @@ const stackEnv = {
   PUBLIC_APP_URL: APP_URL,
   APP_ENV: "local",
 };
-const apiEnv = { ...stackEnv, API_PORT: String(API_PORT), BETTER_AUTH_URL: `${APP_URL}/api/auth`, LOG_LEVEL: "warn" };
+const apiEnv = {
+  ...stackEnv,
+  API_PORT: String(API_PORT),
+  BETTER_AUTH_URL: `${APP_URL}/api/auth`,
+  PUBLIC_REALTIME_URL: REALTIME_URL,
+  LOG_LEVEL: "warn",
+};
+// Debounce flush pendek: test reload tidak perlu menunggu 2 s default.
+const realtimeEnv = {
+  ...stackEnv,
+  REALTIME_PORT: String(REALTIME_PORT),
+  REALTIME_FLUSH_DEBOUNCE_MS: "200",
+  REALTIME_FLUSH_MAX_MS: "1000",
+  LOG_LEVEL: "warn",
+};
 const workerEnv = {
   ...stackEnv,
   WORKER_HEALTH_PORT: String(WORKER_HEALTH_PORT),
@@ -59,6 +75,7 @@ export default defineConfig({
         REDIS_URL: E2E_REDIS_URL,
         E2E_API_ENV: JSON.stringify(apiEnv),
         E2E_WORKER_ENV: JSON.stringify(workerEnv),
+        E2E_REALTIME_ENV: JSON.stringify(realtimeEnv),
       },
     },
     {
@@ -71,6 +88,7 @@ export default defineConfig({
         PUBLIC_APP_URL: APP_URL,
         PUBLIC_MARKETING_URL: MARKETING_URL,
         API_INTERNAL_URL: `http://127.0.0.1:${API_PORT}`,
+        PUBLIC_REALTIME_URL: REALTIME_URL,
         EDITOR_ORIGIN: `http://localhost:${EDITOR_PORT}`,
         APP_ENV: "local",
         NEXT_DIST_DIR: ".next-e2e",

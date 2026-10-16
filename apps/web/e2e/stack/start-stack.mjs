@@ -1,6 +1,6 @@
 // Launcher stack e2e (keputusan owner T1.14.4): satu `webServer` Playwright yang, BERURUTAN,
 // 1) membuat ulang database `platform_e2e` dari migration, 2) mengosongkan Redis DB e2e (rate limit, cache sesi,
-// antrean), 3) menjalankan worker (queue email) lalu menunggu siap, 4) menjalankan api. Playwright menunggu
+// antrean), 3) menjalankan worker (queue email), 4) realtime (Hocuspocus), masing-masing ditunggu siap, 5) api. Playwright menunggu
 // `/health/ready` api. Env (port, DB, Redis) disiapkan playwright.config.ts; tidak menyentuh DB/dev server owner.
 import { spawn } from "node:child_process";
 import { connect } from "node:net";
@@ -65,6 +65,9 @@ try {
   await flushRedis(env.REDIS_URL);
   run("pnpm", ["--filter", "@platform/worker", "start"], { ...JSON.parse(env.E2E_WORKER_ENV ?? "{}") });
   await waitFor(`http://127.0.0.1:${JSON.parse(env.E2E_WORKER_ENV ?? "{}").WORKER_HEALTH_PORT}/health/ready`);
+  const realtimeEnv = JSON.parse(env.E2E_REALTIME_ENV ?? "{}");
+  run("pnpm", ["--filter", "@platform/realtime", "start"], realtimeEnv);
+  await waitFor(`http://127.0.0.1:${realtimeEnv.REALTIME_PORT}/health/ready`);
   const api = run("pnpm", ["--filter", "@platform/api", "start"], { ...JSON.parse(env.E2E_API_ENV ?? "{}") });
   api.on("exit", (code) => shutdown(code ?? 1));
 } catch (error) {
