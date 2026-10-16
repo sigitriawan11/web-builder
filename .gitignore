@@ -14,3 +14,4 @@ playwright-report/
 test-results/
 # Trace Chrome benchmark (BENCH_TRACE=1) berukuran puluhan MB; data mentah tabel tetap di-commit.
 apps/editor/bench/results/traces/
+apps/web/e2e/.auth/

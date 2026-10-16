@@ -61,6 +61,8 @@ const workerEnv = {
 
 export default defineConfig({
   testDir: "e2e",
+  // T1.16.4: user owner terverifikasi + sesi login (setelah webServer siap).
+  globalSetup: "./e2e/global-setup.ts",
   // Satu worker: semua test berbagi stack e2e yang sama (satu IP → rate limit registrasi 3/jam per IP, Redis e2e
   // yang direset antar test). Paralel lintas file membuat registrasi di file lain ikut menghabiskan kuota → flaky.
   workers: 1,
