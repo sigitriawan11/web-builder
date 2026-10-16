@@ -1,0 +1,144 @@
+import type { Node } from "@platform/document-model";
+import { cn } from "@platform/ui";
+import type { ReactNode } from "react";
+import { useStore } from "zustand";
+import { useT } from "../../app/i18n";
+import { useNode, useNodes } from "../../document/use-node";
+import { selectionStore } from "../../store/selection-store";
+import {
+  clampInspectorWidth,
+  RIGHT_SIDEBAR_MAX,
+  RIGHT_SIDEBAR_MIN,
+  RIGHT_TABS,
+  uiPreferencesStore,
+} from "../../store/ui-preferences";
+import { ResizeHandle } from "../ResizeHandle";
+import { InspectorRow, InspectorSection } from "./InspectorSection";
+import { isMixed, mixedValue } from "./mixed";
+
+// ED-008: sidebar kanan (default 280 px, 240–400) — tab Design & Settings. Tanpa seleksi: properti page aktif;
+// multi-seleksi: hanya properti bersama, nilai berbeda = "Mixed". Kontrol properti lengkap (layout, fill, stroke,
+// effects, typography) ditambahkan per epic M2; kerangka ini menyediakan section, tab, dan nilai campuran.
+
+function Value({ value, format }: { value: unknown; format?: (value: never) => ReactNode }) {
+  const t = useT();
+  if (isMixed(value)) {
+    return (
+      <span className="italic text-muted-foreground" data-mixed="">
+        {t("inspector.mixed")}
+      </span>
+    );
+  }
+  if (value === undefined || value === null || value === "") return <span className="text-muted-foreground">—</span>;
+  return <>{format ? format(value as never) : String(value)}</>;
+}
+
+const DEFAULT_TAG: Record<Node["type"], string> = { page: "main", frame: "div", text: "p", image: "img" };
+
+function DesignTab({ pageId, nodes }: { pageId: string; nodes: readonly Node[] }) {
+  const t = useT();
+  const page = useNode(pageId);
+  if (nodes.length === 0) {
+    return (
+      <InspectorSection id="page" title={t("inspector.page")}>
+        <InspectorRow label={t("inspector.title")}>
+          <Value value={page?.type === "page" ? page.props.title : undefined} />
+        </InspectorRow>
+        <InspectorRow label={t("inspector.path")}>
+          <Value value={page?.type === "page" ? page.props.path : undefined} />
+        </InspectorRow>
+      </InspectorSection>
+    );
+  }
+  return (
+    <InspectorSection
+      id="layer"
+      title={nodes.length > 1 ? t("inspector.layers", { count: nodes.length }) : t("inspector.layer")}
+    >
+      <InspectorRow label={t("inspector.type")}>
+        <Value
+          value={mixedValue(nodes.map((node) => node.type))}
+          format={(type: Node["type"]) => t(`nodeType.${type}`)}
+        />
+      </InspectorRow>
+      <InspectorRow label={t("inspector.name")}>
+        <Value value={mixedValue(nodes.map((node) => node.name))} />
+      </InspectorRow>
+    </InspectorSection>
+  );
+}
+
+function SettingsTab({ nodes }: { nodes: readonly Node[] }) {
+  const t = useT();
+  if (nodes.length === 0) return <p className="p-3 text-xs text-muted-foreground">{t("inspector.selectSomething")}</p>;
+  return (
+    <InspectorSection id="html" title={t("inspector.html")}>
+      <InspectorRow label={t("inspector.tag")}>
+        <Value value={mixedValue(nodes.map((node) => node.tag ?? DEFAULT_TAG[node.type]))} />
+      </InspectorRow>
+      <InspectorRow label={t("inspector.visible")}>
+        <Value
+          value={mixedValue(nodes.map((node) => node.visible))}
+          format={(visible: boolean) => (visible ? t("inspector.yes") : t("inspector.no"))}
+        />
+      </InspectorRow>
+    </InspectorSection>
+  );
+}
+
+export function Inspector({ pageId }: { pageId: string }) {
+  const t = useT();
+  const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
+  const nodes = useNodes(selectedIds).filter((node): node is Node => node !== null);
+  const { rightTab, rightWidth, update } = useStore(uiPreferencesStore);
+  return (
+    <aside
+      className="relative flex shrink-0 flex-col border-l bg-background text-sm"
+      style={{ width: rightWidth }}
+      data-testid="inspector"
+      aria-label={t("inspector.label")}
+    >
+      <ResizeHandle
+        edge="start"
+        width={rightWidth}
+        min={RIGHT_SIDEBAR_MIN}
+        max={RIGHT_SIDEBAR_MAX}
+        label={t("inspector.resize")}
+        onResize={(width) => update({ rightWidth: clampInspectorWidth(width) })}
+        testId="inspector-resize"
+      />
+      <div
+        role="tablist"
+        aria-label={t("inspector.label")}
+        className="flex h-9 shrink-0 items-center gap-1 border-b px-2"
+      >
+        {RIGHT_TABS.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            id={`right-tab-${tab}`}
+            aria-selected={rightTab === tab}
+            aria-controls={`right-panel-${tab}`}
+            data-testid={`inspector-tab-${tab}`}
+            className={cn(
+              "rounded px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground",
+              rightTab === tab && "bg-accent text-foreground",
+            )}
+            onClick={() => update({ rightTab: tab })}
+          >
+            {t(`inspector.tab.${tab}`)}
+          </button>
+        ))}
+      </div>
+      <div
+        role="tabpanel"
+        id={`right-panel-${rightTab}`}
+        aria-labelledby={`right-tab-${rightTab}`}
+        className="min-h-0 flex-1 overflow-y-auto"
+      >
+        {rightTab === "design" ? <DesignTab pageId={pageId} nodes={nodes} /> : <SettingsTab nodes={nodes} />}
+      </div>
+    </aside>
+  );
+}

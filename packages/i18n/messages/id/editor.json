@@ -122,5 +122,33 @@
     "pages": "Pages",
     "resize": "Ubah lebar panel",
     "comingSoon": "Segera hadir."
+  },
+  "inspector": {
+    "label": "Inspector",
+    "resize": "Ubah lebar inspector",
+    "tab": {
+      "design": "Desain",
+      "settings": "Pengaturan"
+    },
+    "mixed": "Campuran",
+    "page": "Page",
+    "title": "Judul",
+    "path": "Path",
+    "layer": "Layer",
+    "layers": "{count} layer",
+    "type": "Tipe",
+    "name": "Nama",
+    "html": "HTML",
+    "tag": "Tag",
+    "visible": "Terlihat",
+    "yes": "Ya",
+    "no": "Tidak",
+    "selectSomething": "Pilih elemen untuk melihat pengaturannya."
+  },
+  "nodeType": {
+    "page": "Page",
+    "frame": "Frame",
+    "text": "Teks",
+    "image": "Gambar"
   }
 }

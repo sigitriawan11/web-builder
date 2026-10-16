@@ -50,16 +50,17 @@ test("demo M1: daftar → situs → editor → tambah, resize, drag, undo → tu
   const text = await selected(page);
   await expect(canvas.locator(`[data-node-id="${frameA}"] [data-node-id="${text}"]`)).toHaveText("New text");
 
-  // 4) Resize: pilih frame A, tarik handle bawah +60 px (zoom 100%) → tinggi 160 → 220.
+  // 4) Resize: pilih frame A, tarik handle bawah +30 px screen (zoom 50% = +60 world) → tinggi 160 → 220. Zoom 50%
+  //    agar frame 1440 px muat di canvas di antara sidebar kiri & inspector.
   await page.evaluate((id) => window.__editorTestApi?.select([id]), frameA);
-  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 40, y: 40, zoom: 1 }));
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 40, y: 40, zoom: 0.5 }));
   const handle = page.locator('.overlay-handle[data-handle="s"]');
   await expect(handle).toBeVisible();
   const box = await handle.boundingBox();
   if (!box) throw new Error("handle tidak terlihat");
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 60, { steps: 8 });
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 30, { steps: 8 });
   await page.mouse.up();
   await expect.poll(() => heightOf(page, frameA)).toBe(220);
 

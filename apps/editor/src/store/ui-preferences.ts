@@ -8,7 +8,14 @@ export const LEFT_SIDEBAR_MIN = 200;
 export const LEFT_SIDEBAR_MAX = 480;
 export const LEFT_SIDEBAR_DEFAULT = 260;
 
+export const RIGHT_SIDEBAR_MIN = 240;
+export const RIGHT_SIDEBAR_MAX = 400;
+export const RIGHT_SIDEBAR_DEFAULT = 280;
+
 export const LEFT_TABS = ["layers", "assets", "insert"] as const;
+// ED-008: tab inspector M2 (Prototype P1 M4, Data M7, Component M3 menyusul).
+export const RIGHT_TABS = ["design", "settings"] as const;
+export type RightTab = (typeof RIGHT_TABS)[number];
 export type LeftTab = (typeof LEFT_TABS)[number];
 
 const PreferencesSchema = z.object({
@@ -16,6 +23,10 @@ const PreferencesSchema = z.object({
   leftWidth: z.number().min(LEFT_SIDEBAR_MIN).max(LEFT_SIDEBAR_MAX).catch(LEFT_SIDEBAR_DEFAULT),
   leftCollapsed: z.boolean().catch(false),
   pagesOpen: z.boolean().catch(true),
+  rightTab: z.enum(RIGHT_TABS).catch("design"),
+  rightWidth: z.number().min(RIGHT_SIDEBAR_MIN).max(RIGHT_SIDEBAR_MAX).catch(RIGHT_SIDEBAR_DEFAULT),
+  // ED-008: section inspector yang diciutkan (ID section).
+  collapsedSections: z.array(z.string().max(40)).max(50).catch([]),
 });
 export type UiPreferences = z.infer<typeof PreferencesSchema>;
 
@@ -24,10 +35,15 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   leftWidth: LEFT_SIDEBAR_DEFAULT,
   leftCollapsed: false,
   pagesOpen: true,
+  rightTab: "design",
+  rightWidth: RIGHT_SIDEBAR_DEFAULT,
+  collapsedSections: [],
 };
 
 export const clampSidebarWidth = (width: number) =>
   Math.round(Math.min(LEFT_SIDEBAR_MAX, Math.max(LEFT_SIDEBAR_MIN, width)));
+export const clampInspectorWidth = (width: number) =>
+  Math.round(Math.min(RIGHT_SIDEBAR_MAX, Math.max(RIGHT_SIDEBAR_MIN, width)));
 
 export interface PreferenceStorage {
   read(key: string): string | null;
@@ -76,7 +92,12 @@ export function createUiPreferencesStore(storage: PreferenceStorage = browserSto
     loadFor: (userId) => set({ ...parsePreferences(storage.read(preferencesKey(userId))), userId }),
     update: (patch) => {
       const { userId, loadFor: _l, update: _u, ...current } = get();
-      const next = { ...current, ...patch, leftWidth: clampSidebarWidth(patch.leftWidth ?? current.leftWidth) };
+      const next = {
+        ...current,
+        ...patch,
+        leftWidth: clampSidebarWidth(patch.leftWidth ?? current.leftWidth),
+        rightWidth: clampInspectorWidth(patch.rightWidth ?? current.rightWidth),
+      };
       set(next);
       storage.write(preferencesKey(userId), JSON.stringify(next));
     },

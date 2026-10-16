@@ -19,6 +19,7 @@ import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from
 import { NodeStoreContext, useNode, useNodeFromStore } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
 import { LeftSidebar } from "../panels/LeftSidebar";
+import { Inspector } from "../panels/properties/Inspector";
 import { setTelemetryScope } from "../telemetry/telemetry";
 import { Toolbar } from "./chrome/Toolbar";
 import { AppErrorBoundary } from "./ErrorBoundary";
@@ -166,6 +167,7 @@ function DocumentWorkspace({ session, workspace }: { session: DocumentSession; w
         {/* ED-229: mode lihat saja — pointer ke canvas ditahan (server juga menolak update koneksi read-only). */}
         {readOnly ? <div className="absolute inset-0 z-10 cursor-not-allowed" data-testid="read-only-blocker" /> : null}
       </div>
+      <Inspector pageId={runtime.pageId} />
     </NodeStoreContext.Provider>
   );
 }

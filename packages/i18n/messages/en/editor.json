@@ -122,5 +122,33 @@
     "pages": "Pages",
     "resize": "Resize panel",
     "comingSoon": "Coming soon."
+  },
+  "inspector": {
+    "label": "Inspector",
+    "resize": "Resize inspector",
+    "tab": {
+      "design": "Design",
+      "settings": "Settings"
+    },
+    "mixed": "Mixed",
+    "page": "Page",
+    "title": "Title",
+    "path": "Path",
+    "layer": "Layer",
+    "layers": "{count} layers",
+    "type": "Type",
+    "name": "Name",
+    "html": "HTML",
+    "tag": "Tag",
+    "visible": "Visible",
+    "yes": "Yes",
+    "no": "No",
+    "selectSomething": "Select an element to see its settings."
+  },
+  "nodeType": {
+    "page": "Page",
+    "frame": "Frame",
+    "text": "Text",
+    "image": "Image"
   }
 }

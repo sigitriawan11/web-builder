@@ -1,12 +1,19 @@
 import { useProfile } from "@platform/sdk/react";
 import { cn } from "@platform/ui";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
-import { type KeyboardEvent, type PointerEvent, type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useStore } from "zustand";
 import { useT } from "../app/i18n";
 import { PanelErrorBoundary } from "../app/PanelErrorBoundary";
 import { isEditableEvent } from "../commands/is-editable-target";
-import { clampSidebarWidth, LEFT_TABS, type LeftTab, uiPreferencesStore } from "../store/ui-preferences";
+import {
+  LEFT_SIDEBAR_MAX,
+  LEFT_SIDEBAR_MIN,
+  LEFT_TABS,
+  type LeftTab,
+  uiPreferencesStore,
+} from "../store/ui-preferences";
+import { ResizeHandle } from "./ResizeHandle";
 
 // ED-007: sidebar kiri — tab Layers (Pages di atas, bisa diciutkan, + Layers) / Assets / Insert. Lebar 200–480 px
 // (default 260) lewat drag pegangan atau panah keyboard; `Mod+\\` menciutkan; `Alt+1` Layers, `Alt+2` Assets,
@@ -16,8 +23,6 @@ interface LeftSidebarProps {
   pages: ReactNode;
   layers?: ReactNode;
 }
-
-const KEYBOARD_STEP = 16;
 
 export function useLeftSidebarShortcuts(): void {
   useEffect(() => {
@@ -53,27 +58,8 @@ export function LeftSidebar({ pages, layers }: LeftSidebarProps) {
   useEffect(() => uiPreferencesStore.getState().loadFor(userId), [userId]);
   useLeftSidebarShortcuts();
   const { leftTab, leftWidth, leftCollapsed, pagesOpen, update } = useStore(uiPreferencesStore);
-  const drag = useRef<{ startX: number; startWidth: number } | null>(null);
 
   if (leftCollapsed) return null;
-
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { startX: event.clientX, startWidth: leftWidth };
-  };
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!drag.current) return;
-    update({ leftWidth: clampSidebarWidth(drag.current.startWidth + event.clientX - drag.current.startX) });
-  };
-  const onPointerUp = () => {
-    drag.current = null;
-  };
-  const onHandleKey = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "ArrowLeft") update({ leftWidth: leftWidth - KEYBOARD_STEP });
-    else if (event.key === "ArrowRight") update({ leftWidth: leftWidth + KEYBOARD_STEP });
-    else return;
-    event.preventDefault();
-  };
 
   return (
     <aside
@@ -143,22 +129,14 @@ export function LeftSidebar({ pages, layers }: LeftSidebarProps) {
           </p>
         )}
       </div>
-      {/* Pegangan resize: drag atau panah kiri/kanan saat fokus. */}
-      {/* biome-ignore lint/a11y/useSemanticElements: separator interaktif (WAI-ARIA window splitter), bukan <hr>. */}
-      <div
-        role="separator"
-        aria-orientation="vertical"
-        aria-label={t("sidebar.resize")}
-        aria-valuemin={200}
-        aria-valuemax={480}
-        aria-valuenow={leftWidth}
-        tabIndex={0}
-        data-testid="left-sidebar-resize"
-        className="absolute inset-y-0 -right-1 w-2 cursor-col-resize focus-visible:bg-ring/40 hover:bg-ring/30"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onKeyDown={onHandleKey}
+      <ResizeHandle
+        edge="end"
+        width={leftWidth}
+        min={LEFT_SIDEBAR_MIN}
+        max={LEFT_SIDEBAR_MAX}
+        label={t("sidebar.resize")}
+        onResize={(width) => update({ leftWidth: width })}
+        testId="left-sidebar-resize"
       />
     </aside>
   );
