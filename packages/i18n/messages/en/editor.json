@@ -163,7 +163,12 @@
     "distribute": {
       "horizontal": "Distribute horizontally",
       "vertical": "Distribute vertically"
-    }
+    },
+    "autoLayout": "Auto layout",
+    "direction": "Direction",
+    "direction_column": "Vertical",
+    "direction_row": "Horizontal",
+    "direction_wrap": "Wrap"
   },
   "nodeType": {
     "page": "Page",

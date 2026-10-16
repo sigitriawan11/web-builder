@@ -88,3 +88,33 @@ test("ED-079: Shift+A pada frame freeform (anak horizontal) → flex row", async
   await expect.poll(async () => (await doc(page)).nodes[frame]?.style.base.layout?.mode).toBe("flex");
   expect((await doc(page)).nodes[frame]?.style.base.layout?.direction).toBe("row");
 });
+
+test("T2.8.2 ED-080: panel arah auto-layout (vertical/horizontal/wrap)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Auto Layout Direction")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: { base: { layout: { mode: "flex", direction: "column" }, size: sizeFixed(200, 200) } },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+
+  const inspector = page.getByTestId("inspector");
+  await expect(inspector.getByTestId("auto-layout-direction-column")).toHaveAttribute("aria-pressed", "true");
+
+  await inspector.getByTestId("auto-layout-direction-row").click();
+  await expect.poll(() => doc(page).then((d) => d.nodes[frame]?.style.base.layout?.direction)).toBe("row");
+
+  await inspector.getByTestId("auto-layout-direction-wrap").click();
+  const layout = (await doc(page)).nodes[frame]?.style.base.layout as
+    | { direction?: string; wrap?: boolean }
+    | undefined;
+  expect(layout).toMatchObject({ direction: "row", wrap: true });
+});

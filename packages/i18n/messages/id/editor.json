@@ -163,7 +163,12 @@
     "distribute": {
       "horizontal": "Distribusi horizontal",
       "vertical": "Distribusi vertikal"
-    }
+    },
+    "autoLayout": "Auto layout",
+    "direction": "Arah",
+    "direction_column": "Vertikal",
+    "direction_row": "Horizontal",
+    "direction_wrap": "Wrap"
   },
   "nodeType": {
     "page": "Page",

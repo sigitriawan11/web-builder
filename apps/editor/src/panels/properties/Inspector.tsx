@@ -14,6 +14,7 @@ import {
   uiPreferencesStore,
 } from "../../store/ui-preferences";
 import { ResizeHandle } from "../ResizeHandle";
+import { AutoLayoutSection } from "./AutoLayoutSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { isMixed, mixedValue } from "./mixed";
 import { PositionSizeSection } from "./PositionSizeSection";
@@ -86,6 +87,7 @@ function DesignTab({
         </InspectorRow>
       </InspectorSection>
       {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <AutoLayoutSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
     </>
   );
 }
