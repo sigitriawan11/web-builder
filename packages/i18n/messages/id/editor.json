@@ -150,5 +150,20 @@
     "frame": "Frame",
     "text": "Teks",
     "image": "Gambar"
+  },
+  "bottomBar": {
+    "label": "Bar bawah",
+    "zoomInput": "Zoom (persen)",
+    "zoomMenu": "Opsi zoom",
+    "zoomFit": "Zoom agar muat",
+    "zoomSelection": "Zoom ke seleksi",
+    "noSelection": "Tidak ada seleksi",
+    "selected": "{count} terpilih",
+    "layoutGrid": "Layout grid (menyusul)",
+    "nodes": "{count} / {max} node",
+    "nodeLimit": "Disarankan ≤ {soft} node per page; maksimal {hard}.",
+    "online": "Online",
+    "offline": "Offline",
+    "show": "Tampilkan bar bawah"
   }
 }

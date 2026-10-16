@@ -1,6 +1,7 @@
 import {
   Button,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuRadioGroup,
@@ -44,6 +45,7 @@ import { cameraStore } from "../../canvas/camera-store";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useUndoState } from "../../document/use-undo-state";
 import { BREAKPOINT_OPTIONS, breakpointStore } from "../../store/breakpoint-store";
+import { uiPreferencesStore } from "../../store/ui-preferences";
 import { TOOLS, toolDefinition } from "../../tools/tool-catalog";
 import { type ToolId, toolStore } from "../../tools/tool-store";
 import { useT } from "../i18n";
@@ -91,6 +93,7 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
   const activeTool = useStore(toolStore, (state) => state.active);
   const breakpoint = useStore(breakpointStore, (state) => state.active);
   const zoom = useStore(cameraStore, (state) => state.zoom);
+  const bottomBarHidden = useStore(uiPreferencesStore, (state) => state.bottomBarHidden);
   // Sub-tool shape terakhir dipakai tampil di tombol grup (seperti Figma).
   const [shape, setShape] = useState<ToolId>("rectangle");
   const selectTool = (tool: ToolId) => toolStore.getState().dispatch({ type: "selectTool", tool });
@@ -154,6 +157,14 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
                 {t("toolbar.zoomOut")}
                 <DropdownMenuShortcut>{formatShortcut(ZOOM_OUT)}</DropdownMenuShortcut>
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={!bottomBarHidden}
+                onCheckedChange={(checked) => uiPreferencesStore.getState().update({ bottomBarHidden: !checked })}
+                data-testid="toggle-bottom-bar"
+              >
+                {t("bottomBar.show")}
+              </DropdownMenuCheckboxItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
           <DropdownMenuSub>

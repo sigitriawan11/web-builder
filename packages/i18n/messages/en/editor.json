@@ -150,5 +150,20 @@
     "frame": "Frame",
     "text": "Text",
     "image": "Image"
+  },
+  "bottomBar": {
+    "label": "Bottom bar",
+    "zoomInput": "Zoom (percent)",
+    "zoomMenu": "Zoom options",
+    "zoomFit": "Zoom to fit",
+    "zoomSelection": "Zoom to selection",
+    "noSelection": "Nothing selected",
+    "selected": "{count} selected",
+    "layoutGrid": "Layout grid (coming soon)",
+    "nodes": "{count} / {max} nodes",
+    "nodeLimit": "Recommended ≤ {soft} nodes per page; maximum {hard}.",
+    "online": "Online",
+    "offline": "Offline",
+    "show": "Show bottom bar"
   }
 }

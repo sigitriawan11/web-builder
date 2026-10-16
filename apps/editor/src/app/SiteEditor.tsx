@@ -5,6 +5,7 @@ import type { Site } from "@platform/shared/contracts";
 import { Button } from "@platform/ui";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import * as Y from "yjs";
+import { useStore } from "zustand";
 import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
@@ -20,7 +21,9 @@ import { NodeStoreContext, useNode, useNodeFromStore } from "../document/use-nod
 import { usePageOrder } from "../document/use-page-order";
 import { LeftSidebar } from "../panels/LeftSidebar";
 import { Inspector } from "../panels/properties/Inspector";
+import { uiPreferencesStore } from "../store/ui-preferences";
 import { setTelemetryScope } from "../telemetry/telemetry";
+import { BottomBar } from "./chrome/BottomBar";
 import { Toolbar } from "./chrome/Toolbar";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { useT } from "./i18n";
@@ -67,6 +70,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
   }, [site.id]);
   const { session, status } = useDocumentSession(site.documentId);
   const workspace = useWorkspaceRuntime(session, pageId);
+  const bottomBarHidden = useStore(uiPreferencesStore, (state) => state.bottomBarHidden);
   const pageNode = useNodeFromStore(workspace.runtime?.nodeStore ?? null, workspace.runtime?.pageId ?? null);
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-connection-status={status}>
@@ -94,6 +98,11 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
           <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
         )}
       </div>
+      {workspace.runtime && !bottomBarHidden ? (
+        <NodeStoreContext.Provider value={workspace.runtime.nodeStore}>
+          <BottomBar runtime={workspace.runtime} connection={status} />
+        </NodeStoreContext.Provider>
+      ) : null}
     </div>
   );
 }

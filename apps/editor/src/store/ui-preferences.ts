@@ -27,6 +27,8 @@ const PreferencesSchema = z.object({
   rightWidth: z.number().min(RIGHT_SIDEBAR_MIN).max(RIGHT_SIDEBAR_MAX).catch(RIGHT_SIDEBAR_DEFAULT),
   // ED-008: section inspector yang diciutkan (ID section).
   collapsedSections: z.array(z.string().max(40)).max(50).catch([]),
+  // ED-009: bar bawah bisa disembunyikan lewat menu View.
+  bottomBarHidden: z.boolean().catch(false),
 });
 export type UiPreferences = z.infer<typeof PreferencesSchema>;
 
@@ -38,6 +40,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   rightTab: "design",
   rightWidth: RIGHT_SIDEBAR_DEFAULT,
   collapsedSections: [],
+  bottomBarHidden: false,
 };
 
 export const clampSidebarWidth = (width: number) =>

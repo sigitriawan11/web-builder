@@ -18,6 +18,7 @@ export {
 } from "./components/Dialog";
 export {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
