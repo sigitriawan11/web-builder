@@ -143,7 +143,14 @@
     "tag": "Tag",
     "visible": "Visible",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "positionSize": "Position & size",
+    "position": "Position",
+    "size": "Size",
+    "x": "X position",
+    "y": "Y position",
+    "width": "Width",
+    "height": "Height"
   },
   "nodeType": {
     "page": "Page",

@@ -3,6 +3,7 @@ import { cn } from "@platform/ui";
 import type { ReactNode } from "react";
 import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
+import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useNode, useNodes } from "../../document/use-node";
 import { selectionStore } from "../../store/selection-store";
 import {
@@ -15,6 +16,7 @@ import {
 import { ResizeHandle } from "../ResizeHandle";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { isMixed, mixedValue } from "./mixed";
+import { PositionSizeSection } from "./PositionSizeSection";
 
 // ED-008: sidebar kanan (default 280 px, 240–400) — tab Design & Settings. Tanpa seleksi: properti page aktif;
 // multi-seleksi: hanya properti bersama, nilai berbeda = "Mixed". Kontrol properti lengkap (layout, fill, stroke,
@@ -42,7 +44,17 @@ const DEFAULT_TAG: Record<Node["type"], string> = {
   icon: "span",
 };
 
-function DesignTab({ pageId, nodes }: { pageId: string; nodes: readonly Node[] }) {
+function DesignTab({
+  pageId,
+  nodes,
+  runtime,
+  readOnly,
+}: {
+  pageId: string;
+  nodes: readonly Node[];
+  runtime: CanvasRuntime | null;
+  readOnly: boolean;
+}) {
   const t = useT();
   const page = useNode(pageId);
   if (nodes.length === 0) {
@@ -58,20 +70,23 @@ function DesignTab({ pageId, nodes }: { pageId: string; nodes: readonly Node[] }
     );
   }
   return (
-    <InspectorSection
-      id="layer"
-      title={nodes.length > 1 ? t("inspector.layers", { count: nodes.length }) : t("inspector.layer")}
-    >
-      <InspectorRow label={t("inspector.type")}>
-        <Value
-          value={mixedValue(nodes.map((node) => node.type))}
-          format={(type: Node["type"]) => t(`nodeType.${type}`)}
-        />
-      </InspectorRow>
-      <InspectorRow label={t("inspector.name")}>
-        <Value value={mixedValue(nodes.map((node) => node.name))} />
-      </InspectorRow>
-    </InspectorSection>
+    <>
+      <InspectorSection
+        id="layer"
+        title={nodes.length > 1 ? t("inspector.layers", { count: nodes.length }) : t("inspector.layer")}
+      >
+        <InspectorRow label={t("inspector.type")}>
+          <Value
+            value={mixedValue(nodes.map((node) => node.type))}
+            format={(type: Node["type"]) => t(`nodeType.${type}`)}
+          />
+        </InspectorRow>
+        <InspectorRow label={t("inspector.name")}>
+          <Value value={mixedValue(nodes.map((node) => node.name))} />
+        </InspectorRow>
+      </InspectorSection>
+      {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+    </>
   );
 }
 
@@ -94,7 +109,17 @@ function SettingsTab({ nodes, page }: { nodes: readonly Node[]; page: ReactNode 
   );
 }
 
-export function Inspector({ pageId, pageSettings }: { pageId: string; pageSettings: ReactNode }) {
+export function Inspector({
+  pageId,
+  pageSettings,
+  runtime,
+  readOnly = false,
+}: {
+  pageId: string;
+  pageSettings: ReactNode;
+  runtime?: CanvasRuntime | null;
+  readOnly?: boolean;
+}) {
   const t = useT();
   const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
   const nodes = useNodes(selectedIds).filter((node): node is Node => node !== null);
@@ -146,7 +171,7 @@ export function Inspector({ pageId, pageSettings }: { pageId: string; pageSettin
         className="min-h-0 flex-1 overflow-y-auto"
       >
         {rightTab === "design" ? (
-          <DesignTab pageId={pageId} nodes={nodes} />
+          <DesignTab pageId={pageId} nodes={nodes} runtime={runtime ?? null} readOnly={readOnly} />
         ) : (
           <SettingsTab nodes={nodes} page={pageSettings} />
         )}

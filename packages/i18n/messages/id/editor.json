@@ -143,7 +143,14 @@
     "tag": "Tag",
     "visible": "Terlihat",
     "yes": "Ya",
-    "no": "Tidak"
+    "no": "Tidak",
+    "positionSize": "Posisi & ukuran",
+    "position": "Posisi",
+    "size": "Ukuran",
+    "x": "Posisi X",
+    "y": "Posisi Y",
+    "width": "Lebar",
+    "height": "Tinggi"
   },
   "nodeType": {
     "page": "Page",

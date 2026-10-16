@@ -215,6 +215,8 @@ function DocumentWorkspace({
       </div>
       <Inspector
         pageId={activePageId}
+        runtime={runtime}
+        readOnly={readOnly}
         pageSettings={<PageSettings runtime={runtime} pageId={activePageId} readOnly={readOnly} />}
       />
     </NodeStoreContext.Provider>

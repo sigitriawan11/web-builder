@@ -64,3 +64,61 @@ test("tanpa seleksi = properti page; seleksi = layer; multi berbeda = Mixed; tab
     "false",
   );
 });
+
+test("AC ED-070: edit W dengan ekspresi (100*2 → 200 Fixed) & X node absolute", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Inspector Size")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            position: { type: "absolute", x: 100, y: 120 },
+            size: {
+              width: { mode: "fixed", value: 120, unit: "px" },
+              height: { mode: "fixed", value: 80, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+
+  const inspector = page.getByTestId("inspector");
+  const sizeWidth = inspector.getByTestId("inspector-width");
+  await expect(sizeWidth).toHaveValue("120");
+  await sizeWidth.fill("100*2");
+  await sizeWidth.press("Enter");
+  await expect
+    .poll(() =>
+      page.evaluate((id) => {
+        const doc = window.__editorTestApi?.getDoc() as {
+          nodes: Record<string, { style: { base: { size?: { width?: { mode: string; value?: number } } } } }>;
+        };
+        return doc?.nodes[id]?.style.base.size?.width;
+      }, frame),
+    )
+    .toMatchObject({ mode: "fixed", value: 200 });
+
+  const posX = inspector.getByTestId("inspector-x");
+  await expect(posX).toHaveValue("100");
+  await posX.fill("60");
+  await posX.press("Enter");
+  await expect
+    .poll(() =>
+      page.evaluate((id) => {
+        const doc = window.__editorTestApi?.getDoc() as {
+          nodes: Record<string, { style: { base: { position?: { x?: number } } } }>;
+        };
+        return doc?.nodes[id]?.style.base.position?.x;
+      }, frame),
+    )
+    .toBe(60);
+});
