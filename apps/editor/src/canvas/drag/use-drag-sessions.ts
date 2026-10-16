@@ -16,10 +16,12 @@ import { previewStore } from "../../store/preview-store";
 import { selectionStore } from "../../store/selection-store";
 import { nodeLookupFrom } from "../../tools/select/node-lookup";
 import { resolveClickSelection } from "../../tools/select/selection-depth";
+import { unionBounds } from "../align";
 import { cameraStore } from "../camera-store";
 import { screenDeltaToWorld, screenPoint, screenToWorld } from "../geometry/coordinates";
 import type { GeometryStore, WorldRect } from "../geometry/geometry-store";
 import type { InteractionState } from "../interactions/interaction-machine";
+import { computeSnap, type Rect } from "../snapping/snap";
 import { moveDelta, movedPosition } from "./move";
 import { absoluteDropPosition, type ChildBox, insertionMarker, reorderIndex } from "./reorder";
 import { resizePatch, resizeRect } from "./resize";
@@ -251,10 +253,47 @@ export function useDragSessions(deps: DragSessionDeps): void {
     const deltaFor = (state: MoveState) =>
       moveDelta(state.origin, state.current, cameraStore.getState().zoom, state.shiftKey);
 
+    // ED-073: kandidat snap = sibling (parent sama) + parent box, rect world dari geometry.
+    const snapCandidates = (movingIds: readonly string[]): Rect[] => {
+      const parentId = deps.nodeStore.getNode(movingIds[0] ?? "")?.parentId;
+      if (!parentId) return [];
+      const parent = deps.nodeStore.getNode(parentId);
+      const rects: Rect[] = [];
+      if (parent && "children" in parent) {
+        for (const childId of parent.children) {
+          if (movingIds.includes(childId)) continue;
+          const rect = deps.geometry.peekRect(childId);
+          if (rect) rects.push(rect);
+        }
+      }
+      const parentRect = deps.geometry.peekRect(parentId);
+      if (parentRect) rects.push(parentRect);
+      return rects;
+    };
+
+    // ED-073: delta move + snap smart-guide. Snap dinonaktifkan sementara saat Alt (duplikat tetap snap) —
+    // Mod-disable (ED-073) menyusul. Mengembalikan delta ter-snap & garis guide untuk overlay.
+    const snappedMove = (
+      state: MoveState,
+    ): { dx: number; dy: number; guides: ReturnType<typeof computeSnap>["guides"] } => {
+      const raw = deltaFor(state);
+      const items = moving ?? [];
+      const rects = items.flatMap((item) => {
+        const rect = deps.geometry.peekRect(item.id);
+        return rect ? [rect] : [];
+      });
+      const union = unionBounds(rects);
+      if (!union) return { ...raw, guides: [] };
+      const movingAt: Rect = { x: union.x + raw.dx, y: union.y + raw.dy, width: union.width, height: union.height };
+      const snap = computeSnap(movingAt, snapCandidates(items.map((item) => item.id)), 5 / cameraStore.getState().zoom);
+      return { dx: raw.dx + snap.dx, dy: raw.dy + snap.dy, guides: snap.guides };
+    };
+
     const endMove = () => {
       for (const item of moving ?? []) if (item.element) clearPreviewTranslate(item.element);
       moving = null;
       previewStore.getState().setOffset(null);
+      previewStore.getState().setGuides([]);
     };
 
     const unsubscribeState = interactionStore.subscribe(({ state }) => {
@@ -273,9 +312,10 @@ export function useDragSessions(deps: DragSessionDeps): void {
           return;
         }
         if (!moving || moving.length === 0) return;
-        const { dx, dy } = deltaFor(state);
+        const { dx, dy, guides } = snappedMove(state);
         for (const item of moving) if (item.element) setPreviewTranslate(item.element, dx, dy);
         previewStore.getState().setOffset({ ids: moving.map((item) => item.id), dx, dy });
+        previewStore.getState().setGuides(guides);
       }
     });
 
@@ -295,7 +335,8 @@ export function useDragSessions(deps: DragSessionDeps): void {
         const items = moving ?? [];
         const alt = moveAlt;
         if (effect.type === "commit" && items.length > 0) {
-          const delta = deltaFor(drag);
+          const snap = snappedMove(drag);
+          const delta = { dx: snap.dx, dy: snap.dy };
           deps.undoBoundary();
           if (alt) {
             // ED-071: Alt+drag → duplikat node (asli tetap) digeser ke posisi tujuan; satu command = satu undo.

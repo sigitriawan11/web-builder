@@ -981,7 +981,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.7 — Snapping & pengukuran
 
-- [ ] **T2.7.1** Smart guides: snap ke tepi/tengah node sibling & parent, garis guide merah — ED-073 · `apps/editor/src/canvas/snapping` · Verifikasi: unit test algoritma snap (threshold dalam screen px)
+- [x] **T2.7.1** Smart guides: snap ke tepi/tengah node sibling & parent, garis guide merah — ED-073 · `apps/editor/src/canvas/snapping` · Verifikasi: unit test algoritma snap (threshold dalam screen px)
+  - Catatan: ✅ 2026-10-17 — algoritma murni `canvas/snapping/snap.ts` `computeSnap(moving, candidates, threshold)`: snap independen per sumbu (tepi awal/pusat/akhir node ke tepi/pusat kandidat), pilih penyesuaian terkecil ≤ threshold, kembalikan `dx/dy` + garis guide (membentang menutupi node bergerak & kandidat). Threshold **world px = 5px screen ÷ zoom** (lebih kecil saat zoom in). Terintegrasi di `use-drag-sessions` (move): kandidat = sibling (parent sama) + parent box dari geometry; `snappedMove` dipakai sama untuk preview & commit; guide magenta 1px `SnapGuidesOverlay` (di `CanvasOverlay`). Tanpa rbush (O(n) atas ~200 kandidat ≪ 2ms; dibatasi sibling+parent). **Belum:** tanda "×" di titik snap, Mod-disable sementara, snap saat resize/draw (ED-073 lanjutan). Verifikasi: **8 unit** `snap.test` (tepi kiri/kanan, pusat, terkecil, per-sumbu, rentang guide, kosong) + **e2e** `editor-snap.spec` (drag B 3px dari tepi A → snap ke 100, guide tampil); move/reorder/drag e2e lama tetap hijau (geometri fixture tak memicu snap tak sengaja).
 - [ ] **T2.7.2** Snap ke pixel grid (bilangan bulat) — ED-074 · `apps/editor/src/canvas/snapping` · Verifikasi: unit test
 - [ ] **T2.7.3** Pengukuran jarak Alt+hover (ke parent/sibling) — ED-076 · `apps/editor/src/canvas/overlay` · Verifikasi: e2e screenshot label jarak
 - [ ] **T2.7.4** (P1) Equal spacing indicators — ED-077 · `apps/editor/src/canvas/snapping` · Verifikasi: unit test

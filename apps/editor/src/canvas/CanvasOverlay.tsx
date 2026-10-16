@@ -8,6 +8,7 @@ import { DrawPreview } from "./overlay/DrawPreview";
 import { FrameLabels } from "./overlay/FrameLabels";
 import { ReorderOverlay } from "./overlay/ReorderOverlay";
 import { SelectionOverlay } from "./overlay/SelectionOverlay";
+import { SnapGuidesOverlay } from "./overlay/SnapGuidesOverlay";
 import { Toasts } from "./overlay/Toasts";
 
 const outlineNodeId = outlineNodeFromSearch(window.location.search);
@@ -26,6 +27,7 @@ export function CanvasOverlay() {
       <SelectionOverlay nodeStore={runtime.nodeStore} geometry={runtime.geometry.store} />
       <MarqueeOverlay />
       <ReorderOverlay />
+      <SnapGuidesOverlay />
       <FrameLabels />
       <DrawPreview />
       <Toasts />
