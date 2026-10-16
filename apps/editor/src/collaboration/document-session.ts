@@ -1,6 +1,6 @@
 import { HocuspocusProvider, WebSocketStatus } from "@hocuspocus/provider";
 import { isApiError } from "@platform/sdk";
-import { type LockHolder, RealtimeStatelessMessageSchema } from "@platform/shared/contracts";
+import { type LockHolder, REALTIME_DENY_REASONS, RealtimeStatelessMessageSchema } from "@platform/shared/contracts";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 import { createSaveTracker, type SaveTracker } from "./save-tracker";
@@ -17,13 +17,16 @@ export type ConnectionStatus = "loading" | "local" | "connecting" | "synced" | "
  * - `editing`: boleh mengedit;
  * - `locked`: user lain memegang lock → koneksi read-only; `released` = pemegang sudah pergi (boleh takeover);
  * - `forbidden`: api menolak (403 — akses dicabut/paket berubah) → read-only;
- * - `unauthenticated`: sesi login habis (401) → login ulang tanpa meninggalkan editor; edit tetap di IndexedDB.
+ * - `unauthenticated`: sesi login habis (401) → login ulang tanpa meninggalkan editor; edit tetap di IndexedDB;
+ * - `serverOutdated`: realtime menolak dokumen yang lebih baru dari server-nya (`schema-unsupported`, mis. rollback
+ *   deploy) → lihat saja dari data lokal sampai server diperbarui.
  */
 export type EditAccess =
   | { kind: "editing" }
   | { kind: "locked"; holder: LockHolder; released: boolean }
   | { kind: "forbidden" }
-  | { kind: "unauthenticated" };
+  | { kind: "unauthenticated" }
+  | { kind: "serverOutdated" };
 
 const EDITING: EditAccess = { kind: "editing" };
 
@@ -209,6 +212,9 @@ export function openDocumentSession(options: DocumentSessionOptions): DocumentSe
         })(),
         onSynced: () => setStatus("synced"),
         onStateless: ({ payload }) => handleStateless(payload),
+        onAuthenticationFailed: ({ reason }) => {
+          if (reason === REALTIME_DENY_REASONS.schemaUnsupported) setAccess({ kind: "serverOutdated" });
+        },
         onStatus: ({ status: socket }) => {
           if (socket === WebSocketStatus.Disconnected) setStatus("offline");
           else if (socket === WebSocketStatus.Connecting && status !== "synced") setStatus("connecting");

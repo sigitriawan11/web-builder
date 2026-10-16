@@ -60,7 +60,8 @@
     "sessionTitle": "Your session has ended",
     "sessionDescription": "Your changes are still kept on this device. Sign in again in a new tab, then reconnect.",
     "login": "Sign in again",
-    "reconnect": "Reconnect"
+    "reconnect": "Reconnect",
+    "serverOutdated": "This website was saved by a newer platform version than the current server. The editor is view-only — try again in a little while."
   },
   "schema": {
     "title": "The editor needs an update",

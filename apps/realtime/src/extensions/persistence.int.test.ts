@@ -11,7 +11,7 @@ import {
   userOrigin,
   yDocToJson,
 } from "@platform/document-model";
-import { REALTIME_TOKEN_AUDIENCE } from "@platform/shared/contracts";
+import { REALTIME_DENY_REASONS, REALTIME_TOKEN_AUDIENCE } from "@platform/shared/contracts";
 import { createLogger, signToken } from "@platform/shared/node";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import * as Y from "yjs";
@@ -176,6 +176,49 @@ describe("onLoadDocument", () => {
       .where(eq(schema.documentUpdates.documentId, document.id));
     expect(again).toHaveLength(2);
   });
+
+  it.each([
+    ["kolom schema_version", 2, 1],
+    ["meta.schemaVersion di Y.Doc", 1, 2],
+  ])(
+    "dokumen lebih baru dari server (%s) → koneksi ditolak `schema-unsupported`, tidak ada yang ditulis",
+    async (_, column, meta) => {
+      const { owner, site, document } = await siteDocument(column);
+      const newer = jsonToYDoc(createBlankSiteDocument({ title: "Dari masa depan" }));
+      newer.getMap("meta").set("schemaVersion", meta);
+      await appendDocumentUpdates(testDb.db, tenant, document.id, [
+        { update: Y.encodeStateAsUpdate(newer), origin: "local" },
+      ]);
+
+      const token = await signToken(
+        SECRET,
+        { sub: owner.id, docId: document.id, siteId: site.id, role: "owner" },
+        { expiresInSeconds: 300, audience: REALTIME_TOKEN_AUDIENCE },
+      );
+      const reason = await new Promise<string>((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("tidak ada penolakan")), 5000);
+        const provider = new HocuspocusProvider({
+          url,
+          name: document.id,
+          token,
+          document: new Y.Doc(),
+          onSynced: () => reject(new Error("tersinkron padahal harus ditolak")),
+          onAuthenticationFailed: ({ reason }) => {
+            clearTimeout(timer);
+            provider.destroy();
+            resolve(reason);
+          },
+        });
+      });
+      expect(reason).toBe(REALTIME_DENY_REASONS.schemaUnsupported);
+      // Tidak dimigrasi/ditulis: hanya update awal.
+      const rows = await testDb.db
+        .select()
+        .from(schema.documentUpdates)
+        .where(eq(schema.documentUpdates.documentId, document.id));
+      expect(rows).toHaveLength(1);
+    },
+  );
 
   it("dokumen tidak ada di DB → tidak pernah tersinkron", async () => {
     const { user: owner } = await createUser(testDb.db);

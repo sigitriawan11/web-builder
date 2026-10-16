@@ -385,3 +385,27 @@ test("tombol dev tambah frame/teks → tersimpan → reload → tetap ada (T1.15
   await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
   await expect(canvas.locator(`[data-node-id="${frameId}"] [data-node-id="${textId}"]`)).toHaveText("New text");
 });
+
+test("server menolak dokumen ber-schemaVersion lebih baru (rollback deploy) → editor lihat saja dengan pesan (temuan M1 #3)", async ({
+  browser,
+  page,
+}) => {
+  const siteId = await openNewSite(page);
+  await expect(shell(page)).toHaveAttribute("data-connection-status", "synced");
+  // Dokumen tersimpan di server dengan schemaVersion 2 (seolah ditulis platform versi lebih baru).
+  const reloaded = page.waitForEvent("load");
+  await page.evaluate(() => window.__editorTestApi?.setSchemaVersion(2));
+  await reloaded;
+  await expect(page.getByTestId("editor-outdated")).toBeVisible();
+  const state = await page.context().storageState();
+  await page.close();
+  // Tunggu dokumen di-unload server setelah koneksi terakhir putus (load berikutnya dari DB).
+  await new Promise((resolve) => setTimeout(resolve, 1_500));
+
+  // Perangkat baru (IndexedDB kosong): server realtime versi ini menolak memuat dokumen → banner + lihat saja.
+  const fresh = await browser.newContext({ locale: "en-US", storageState: state });
+  const other = await fresh.newPage();
+  await other.goto(`${APP_URL}/editor/${siteId}`);
+  await expect(other.getByTestId("server-outdated-banner")).toContainText("newer platform version");
+  await fresh.close();
+});

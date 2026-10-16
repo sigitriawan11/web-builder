@@ -60,7 +60,8 @@
     "sessionTitle": "Sesi Anda berakhir",
     "sessionDescription": "Perubahan tetap tersimpan di perangkat ini. Masuk lagi di tab baru, lalu sambungkan ulang.",
     "login": "Masuk lagi",
-    "reconnect": "Sambungkan ulang"
+    "reconnect": "Sambungkan ulang",
+    "serverOutdated": "Situs ini disimpan oleh versi platform yang lebih baru daripada server saat ini. Editor dalam mode lihat saja — coba lagi beberapa saat lagi."
   },
   "schema": {
     "title": "Editor perlu diperbarui",

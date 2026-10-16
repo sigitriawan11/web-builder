@@ -64,6 +64,13 @@ export function EditAccessGate({ session }: { session: DocumentSession }) {
       </Alert>
     );
   }
+  if (access.kind === "serverOutdated") {
+    return (
+      <Alert variant="warning" className="rounded-none border-x-0 py-2" data-testid="server-outdated-banner">
+        <AlertDescription>{t("access.serverOutdated")}</AlertDescription>
+      </Alert>
+    );
+  }
   if (access.kind === "unauthenticated") {
     return (
       <Dialog open>

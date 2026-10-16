@@ -42,6 +42,13 @@ export const RealtimeStatelessMessageSchema = z.discriminatedUnion("type", [
   RealtimeLockAcquiredMessageSchema,
 ]);
 
+/**
+ * Alasan penolakan koneksi realtime (dikirim sebagai `permission-denied` → `onAuthenticationFailed({ reason })` di
+ * provider). `schema-unsupported`: dokumen ber-`schemaVersion` lebih baru dari server ini (mis. setelah rollback
+ * deploy) — server tidak memuat/menulisnya agar data tidak rusak.
+ */
+export const REALTIME_DENY_REASONS = { schemaUnsupported: "schema-unsupported" } as const;
+
 /** Pesan editor → realtime. `takeover` = ambil alih edit dari user lain (koneksi pemegang lama jadi read-only). */
 export const RealtimeClientMessageSchema = z.discriminatedUnion("type", [z.object({ type: z.literal("takeover") })]);
 

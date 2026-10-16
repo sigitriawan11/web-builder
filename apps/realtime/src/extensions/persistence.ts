@@ -13,9 +13,14 @@ import {
   DOCUMENT_LIMITS,
   loadDocument,
   migrateYDoc,
+  YDOC_KEYS,
   yDocToJson,
 } from "@platform/document-model";
-import type { RealtimeLimitWarningMessage, RealtimeSavedMessage } from "@platform/shared/contracts";
+import {
+  REALTIME_DENY_REASONS,
+  type RealtimeLimitWarningMessage,
+  type RealtimeSavedMessage,
+} from "@platform/shared/contracts";
 import type { Logger } from "@platform/shared/node";
 import * as Y from "yjs";
 import type { RealtimeContext } from "../auth";
@@ -66,6 +71,15 @@ interface DocumentBuffer {
   flushing: Promise<void>;
 }
 
+/** Penolakan load: `reason` diteruskan Hocuspocus ke klien sebagai `permission-denied` (lihat REALTIME_DENY_REASONS). */
+export class SchemaUnsupportedError extends Error {
+  readonly reason = REALTIME_DENY_REASONS.schemaUnsupported;
+  constructor(docId: string, version: number) {
+    super(`dokumen ${docId} schemaVersion ${version} > ${CURRENT_SCHEMA_VERSION} (server)`);
+    this.name = "SchemaUnsupportedError";
+  }
+}
+
 export class PersistenceExtension implements Extension {
   private readonly buffers = new Map<string, DocumentBuffer>();
   private readonly debounceMs: number;
@@ -96,6 +110,18 @@ export class PersistenceExtension implements Extension {
     // Belum pernah di-snapshot → interval dihitung sejak dimuat.
     buffer.lastSnapshotAt = stored.snapshot?.createdAt.getTime() ?? this.now();
     try {
+      // Dokumen dari versi platform yang lebih baru (rollback deploy): jangan dimuat/ditulis — server ini tidak
+      // mengerti formatnya. Kolom DB & `meta.schemaVersion` dicek (keduanya bisa lebih dulu naik).
+      const metaVersion = loaded.getMap<unknown>(YDOC_KEYS.meta).get("schemaVersion");
+      const version = Math.max(stored.schemaVersion, typeof metaVersion === "number" ? metaVersion : 0);
+      if (version > CURRENT_SCHEMA_VERSION) {
+        const error = new SchemaUnsupportedError(documentName, version);
+        this.options.logger.error(
+          { err: error, docId: documentName, schemaVersion: version, supported: CURRENT_SCHEMA_VERSION },
+          "dokumen ber-schemaVersion lebih baru dari server; koneksi ditolak",
+        );
+        throw error;
+      }
       if (stored.schemaVersion < CURRENT_SCHEMA_VERSION) {
         await this.migrate(documentName, loaded, stored.lastSeq);
         buffer.updatesSinceSnapshot = 0;
