@@ -127,6 +127,29 @@ body,
   background: #f24d9c;
 }
 
+/* ED-076: garis ukur jarak (merah 1px) + label px saat Alt+hover. */
+.overlay-measure-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #f24822;
+}
+
+.overlay-measure-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 4px;
+  border-radius: 2px;
+  background: #f24822;
+  color: #ffffff;
+  font:
+    10px / 14px system-ui,
+    sans-serif;
+  white-space: nowrap;
+  transform-origin: 0 0;
+}
+
 /* ED-074: garis pixel grid saat zoom ≥ 800%. */
 .overlay-pixel-grid {
   position: absolute;

@@ -25,6 +25,7 @@ import { useAlignShortcuts } from "./interactions/use-align-shortcuts";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLockHide } from "./interactions/use-lock-hide";
+import { useMeasure } from "./interactions/use-measure";
 import { useNudge } from "./interactions/use-nudge";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { usePixelGridShortcut } from "./interactions/use-pixel-grid-shortcut";
@@ -103,6 +104,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useNudge(runtime);
   useAlignShortcuts(runtime);
   usePixelGridShortcut();
+  useMeasure(viewportRef, runtime);
   useCreateTool(viewportRef, runtime);
   useEmptyTextCleanup(runtime);
   useTextEditingInteractions(viewportRef);

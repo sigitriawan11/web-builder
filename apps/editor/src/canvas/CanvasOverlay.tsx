@@ -6,6 +6,7 @@ import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
 import { MarqueeOverlay } from "./MarqueeOverlay";
 import { DrawPreview } from "./overlay/DrawPreview";
 import { FrameLabels } from "./overlay/FrameLabels";
+import { MeasureOverlay } from "./overlay/MeasureOverlay";
 import { PixelGridOverlay } from "./overlay/PixelGridOverlay";
 import { ReorderOverlay } from "./overlay/ReorderOverlay";
 import { SelectionOverlay } from "./overlay/SelectionOverlay";
@@ -30,6 +31,7 @@ export function CanvasOverlay() {
       <MarqueeOverlay />
       <ReorderOverlay />
       <SnapGuidesOverlay />
+      <MeasureOverlay />
       <FrameLabels />
       <DrawPreview />
       <Toasts />
