@@ -205,6 +205,21 @@ export const ShadowSchema = z.strictObject({
   visible: z.boolean().optional(),
 });
 
+// ── Transform (DM-033) — tidak memengaruhi layout (CSS transform) ────────────
+
+const transformShape = {
+  rotate: z.number().finite(), // derajat
+  scaleX: z.number().finite(),
+  scaleY: z.number().finite(),
+  translateX: LengthSchema,
+  translateY: LengthSchema,
+  flipX: z.boolean(),
+  flipY: z.boolean(),
+  origin: z.enum(["center", "topLeft"]),
+};
+export const TransformSchema = z.strictObject(transformShape).partial();
+const TransformPatchSchema = z.strictObject(patchShape(transformShape));
+
 // ── Style & responsive (DM-036) ────────────────────────────────────────────
 
 const styleShape = {
@@ -220,6 +235,8 @@ const styleShape = {
   typography: TypographySchema,
   // Warna teks/ikon (diwariskan ke turunan seperti CSS `color`).
   color: ColorSchema,
+  // DM-033: transform (rotate/scale/translate/flip); tidak memengaruhi layout flex.
+  transform: TransformSchema,
 };
 
 // DM-034: strict — tidak ada `customCss`/`className`/key tak dikenal; kebutuhan baru = field schema + migrasi.
@@ -234,6 +251,7 @@ export const StylePatchSchema = z.strictObject(
     flexChild: FlexChildPatchSchema,
     position: PositionPatchSchema,
     typography: TypographyPatchSchema,
+    transform: TransformPatchSchema,
   }),
 );
 
@@ -253,6 +271,7 @@ export type Fill = z.infer<typeof FillSchema>;
 export type RadiusValue = z.infer<typeof RadiusSchema>;
 export type Stroke = z.infer<typeof StrokeSchema>;
 export type Shadow = z.infer<typeof ShadowSchema>;
+export type Transform = z.infer<typeof TransformSchema>;
 export type TypographyStyle = z.infer<typeof TypographyStyleSchema>;
 export type Typography = z.infer<typeof TypographySchema>;
 export type Style = z.infer<typeof StyleSchema>;

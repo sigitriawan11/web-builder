@@ -136,6 +136,26 @@ describe("pemetaan style → CSS (spec 07 §4.2)", () => {
     expect(decl({ size: { height: { mode: "hug" } } })).toEqual({ height: "fit-content" });
   });
 
+  it("transform (DM-033): translate → rotate → scale, flip = skala negatif, origin topLeft", () => {
+    expect(decl({ transform: { rotate: 45 } })).toEqual({ transform: "rotate(45deg)" });
+    expect(decl({ transform: { flipX: true } })).toEqual({ transform: "scale(-1, 1)" });
+    expect(
+      decl({
+        transform: {
+          translateX: px(10),
+          translateY: { value: -4, unit: "px" },
+          rotate: 90,
+          scaleX: 2,
+          flipY: true,
+          origin: "topLeft",
+        },
+      }),
+    ).toEqual({ transform: "translate(10px, -4px) rotate(90deg) scale(2, -1)", "transform-origin": "top left" });
+    // origin center = default CSS → tidak ditulis; rotate 0 & scale 1 → tanpa transform.
+    expect(decl({ transform: { rotate: 10, origin: "center" } })).toEqual({ transform: "rotate(10deg)" });
+    expect(decl({ transform: { rotate: 0, scaleX: 1, scaleY: 1 } })).toEqual({});
+  });
+
   it("layout flex: arah, gap utama/silang, padding sebagian, align/justify", () => {
     expect(
       decl({

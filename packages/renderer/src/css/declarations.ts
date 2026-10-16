@@ -245,6 +245,23 @@ function position(value: NonNullable<Style["position"]>, out: Declaration[]): vo
   out.push(["position", "absolute"], ["left", `${value.x}px`], ["top", `${value.y}px`]);
 }
 
+// DM-033: transform CSS (translate → rotate → scale); flip = skala negatif. Tidak memengaruhi layout.
+function transform(value: NonNullable<Style["transform"]>, out: Declaration[]): void {
+  const parts: string[] = [];
+  if (value.translateX || value.translateY) {
+    const tx = value.translateX ? lengthToCss(value.translateX) : "0";
+    const ty = value.translateY ? lengthToCss(value.translateY) : "0";
+    parts.push(`translate(${tx}, ${ty})`);
+  }
+  if (value.rotate) parts.push(`rotate(${value.rotate}deg)`);
+  const scaleX = (value.scaleX ?? 1) * (value.flipX ? -1 : 1);
+  const scaleY = (value.scaleY ?? 1) * (value.flipY ? -1 : 1);
+  if (scaleX !== 1 || scaleY !== 1) parts.push(`scale(${scaleX}, ${scaleY})`);
+  if (parts.length > 0) out.push(["transform", parts.join(" ")]);
+  // Default origin CSS = center; hanya topLeft yang perlu ditulis.
+  if (value.origin === "topLeft") out.push(["transform-origin", "top left"]);
+}
+
 export function styleDeclarations(style: Style, ctx: DeclarationContext): Declaration[] {
   const out: Declaration[] = [];
   if (style.layout) layout(style.layout, out);
@@ -260,6 +277,7 @@ export function styleDeclarations(style: Style, ctx: DeclarationContext): Declar
   if (style.radius) radius(style.radius, out);
   if (style.typography) typography(style.typography, ctx, out);
   if (style.color) out.push(["color", colorToCss(style.color)]);
+  if (style.transform) transform(style.transform, out);
   // Terakhir: `position: absolute` menang atas `relative` dari layout none.
   if (style.position) position(style.position, out);
   // DM-039: sembunyi di breakpoint ini.
