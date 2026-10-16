@@ -14,6 +14,16 @@ import {
 
 export { checkMessages, formatIssues, type MessageIssue } from "./check";
 export {
+  DEFAULT_TIME_ZONE,
+  formatBytes,
+  formatCurrency,
+  formatDate,
+  formatDateTime,
+  formatNumber,
+  formatRelative,
+  normalizeIntlSpaces,
+} from "./format";
+export {
   DEFAULT_LOCALE,
   LOCALES,
   type Locale,
