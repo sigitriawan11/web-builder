@@ -12,6 +12,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -45,6 +48,7 @@ import { zoomStep, zoomTo } from "../../canvas/camera-commands";
 import { cameraStore } from "../../canvas/camera-store";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useUndoState } from "../../document/use-undo-state";
+import { IconPicker } from "../../panels/icons/IconPicker";
 import { BREAKPOINT_OPTIONS, breakpointStore } from "../../store/breakpoint-store";
 import { uiPreferencesStore } from "../../store/ui-preferences";
 import { TOOLS, toolDefinition } from "../../tools/tool-catalog";
@@ -98,6 +102,7 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
   const showAllFrames = useStore(uiPreferencesStore, (state) => state.showAllFrames);
   // Sub-tool shape terakhir dipakai tampil di tombol grup (seperti Figma).
   const [shape, setShape] = useState<ToolId>("rectangle");
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const selectTool = (tool: ToolId) => toolStore.getState().dispatch({ type: "selectTool", tool });
   const toolLabel = (tool: ToolId) => t(`toolbar.tool.${tool}`);
   const firstShortcut = (tool: ToolId) => toolDefinition(tool).shortcuts[0];
@@ -248,7 +253,25 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
         </div>
         {toolButton("text")}
         {toolButton("image")}
-        {toolButton("icon")}
+        {runtime ? (
+          <Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
+            <PopoverTrigger asChild>
+              <ToolbarButton
+                label={toolLabel("icon")}
+                shortcut={firstShortcut("icon")}
+                pressed={activeTool === "icon" || iconPickerOpen}
+                icon={<SmileIcon />}
+                data-testid="tool-icon"
+                onClick={() => setIconPickerOpen(true)}
+              />
+            </PopoverTrigger>
+            <PopoverContent align="start" data-testid="icon-picker-popover">
+              <IconPicker runtime={runtime} onClose={() => setIconPickerOpen(false)} />
+            </PopoverContent>
+          </Popover>
+        ) : (
+          toolButton("icon")
+        )}
         {toolButton("hand")}
       </div>
 

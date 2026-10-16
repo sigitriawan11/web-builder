@@ -174,9 +174,11 @@ test("AC ED-044: text tool klik → ketik → Esc = text node auto-width dengan 
     }, textId),
   ).toContain("Halo dunia");
 
-  // Teks kosong: klik, langsung Esc → node dihapus (tanpa menambah jumlah).
+  // Teks kosong: klik → editor fokus → Esc (Escape ditangani editor) → node dihapus (tanpa menambah jumlah).
   await page.keyboard.press("t");
   await page.mouse.click(box.x + 80, box.y + 160);
+  const emptyId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  await expect(canvas.locator(`[data-node-id="${emptyId}"] .ProseMirror`)).toBeFocused();
   await page.keyboard.press("Escape");
   await expect.poll(async () => Object.keys((await doc(page)).nodes).length).toBe(before + 1);
   void pageId;

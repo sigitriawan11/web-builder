@@ -72,6 +72,28 @@ export function createText(context: CreateContext, moved: boolean): string | nul
   return result.ok ? result.value : null;
 }
 
+/** ED-046: icon node (Lucide) dengan ukuran square dari drag/klik. */
+export function createIcon(name: string): (context: CreateContext) => string | null {
+  return (context) => {
+    const side = Math.max(16, Math.round(Math.max(context.rect.width, context.rect.height)) || 24);
+    const size = {
+      width: { mode: "fixed" as const, value: side, unit: "px" as const },
+      height: { mode: "fixed" as const, value: side, unit: "px" as const },
+    };
+    const base = context.parentIsFlow
+      ? { size }
+      : { size, position: { type: "absolute" as const, x: Math.round(context.rect.x), y: Math.round(context.rect.y) } };
+    const result = runCommand(ctxOf(context.runtime), createNode, {
+      parentId: context.parentId,
+      index: context.index,
+      type: "icon",
+      props: { set: "lucide", name },
+      style: { base },
+    });
+    return result.ok ? result.value : null;
+  };
+}
+
 /** ED-041/042: shape (rect/ellipse) = node `shape`; fill default abu-abu. */
 export function createShape(shape: "rect" | "ellipse"): (context: CreateContext) => string | null {
   return (context) => {

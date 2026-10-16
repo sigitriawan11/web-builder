@@ -35,6 +35,7 @@ export {
 export { Input } from "./components/Input";
 export { Label } from "./components/Label";
 export { NativeSelect } from "./components/NativeSelect";
+export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "./components/Popover";
 export { Separator } from "./components/Separator";
 export { ThemeSwitcher, type ThemeSwitcherProps } from "./components/ThemeSwitcher";
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./components/Tooltip";

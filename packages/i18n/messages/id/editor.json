@@ -203,5 +203,16 @@
   },
   "sections": {
     "pageNotDeletable": "Halaman tidak bisa dihapus dari sini. Gunakan panel Pages."
+  },
+  "icons": {
+    "search": "Cari ikon",
+    "results": "Hasil ikon",
+    "empty": "Tidak ada ikon yang cocok."
+  },
+  "insert": {
+    "basic": "Dasar",
+    "button": "Tombol",
+    "divider": "Pembatas",
+    "buttonLabel": "Tombol"
   }
 }
