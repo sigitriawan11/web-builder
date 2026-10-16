@@ -22,6 +22,7 @@ import { CanvasFrames } from "./frames/CanvasFrames";
 import { frameOptionsFromSearch, layoutFrames } from "./frames/frame-layout";
 import { FramesContext, useFrameActivation } from "./frames/frames-context";
 import { useAlignShortcuts } from "./interactions/use-align-shortcuts";
+import { useAutoLayoutShortcut } from "./interactions/use-auto-layout-shortcut";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLockHide } from "./interactions/use-lock-hide";
@@ -103,6 +104,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useLockHide(runtime);
   useNudge(runtime);
   useAlignShortcuts(runtime);
+  useAutoLayoutShortcut(runtime);
   usePixelGridShortcut();
   useMeasure(viewportRef, runtime);
   useCreateTool(viewportRef, runtime);

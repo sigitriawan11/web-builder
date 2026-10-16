@@ -224,6 +224,9 @@
   "sections": {
     "pageNotDeletable": "The page can't be deleted from here. Use the Pages panel."
   },
+  "autoLayout": {
+    "sameParentRequired": "Select layers with the same parent to add auto layout."
+  },
   "icons": {
     "search": "Search icons",
     "results": "Icon results",

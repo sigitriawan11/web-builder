@@ -224,6 +224,9 @@
   "sections": {
     "pageNotDeletable": "Halaman tidak bisa dihapus dari sini. Gunakan panel Pages."
   },
+  "autoLayout": {
+    "sameParentRequired": "Pilih layer dengan parent yang sama untuk menambah auto layout."
+  },
   "icons": {
     "search": "Cari ikon",
     "results": "Hasil ikon",
