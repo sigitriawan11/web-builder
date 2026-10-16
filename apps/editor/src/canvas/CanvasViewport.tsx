@@ -24,6 +24,7 @@ import { FramesContext, useFrameActivation } from "./frames/frames-context";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLockHide } from "./interactions/use-lock-hide";
+import { useNudge } from "./interactions/use-nudge";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
 import { useSelectAll } from "./interactions/use-select-all";
@@ -97,6 +98,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useSelectionNav(runtime);
   useSelectAll(runtime);
   useLockHide(runtime);
+  useNudge(runtime);
   useCreateTool(viewportRef, runtime);
   useEmptyTextCleanup(runtime);
   useTextEditingInteractions(viewportRef);
