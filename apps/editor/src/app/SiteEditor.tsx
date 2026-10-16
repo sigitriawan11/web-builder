@@ -20,6 +20,7 @@ import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from
 import { NodeStoreContext, useNodeFromStore } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
 import { LeftSidebar } from "../panels/LeftSidebar";
+import { PageSettings } from "../panels/pages/PageSettings";
 import { PagesPanel } from "../panels/pages/PagesPanel";
 import { Inspector } from "../panels/properties/Inspector";
 import { uiPreferencesStore } from "../store/ui-preferences";
@@ -210,7 +211,10 @@ function DocumentWorkspace({
         {/* ED-229: mode lihat saja — pointer ke canvas ditahan (server juga menolak update koneksi read-only). */}
         {readOnly ? <div className="absolute inset-0 z-10 cursor-not-allowed" data-testid="read-only-blocker" /> : null}
       </div>
-      <Inspector pageId={activePageId} />
+      <Inspector
+        pageId={activePageId}
+        pageSettings={<PageSettings runtime={runtime} pageId={activePageId} readOnly={readOnly} />}
+      />
     </NodeStoreContext.Provider>
   );
 }

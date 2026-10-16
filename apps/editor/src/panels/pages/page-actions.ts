@@ -29,6 +29,15 @@ type DocJson = {
 
 const docJson = (doc: Y.Doc) => yDocToJson(doc) as DocJson;
 
+/** Semua page dengan path-nya (urutan pageOrder) — untuk validasi path unik di klien. */
+export function pagesWithPaths(doc: Y.Doc): { id: string; path: string }[] {
+  const json = docJson(doc);
+  return doc
+    .getArray<string>(YDOC_KEYS.pageOrder)
+    .toArray()
+    .map((id) => ({ id, path: json.nodes[id]?.props?.path ?? "" }));
+}
+
 export function pagePaths(doc: Y.Doc): string[] {
   const json = docJson(doc);
   return doc

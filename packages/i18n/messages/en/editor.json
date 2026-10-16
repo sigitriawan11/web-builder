@@ -142,8 +142,7 @@
     "tag": "Tag",
     "visible": "Visible",
     "yes": "Yes",
-    "no": "No",
-    "selectSomething": "Select an element to see its settings."
+    "no": "No"
   },
   "nodeType": {
     "page": "Page",
@@ -179,5 +178,24 @@
     "deleteDescription": "The page and its content will be deleted. You can revert this with Undo.",
     "cancel": "Cancel",
     "home": "Home"
+  },
+  "pageSettings": {
+    "title": "Page settings",
+    "name": "Page title",
+    "path": "Path (URL)",
+    "homePath": "The home page is always at /.",
+    "seo": "SEO",
+    "seoTitle": "SEO title",
+    "seoDescription": "Meta description",
+    "preview": "Google search result preview",
+    "previewHost": "yoursite.platformmu.site",
+    "noDescription": "Add a description so it shows in search results.",
+    "open": "Page settings",
+    "pathError": {
+      "format": "Use lowercase letters, numbers, and hyphens, starting with /.",
+      "taken": "Another page already uses this path.",
+      "homeIsRoot": "The home page must be at /.",
+      "rootIsHome": "/ is reserved for the home page."
+    }
   }
 }

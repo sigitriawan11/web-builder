@@ -142,8 +142,7 @@
     "tag": "Tag",
     "visible": "Terlihat",
     "yes": "Ya",
-    "no": "Tidak",
-    "selectSomething": "Pilih elemen untuk melihat pengaturannya."
+    "no": "Tidak"
   },
   "nodeType": {
     "page": "Page",
@@ -179,5 +178,24 @@
     "deleteDescription": "Page beserta isinya akan dihapus. Anda bisa membatalkannya dengan Undo.",
     "cancel": "Batal",
     "home": "Beranda"
+  },
+  "pageSettings": {
+    "title": "Pengaturan page",
+    "name": "Judul page",
+    "path": "Path (URL)",
+    "homePath": "Page beranda selalu di /.",
+    "seo": "SEO",
+    "seoTitle": "Judul SEO",
+    "seoDescription": "Deskripsi meta",
+    "preview": "Pratinjau hasil pencarian Google",
+    "previewHost": "situsanda.platformmu.site",
+    "noDescription": "Tambahkan deskripsi agar muncul di hasil pencarian.",
+    "open": "Pengaturan page",
+    "pathError": {
+      "format": "Gunakan huruf kecil, angka, dan tanda hubung, diawali /.",
+      "taken": "Path sudah dipakai page lain.",
+      "homeIsRoot": "Page beranda harus di /.",
+      "rootIsHome": "/ khusus page beranda."
+    }
   }
 }

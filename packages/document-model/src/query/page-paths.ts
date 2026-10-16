@@ -26,3 +26,33 @@ export function uniquePagePath(title: string, taken: Iterable<string>): string {
     if (!used.has(candidate)) return candidate;
   }
 }
+
+export type PagePathError = "format" | "taken" | "homeIsRoot" | "rootIsHome";
+
+// Sama dengan PAGE_PATH_PATTERN schema (DM-010): "/" atau segmen huruf kecil/angka/"-" (dinamis `[slug]` = M7).
+const PATH_PATTERN = /^\/$|^(\/([a-z0-9-]+|\[[a-z][a-zA-Z0-9]*\]))+$/;
+
+/**
+ * ED-032/ED-033: validasi path page di klien dengan aturan yang sama dengan command (`createPage`/`updatePage`):
+ * format slug, unik per situs, home tepat di "/", page lain tidak boleh "/".
+ */
+export function validatePagePath(
+  path: string,
+  page: { id: string; isHome: boolean },
+  pages: readonly { id: string; path: string }[],
+): PagePathError | null {
+  if (path.length > 200 || !PATH_PATTERN.test(path)) return "format";
+  if (page.isHome && path !== "/") return "homeIsRoot";
+  if (!page.isHome && path === "/") return "rootIsHome";
+  if (pages.some((other) => other.id !== page.id && other.path === path)) return "taken";
+  return null;
+}
+
+/** Normalisasi input path user: "Tentang Kami" / "tentang kami/" → "/tentang-kami" (per segmen di-slugify). */
+export function normalizePagePath(input: string): string {
+  const segments = input
+    .split("/")
+    .map((segment) => slugify(segment))
+    .filter(Boolean);
+  return `/${segments.join("/")}`;
+}

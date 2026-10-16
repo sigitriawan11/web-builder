@@ -35,6 +35,8 @@ import { type KeyboardEvent, useState } from "react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useNode } from "../../document/use-node";
+import { selectionStore } from "../../store/selection-store";
+import { uiPreferencesStore } from "../../store/ui-preferences";
 import {
   addPage,
   duplicatePage,
@@ -142,6 +144,16 @@ function PageRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onSelect={() => setEditing(true)}>{t("pages.rename")}</DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => {
+                // ED-033: buka page lalu tab Settings inspector tanpa seleksi = pengaturan page.
+                onOpen(id);
+                selectionStore.getState().clear();
+                uiPreferencesStore.getState().update({ rightTab: "settings" });
+              }}
+            >
+              {t("pageSettings.open")}
+            </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={() => {
                 const copy = duplicatePage(context, id, (source) => t("pages.copyTitle", { title: source }));

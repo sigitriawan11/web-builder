@@ -68,9 +68,10 @@ function DesignTab({ pageId, nodes }: { pageId: string; nodes: readonly Node[] }
   );
 }
 
-function SettingsTab({ nodes }: { nodes: readonly Node[] }) {
+function SettingsTab({ nodes, page }: { nodes: readonly Node[]; page: ReactNode }) {
   const t = useT();
-  if (nodes.length === 0) return <p className="p-3 text-xs text-muted-foreground">{t("inspector.selectSomething")}</p>;
+  // ED-033: tanpa seleksi → pengaturan page aktif.
+  if (nodes.length === 0) return <>{page}</>;
   return (
     <InspectorSection id="html" title={t("inspector.html")}>
       <InspectorRow label={t("inspector.tag")}>
@@ -86,7 +87,7 @@ function SettingsTab({ nodes }: { nodes: readonly Node[] }) {
   );
 }
 
-export function Inspector({ pageId }: { pageId: string }) {
+export function Inspector({ pageId, pageSettings }: { pageId: string; pageSettings: ReactNode }) {
   const t = useT();
   const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
   const nodes = useNodes(selectedIds).filter((node): node is Node => node !== null);
@@ -137,7 +138,11 @@ export function Inspector({ pageId }: { pageId: string }) {
         aria-labelledby={`right-tab-${rightTab}`}
         className="min-h-0 flex-1 overflow-y-auto"
       >
-        {rightTab === "design" ? <DesignTab pageId={pageId} nodes={nodes} /> : <SettingsTab nodes={nodes} />}
+        {rightTab === "design" ? (
+          <DesignTab pageId={pageId} nodes={nodes} />
+        ) : (
+          <SettingsTab nodes={nodes} page={pageSettings} />
+        )}
       </div>
     </aside>
   );

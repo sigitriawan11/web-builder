@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PagePropsSchema } from "../schema";
-import { slugify, uniquePagePath } from "./page-paths";
+import { normalizePagePath, slugify, uniquePagePath, validatePagePath } from "./page-paths";
 
 describe("slugify (ED-032)", () => {
   it.each([
@@ -31,5 +31,36 @@ describe("uniquePagePath", () => {
     for (const title of ["Tentang Kami", "日本語", "Café"]) {
       expect(PagePropsSchema.shape.path.safeParse(uniquePagePath(title, [])).success).toBe(true);
     }
+  });
+});
+
+describe("validatePagePath (ED-033, sama dengan command)", () => {
+  const pages = [
+    { id: "pg_home", path: "/" },
+    { id: "pg_about", path: "/tentang" },
+  ];
+  it.each([
+    ["/kontak", "pg_new", false, null],
+    ["/layanan/web", "pg_new", false, null],
+    ["/tentang", "pg_about", false, null],
+    ["/tentang", "pg_new", false, "taken"],
+    ["/", "pg_new", false, "rootIsHome"],
+    ["/beranda", "pg_home", true, "homeIsRoot"],
+    ["/", "pg_home", true, null],
+    ["tentang", "pg_new", false, "format"],
+    ["/Tentang", "pg_new", false, "format"],
+    ["/tentang/", "pg_new", false, "format"],
+    ["/a//b", "pg_new", false, "format"],
+    ["/kopi_susu", "pg_new", false, "format"],
+    [`/${"a".repeat(200)}`, "pg_new", false, "format"],
+  ] as const)("%j (page %s, home %s) → %s", (path, id, isHome, expected) => {
+    expect(validatePagePath(path, { id, isHome }, pages)).toBe(expected);
+  });
+
+  it("hasil normalisasi lolos validasi format", () => {
+    expect(normalizePagePath("Tentang Kami")).toBe("/tentang-kami");
+    expect(normalizePagePath("/Layanan/Web Design/")).toBe("/layanan/web-design");
+    expect(normalizePagePath("  ")).toBe("/");
+    expect(validatePagePath(normalizePagePath("Café Résumé"), { id: "x", isHome: false }, [])).toBeNull();
   });
 });
