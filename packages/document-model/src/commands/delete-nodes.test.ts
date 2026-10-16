@@ -20,7 +20,10 @@ describe("deleteNodes", () => {
   it("menerima id yang tumpang tindih (node dan turunannya)", () => {
     const { ctx, read } = setupDoc(nestedDocument());
 
-    const result = runCommand(ctx, deleteNodes, { ids: ["n_lvl4text001", "n_lvl2000001", "n_lvl4text001"] });
+    // n_lvl4text001 terkunci di fixture; test ini menguji dedup id tumpang tindih, jadi `force` melewati DM-075.
+    const result = runCommand({ ...ctx, force: true }, deleteNodes, {
+      ids: ["n_lvl4text001", "n_lvl2000001", "n_lvl4text001"],
+    });
 
     expect(result.ok).toBe(true);
     const doc = read();

@@ -53,3 +53,17 @@ export function collectSubtree(nodes: Y.Map<YNode>, rootId: string, into: Set<st
   }
   return into;
 }
+
+/** DM-075: node efektif terkunci bila node atau salah satu ancestornya `locked: true`. */
+export function isEffectivelyLocked(nodes: Y.Map<YNode>, nodeId: string): boolean {
+  let current: string | null = nodeId;
+  const seen = new Set<string>();
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    const yNode = nodes.get(current);
+    if (!yNode) return false;
+    if (yNode.get("locked") === true) return true;
+    current = parentIdOf(yNode);
+  }
+  return false;
+}

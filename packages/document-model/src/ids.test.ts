@@ -18,7 +18,8 @@ describe("createId", () => {
     }
   });
 
-  it("tidak menghasilkan duplikat dalam 1 juta ID", () => {
+  // Membuat 1 juta ID bisa >5s di bawah beban paralel turbo (CPU jenuh); batas diperlebar seperti test berat lain.
+  it("tidak menghasilkan duplikat dalam 1 juta ID", { timeout: 30_000 }, () => {
     const count = 1_000_000;
     const ids = new Set<string>();
     for (let i = 0; i < count; i++) {
