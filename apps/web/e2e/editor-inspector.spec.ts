@@ -180,3 +180,44 @@ test("T2.8.6 ED-084: mode sizing per sumbu (Fixed/Hug/Fill)", async ({ page }) =
   await select.selectOption("fixed");
   await expect.poll(widthMode).toBe("fixed");
 });
+
+test("T2.8.7 ED-085: min/max width & height", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Min Max")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            position: { type: "absolute", x: 0, y: 0 },
+            size: {
+              width: { mode: "fixed", value: 120, unit: "px" },
+              height: { mode: "fixed", value: 80, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  const inspector = page.getByTestId("inspector");
+  const sizeOf = () =>
+    page.evaluate((id) => {
+      const d = window.__editorTestApi?.getDoc() as {
+        nodes: Record<string, { style: { base: { size?: Record<string, { value?: number }> } } }>;
+      };
+      return d?.nodes[id]?.style.base.size;
+    }, frame);
+
+  await inspector.getByTestId("inspector-minWidth").fill("50");
+  await inspector.getByTestId("inspector-minWidth").press("Enter");
+  await inspector.getByTestId("inspector-maxHeight").fill("200");
+  await inspector.getByTestId("inspector-maxHeight").press("Enter");
+  await expect.poll(async () => (await sizeOf())?.minWidth?.value).toBe(50);
+  expect((await sizeOf())?.maxHeight?.value).toBe(200);
+});

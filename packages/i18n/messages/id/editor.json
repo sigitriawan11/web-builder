@@ -184,7 +184,16 @@
     "sizeHug": "Hug konten",
     "sizeFill": "Fill kontainer",
     "widthMode": "Mode lebar",
-    "heightMode": "Mode tinggi"
+    "heightMode": "Mode tinggi",
+    "minMax": "Min / maks",
+    "minWidth": "Lebar minimum",
+    "maxWidth": "Lebar maksimum",
+    "minHeight": "Tinggi minimum",
+    "maxHeight": "Tinggi maksimum",
+    "minWidthShort": "Min W",
+    "maxWidthShort": "Maks W",
+    "minHeightShort": "Min H",
+    "maxHeightShort": "Maks H"
   },
   "nodeType": {
     "page": "Page",

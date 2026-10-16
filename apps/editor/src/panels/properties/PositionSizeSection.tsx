@@ -64,6 +64,20 @@ export function PositionSizeSection({
     runCommand(ctx(), updateStyle, { ids: [node.id], patch: { position: { [axis]: value } } });
   };
 
+  // ED-085: min/max width & height (LengthSchema). Kosong = tak dibatasi; input mengisi nilai px.
+  type Limit = "minWidth" | "maxWidth" | "minHeight" | "maxHeight";
+  const limitOf = (node: Node, key: Limit) => {
+    const value = resolveStyle(node.style, "base").size?.[key];
+    return value && "value" in value ? value.value : undefined;
+  };
+  const limitValue = (key: Limit) => mixedValue(nodes.map((node) => limitOf(node, key)));
+  const setLimit = (node: Node, key: Limit, value: number) => {
+    runCommand(ctx(), updateStyle, {
+      ids: [node.id],
+      patch: { size: { [key]: { value: Math.max(0, value), unit: "px" } } },
+    });
+  };
+
   // ED-084: mode sizing per sumbu (Fixed / Hug / Fill). Fixed memakai nilai terukur sebagai titik awal.
   const sizeModeValue = (axis: "width" | "height") =>
     mixedValue(nodes.map((node) => resolveStyle(node.style, "base").size?.[axis]?.mode ?? "fixed"));
@@ -150,6 +164,27 @@ export function PositionSizeSection({
             />
             <SizeModeSelect axis="height" value={sizeModeValue("height")} readOnly={readOnly} onChange={setSizeMode} />
           </div>
+        </div>
+      </InspectorRow>
+      <InspectorRow label={t("inspector.minMax")}>
+        <div className="grid grid-cols-2 gap-1">
+          {(["minWidth", "maxWidth", "minHeight", "maxHeight"] as const).map((key) => (
+            <NumberInput
+              key={key}
+              label={t(`inspector.${key}`)}
+              scrubLabel={t(`inspector.${key}Short`)}
+              value={limitValue(key)}
+              min={0}
+              testId={`inspector-${key}`}
+              onCommit={(update) =>
+                commit(
+                  update,
+                  (node) => limitOf(node, key) ?? 0,
+                  (node, value) => setLimit(node, key, value),
+                )
+              }
+            />
+          ))}
         </div>
       </InspectorRow>
     </InspectorSection>

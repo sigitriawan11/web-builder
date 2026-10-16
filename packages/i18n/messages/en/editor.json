@@ -184,7 +184,16 @@
     "sizeHug": "Hug contents",
     "sizeFill": "Fill container",
     "widthMode": "Width sizing",
-    "heightMode": "Height sizing"
+    "heightMode": "Height sizing",
+    "minMax": "Min / max",
+    "minWidth": "Minimum width",
+    "maxWidth": "Maximum width",
+    "minHeight": "Minimum height",
+    "maxHeight": "Maximum height",
+    "minWidthShort": "Min W",
+    "maxWidthShort": "Max W",
+    "minHeightShort": "Min H",
+    "maxHeightShort": "Max H"
   },
   "nodeType": {
     "page": "Page",
