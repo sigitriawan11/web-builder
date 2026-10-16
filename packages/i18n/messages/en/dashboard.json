@@ -41,5 +41,34 @@
       "next": "Next page",
       "first": "Back to first page"
     }
+  },
+  "createSite": {
+    "button": "Create website",
+    "title": "Create a new website",
+    "description": "Choose how to start. You can change everything later in the editor.",
+    "close": "Close",
+    "options": {
+      "label": "How to start",
+      "template": {
+        "title": "From a template",
+        "description": "Start from a ready-made design."
+      },
+      "blank": {
+        "title": "Blank",
+        "description": "Start from an empty page."
+      },
+      "ai": {
+        "title": "With AI",
+        "description": "Describe your business and AI drafts it."
+      },
+      "soon": "Coming soon"
+    },
+    "name": "Website name",
+    "namePlaceholder": "E.g. Sri's Cake Shop",
+    "nameHint": "You can change it anytime.",
+    "submit": "Create and open editor",
+    "cancel": "Cancel",
+    "forbidden": "You don't have permission to create websites in this workspace.",
+    "limit": "You've reached the website limit on your plan."
   }
 }

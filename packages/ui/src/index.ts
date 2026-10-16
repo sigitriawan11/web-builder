@@ -7,6 +7,16 @@ export { Button, type ButtonProps, buttonVariants } from "./components/Button";
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./components/Card";
 export { Checkbox } from "./components/Checkbox";
 export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./components/Dialog";
+export {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,

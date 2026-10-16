@@ -2,6 +2,7 @@ import type { Site } from "@platform/shared/contracts";
 import { Badge, Button, Card } from "@platform/ui";
 import { GlobeIcon } from "lucide-react";
 import { getFormatter, getNow, getTranslations } from "next-intl/server";
+import { CreateSiteDialog } from "../../../../components/dashboard/CreateSiteDialog";
 import { apiServerGet } from "../../../../lib/api/server";
 import { getDashboardSession } from "../../../../lib/workspace/current";
 
@@ -14,6 +15,7 @@ const STATUS_VARIANT = {
 
 // Daftar situs (ACC-050): kartu nama + status + terakhir diedit → editor; kosong → empty state; 24 per halaman
 // (cursor api). Thumbnail, URL live, filter/urutan/cari & aksi cepat menyusul bersama fiturnya (publish M4).
+// Tombol "Buat website" (ACC-051) di header — terlihat juga saat empty state.
 export default async function SitesPage({
   searchParams,
 }: {
@@ -34,9 +36,12 @@ export default async function SitesPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("description")}</p>
+        </div>
+        <CreateSiteDialog workspaceId={current.id} />
       </div>
 
       {sites.length === 0 && !cursor ? (

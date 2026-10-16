@@ -41,5 +41,34 @@
       "next": "Halaman berikutnya",
       "first": "Kembali ke halaman pertama"
     }
+  },
+  "createSite": {
+    "button": "Buat website",
+    "title": "Buat website baru",
+    "description": "Pilih cara memulai. Anda bisa mengubah semuanya nanti di editor.",
+    "close": "Tutup",
+    "options": {
+      "label": "Cara memulai",
+      "template": {
+        "title": "Dari template",
+        "description": "Mulai dari desain siap pakai."
+      },
+      "blank": {
+        "title": "Kosong",
+        "description": "Mulai dari halaman kosong."
+      },
+      "ai": {
+        "title": "Dengan AI",
+        "description": "Ceritakan bisnis Anda, AI menyusun draftnya."
+      },
+      "soon": "Segera"
+    },
+    "name": "Nama website",
+    "namePlaceholder": "Mis. Toko Kue Bu Sri",
+    "nameHint": "Bisa diganti kapan saja.",
+    "submit": "Buat dan buka editor",
+    "cancel": "Batal",
+    "forbidden": "Anda tidak punya izin membuat website di workspace ini.",
+    "limit": "Batas jumlah website di paket Anda sudah tercapai."
   }
 }

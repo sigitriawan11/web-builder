@@ -40,7 +40,10 @@ const workerEnv = {
 
 export default defineConfig({
   testDir: "e2e",
-  fullyParallel: true,
+  // Satu worker: semua test berbagi stack e2e yang sama (satu IP → rate limit registrasi 3/jam per IP, Redis e2e
+  // yang direset antar test). Paralel lintas file membuat registrasi di file lain ikut menghabiskan kuota → flaky.
+  workers: 1,
+  fullyParallel: false,
   reporter: "list",
   use: { baseURL: APP_URL, trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
