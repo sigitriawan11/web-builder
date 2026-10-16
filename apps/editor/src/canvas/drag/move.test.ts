@@ -19,7 +19,11 @@ describe("moveDelta (ED-062)", () => {
 });
 
 describe("movedPosition", () => {
-  it("posisi awal + geser, dibulatkan ke pixel", () => {
+  it("posisi awal + geser, dibulatkan ke pixel (snap aktif)", () => {
     expect(movedPosition({ x: 80, y: 80 }, { dx: 12.6, dy: -0.4 })).toEqual({ x: 93, y: 80 });
+  });
+
+  it("ED-074: snap pixel nonaktif → posisi subpixel dipertahankan", () => {
+    expect(movedPosition({ x: 80, y: 80 }, { dx: 12.6, dy: -0.4 }, false)).toEqual({ x: 92.6, y: 79.6 });
   });
 });

@@ -14,6 +14,7 @@ import type { NodeStore } from "../../document/node-store";
 import { interactionStore } from "../../store/interaction-store";
 import { previewStore } from "../../store/preview-store";
 import { selectionStore } from "../../store/selection-store";
+import { uiPreferencesStore } from "../../store/ui-preferences";
 import { nodeLookupFrom } from "../../tools/select/node-lookup";
 import { resolveClickSelection } from "../../tools/select/selection-depth";
 import { unionBounds } from "../align";
@@ -349,12 +350,14 @@ export function useDragSessions(deps: DragSessionDeps): void {
               selectionStore.getState().select(items.map((item) => idMap[item.id] ?? item.id));
             }
           } else {
+            // ED-074: snap pixel (default) → posisi bulat; nonaktif → subpixel dipertahankan.
+            const snapToPixel = uiPreferencesStore.getState().snapToPixelGrid;
             // Semua node dalam SATU transaksi (= satu update Yjs & satu langkah undo, ED-024).
             deps.opContext.doc.transact(() => {
               for (const item of items) {
                 runCommand(deps.opContext, updateStyle, {
                   ids: [item.id],
-                  patch: { position: movedPosition(item.start, delta) },
+                  patch: { position: movedPosition(item.start, delta, snapToPixel) },
                 });
               }
             }, deps.opContext.origin);

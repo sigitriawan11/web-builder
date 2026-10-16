@@ -6,6 +6,7 @@ import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
 import { MarqueeOverlay } from "./MarqueeOverlay";
 import { DrawPreview } from "./overlay/DrawPreview";
 import { FrameLabels } from "./overlay/FrameLabels";
+import { PixelGridOverlay } from "./overlay/PixelGridOverlay";
 import { ReorderOverlay } from "./overlay/ReorderOverlay";
 import { SelectionOverlay } from "./overlay/SelectionOverlay";
 import { SnapGuidesOverlay } from "./overlay/SnapGuidesOverlay";
@@ -22,6 +23,7 @@ export function CanvasOverlay() {
 
   return (
     <div id="overlay">
+      <PixelGridOverlay />
       {outlineNodeId && <GeometryOutline nodeId={outlineNodeId} />}
       {hoveredId && <GeometryOutline nodeId={hoveredId} className="overlay-hover-outline" />}
       <SelectionOverlay nodeStore={runtime.nodeStore} geometry={runtime.geometry.store} />

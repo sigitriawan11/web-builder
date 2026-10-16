@@ -27,6 +27,7 @@ import { type InteractionAdapterDeps, useInteractionMachine } from "./interactio
 import { useLockHide } from "./interactions/use-lock-hide";
 import { useNudge } from "./interactions/use-nudge";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
+import { usePixelGridShortcut } from "./interactions/use-pixel-grid-shortcut";
 import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
 import { useSelectAll } from "./interactions/use-select-all";
 import { useSelectionNav } from "./interactions/use-selection-nav";
@@ -101,6 +102,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useLockHide(runtime);
   useNudge(runtime);
   useAlignShortcuts(runtime);
+  usePixelGridShortcut();
   useCreateTool(viewportRef, runtime);
   useEmptyTextCleanup(runtime);
   useTextEditingInteractions(viewportRef);

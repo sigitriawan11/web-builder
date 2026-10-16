@@ -17,10 +17,14 @@ export function moveDelta(
   return Math.abs(delta.dx) >= Math.abs(delta.dy) ? { dx: delta.dx, dy: 0 } : { dx: 0, dy: delta.dy };
 }
 
-// ED-062: posisi akhir dibulatkan ke grid pixel (snap pixel aktif secara default).
+// ED-062/ED-074: posisi akhir dibulatkan ke grid pixel saat snap pixel aktif (default); jika nonaktif,
+// posisi subpixel dipertahankan.
 export function movedPosition(
   start: { x: number; y: number },
   delta: { dx: number; dy: number },
+  snapToPixel = true,
 ): { x: number; y: number } {
-  return { x: Math.round(start.x + delta.dx), y: Math.round(start.y + delta.dy) };
+  const x = start.x + delta.dx;
+  const y = start.y + delta.dy;
+  return snapToPixel ? { x: Math.round(x), y: Math.round(y) } : { x, y };
 }

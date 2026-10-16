@@ -31,6 +31,10 @@ const PreferencesSchema = z.object({
   bottomBarHidden: z.boolean().catch(false),
   // ED-034: tampilkan semua frame device berdampingan (selain itu mode fokus: breakpoint aktif saja).
   showAllFrames: z.boolean().catch(false),
+  // ED-074: snap posisi/ukuran ke pixel grid (bilangan bulat). Default aktif.
+  snapToPixelGrid: z.boolean().catch(true),
+  // ED-074: tampilkan garis pixel grid saat zoom ≥ 800% (toggle Shift+').
+  pixelGridVisible: z.boolean().catch(true),
 });
 export type UiPreferences = z.infer<typeof PreferencesSchema>;
 
@@ -44,6 +48,8 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   collapsedSections: [],
   bottomBarHidden: false,
   showAllFrames: false,
+  snapToPixelGrid: true,
+  pixelGridVisible: true,
 };
 
 export const clampSidebarWidth = (width: number) =>
