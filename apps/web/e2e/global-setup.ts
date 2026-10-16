@@ -33,6 +33,20 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
     await login(page, email, PASSWORD, "/sites");
     await page.waitForURL(`${APP_URL}/sites`);
 
+    // Pemanasan editor: Vite dev mengompilasi chunk `SiteEditor` saat pertama dibuka (bisa > 5 s pada run dingin) —
+    // dilakukan sekali di sini agar test pertama yang membuka editor tidak menanggungnya (flaky).
+    const siteId = await page.evaluate(async () => {
+      const workspaces = (await (await fetch("/api/v1/workspaces")).json()) as { data: { id: string }[] };
+      const response = await fetch(`/api/v1/workspaces/${workspaces.data[0]?.id}/sites`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: "Pemanasan e2e" }),
+      });
+      return ((await response.json()) as { data: { id: string } }).data.id;
+    });
+    await page.goto(`${APP_URL}/editor/${siteId}`);
+    await page.locator('[data-connection-status="synced"]').waitFor({ timeout: 60_000 });
+
     mkdirSync(dirname(OWNER_STATE), { recursive: true });
     await context.storageState({ path: OWNER_STATE });
     writeFileSync(OWNER_ACCOUNT, JSON.stringify({ email, password: PASSWORD }));
