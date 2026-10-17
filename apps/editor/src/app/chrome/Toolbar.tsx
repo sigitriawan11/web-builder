@@ -54,6 +54,7 @@ import { uiPreferencesStore } from "../../store/ui-preferences";
 import { TOOLS, toolDefinition } from "../../tools/tool-catalog";
 import { type ToolId, toolStore } from "../../tools/tool-store";
 import { useT } from "../i18n";
+import { BreakpointWidthControl } from "./BreakpointWidthControl";
 import { formatShortcut, type Shortcut } from "./shortcut";
 import { ToolbarButton } from "./ToolbarButton";
 
@@ -319,6 +320,7 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
             onClick={() => uiPreferencesStore.getState().update({ showAllFrames: !showAllFrames })}
           />
         </div>
+        {runtime ? <BreakpointWidthControl runtime={runtime} readOnly={runtime.isReadOnly()} /> : null}
         <DropdownMenu>
           <Tooltip>
             <TooltipTrigger asChild>

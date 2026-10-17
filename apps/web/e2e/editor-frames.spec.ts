@@ -106,3 +106,15 @@ test("AC ED-173: Alt+Shift+3 pindah ke Mobile & mempertahankan seleksi", async (
   // Seleksi tetap setelah ganti breakpoint (AC ED-173).
   expect(await page.evaluate(() => window.__editorTestApi?.getSelection() ?? [])).toEqual([frame]);
 });
+
+test("AC ED-174: ubah lebar preview custom → frame breakpoint menyesuaikan", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Preview Width Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  const canvas = page.getByTestId("editor-canvas");
+  await expect(canvas.locator('.bp-frame[data-breakpoint="base"]')).toHaveCSS("width", "1440px");
+
+  await page.getByTestId("preview-width").fill("1280");
+  await page.getByTestId("preview-width").press("Enter");
+  await expect(canvas.locator('.bp-frame[data-breakpoint="base"]')).toHaveCSS("width", "1280px");
+});

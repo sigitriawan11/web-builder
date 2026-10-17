@@ -111,7 +111,8 @@
     "mode": "Mode desain",
     "comingSoon": "Menyusul",
     "narrowScreen": "Editor paling optimal di layar ≥ 1280px.",
-    "showAllDevices": "Tampilkan semua device"
+    "showAllDevices": "Tampilkan semua device",
+    "previewWidth": "Lebar preview"
   },
   "sidebar": {
     "label": "Panel kiri",
