@@ -205,7 +205,10 @@
     "constraint_scale": "Skala",
     "constraint_top": "Atas",
     "constraint_bottom": "Bawah",
-    "constraint_topBottom": "Atas & bawah"
+    "constraint_topBottom": "Atas & bawah",
+    "autoLayoutHint": "Gunakan Auto layout agar frame ini rapi di HP.",
+    "convert": "Konversi",
+    "dismiss": "Tutup"
   },
   "nodeType": {
     "page": "Page",

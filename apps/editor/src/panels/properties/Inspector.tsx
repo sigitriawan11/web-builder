@@ -14,6 +14,7 @@ import {
   uiPreferencesStore,
 } from "../../store/ui-preferences";
 import { ResizeHandle } from "../ResizeHandle";
+import { AutoLayoutHint } from "./AutoLayoutHint";
 import { AutoLayoutSection } from "./AutoLayoutSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { isMixed, mixedValue } from "./mixed";
@@ -86,6 +87,7 @@ function DesignTab({
           <Value value={mixedValue(nodes.map((node) => node.name))} />
         </InspectorRow>
       </InspectorSection>
+      {runtime ? <AutoLayoutHint runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AutoLayoutSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
     </>

@@ -69,3 +69,55 @@ test("AC ED-098: constraint Right → resize parent menggeser child menjaga jara
   // Child Right: jarak kanan 200−10−40=150 tetap → x baru = 300−150−40 = 110.
   await expect.poll(async () => (await posX(page, child))?.x).toBe(110);
 });
+
+test("AC ED-099: banner auto-layout di frame freeform ≥376px — dismiss per frame & convert", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Auto Layout Hint")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const freeform = (w: number) =>
+    editorCommand(page, "createNode", {
+      parentId: pageId,
+      type: "frame",
+      style: {
+        base: { layout: { mode: "none" }, position: { type: "absolute", x: 0, y: 0 }, size: sizeFixed(w, 200) },
+      },
+    }).then((r) => String(r.value));
+
+  const wide = await freeform(500);
+  const narrow = await freeform(300);
+  const inspector = page.getByTestId("inspector");
+  const hint = inspector.getByTestId("auto-layout-hint");
+
+  // Frame lebar → banner tampil; frame sempit → tidak.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), wide);
+  await expect(hint).toBeVisible();
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), narrow);
+  await expect(hint).toBeHidden();
+
+  // Dismiss per frame: wide di-dismiss → hilang; frame lebar lain tetap tampil.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), wide);
+  await expect(hint).toBeVisible();
+  await inspector.getByTestId("auto-layout-hint-dismiss").click();
+  await expect(hint).toBeHidden();
+
+  const other = await freeform(500);
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), other);
+  await expect(hint).toBeVisible();
+
+  // Convert → frame jadi auto-layout, banner hilang.
+  await inspector.getByTestId("auto-layout-hint-convert").click();
+  await expect
+    .poll(() =>
+      page.evaluate((id) => {
+        const d = window.__editorTestApi?.getDoc() as {
+          nodes: Record<string, { style: { base: { layout?: { mode?: string } } } }>;
+        };
+        return d?.nodes[id]?.style.base.layout?.mode;
+      }, other),
+    )
+    .toBe("flex");
+  await expect(hint).toBeHidden();
+});

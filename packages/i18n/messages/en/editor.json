@@ -205,7 +205,10 @@
     "constraint_scale": "Scale",
     "constraint_top": "Top",
     "constraint_bottom": "Bottom",
-    "constraint_topBottom": "Top & bottom"
+    "constraint_topBottom": "Top & bottom",
+    "autoLayoutHint": "Use Auto layout so this frame stays tidy on mobile.",
+    "convert": "Convert",
+    "dismiss": "Dismiss"
   },
   "nodeType": {
     "page": "Page",
