@@ -1020,7 +1020,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.9 — Constraints
 
-- [ ] **T2.9.1** Constraints horizontal & vertikal (left/right/both/center/scale) untuk anak frame non-auto-layout — ED-098 · `apps/editor`, `packages/renderer` · Verifikasi: unit test CSS hasil; e2e resize parent
+- [x] **T2.9.1** Constraints horizontal & vertikal (left/right/both/center/scale) untuk anak frame non-auto-layout — ED-098 · `apps/editor`, `packages/renderer` · Verifikasi: unit test CSS hasil; e2e resize parent
+  - Catatan: ✅ 2026-10-17 — **CSS (publish/editor sama):** `constraintDeclarations` di renderer `declarations.ts` memetakan constraints child absolute → CSS pakai ukuran parent (left/right px, left&right+width auto, center via `left:50%`+margin, scale via %). Ukuran parent/anak px fixed dialirkan lewat `visit` (`parentWidth/Height` di `DeclarationContext`); tanpa ukuran → fallback Left/Top. Snapshot CSS byte-identik (default Left/Top). **Editor live-resize:** `propagateConstraints` murni (`canvas/constraints.ts`) mereposisi/menskalakan child absolute saat frame freeform di-resize (handle drag), dijalankan di commit resize `use-drag-sessions` (satu transaksi). **UI:** dua dropdown constraint (H/V) di `PositionSizeSection` saat node absolute (default Left/Top). i18n `inspector.constraints/constraint_*`. Verifikasi: **6 unit** `css.test` (constraintDeclarations: 5 kombinasi + fallback) + **6 unit** `constraints.test` (propagasi) + **e2e** `editor-constraints.spec` (set Right, seret handle E +100 → x 10→110). **Belum:** widget constraints visual Figma-style + 5×5 visual regression (AC penuh), propagasi saat resize lewat input inspector W/H.
 - [ ] **T2.9.2** Default constraints & anjuran auto-layout (hint di panel) — ED-099 · `apps/editor` · Verifikasi: e2e hint muncul
 
 #### Epic 2.10 — Properti visual

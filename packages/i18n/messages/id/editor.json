@@ -194,7 +194,18 @@
     "maxWidthShort": "Maks W",
     "minHeightShort": "Min H",
     "maxHeightShort": "Maks H",
-    "absolutePosition": "Posisi absolut"
+    "absolutePosition": "Posisi absolut",
+    "constraints": "Constraints",
+    "constraintH": "Constraint horizontal",
+    "constraintV": "Constraint vertikal",
+    "constraint_left": "Kiri",
+    "constraint_right": "Kanan",
+    "constraint_leftRight": "Kiri & kanan",
+    "constraint_center": "Tengah",
+    "constraint_scale": "Skala",
+    "constraint_top": "Atas",
+    "constraint_bottom": "Bawah",
+    "constraint_topBottom": "Atas & bawah"
   },
   "nodeType": {
     "page": "Page",

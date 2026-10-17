@@ -24,6 +24,9 @@ export interface DeclarationContext {
   parent: ParentLayout;
   theme: Theme;
   assetUrl: (assetId: string) => string;
+  // ED-098: ukuran px fixed parent (bila diketahui) untuk CSS constraints child absolute.
+  parentWidth?: number | undefined;
+  parentHeight?: number | undefined;
 }
 
 const JUSTIFY: Record<string, string> = {
@@ -240,9 +243,120 @@ function typography(value: NonNullable<Style["typography"]>, ctx: DeclarationCon
 }
 
 // DM-028: absolute = px relatif ke parent. Constraints (kanan/tengah/skala) butuh ukuran parent → aturan responsif T1.10.4.
-function position(value: NonNullable<Style["position"]>, out: Declaration[]): void {
-  if (value.type !== "absolute") return;
-  out.push(["position", "absolute"], ["left", `${value.x}px`], ["top", `${value.y}px`]);
+// ED-098/DM-028: nilai px fixed dari Dimension (constraints butuh W/H & PW/PH dalam px); selain itu undefined.
+export function fixedPx(dimension: NonNullable<Style["size"]>["width"]): number | undefined {
+  return dimension && dimension.mode === "fixed" && dimension.unit === "px" ? dimension.value : undefined;
+}
+
+export interface AbsoluteBox {
+  x: number;
+  y: number;
+  width?: number | undefined;
+  height?: number | undefined;
+}
+type Horizontal = "left" | "right" | "leftRight" | "center" | "scale";
+type Vertical = "top" | "bottom" | "topBottom" | "center" | "scale";
+
+const px = (value: number) => `${Math.round(value)}px`;
+const pct = (ratio: number) => `${Math.round(ratio * 1000) / 10}%`;
+
+function horizontalConstraint(
+  kind: Horizontal,
+  x: number,
+  w: number | undefined,
+  pw: number | undefined,
+): Declaration[] {
+  const right = pw !== undefined && w !== undefined ? pw - x - w : undefined;
+  switch (kind) {
+    case "right":
+      return right !== undefined ? [["right", px(right)]] : [["left", px(x)]];
+    case "leftRight":
+      return right !== undefined
+        ? [
+            ["left", px(x)],
+            ["right", px(right)],
+            ["width", "auto"],
+          ]
+        : [["left", px(x)]];
+    case "center":
+      return pw !== undefined
+        ? [
+            ["left", "50%"],
+            ["margin-left", px(x - pw / 2)],
+          ]
+        : [["left", px(x)]];
+    case "scale":
+      return pw !== undefined && pw > 0
+        ? w !== undefined
+          ? [
+              ["left", pct(x / pw)],
+              ["width", pct(w / pw)],
+            ]
+          : [["left", pct(x / pw)]]
+        : [["left", px(x)]];
+    default:
+      return [["left", px(x)]];
+  }
+}
+
+function verticalConstraint(kind: Vertical, y: number, h: number | undefined, ph: number | undefined): Declaration[] {
+  const bottom = ph !== undefined && h !== undefined ? ph - y - h : undefined;
+  switch (kind) {
+    case "bottom":
+      return bottom !== undefined ? [["bottom", px(bottom)]] : [["top", px(y)]];
+    case "topBottom":
+      return bottom !== undefined
+        ? [
+            ["top", px(y)],
+            ["bottom", px(bottom)],
+            ["height", "auto"],
+          ]
+        : [["top", px(y)]];
+    case "center":
+      return ph !== undefined
+        ? [
+            ["top", "50%"],
+            ["margin-top", px(y - ph / 2)],
+          ]
+        : [["top", px(y)]];
+    case "scale":
+      return ph !== undefined && ph > 0
+        ? h !== undefined
+          ? [
+              ["top", pct(y / ph)],
+              ["height", pct(h / ph)],
+            ]
+          : [["top", pct(y / ph)]]
+        : [["top", px(y)]];
+    default:
+      return [["top", px(y)]];
+  }
+}
+
+/** ED-098: CSS posisi child absolute dari constraints + ukuran parent (px). Fallback Left/Top bila dimensi tak diketahui. */
+export function constraintDeclarations(
+  box: AbsoluteBox,
+  parent: { width?: number | undefined; height?: number | undefined },
+  constraints: { horizontal: Horizontal; vertical: Vertical } | undefined,
+): Declaration[] {
+  const c = constraints ?? { horizontal: "left", vertical: "top" };
+  return [
+    ...horizontalConstraint(c.horizontal, box.x, box.width, parent.width),
+    ...verticalConstraint(c.vertical, box.y, box.height, parent.height),
+  ];
+}
+
+function position(style: Style, ctx: DeclarationContext, out: Declaration[]): void {
+  const value = style.position;
+  if (value?.type !== "absolute") return;
+  out.push(["position", "absolute"]);
+  out.push(
+    ...constraintDeclarations(
+      { x: value.x, y: value.y, width: fixedPx(style.size?.width), height: fixedPx(style.size?.height) },
+      { width: ctx.parentWidth, height: ctx.parentHeight },
+      value.constraints,
+    ),
+  );
 }
 
 // DM-033: transform CSS (translate → rotate → scale); flip = skala negatif. Tidak memengaruhi layout.
@@ -278,8 +392,8 @@ export function styleDeclarations(style: Style, ctx: DeclarationContext): Declar
   if (style.typography) typography(style.typography, ctx, out);
   if (style.color) out.push(["color", colorToCss(style.color)]);
   if (style.transform) transform(style.transform, out);
-  // Terakhir: `position: absolute` menang atas `relative` dari layout none.
-  if (style.position) position(style.position, out);
+  // Terakhir: `position: absolute` menang atas `relative` dari layout none; constraints memakai ukuran parent.
+  if (style.position) position(style, ctx, out);
   // DM-039: sembunyi di breakpoint ini.
   if (style.display === "none") out.push(["display", "none"]);
   return out;

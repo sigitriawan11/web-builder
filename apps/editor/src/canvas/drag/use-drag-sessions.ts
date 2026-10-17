@@ -6,6 +6,7 @@ import {
   resolveStyle,
   runCommand,
   runCommands,
+  type StylePatch,
   step,
   updateStyle,
 } from "@platform/document-model";
@@ -19,6 +20,7 @@ import { nodeLookupFrom } from "../../tools/select/node-lookup";
 import { resolveClickSelection } from "../../tools/select/selection-depth";
 import { unionBounds } from "../align";
 import { cameraStore } from "../camera-store";
+import { type Constraints, propagateConstraints } from "../constraints";
 import { screenDeltaToWorld, screenPoint, screenToWorld } from "../geometry/coordinates";
 import type { GeometryStore, WorldRect } from "../geometry/geometry-store";
 import type { InteractionState } from "../interactions/interaction-machine";
@@ -297,6 +299,37 @@ export function useDragSessions(deps: DragSessionDeps): void {
       previewStore.getState().setGuides([]);
     };
 
+    // ED-098: setelah frame freeform di-resize, reposisi/skalakan child absolute sesuai constraints masing-masing.
+    const propagateConstraintsToChildren = (frameId: string, startRect: WorldRect, patch: StylePatch) => {
+      const frame = deps.nodeStore.getNode(frameId);
+      if (!frame || !("children" in frame)) return;
+      // Auto-layout reflow sendiri; hanya frame freeform yang perlu propagasi.
+      if (resolveStyle(frame.style, "base").layout?.mode === "flex") return;
+      const dimValue = (dim: unknown): number | undefined =>
+        dim && typeof dim === "object" && "value" in dim && typeof dim.value === "number" ? dim.value : undefined;
+      const from = { width: startRect.width, height: startRect.height };
+      const to = {
+        width: dimValue(patch.size?.width) ?? startRect.width,
+        height: dimValue(patch.size?.height) ?? startRect.height,
+      };
+      if (from.width === to.width && from.height === to.height) return;
+
+      for (const childId of frame.children) {
+        const child = deps.nodeStore.getNode(childId);
+        const position = child ? resolveStyle(child.style, "base").position : undefined;
+        if (position?.type !== "absolute") continue;
+        const rect = deps.geometry.peekRect(childId);
+        const box = { x: position.x, y: position.y, width: rect?.width ?? 0, height: rect?.height ?? 0 };
+        const next = propagateConstraints(box, position.constraints as Constraints | undefined, from, to);
+        const childPatch: StylePatch = { position: { x: next.x, y: next.y } };
+        const size: NonNullable<StylePatch["size"]> = {};
+        if (next.width !== box.width) size.width = { mode: "fixed", value: next.width, unit: "px" };
+        if (next.height !== box.height) size.height = { mode: "fixed", value: next.height, unit: "px" };
+        if (size.width || size.height) childPatch.size = size;
+        runCommand(deps.opContext, updateStyle, { ids: [childId], patch: childPatch });
+      }
+    };
+
     const unsubscribeState = interactionStore.subscribe(({ state }) => {
       if (state.type === "dragResize") {
         const patch = resizePatchFor(state);
@@ -370,12 +403,17 @@ export function useDragSessions(deps: DragSessionDeps): void {
       }
 
       if (drag.type !== "dragResize") return;
+      const startRect = resizing?.nodeId === drag.nodeId ? resizing.start : null;
       const patch = effect.type === "commit" ? resizePatchFor(drag) : null;
       resizing = null;
       // Commit dulu, baru buang preview: keduanya di-batch React, jadi tidak ada kedipan ukuran lama.
       if (patch) {
         deps.undoBoundary();
-        runCommand(deps.opContext, updateStyle, { ids: [drag.nodeId], patch });
+        deps.opContext.doc.transact(() => {
+          runCommand(deps.opContext, updateStyle, { ids: [drag.nodeId], patch });
+          // ED-098: parent di-resize → reposisi child absolute sesuai constraints (frame freeform).
+          if (startRect) propagateConstraintsToChildren(drag.nodeId, startRect, patch);
+        }, deps.opContext.origin);
         deps.undoBoundary();
       }
       previewStore.getState().clear([drag.nodeId]);

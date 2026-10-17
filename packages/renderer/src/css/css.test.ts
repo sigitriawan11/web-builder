@@ -3,7 +3,7 @@ import { heroDocument, richTextDocument, styledDocument } from "@platform/docume
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { render } from "../render";
-import { type DeclarationContext, nodeDeclarations, styleDeclarations } from "./declarations";
+import { constraintDeclarations, type DeclarationContext, nodeDeclarations, styleDeclarations } from "./declarations";
 import { buildPageStyles } from "./stylesheet";
 import { tokenDeclarations, usedTokens } from "./tokens";
 import { cssString, tokenVarName } from "./values";
@@ -258,5 +258,56 @@ describe("pemetaan style → CSS (spec 07 §4.2)", () => {
 
   it("string CSS di-escape (nama font, URL)", () => {
     expect(cssString('Font "Aneh"\nBaris')).toBe('"Font \\"Aneh\\"\\a Baris"');
+  });
+});
+
+describe("constraintDeclarations (ED-098)", () => {
+  const box = { x: 10, y: 20, width: 40, height: 30 };
+  const parent = { width: 200, height: 100 };
+  const decl = (h: Parameters<typeof constraintDeclarations>[2]) =>
+    Object.fromEntries(constraintDeclarations(box, parent, h));
+
+  it("default Left/Top → jarak dari tepi kiri/atas", () => {
+    expect(decl(undefined)).toEqual({ left: "10px", top: "20px" });
+  });
+
+  it("Right/Bottom → jarak ke kanan/bawah (PW−X−W, PH−Y−H)", () => {
+    expect(decl({ horizontal: "right", vertical: "bottom" })).toEqual({ right: "150px", bottom: "50px" });
+  });
+
+  it("Left&Right / Top&Bottom → melar, width/height auto", () => {
+    expect(decl({ horizontal: "leftRight", vertical: "topBottom" })).toEqual({
+      left: "10px",
+      right: "150px",
+      width: "auto",
+      top: "20px",
+      bottom: "50px",
+      height: "auto",
+    });
+  });
+
+  it("Center → 50% + margin (X−PW/2, Y−PH/2)", () => {
+    expect(decl({ horizontal: "center", vertical: "center" })).toEqual({
+      left: "50%",
+      "margin-left": "-90px",
+      top: "50%",
+      "margin-top": "-30px",
+    });
+  });
+
+  it("Scale → posisi & ukuran persen dari parent", () => {
+    expect(decl({ horizontal: "scale", vertical: "scale" })).toEqual({
+      left: "5%",
+      width: "20%",
+      top: "20%",
+      height: "30%",
+    });
+  });
+
+  it("tanpa ukuran parent → fallback Left/Top", () => {
+    expect(Object.fromEntries(constraintDeclarations(box, {}, { horizontal: "right", vertical: "bottom" }))).toEqual({
+      left: "10px",
+      top: "20px",
+    });
   });
 });

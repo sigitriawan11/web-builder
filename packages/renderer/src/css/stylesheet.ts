@@ -9,6 +9,7 @@ import { type AutoResponsiveOptions, applyAutoResponsive } from "../responsive/a
 import {
   childLayoutOf,
   type Declaration,
+  fixedPx,
   nodeDeclarations,
   type ParentLayout,
   styleDeclarations,
@@ -135,27 +136,41 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
     mobile: applyAutoResponsive(tree, "mobile", doc.settings.autoResponsive, fonts),
   };
 
+  type ParentBox = { width?: number | undefined; height?: number | undefined };
   // Arti `fill` bergantung arah parent DI BREAKPOINT YANG SAMA (mis. row di desktop, stack di mobile).
-  const visit = (nodeId: string, parents: Record<Breakpoint, ParentLayout>) => {
+  const visit = (
+    nodeId: string,
+    parents: Record<Breakpoint, ParentLayout>,
+    parentBoxes: Record<Breakpoint, ParentBox>,
+  ) => {
     const node = doc.nodes[nodeId];
     if (!node?.visible) return;
     const declarations = {} as Record<Breakpoint, Declaration[]>;
     const childParents = {} as Record<Breakpoint, ParentLayout>;
+    const childBoxes = {} as Record<Breakpoint, ParentBox>;
     for (const bp of BREAKPOINTS) {
       const style =
         (bp === "base" ? undefined : auto[bp].styleOf(nodeId)) ?? resolveStyle(node.style, bp, { theme: doc.theme });
-      const ctx = { parent: parents[bp], theme: doc.theme, assetUrl: options.assetUrl };
+      const ctx = {
+        parent: parents[bp],
+        theme: doc.theme,
+        assetUrl: options.assetUrl,
+        parentWidth: parentBoxes[bp].width,
+        parentHeight: parentBoxes[bp].height,
+      };
       declarations[bp] = [
         ...nodeDeclarations(node, style),
         ...styleDeclarations(style, ctx),
         ...(bp === "base" ? [] : auto[bp].declarationsOf(nodeId)),
       ];
       childParents[bp] = childLayoutOf(style);
+      childBoxes[bp] = { width: fixedPx(style.size?.width), height: fixedPx(style.size?.height) };
     }
     assign(nodeId, declarations);
-    if ("children" in node) for (const childId of node.children) visit(childId, childParents);
+    if ("children" in node) for (const childId of node.children) visit(childId, childParents, childBoxes);
   };
-  visit(options.pageId, { base: "block", tablet: "block", mobile: "block" });
+  const noBox: Record<Breakpoint, ParentBox> = { base: {}, tablet: {}, mobile: {} };
+  visit(options.pageId, { base: "block", tablet: "block", mobile: "block" }, noBox);
 
   // Variabel token: base di root; varian responsif di breakpoint (token tidak perlu re-render node, PUB-043).
   const used = usedTokens(doc);

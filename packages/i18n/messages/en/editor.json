@@ -194,7 +194,18 @@
     "maxWidthShort": "Max W",
     "minHeightShort": "Min H",
     "maxHeightShort": "Max H",
-    "absolutePosition": "Absolute position"
+    "absolutePosition": "Absolute position",
+    "constraints": "Constraints",
+    "constraintH": "Horizontal constraint",
+    "constraintV": "Vertical constraint",
+    "constraint_left": "Left",
+    "constraint_right": "Right",
+    "constraint_leftRight": "Left & right",
+    "constraint_center": "Center",
+    "constraint_scale": "Scale",
+    "constraint_top": "Top",
+    "constraint_bottom": "Bottom",
+    "constraint_topBottom": "Top & bottom"
   },
   "nodeType": {
     "page": "Page",

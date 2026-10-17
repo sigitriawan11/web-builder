@@ -103,6 +103,27 @@ export function PositionSizeSection({
     runtime.undo.stopCapturing();
   };
 
+  // ED-098: constraints horizontal/vertikal untuk node absolute (default Left/Top).
+  const constraintsOf = (node: Node) => {
+    const pos = resolveStyle(node.style, "base").position;
+    return pos?.type === "absolute" ? pos.constraints : undefined;
+  };
+  const hConstraint = mixedValue(nodes.map((node) => constraintsOf(node)?.horizontal ?? "left"));
+  const vConstraint = mixedValue(nodes.map((node) => constraintsOf(node)?.vertical ?? "top"));
+  const setConstraint = (axis: "horizontal" | "vertical", value: string) => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runtime.doc.transact(() => {
+      for (const node of nodes) {
+        if (resolveStyle(node.style, "base").position?.type !== "absolute") continue;
+        const current = constraintsOf(node) ?? { horizontal: "left", vertical: "top" };
+        const constraints = { ...current, [axis]: value };
+        runCommand(ctx(), updateStyle, { ids: [node.id], patch: { position: { constraints } } });
+      }
+    }, runtime.origin);
+    runtime.undo.stopCapturing();
+  };
+
   // ED-084: mode sizing per sumbu (Fixed / Hug / Fill). Fixed memakai nilai terukur sebagai titik awal.
   const sizeModeValue = (axis: "width" | "height") =>
     mixedValue(nodes.map((node) => resolveStyle(node.style, "base").size?.[axis]?.mode ?? "fixed"));
@@ -231,7 +252,67 @@ export function PositionSizeSection({
           ))}
         </div>
       </InspectorRow>
+      {isAbsolute ? (
+        <InspectorRow label={t("inspector.constraints")}>
+          <div className="grid grid-cols-2 gap-1">
+            <ConstraintSelect
+              axis="horizontal"
+              value={hConstraint}
+              options={["left", "right", "leftRight", "center", "scale"]}
+              readOnly={readOnly}
+              onChange={setConstraint}
+            />
+            <ConstraintSelect
+              axis="vertical"
+              value={vConstraint}
+              options={["top", "bottom", "topBottom", "center", "scale"]}
+              readOnly={readOnly}
+              onChange={setConstraint}
+            />
+          </div>
+        </InspectorRow>
+      ) : null}
     </InspectorSection>
+  );
+}
+
+// ED-098: pemilih constraint per sumbu (Left/Right/Both/Center/Scale, dst.).
+type ConstraintValue = "left" | "right" | "leftRight" | "center" | "scale" | "top" | "bottom" | "topBottom";
+
+function ConstraintSelect({
+  axis,
+  value,
+  options,
+  readOnly,
+  onChange,
+}: {
+  axis: "horizontal" | "vertical";
+  value: ReturnType<typeof mixedValue>;
+  options: readonly ConstraintValue[];
+  readOnly: boolean;
+  onChange: (axis: "horizontal" | "vertical", value: string) => void;
+}) {
+  const t = useT();
+  return (
+    <select
+      aria-label={t(axis === "horizontal" ? "inspector.constraintH" : "inspector.constraintV")}
+      data-testid={`inspector-constraint-${axis}`}
+      disabled={readOnly}
+      value={isMixed(value) ? "" : String(value)}
+      onChange={(event) => onChange(axis, event.target.value)}
+      className="h-7 min-w-0 rounded border border-transparent bg-muted/50 px-1 text-xs hover:border-border focus:border-ring"
+    >
+      {isMixed(value) ? (
+        <option value="" disabled>
+          {t("inspector.mixed")}
+        </option>
+      ) : null}
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {t(`inspector.constraint_${option}`)}
+        </option>
+      ))}
+    </select>
   );
 }
 
