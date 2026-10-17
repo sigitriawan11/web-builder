@@ -16,6 +16,14 @@ const typographyOf = (page: Page, id: string) =>
     return docu?.nodes[nid]?.style?.base?.typography ?? null;
   }, id);
 
+const typographyAutoSize = (page: Page, id: string) =>
+  page.evaluate((nid) => {
+    const docu = window.__editorTestApi?.getDoc() as
+      | { nodes: Record<string, { props?: { autoSize?: string } }> }
+      | undefined;
+    return docu?.nodes[nid]?.props?.autoSize ?? null;
+  }, id);
+
 test("AC ED-117: ubah size & weight → tersimpan di node & tercermin di canvas", async ({ page }) => {
   await page.goto(`${APP_URL}/sites`);
   await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Typography Test")}`);
@@ -120,4 +128,27 @@ test("AC ED-120: italic, underline, uppercase → tersimpan & tercermin di canva
   await expect(node).toHaveCSS("font-style", "italic");
   await expect(node).toHaveCSS("text-transform", "uppercase");
   expect(await node.evaluate((el) => getComputedStyle(el).textDecorationLine)).toContain("underline");
+});
+
+test("AC ED-123: auto-resize teks (auto width → hug + nowrap)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Text Sizing Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const canvas = page.getByTestId("editor-canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("canvas tidak terlihat");
+
+  await page.keyboard.press("t");
+  await page.mouse.click(box.x + 80, box.y + 80);
+  const textId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  await expect(canvas.locator(`[data-node-id="${textId}"] .ProseMirror`)).toBeFocused();
+  await page.keyboard.type("Halo dunia");
+  await page.keyboard.press("Escape");
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), textId);
+
+  await page.getByTestId("tsize-width").click(); // auto width
+  await expect.poll(() => typographyAutoSize(page, textId)).toBe("width");
+  await expect(canvas.locator(`[data-node-id="${textId}"]`)).toHaveCSS("white-space", "nowrap");
 });

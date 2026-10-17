@@ -1062,7 +1062,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 - [x] **T2.11.6** List bullet & numbered — ED-121 · `apps/editor`, `packages/renderer` · Verifikasi: snapshot HTML `<ul>/<ol>`
   - Catatan (2026-10-17): schema (DM-013), converter Yjs↔JSON (`yjs/rich-text`), & renderer (`rich-text.tsx` → `<ul>/<ol>/<li>`) sudah mendukung list; hanya extension Tiptap yang dimatikan. Diaktifkan `bulletList`/`orderedList`/`listItem`/`listKeymap` (StarterKit) → buat via input rule `- `/`1. ` + keymap. **Toolbar tombol list ditunda** (butuh toolbar teks; menyusul T2.11.9). Verifikasi: renderer snapshot `<ul>/<ol>` (sudah ada `render.test`), round-trip converter list bersarang (`yjs/rich-text.test`), e2e ketik `- ` → `<ul><li>` + content `bulletList`.
 - [ ] **T2.11.7** Link pada teks (LinkValue: URL, page, anchor, email, phone, WhatsApp) — ED-122, DM-056 · `apps/editor` · Verifikasi: e2e; sanitasi URL
-- [ ] **T2.11.8** Text auto-resize (auto width, auto height, fixed) — ED-123 · `apps/editor` · Verifikasi: e2e
+- [x] **T2.11.8** Text auto-resize (auto width, auto height, fixed) — ED-123 · `apps/editor` · Verifikasi: e2e
+  - Catatan (2026-10-17): toggle 3 mode di `TypographySection` — auto width (size W/H hug + `props.autoSize="width"` → renderer `white-space:nowrap`), auto height (W fixed dari rect terukur, H hug), fixed (W&H fixed). Renderer `nodeDeclarations` text + autoSize width → nowrap. Verifikasi: unit renderer (`css.test`) + e2e `editor-typography` (auto width → autoSize width + nowrap). Edge-case auto-responsive (auto width → auto height di mobile) = DM-038 (M4).
 - [ ] **T2.11.9** Rich text per range (marks per seleksi teks: warna, weight, size) — ED-125 · `apps/editor` · Verifikasi: e2e
 - [ ] **T2.11.10** Token warna & typography dasar dapat dipilih di input (subset M2 dari ED-129) — ED-129, DM-041 · `apps/editor` · Verifikasi: e2e pilih `color.primary` → ref `$token` tersimpan
 

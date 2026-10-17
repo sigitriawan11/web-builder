@@ -1,4 +1,4 @@
-import type { SiteDocument, Style } from "@platform/document-model";
+import type { Node, SiteDocument, Style } from "@platform/document-model";
 import { heroDocument, richTextDocument, styledDocument } from "@platform/document-model/fixtures";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -307,6 +307,25 @@ describe("interaction states (DM-040)", () => {
     const after = styles(heroDocument());
     expect(after.css).toBe(before.css);
     expect(after.classOf("n_hero000001")).toBe(before.classOf("n_hero000001"));
+  });
+});
+
+describe("text auto-resize (ED-123)", () => {
+  const textNode = (autoSize?: "width" | "height" | "none"): Node =>
+    ({
+      id: "n_text000001",
+      type: "text",
+      name: "Text",
+      parentId: null,
+      visible: true,
+      props: { content: { type: "doc", content: [] }, ...(autoSize ? { autoSize } : {}) },
+      style: { base: {} },
+    }) as unknown as Node;
+
+  it("auto width → white-space:nowrap; auto height & fixed tidak", () => {
+    expect(Object.fromEntries(nodeDeclarations(textNode("width"), {}))["white-space"]).toBe("nowrap");
+    expect(Object.fromEntries(nodeDeclarations(textNode("height"), {}))).not.toHaveProperty("white-space");
+    expect(Object.fromEntries(nodeDeclarations(textNode("none"), {}))).not.toHaveProperty("white-space");
   });
 });
 

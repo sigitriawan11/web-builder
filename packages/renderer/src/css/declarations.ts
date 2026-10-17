@@ -444,6 +444,8 @@ export function nodeDeclarations(node: Node, style: Style): Declaration[] {
       out.push(["color", "inherit"], ["text-decoration", "none"]);
     }
   }
+  // ED-123: text auto width = tidak wrap (lebar mengikuti konten). Auto height/fixed = wrap normal.
+  if (node.type === "text" && node.props.autoSize === "width") out.push(["white-space", "nowrap"]);
   if (node.type === "image") out.push(["display", "block"], ["object-fit", node.props.fit]);
   // DM-016: shape ellipse = lingkaran/oval lewat border-radius; rect/line memakai radius/stroke dari style.
   if (node.type === "shape" && node.props.shape === "ellipse") out.push(["border-radius", "50%"]);

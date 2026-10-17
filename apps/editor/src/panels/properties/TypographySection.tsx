@@ -1,4 +1,12 @@
-import { addFont, applyStylePatch, type Node, resolveStyle, runCommand, updateStyle } from "@platform/document-model";
+import {
+  addFont,
+  applyStylePatch,
+  type Node,
+  resolveStyle,
+  runCommand,
+  setNodeProps,
+  updateStyle,
+} from "@platform/document-model";
 import { cn, Input, Popover, PopoverContent, PopoverTrigger } from "@platform/ui";
 import {
   AlignCenterIcon,
@@ -8,8 +16,11 @@ import {
   AlignVerticalJustifyCenterIcon,
   AlignVerticalJustifyEndIcon,
   AlignVerticalJustifyStartIcon,
+  ArrowLeftRightIcon,
+  ArrowUpDownIcon,
   ChevronDownIcon,
   ItalicIcon,
+  SquareIcon,
   StrikethroughIcon,
   UnderlineIcon,
 } from "lucide-react";
@@ -122,6 +133,35 @@ export function TypographySection({
   const italicOn = !isMixed(fontStyle) && fontStyle === "italic";
   const underlineOn = !isMixed(decoration) && decoration === "underline";
   const strikeOn = !isMixed(decoration) && decoration === "lineThrough";
+
+  // ED-123: auto-resize teks (auto width / auto height / fixed) = mode size + prop autoSize.
+  const autoSize = mixedValue(
+    texts.map((node) => (node.type === "text" ? (node.props.autoSize ?? "none") : undefined)),
+  );
+  const setAutoSize = (mode: "width" | "height" | "none") => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runtime.doc.transact(() => {
+      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      for (const node of texts) {
+        const rect = runtime.geometry.store.peekRect(node.id);
+        const w = Math.round(rect?.width ?? 120);
+        const h = Math.round(rect?.height ?? 40);
+        const size =
+          mode === "width"
+            ? { width: { mode: "hug" as const }, height: { mode: "hug" as const } }
+            : mode === "height"
+              ? { width: { mode: "fixed" as const, value: w, unit: "px" as const }, height: { mode: "hug" as const } }
+              : {
+                  width: { mode: "fixed" as const, value: w, unit: "px" as const },
+                  height: { mode: "fixed" as const, value: h, unit: "px" as const },
+                };
+        runCommand(ctx, updateStyle, { ids: [node.id], patch: { size } });
+        runCommand(ctx, setNodeProps, { id: node.id, patch: { autoSize: mode } });
+      }
+    }, runtime.origin);
+    runtime.undo.stopCapturing();
+  };
 
   // ED-119: horizontal = typography.textAlign; vertical = style.textAlignVertical (updateStyle langsung).
   const textAlign = mixedValue(texts.map((node) => effective(node)?.textAlign as string | undefined));
@@ -246,6 +286,20 @@ export function TypographySection({
           />
         </div>
       </InspectorRow>
+      <InspectorRow label={t("inspector.textSizing")}>
+        <ToggleButtons
+          label={t("inspector.textSizing")}
+          name="tsize"
+          value={isMixed(autoSize) ? null : ((autoSize as string | undefined) ?? "none")}
+          readOnly={readOnly}
+          onChange={(value) => setAutoSize(value as "width" | "height" | "none")}
+          options={[
+            { id: "width", icon: <ArrowLeftRightIcon className="size-3.5" />, title: t("inspector.sizing_width") },
+            { id: "height", icon: <ArrowUpDownIcon className="size-3.5" />, title: t("inspector.sizing_height") },
+            { id: "none", icon: <SquareIcon className="size-3.5" />, title: t("inspector.sizing_fixed") },
+          ]}
+        />
+      </InspectorRow>
       <InspectorRow label={t("inspector.textDecoration")}>
         <div className="flex items-center gap-1">
           <IconToggle
@@ -335,12 +389,14 @@ function ToggleButtons({
   options,
   readOnly,
   onChange,
+  name = "talign",
 }: {
   label: string;
   value: string | null;
   options: readonly { id: string; icon: ReactNode; title: string }[];
   readOnly: boolean;
   onChange: (value: string) => void;
+  name?: string;
 }) {
   return (
     <div role="toolbar" aria-label={label} className="flex gap-0.5">
@@ -352,7 +408,7 @@ function ToggleButtons({
           aria-pressed={value === option.id}
           aria-label={option.title}
           title={option.title}
-          data-testid={`talign-${option.id}`}
+          data-testid={`${name}-${option.id}`}
           onClick={() => onChange(option.id)}
           className={cn(
             "flex size-7 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40",
