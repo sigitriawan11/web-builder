@@ -239,6 +239,8 @@ const styleShape = {
   transform: TransformSchema,
   // DM-031/ED-110: opacity layer node (0–1).
   opacity: z.number().min(0).max(1),
+  // DM-031/ED-108: efek bayangan (drop/inner, multi).
+  effects: z.array(ShadowSchema).max(8),
 };
 
 // DM-034: strict — tidak ada `customCss`/`className`/key tak dikenal; kebutuhan baru = field schema + migrasi.

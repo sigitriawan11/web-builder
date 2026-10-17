@@ -379,3 +379,112 @@ test("T2.10.8 ED-110: opacity layer via input & shortcut angka 1–0", async ({ 
   await page.keyboard.press("0");
   await expect.poll(opacityDoc).toBe(1);
 });
+
+test("T2.10.5 ED-106: stroke tambah/warna/tebal/posisi", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Stroke Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            position: { type: "absolute", x: 20, y: 20 },
+            size: {
+              width: { mode: "fixed", value: 100, unit: "px" },
+              height: { mode: "fixed", value: 100, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  const inspector = page.getByTestId("inspector");
+  const strokeDoc = () =>
+    page.evaluate((id) => {
+      const d = window.__editorTestApi?.getDoc() as {
+        nodes: Record<
+          string,
+          { style: { base: { strokes?: { color?: string; width?: { value?: number }; position?: string }[] } } }
+        >;
+      };
+      return d?.nodes[id]?.style.base.strokes?.[0];
+    }, frame);
+  const canvasNode = page.getByTestId("editor-canvas").locator(`[data-node-id="${frame}"]`);
+
+  // Tambah stroke → border 1px solid hitam (posisi default inside).
+  await inspector.getByTestId("stroke-add").click();
+  await expect.poll(strokeDoc).toMatchObject({ width: { value: 1 } });
+  await expect(canvasNode).toHaveCSS("border-top-width", "1px");
+
+  // Tebal 3.
+  await inspector.getByTestId("stroke-width").fill("3");
+  await inspector.getByTestId("stroke-width").press("Enter");
+  await expect.poll(async () => (await strokeDoc())?.width?.value).toBe(3);
+
+  // Posisi outside → outline (bukan border).
+  await inspector.getByTestId("stroke-position").selectOption("outside");
+  await expect.poll(async () => (await strokeDoc())?.position).toBe("outside");
+  await expect(canvasNode).toHaveCSS("outline-style", "solid");
+});
+
+test("T2.10.7 ED-108: effects drop shadow (tambah, atur, inner, hapus)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Effects Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            position: { type: "absolute", x: 20, y: 20 },
+            size: {
+              width: { mode: "fixed", value: 100, unit: "px" },
+              height: { mode: "fixed", value: 100, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  const inspector = page.getByTestId("inspector");
+  const effects = () =>
+    page.evaluate((id) => {
+      const d = window.__editorTestApi?.getDoc() as {
+        nodes: Record<string, { style: { base: { effects?: { type?: string; blur?: number }[] } } }>;
+      };
+      return d?.nodes[id]?.style.base.effects ?? [];
+    }, frame);
+  const canvasNode = page.getByTestId("editor-canvas").locator(`[data-node-id="${frame}"]`);
+
+  // Tambah drop shadow → box-shadow muncul.
+  await inspector.getByTestId("effect-add").click();
+  await expect.poll(async () => (await effects())[0]?.type).toBe("dropShadow");
+  await expect(canvasNode).not.toHaveCSS("box-shadow", "none");
+
+  // Atur blur 10.
+  await inspector.getByTestId("effect-blur-0").fill("10");
+  await inspector.getByTestId("effect-blur-0").press("Enter");
+  await expect.poll(async () => (await effects())[0]?.blur).toBe(10);
+
+  // Ganti ke inner shadow → box-shadow inset.
+  await inspector.getByTestId("effect-type-0").selectOption("innerShadow");
+  await expect.poll(async () => (await effects())[0]?.type).toBe("innerShadow");
+  await expect(canvasNode).toHaveCSS("box-shadow", /inset/);
+
+  // Hapus → kosong.
+  await inspector.getByTestId("effect-remove-0").click();
+  await expect.poll(() => effects()).toEqual([]);
+});

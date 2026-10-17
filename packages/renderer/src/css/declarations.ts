@@ -346,6 +346,17 @@ export function constraintDeclarations(
   ];
 }
 
+// DM-031: efek bayangan → `box-shadow` (innerShadow = `inset`); layer tersembunyi dilewati.
+function effects(value: NonNullable<Style["effects"]>, out: Declaration[]): void {
+  const visible = value.filter((shadow) => shadow.visible !== false);
+  if (visible.length === 0) return;
+  const shadows = visible.map((shadow) => {
+    const inset = shadow.type === "innerShadow" ? "inset " : "";
+    return `${inset}${shadow.x}px ${shadow.y}px ${shadow.blur}px ${shadow.spread ?? 0}px ${colorToCss(shadow.color)}`;
+  });
+  out.push(["box-shadow", shadows.join(", ")]);
+}
+
 function position(style: Style, ctx: DeclarationContext, out: Declaration[]): void {
   const value = style.position;
   if (value?.type !== "absolute") return;
@@ -391,6 +402,8 @@ export function styleDeclarations(style: Style, ctx: DeclarationContext): Declar
   if (style.radius) radius(style.radius, out);
   if (style.typography) typography(style.typography, ctx, out);
   if (style.color) out.push(["color", colorToCss(style.color)]);
+  // DM-031/ED-108: efek bayangan → box-shadow (innerShadow = inset).
+  if (style.effects) effects(style.effects, out);
   // DM-031/ED-110: opacity layer (0 valid → cek undefined).
   if (style.opacity !== undefined) out.push(["opacity", String(style.opacity)]);
   if (style.transform) transform(style.transform, out);
