@@ -205,6 +205,9 @@ export const ShadowSchema = z.strictObject({
   visible: z.boolean().optional(),
 });
 
+// DM-031/ED-108: efek bayangan node (drop/inner, multi).
+export const EffectsSchema = z.array(ShadowSchema).max(8);
+
 // ── Transform (DM-033) — tidak memengaruhi layout (CSS transform) ────────────
 
 const transformShape = {
@@ -219,6 +222,34 @@ const transformShape = {
 };
 export const TransformSchema = z.strictObject(transformShape).partial();
 const TransformPatchSchema = z.strictObject(patchShape(transformShape));
+
+// ── Interaction states (DM-040) — hover & pressed (P0 · M2); focus/active/disabled (P1) ─────────
+// Hanya properti non-layout yang diizinkan agar state tidak menggeser layout: fills, strokes, effects,
+// opacity, color, typography, transform. `strictObject` otomatis menolak key lain (layout/size/position/dll).
+const stateStyleShape = {
+  fills: FillsSchema,
+  strokes: StrokesSchema,
+  effects: EffectsSchema,
+  opacity: z.number().min(0).max(1),
+  color: ColorSchema,
+};
+export const StateStylePatchSchema = z.strictObject({
+  ...patchShape(stateStyleShape),
+  typography: z.optional(z.nullable(TypographyPatchSchema)),
+  transform: z.optional(z.nullable(TransformPatchSchema)),
+});
+
+// Satu state, cascade breakpoint desktop-first (base → tablet → mobile) seperti style biasa.
+const StateVariantSchema = z.strictObject({
+  base: StateStylePatchSchema.optional(),
+  tablet: StateStylePatchSchema.optional(),
+  mobile: StateStylePatchSchema.optional(),
+});
+
+export const StatesSchema = z.strictObject({
+  hover: StateVariantSchema.optional(),
+  pressed: StateVariantSchema.optional(),
+});
 
 // ── Style & responsive (DM-036) ────────────────────────────────────────────
 
@@ -240,7 +271,7 @@ const styleShape = {
   // DM-031/ED-110: opacity layer node (0–1).
   opacity: z.number().min(0).max(1),
   // DM-031/ED-108: efek bayangan (drop/inner, multi).
-  effects: z.array(ShadowSchema).max(8),
+  effects: EffectsSchema,
 };
 
 // DM-034: strict — tidak ada `customCss`/`className`/key tak dikenal; kebutuhan baru = field schema + migrasi.
@@ -263,6 +294,9 @@ export const ResponsiveStyleSchema = z.strictObject({
   base: StyleSchema,
   tablet: StylePatchSchema.optional(),
   mobile: StylePatchSchema.optional(),
+  // DM-040: variasi style per interaction state (hover/pressed). Parallel dengan breakpoint; tiap state punya
+  // cascade base/tablet/mobile sendiri.
+  states: StatesSchema.optional(),
 });
 
 export type Padding = z.infer<typeof PaddingSchema>;
@@ -278,6 +312,10 @@ export type Shadow = z.infer<typeof ShadowSchema>;
 export type Transform = z.infer<typeof TransformSchema>;
 export type TypographyStyle = z.infer<typeof TypographyStyleSchema>;
 export type Typography = z.infer<typeof TypographySchema>;
+export type Shadows = z.infer<typeof EffectsSchema>;
 export type Style = z.infer<typeof StyleSchema>;
 export type StylePatch = z.infer<typeof StylePatchSchema>;
+export type StateStylePatch = z.infer<typeof StateStylePatchSchema>;
+export type States = z.infer<typeof StatesSchema>;
+export type StateName = keyof States;
 export type ResponsiveStyle = z.infer<typeof ResponsiveStyleSchema>;

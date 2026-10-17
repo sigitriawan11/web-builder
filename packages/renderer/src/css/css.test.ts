@@ -276,6 +276,40 @@ describe("pemetaan style → CSS (spec 07 §4.2)", () => {
   });
 });
 
+describe("interaction states (DM-040)", () => {
+  function docWithStates() {
+    const doc = heroDocument();
+    const hero = doc.nodes.n_hero000001;
+    if (hero?.type !== "frame") throw new Error("fixture berubah");
+    hero.style.states = {
+      hover: { base: { fills: [{ type: "solid", color: "#ff0000" }] } },
+      pressed: { base: { opacity: 0.5 } },
+    };
+    return doc;
+  }
+
+  it("publish: hover dibungkus @media(hover:hover); pressed → :active", () => {
+    const page = styles(docWithStates());
+    const cls = page.classOf("n_hero000001");
+    expect(cls).toBeDefined();
+    expect(page.css).toContain(`@media (hover:hover){.${cls}:hover{background-color:#ff0000}}`);
+    expect(page.css).toContain(`.${cls}:active{opacity:0.5}`);
+  });
+
+  it("editor target: tidak mengemisikan aturan state (force-preview = task editor terpisah)", () => {
+    const css = buildPageStyles(docWithStates(), { pageId: "pg_home000001", assetUrl, target: "editor" }).css;
+    expect(css).not.toContain(":hover");
+    expect(css).not.toContain(":active");
+  });
+
+  it("tanpa states: nama class & CSS tidak berubah (signature stabil)", () => {
+    const before = styles(heroDocument());
+    const after = styles(heroDocument());
+    expect(after.css).toBe(before.css);
+    expect(after.classOf("n_hero000001")).toBe(before.classOf("n_hero000001"));
+  });
+});
+
 describe("constraintDeclarations (ED-098)", () => {
   const box = { x: 10, y: 20, width: 40, height: 30 };
   const parent = { width: 200, height: 100 };

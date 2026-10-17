@@ -1,5 +1,5 @@
 import { mergeStyle } from "../commands/merge-style";
-import { type ResponsiveStyle, type Style, type StylePatch, StyleSchema, type Theme } from "../schema";
+import { type ResponsiveStyle, type StateName, type Style, type StylePatch, StyleSchema, type Theme } from "../schema";
 import { isTokenRef } from "../schema/values";
 import { resolveToken, TokenResolveError } from "./tokens";
 
@@ -46,6 +46,26 @@ export function resolveStyle(style: ResponsiveStyle, breakpoint: Breakpoint, ctx
   const tablet = style.tablet ? applyStylePatch(style.base, style.tablet, at(breakpoint)) : style.base;
   if (breakpoint === "tablet" || !style.mobile) return tablet;
   return applyStylePatch(tablet, style.mobile, at("mobile"));
+}
+
+/**
+ * DM-040: style override untuk satu interaction state di satu breakpoint. Mengembalikan HANYA properti yang
+ * di-override state (bukan style penuh) — karena CSS pseudo-class (`:hover`/`:active`) mewarisi aturan base dan
+ * hanya menimpa properti yang berubah. Cascade breakpoint sama dengan `resolveStyle` (base → tablet → mobile).
+ */
+export function resolveStateStyle(
+  style: ResponsiveStyle,
+  breakpoint: Breakpoint,
+  state: StateName,
+  ctx: { theme?: Theme } = {},
+): Style {
+  const variant = style.states?.[state];
+  if (!variant) return {};
+  const at = (bp: Breakpoint): StyleContext => ({ ...ctx, breakpoint: bp });
+  let result: Style = variant.base ? applyStylePatch({}, variant.base, at("base")) : {};
+  if (breakpoint !== "base" && variant.tablet) result = applyStylePatch(result, variant.tablet, at("tablet"));
+  if (breakpoint === "mobile" && variant.mobile) result = applyStylePatch(result, variant.mobile, at("mobile"));
+  return result;
 }
 
 /**

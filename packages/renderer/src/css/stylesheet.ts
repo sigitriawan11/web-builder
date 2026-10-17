@@ -1,8 +1,10 @@
 import {
   type AutoRuleId,
   type BreakpointDef,
+  resolveStateStyle,
   resolveStyle,
   type SiteDocument,
+  type StateName,
   tokenEntry,
 } from "@platform/document-model";
 import { type AutoResponsiveOptions, applyAutoResponsive } from "../responsive/auto-responsive";
@@ -106,13 +108,33 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
   const classByNode = new Map<string, string>();
   const classBySignature = new Map<string, string>();
   const rules: Record<Breakpoint, string[]> = { base: [], tablet: [], mobile: [] };
+  // DM-040: aturan interaction state. hover dibungkus `@media (hover:hover)` (jangan aktif di sentuh); pressed = `:active`.
+  const hoverRules: Record<Breakpoint, string[]> = { base: [], tablet: [], mobile: [] };
+  const pressedRules: Record<Breakpoint, string[]> = { base: [], tablet: [], mobile: [] };
 
-  const assign = (nodeId: string, perBreakpoint: Record<Breakpoint, Declaration[]>) => {
+  type StateDecls = Record<StateName, Record<Breakpoint, Declaration[]>>;
+  const STATE_PSEUDO: Record<StateName, { pseudo: string; bucket: Record<Breakpoint, string[]> }> = {
+    hover: { pseudo: ":hover", bucket: hoverRules },
+    pressed: { pseudo: ":active", bucket: pressedRules },
+  };
+
+  const assign = (nodeId: string, perBreakpoint: Record<Breakpoint, Declaration[]>, states: StateDecls | null) => {
     const tablet = overrideDeclarations(perBreakpoint.base, perBreakpoint.tablet);
     const mobile = overrideDeclarations(perBreakpoint.tablet, perBreakpoint.mobile);
     const base = [...asMap(perBreakpoint.base)];
-    if (base.length + tablet.length + mobile.length === 0) return;
-    const signature = JSON.stringify([base, tablet, mobile]);
+    // Override state per breakpoint (desktop-first), dihitung seperti base. Null bila node tak punya states.
+    const stateParts = states
+      ? (Object.keys(STATE_PSEUDO) as StateName[]).map((name) => ({
+          name,
+          base: [...asMap(states[name].base)],
+          tablet: overrideDeclarations(states[name].base, states[name].tablet),
+          mobile: overrideDeclarations(states[name].tablet, states[name].mobile),
+        }))
+      : null;
+    const hasState = !!stateParts?.some((part) => part.base.length + part.tablet.length + part.mobile.length > 0);
+    if (base.length + tablet.length + mobile.length === 0 && !hasState) return;
+    // Signature identik dengan sebelum states bila node tak punya state → nama class lama tetap stabil (snapshot).
+    const signature = JSON.stringify(hasState ? [base, tablet, mobile, stateParts] : [base, tablet, mobile]);
     let className = classBySignature.get(signature);
     if (!className) {
       className = `s-${hash(signature)}`;
@@ -124,6 +146,12 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
       const scoped = (bp: Overrides) => (target === "editor" ? `.bp-${bp} .${className}` : `.${className}`);
       if (tablet.length > 0) rules.tablet.push(declarationsToCss(scoped("tablet"), tablet));
       if (mobile.length > 0) rules.mobile.push(declarationsToCss(scoped("mobile"), mobile));
+      for (const part of stateParts ?? []) {
+        const { pseudo, bucket } = STATE_PSEUDO[part.name];
+        if (part.base.length > 0) bucket.base.push(declarationsToCss(`.${className}${pseudo}`, part.base));
+        if (part.tablet.length > 0) bucket.tablet.push(declarationsToCss(`.${className}${pseudo}`, part.tablet));
+        if (part.mobile.length > 0) bucket.mobile.push(declarationsToCss(`.${className}${pseudo}`, part.mobile));
+      }
     }
     classByNode.set(nodeId, className);
   };
@@ -166,7 +194,22 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
       childParents[bp] = childLayoutOf(style);
       childBoxes[bp] = { width: fixedPx(style.size?.width), height: fixedPx(style.size?.height) };
     }
-    assign(nodeId, declarations);
+    // DM-040: state hanya dirender untuk publish (editor memakai force-preview — task editor terpisah).
+    let states: StateDecls | null = null;
+    if (target === "publish" && node.style.states) {
+      states = { hover: {} as Record<Breakpoint, Declaration[]>, pressed: {} as Record<Breakpoint, Declaration[]> };
+      for (const name of Object.keys(STATE_PSEUDO) as StateName[]) {
+        for (const bp of BREAKPOINTS) {
+          const override = resolveStateStyle(node.style, bp, name, { theme: doc.theme });
+          states[name][bp] = styleDeclarations(override, {
+            parent: parents[bp],
+            theme: doc.theme,
+            assetUrl: options.assetUrl,
+          });
+        }
+      }
+    }
+    assign(nodeId, declarations, states);
     if ("children" in node) for (const childId of node.children) visit(childId, childParents, childBoxes);
   };
   const noBox: Record<Breakpoint, ParentBox> = { base: {}, tablet: {}, mobile: {} };
@@ -184,10 +227,16 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
     return declarationsToCss(target === "editor" ? `.bp-${bp}` : rootSelector, tokens[bp]);
   };
 
+  // DM-040: hover dibungkus `@media (hover:hover)`. Urutan dalam satu breakpoint: base → :hover → :active
+  // (konvensi LVHA; :active menang saat hover+press bersamaan).
+  const hoverWrap = (body: string) => (body ? `@media (hover:hover){${body}}` : "");
+  const blockFor = (bp: Breakpoint) =>
+    rules[bp].join("") + hoverWrap(hoverRules[bp].join("")) + pressedRules[bp].join("");
+
   // Urutan: base → tablet → mobile (cascade desktop-first); satu blok per breakpoint (PUB-042).
-  let css = tokenRule("base") + rules.base.join("");
+  let css = tokenRule("base") + blockFor("base");
   for (const bp of ["tablet", "mobile"] as const) {
-    const body = tokenRule(bp) + rules[bp].join("");
+    const body = tokenRule(bp) + blockFor(bp);
     if (!body) continue;
     css += target === "editor" ? body : `${mediaQuery(doc.settings.breakpoints, bp)}{${body}}`;
   }

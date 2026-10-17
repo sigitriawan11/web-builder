@@ -9,6 +9,7 @@ export {
   BREAKPOINTS,
   type Breakpoint,
   createStyleResolver,
+  resolveStateStyle,
   resolveStyle,
   type StyleContext,
 } from "./resolve-style";
