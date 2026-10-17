@@ -1,4 +1,5 @@
 import StarterKit from "@tiptap/starter-kit";
+import { LinkMark } from "./link-mark";
 import { TextStyleMark } from "./text-style-mark";
 
 // Hanya node & mark yang ada di schema rich text dokumen (DM-013); sisanya dimatikan.
@@ -17,4 +18,5 @@ export const richTextExtensions = [
     undoRedo: false,
   }),
   TextStyleMark,
+  LinkMark,
 ];

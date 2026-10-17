@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { useT } from "../../app/i18n";
 import { ColorInput } from "../../panels/properties/color/ColorInput";
 import { NumberInput } from "../../panels/properties/inputs/NumberInput";
+import { LinkPopover } from "./LinkPopover";
 
 // ED-122/ED-125: toolbar seleksi teks (bubble) hand-rolled. Editor berada di shadow root canvas; toolbar di-portal
 // ke document.body (fixed, koordinat dari `coordsAtPos`) agar style chrome editor berlaku & tidak terpotong.
@@ -138,6 +139,8 @@ export function BubbleToolbar({ editor }: { editor: Editor | null }) {
           </option>
         ))}
       </select>
+      <span aria-hidden className="mx-0.5 h-5 w-px bg-border" />
+      <LinkPopover editor={editor} />
     </div>,
     document.body,
   );

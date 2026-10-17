@@ -114,3 +114,36 @@ test("AC ED-125: textStyle per range (size & weight) via bubble toolbar", async 
   await expect.poll(() => contentText(page, textId)).toContain("fontWeight");
   // Warna per range dites round-trip di converter (yjs/rich-text.test); popover color diuji di e2e color picker.
 });
+
+test("AC ED-122: tautan teks (URL) + sanitasi javascript: ditolak", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Text Link Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const canvas = page.getByTestId("editor-canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("canvas tidak terlihat");
+
+  await page.keyboard.press("t");
+  await page.mouse.click(box.x + 80, box.y + 80);
+  const textId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  await expect(canvas.locator(`[data-node-id="${textId}"] .ProseMirror`)).toBeFocused();
+  await page.keyboard.type("Halo");
+  await page.keyboard.press("Shift+Home");
+  await expect(page.getByTestId("text-bubble-toolbar")).toBeVisible();
+
+  await page.getByTestId("mark-link").click();
+  // Sanitasi: javascript: ditolak oleh LinkValueSchema → tidak jadi link.
+  await page.getByTestId("link-value").fill("javascript:alert(1)");
+  await page.getByTestId("link-apply").click();
+  await expect(page.getByTestId("link-value")).toHaveAttribute("aria-invalid", "true");
+  expect(await contentText(page, textId)).not.toContain("link");
+
+  // URL valid → mark link tersimpan.
+  await page.getByTestId("link-value").fill("https://contoh.id/promo");
+  await page.getByTestId("link-apply").click();
+  await expect.poll(() => contentText(page, textId)).toContain("contoh.id/promo");
+  expect(await contentText(page, textId)).toContain("link");
+  expect(await contentText(page, textId)).not.toContain("javascript");
+});
