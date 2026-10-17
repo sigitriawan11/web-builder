@@ -15,7 +15,7 @@ import {
   StickyNoteIcon,
   TypeIcon,
 } from "lucide-react";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { type NodeRendererProps, Tree } from "react-arborist";
 import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
@@ -38,8 +38,18 @@ interface LayerActions {
   readOnly: boolean;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
+  // ED-143: klik dengan modifier — Shift = rentang, Mod = toggle, selain itu seleksi tunggal.
+  onRowClick: (id: string, event: { shiftKey: boolean; metaKey: boolean; ctrlKey: boolean }) => void;
 }
 const LayerActionsContext = createContext<LayerActions | null>(null);
+
+function flattenIds(nodes: readonly LayerNode[], out: string[] = []): string[] {
+  for (const node of nodes) {
+    out.push(node.id);
+    if (node.children) flattenIds(node.children, out);
+  }
+  return out;
+}
 
 // ED-136: tree layers virtualized (react-arborist). Seleksi ikut store seleksi canvas (dua arah).
 export function LayersPanel({
@@ -55,6 +65,26 @@ export function LayersPanel({
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const flatIds = useMemo(() => flattenIds(tree), [tree]);
+  const onRowClick: LayerActions["onRowClick"] = (id, event) => {
+    const store = selectionStore.getState();
+    const anchor = store.anchorId;
+    if (event.shiftKey && anchor) {
+      const a = flatIds.indexOf(anchor);
+      const b = flatIds.indexOf(id);
+      if (a >= 0 && b >= 0) {
+        const [lo, hi] = a < b ? [a, b] : [b, a];
+        store.select(flatIds.slice(lo, hi + 1));
+        return;
+      }
+    }
+    if (event.metaKey || event.ctrlKey) {
+      const current = store.selectedIds;
+      store.select(current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
+      return;
+    }
+    store.select([id]);
+  };
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return;
@@ -66,7 +96,7 @@ export function LayersPanel({
   }, []);
 
   return (
-    <LayerActionsContext.Provider value={{ runtime, readOnly, editingId, setEditingId }}>
+    <LayerActionsContext.Provider value={{ runtime, readOnly, editingId, setEditingId, onRowClick }}>
       <div ref={containerRef} className="min-h-0 flex-1" data-testid="layers-tree">
         {size.height > 0 ? (
           <Tree<LayerNode>
@@ -119,7 +149,9 @@ function LayerRow({ node, style }: NodeRendererProps<LayerNode>) {
       aria-expanded={node.isInternal ? node.isOpen : undefined}
       tabIndex={-1}
       data-testid={`layer-${node.id}`}
-      onClick={() => selectionStore.getState().select([node.id])}
+      onClick={(event) =>
+        actions?.onRowClick(node.id, { shiftKey: event.shiftKey, metaKey: event.metaKey, ctrlKey: event.ctrlKey })
+      }
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();

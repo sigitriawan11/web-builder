@@ -93,3 +93,36 @@ test("AC ED-137/ED-139: rename (F2/dbl-click), toggle visibility & lock di baris
   await page.getByTestId(`layer-lock-${frame}`).click();
   await expect.poll(() => nodeField(page, frame, "locked")).toBe(true);
 });
+
+test("AC ED-143: multi-select Shift (rentang) & Mod (toggle) di layers", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layer Multiselect Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await firstPageId(page);
+  const ids: string[] = [];
+  for (let i = 0; i < 3; i++) {
+    ids.push(
+      String(
+        (
+          await editorCommand(page, "createNode", {
+            parentId: pageId,
+            type: "frame",
+            style: { base: { position: { type: "absolute", x: 40 + i * 40, y: 40 }, size: sizeFixed(60, 60) } },
+          })
+        ).value,
+      ),
+    );
+  }
+  const [a, b, c] = ids;
+  const sel = () => page.evaluate(() => (window.__editorTestApi?.getSelection() ?? []).slice().sort());
+
+  await expect(page.getByTestId(`layer-${c}`)).toBeVisible();
+  // Shift dari c ke a → seluruh rentang (3 node).
+  await page.getByTestId(`layer-${c}`).click();
+  await page.getByTestId(`layer-${a}`).click({ modifiers: ["Shift"] });
+  await expect.poll(sel).toEqual([a, b, c].sort());
+  // Mod+klik b → toggle keluar.
+  await page.getByTestId(`layer-${b}`).click({ modifiers: ["ControlOrMeta"] });
+  await expect.poll(sel).toEqual([a, c].sort());
+});
