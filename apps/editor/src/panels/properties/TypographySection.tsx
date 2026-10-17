@@ -8,7 +8,17 @@ import { type CatalogFont, catalogFont, catalogFontDef, searchFonts } from "../.
 import { loadSiteFont } from "../../canvas/fonts/site-fonts";
 import { useDocTheme } from "../../document/use-doc-theme";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
+import { NumberInput } from "./inputs/NumberInput";
 import { isMixed, mixedValue } from "./mixed";
+
+// ED-117: weight umum yang ditawarkan (font tetap fallback bila weight spesifik tak termuat).
+const WEIGHTS = [300, 400, 500, 600, 700, 800] as const;
+const lengthValue = (value: unknown): number | undefined =>
+  typeof value === "number"
+    ? value
+    : value && typeof value === "object" && "value" in value
+      ? Number(value.value)
+      : undefined;
 
 // ED-116: picker font family. Font di-load dari Fontsource dengan nama family mentah (cocok dengan output renderer
 // `fontStack`), bukan ber-namespace (itu khusus font dasar canvas). Preview weight 400 saja (lazy, saat terlihat).
@@ -44,33 +54,116 @@ export function TypographySection({
   const current = mixed ? null : (value as string) || null;
   const registered = new Set((theme?.fonts ?? []).map((font) => font.family.toLowerCase()));
 
-  const selectFamily = (font: CatalogFont) => {
+  // Typography efektif node (token komposit di-expand lewat theme → objek literal), untuk menampilkan nilai saat ini.
+  const effective = (node: Node): Record<string, unknown> | undefined => {
+    const typography = applyStylePatch(
+      resolveStyle(node.style, "base"),
+      { typography: {} },
+      theme ? { theme } : {},
+    ).typography;
+    return typography && !("$token" in typography) ? (typography as Record<string, unknown>) : undefined;
+  };
+  const fieldOf = (node: Node, key: string) => lengthValue(effective(node)?.[key]);
+  const fieldValue = (key: string) => mixedValue(texts.map((node) => fieldOf(node, key)));
+
+  // Terapkan patch typography ke semua text node (satu transaksi = satu undo). Token di-expand dulu (DM-032) agar
+  // field lain tidak hilang. `before` dipakai untuk aksi tambahan (mis. addFont) di transaksi yang sama.
+  const commitTypography = (
+    make: (node: Node) => Record<string, unknown>,
+    before?: (ctx: { doc: typeof runtime.doc; origin: typeof runtime.origin }) => void,
+  ) => {
     if (readOnly) return;
-    // Muat untuk canvas (nama mentah + semua weight yang dipakai) agar langsung terlihat.
-    loadPreview(font.family);
-    void loadSiteFont(document.fonts, font.family, font.weights, FontFace, font.family).catch(() => {});
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
       const ctx = { doc: runtime.doc, origin: runtime.origin };
-      if (!registered.has(font.family.toLowerCase())) runCommand(ctx, addFont, catalogFontDef(font));
+      before?.(ctx);
+      const ctxTheme = theme ? { theme } : {};
       for (const node of texts) {
-        // Bila typography node berupa token komposit (mis. `type.body`), ekspansi dulu lewat theme agar ukuran/
-        // weight tidak hilang (mergeStyle tanpa theme mengganti token utuh — DM-032). applyStylePatch meng-expand.
-        const base = resolveStyle(node.style, "base");
-        const ctxTheme = theme ? { theme } : {};
-        const typography = applyStylePatch(base, { typography: { fontFamily: font.family } }, ctxTheme).typography ?? {
-          fontFamily: font.family,
-        };
+        const partial = make(node);
+        const typography =
+          applyStylePatch(resolveStyle(node.style, "base"), { typography: partial }, ctxTheme).typography ?? partial;
         runCommand(ctx, updateStyle, { ids: [node.id], patch: { typography } });
       }
     }, runtime.origin);
     runtime.undo.stopCapturing();
   };
 
+  const selectFamily = (font: CatalogFont) => {
+    // Muat untuk canvas (nama mentah + semua weight yang dipakai) agar langsung terlihat.
+    loadPreview(font.family);
+    void loadSiteFont(document.fonts, font.family, font.weights, FontFace, font.family).catch(() => {});
+    commitTypography(
+      () => ({ fontFamily: font.family }),
+      (ctx) => {
+        if (!registered.has(font.family.toLowerCase())) runCommand(ctx, addFont, catalogFontDef(font));
+      },
+    );
+  };
+
+  const weightMixed = fieldValue("fontWeight");
+
   return (
     <InspectorSection id="typography" title={t("inspector.typography")}>
       <InspectorRow label={t("inspector.font")}>
         <FontFamilyPicker value={current} mixed={mixed} readOnly={readOnly} onSelect={selectFamily} />
+      </InspectorRow>
+      <InspectorRow label={t("inspector.fontWeight")}>
+        <select
+          aria-label={t("inspector.fontWeight")}
+          data-testid="font-weight"
+          disabled={readOnly}
+          value={isMixed(weightMixed) ? "" : String(weightMixed ?? "")}
+          onChange={(event) => commitTypography(() => ({ fontWeight: Number(event.target.value) }))}
+          className="h-7 w-full rounded border border-transparent bg-muted/50 px-1 text-xs hover:border-border focus:border-ring"
+        >
+          {isMixed(weightMixed) || weightMixed === undefined ? <option value="" disabled /> : null}
+          {WEIGHTS.map((weight) => (
+            <option key={weight} value={weight}>
+              {weight}
+            </option>
+          ))}
+        </select>
+      </InspectorRow>
+      <InspectorRow label={t("inspector.fontSizeLineHeight")}>
+        <div className="grid grid-cols-2 gap-1">
+          <NumberInput
+            label={t("inspector.fontSize")}
+            scrubLabel="S"
+            value={fieldValue("fontSize")}
+            min={1}
+            testId="font-size"
+            onCommit={(update) =>
+              commitTypography((node) => ({
+                fontSize: { value: Math.max(1, update(fieldOf(node, "fontSize") ?? 16)), unit: "px" as const },
+              }))
+            }
+          />
+          <NumberInput
+            label={t("inspector.lineHeight")}
+            scrubLabel="LH"
+            value={fieldValue("lineHeight")}
+            min={0}
+            precision={2}
+            testId="line-height"
+            onCommit={(update) =>
+              commitTypography((node) => ({ lineHeight: Math.max(0, update(fieldOf(node, "lineHeight") ?? 1.5)) }))
+            }
+          />
+        </div>
+      </InspectorRow>
+      <InspectorRow label={t("inspector.letterSpacing")}>
+        <NumberInput
+          label={t("inspector.letterSpacing")}
+          scrubLabel="LS"
+          value={fieldValue("letterSpacing")}
+          precision={1}
+          testId="letter-spacing"
+          onCommit={(update) =>
+            commitTypography((node) => ({
+              letterSpacing: { value: update(fieldOf(node, "letterSpacing") ?? 0), unit: "px" as const },
+            }))
+          }
+        />
       </InspectorRow>
     </InspectorSection>
   );
