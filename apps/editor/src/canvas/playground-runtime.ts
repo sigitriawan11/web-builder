@@ -1,4 +1,12 @@
-import { createNode, deleteNodes, jsonToYDoc, moveNode, runCommand, updateStyle } from "@platform/document-model";
+import {
+  createNode,
+  deleteNodes,
+  jsonToYDoc,
+  moveNode,
+  runCommand,
+  setLink,
+  updateStyle,
+} from "@platform/document-model";
 import { interactionStore } from "../store/interaction-store";
 import { selectionStore } from "../store/selection-store";
 import { marqueeSelection } from "../tools/select/marquee-selection";
@@ -31,7 +39,7 @@ export function exposeDevApi(runtime: CanvasRuntime): void {
   Object.assign(window, {
     __spike: {
       doc: runtime.doc,
-      ops: { createNode, moveNode, updateStyle, deleteNodes },
+      ops: { createNode, moveNode, updateStyle, deleteNodes, setLink },
       run: (op: Parameters<typeof runCommand>[1], input: unknown) =>
         runCommand({ doc: runtime.doc, origin: runtime.origin }, op, input),
       // Dipakai E2E & benchmark canvas (T0.4.6, T0.7.3).

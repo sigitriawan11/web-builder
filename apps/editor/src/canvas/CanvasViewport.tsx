@@ -29,6 +29,7 @@ import { useClipboardShortcuts } from "./interactions/use-clipboard-shortcuts";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLockHide } from "./interactions/use-lock-hide";
 import { useMeasure } from "./interactions/use-measure";
+import { useNodeLinkShortcut } from "./interactions/use-node-link-shortcut";
 import { useNudge } from "./interactions/use-nudge";
 import { useOpacityShortcut } from "./interactions/use-opacity-shortcut";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
@@ -108,6 +109,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useClipboardShortcuts(runtime);
   useBreakpointShortcut();
   usePreviewShortcut();
+  useNodeLinkShortcut(runtime);
   useSelectionNav(runtime);
   useSelectAll(runtime);
   useLockHide(runtime);

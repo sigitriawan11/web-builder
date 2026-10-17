@@ -27,6 +27,8 @@ const FIXTURES: Record<string, () => SiteDocument> = {
   responsive10: () => responsiveSectionsDocument().document,
   // T2.3.5: 2 page × ~1.000 node untuk benchmark switch page.
   pages1000: () => benchPagesDocument(1000),
+  // T2.15.4: 2 page kecil untuk uji navigasi link antar page di preview.
+  pages2: () => benchPagesDocument(16),
 };
 
 export const DEFAULT_FIXTURE = "landing200";
