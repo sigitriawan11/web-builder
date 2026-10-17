@@ -30,6 +30,7 @@ import { Inspector } from "../panels/properties/Inspector";
 import { uiPreferencesStore } from "../store/ui-preferences";
 import { setTelemetryScope } from "../telemetry/telemetry";
 import { BottomBar } from "./chrome/BottomBar";
+import { DocumentLimitBanner } from "./chrome/DocumentLimitBanner";
 import { Toolbar } from "./chrome/Toolbar";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { useT } from "./i18n";
@@ -104,6 +105,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
         {t("toolbar.narrowScreen")}
       </p>
       <ProfileLocaleSync />
+      {workspace.runtime ? <DocumentLimitBanner runtime={workspace.runtime} /> : null}
       {session ? <SessionBanners session={session} status={status} /> : null}
       {session ? <EditAccessGate session={session} /> : null}
       <div

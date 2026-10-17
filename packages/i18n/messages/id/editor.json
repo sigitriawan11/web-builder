@@ -348,7 +348,8 @@
     "nodeLimit": "Disarankan ≤ {soft} node per page; maksimal {hard}.",
     "online": "Online",
     "offline": "Offline",
-    "show": "Tampilkan bar bawah"
+    "show": "Tampilkan bar bawah",
+    "limitBanner": "Halaman ini punya {count} elemen (batas nyaman {soft}). Pertimbangkan pecah jadi beberapa page atau pakai component."
   },
   "pages": {
     "add": "Tambah page",

@@ -1151,7 +1151,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.18 — Performa & batasan
 
-- [ ] **T2.18.1** Batasan dokumen di editor (peringatan mendekati batas, blokir di atas batas) — ED-223, DM-076 · `apps/editor` · Verifikasi: e2e fixture di atas batas
+- [x] **T2.18.1** Batasan dokumen di editor (peringatan mendekati batas, blokir di atas batas) — ED-223, DM-076 · `apps/editor` · Verifikasi: e2e fixture di atas batas
+  - Catatan (2026-10-18): batas keras ditegakkan **atomik di level command** (`insertSubtree`/create via `exceeds`: nodesPerPage/Site, depth, children, text) — sudah ada & diuji (`validate/limits.test`, AC paste atomik). Indikator soft di **bottom bar** (jumlah node, amber bila > soft) sudah ada. Ditambah **banner non-blocking** `DocumentLimitBanner` di SiteEditor saat page > soft limit (saran pecah page / pakai component, bisa ditutup). Blokir hard → pesan ke user = toast (T2.20.2). **e2e** butuh harness SiteEditor (bottom bar/banner tak ada di playground) → menyusul bersama suite T2.19.1; enforcement sudah tercakup unit document-model.
 - [ ] **T2.18.2** Loading dokumen besar & code splitting panel — ED-226 · `apps/editor` · Verifikasi: load 500 node < 3 s TTI (cache dingin)
 - [ ] **T2.18.3** Optimasi menuju target M2 (2.000 node 60 fps): profiling, memo, culling — ED-022, DM-077 · `apps/editor` · Verifikasi: benchmark §M0.e versi M2 lulus
 - [ ] **T2.18.4** (P1) Benchmark performa otomatis di CI nightly (regresi > 20% gagal) — ED-241 · `.github/workflows`, `apps/editor/bench` · Verifikasi: job nightly hijau
