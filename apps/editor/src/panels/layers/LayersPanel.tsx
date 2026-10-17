@@ -1,4 +1,4 @@
-import { type Node, renameNode, runCommand, setLocked, setVisible } from "@platform/document-model";
+import { moveNode, type Node, renameNode, runCommand, setLocked, setVisible } from "@platform/document-model";
 import { cn } from "@platform/ui";
 import {
   ChevronDownIcon,
@@ -20,7 +20,7 @@ import { type NodeRendererProps, Tree, type TreeApi } from "react-arborist";
 import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
-import { type LayerNode, useLayerTree } from "../../document/use-layer-tree";
+import { docDropIndex, type LayerNode, useLayerTree } from "../../document/use-layer-tree";
 import { selectionStore } from "../../store/selection-store";
 
 // ED-141: ikon per tipe node.
@@ -82,6 +82,38 @@ export function LayersPanel({
     if (!api) return;
     for (const id of containerIds(data)) (open ? api.open : api.close).call(api, id);
   };
+  // ED-138: drag reorder/reparent. react-arborist index = urutan tampilan (Figma); dikonversi ke index dokumen.
+  // Node yang ditarik di-reparent lewat moveNode (validasi cycle/limit di command); drop hanya ke container.
+  const handleMove = ({ dragIds, parentId, index }: { dragIds: string[]; parentId: string | null; index: number }) => {
+    if (readOnly || dragIds.length === 0) return;
+    const targetParentId = parentId ?? pageId;
+    const parent = runtime.nodeStore.getNode(targetParentId);
+    if (!parent || !("children" in parent)) return;
+    const remaining = parent.children.filter((id) => !dragIds.includes(id));
+    const base = docDropIndex(remaining.length, index);
+    runtime.undo.stopCapturing();
+    runtime.doc.transact(() => {
+      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      const parentRect = runtime.geometry.store.peekRect(targetParentId);
+      // Urutan dokumen node yang ditarik = kebalikan urutan tampilan.
+      [...dragIds].reverse().forEach((id, offset) => {
+        const rect = runtime.geometry.store.peekRect(id);
+        const measured =
+          rect && parentRect
+            ? { node: { x: rect.x, y: rect.y }, newParent: { x: parentRect.x, y: parentRect.y } }
+            : undefined;
+        runCommand(ctx, moveNode, {
+          id,
+          newParentId: targetParentId,
+          index: base + offset,
+          keepVisualPosition: true,
+          ...(measured ? { measured } : {}),
+        });
+      });
+    }, runtime.origin);
+    runtime.undo.stopCapturing();
+  };
+
   // ED-140: buka otomatis ke node terseleksi (buka semua ancestornya).
   useEffect(() => {
     const expand = (ids: readonly string[]) => {
@@ -131,9 +163,8 @@ export function LayersPanel({
             rowHeight={24}
             indent={12}
             openByDefault
-            disableDrag
-            disableDrop
             disableMultiSelection
+            onMove={handleMove}
           >
             {LayerRow}
           </Tree>
@@ -143,7 +174,7 @@ export function LayersPanel({
   );
 }
 
-function LayerRow({ node, style }: NodeRendererProps<LayerNode>) {
+function LayerRow({ node, style, dragHandle }: NodeRendererProps<LayerNode>) {
   const t = useT();
   const actions = useContext(LayerActionsContext);
   const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
@@ -168,6 +199,7 @@ function LayerRow({ node, style }: NodeRendererProps<LayerNode>) {
 
   return (
     <div
+      ref={dragHandle}
       style={style}
       role="treeitem"
       aria-selected={selected}

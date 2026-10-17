@@ -15,6 +15,12 @@ export interface LayerNode {
   children?: LayerNode[];
 }
 
+// ED-138: react-arborist memberi index di urutan TAMPILAN (Figma = kebalikan dokumen). Konversi ke index dokumen
+// akhir: display 0 (atas) = dokumen terakhir. `remaining` = jumlah anak parent tujuan tanpa node yang ditarik.
+export function docDropIndex(remaining: number, displayIndex: number): number {
+  return Math.max(0, Math.min(remaining, remaining - displayIndex));
+}
+
 export function buildLayerTree(store: NodeStore, pageId: string): LayerNode[] {
   const build = (id: string): LayerNode | null => {
     const node = store.getNode(id);
