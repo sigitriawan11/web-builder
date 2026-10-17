@@ -8,6 +8,7 @@ import { clearBreakpointOverrides, setBreakpointOverride, setLayoutMode, setSett
 import { duplicateNodes, insertSubtree } from "./subtree";
 import { addFont, deleteToken, renameToken, setToken } from "./theme";
 import { updateStyle } from "./update-style";
+import { wrapInFrame } from "./wrap-in-frame";
 
 export {
   type CommandContext,
@@ -49,6 +50,7 @@ export {
   setVisible,
   updatePage,
   updateStyle,
+  wrapInFrame,
 };
 
 /** Registry command (DM-073): sumber daftar tool AI (`aiExposed`) & dokumentasi. */

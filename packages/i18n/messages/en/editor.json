@@ -362,7 +362,8 @@
     }
   },
   "sections": {
-    "pageNotDeletable": "The page can't be deleted from here. Use the Pages panel."
+    "pageNotDeletable": "The page can't be deleted from here. Use the Pages panel.",
+    "wrapSameParent": "Select layers with the same parent to wrap them in a frame."
   },
   "autoLayout": {
     "sameParentRequired": "Select layers with the same parent to add auto layout."

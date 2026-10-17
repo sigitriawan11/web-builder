@@ -362,7 +362,8 @@
     }
   },
   "sections": {
-    "pageNotDeletable": "Halaman tidak bisa dihapus dari sini. Gunakan panel Pages."
+    "pageNotDeletable": "Halaman tidak bisa dihapus dari sini. Gunakan panel Pages.",
+    "wrapSameParent": "Pilih layer dengan parent yang sama untuk membungkus dalam frame."
   },
   "autoLayout": {
     "sameParentRequired": "Pilih layer dengan parent yang sama untuk menambah auto layout."

@@ -1096,7 +1096,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
   - Catatan (2026-10-17): Ikon per tipe node (`TYPE_ICON` di `LayerRow`). Verifikasi: tampil di e2e `editor-layers`.
 - [x] **T2.13.7** Multi-select & keyboard di layers (Shift range, Mod toggle, panah) — ED-143 · `apps/editor/src/panels/layers` · Verifikasi: e2e
   - Catatan (2026-10-17): Shift=rentang & Mod=toggle di `LayersPanel` (atas urutan flatten tree) → `selectionStore`. e2e `editor-layers`. Navigasi panah di panel layers ditunda (polish kecil; selection-nav canvas sudah ada).
-- [ ] **T2.13.8** Frame selection / wrap in frame (`Mod+Alt+G`) — ED-146 · `apps/editor/src/commands` · Verifikasi: unit test command `wrapInFrame`
+- [x] **T2.13.8** Frame selection / wrap in frame (`Mod+Alt+G`) — ED-146 · `apps/editor/src/commands` · Verifikasi: unit test command `wrapInFrame`
+  - Catatan (2026-10-17): command document-model **`wrapInFrame`** (validasi parent sama; freeform `rect` → frame bbox absolute, auto-layout → Hug; posisi anak jadi relatif via moveNode keepVisualPosition). Shortcut `Mod+Alt+G` (`use-wrap-shortcut`) hitung bbox dari geometry (lokal parent), toast bila parent beda. Verifikasi: unit `wrap-in-frame.test` (3) + e2e `editor-layers` (ED-146).
 - [ ] **T2.13.9** (P1) Group & ungroup (sesuai keputusan OPEN 02#6) + node `group` — ED-144, ED-145, DM-012 · `apps/editor`, `packages/document-model` · Verifikasi: unit test; e2e `Mod+G`
 - [ ] **T2.13.10** (P1) Search & filter layers — ED-142 · `apps/editor/src/panels/layers` · Verifikasi: e2e
 

@@ -34,6 +34,7 @@ import { usePixelGridShortcut } from "./interactions/use-pixel-grid-shortcut";
 import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
 import { useSelectAll } from "./interactions/use-select-all";
 import { useSelectionNav } from "./interactions/use-selection-nav";
+import { useWrapShortcut } from "./interactions/use-wrap-shortcut";
 import { useZoomInteractions } from "./interactions/use-zoom-interactions";
 import { useZoomShortcuts } from "./interactions/use-zoom-shortcuts";
 import { canvasStyleSheet, isolationFromSearch, PREFIX_ROOT_CLASS, siteCssFromSearch } from "./isolation";
@@ -100,6 +101,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useZoomInteractions(viewportRef);
   useZoomShortcuts(runtime);
   useSectionShortcuts(runtime);
+  useWrapShortcut(runtime);
   useSelectionNav(runtime);
   useSelectAll(runtime);
   useLockHide(runtime);

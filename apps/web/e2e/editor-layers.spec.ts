@@ -162,3 +162,46 @@ test("AC ED-140: collapse frame → anak tersembunyi; select anak di canvas → 
   await page.evaluate((id) => window.__editorTestApi?.select([id]), child);
   await expect(page.getByTestId(`layer-${child}`)).toBeVisible();
 });
+
+test("AC ED-146: Mod+Alt+G membungkus seleksi dalam frame baru", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Wrap Frame Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const a = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: { base: { position: { type: "absolute", x: 40, y: 40 }, size: sizeFixed(80, 60) } },
+      })
+    ).value,
+  );
+  const b = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: { base: { position: { type: "absolute", x: 200, y: 120 }, size: sizeFixed(80, 60) } },
+      })
+    ).value,
+  );
+  await page.evaluate((ids) => window.__editorTestApi?.select(ids), [a, b]);
+  await page.getByTestId("editor-canvas").click({ position: { x: 5, y: 5 } }); // ensure window focus (no node at 5,5 → still selected? reselect)
+  await page.evaluate((ids) => window.__editorTestApi?.select(ids), [a, b]);
+  await page.keyboard.press("ControlOrMeta+Alt+g");
+
+  const wrapper = String((await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] ?? "");
+  const doc = await page.evaluate(
+    () =>
+      window.__editorTestApi?.getDoc() as {
+        nodes: Record<string, { type: string; parentId: string | null; children?: string[] }>;
+      },
+  );
+  expect(doc.nodes[wrapper]?.type).toBe("frame");
+  expect(doc.nodes[wrapper]?.parentId).toBe(pageId);
+  expect(doc.nodes[wrapper]?.children).toEqual([a, b]);
+  expect(doc.nodes[a]?.parentId).toBe(wrapper);
+});
