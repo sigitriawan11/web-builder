@@ -60,9 +60,15 @@ export function richTextToYXmlFragment(doc: RichTextDoc, fragment: Y.XmlFragment
 }
 
 function attributesToMarks(attributes: Record<string, unknown> | undefined): Record<string, unknown>[] {
-  return Object.entries(attributes ?? {}).map(([type, attrs]) =>
-    attrs && typeof attrs === "object" && Object.keys(attrs).length > 0 ? { type, attrs } : { type },
-  );
+  return Object.entries(attributes ?? {}).map(([type, raw]) => {
+    // y-prosemirror menserialisasi SEMUA atribut mark termasuk yang belum diisi sebagai `null`; `null` = unset,
+    // buang agar cocok skema (atribut opsional, bukan nullable) — mis. textStyle hanya `color` tanpa weight/size.
+    const attrs =
+      raw && typeof raw === "object"
+        ? Object.fromEntries(Object.entries(raw).filter(([, value]) => value !== null && value !== undefined))
+        : {};
+    return Object.keys(attrs).length > 0 ? { type, attrs } : { type };
+  });
 }
 
 function elementToBlock(element: Y.XmlElement): Record<string, unknown> {

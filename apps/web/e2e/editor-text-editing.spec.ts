@@ -84,3 +84,33 @@ test("AC ED-125: bubble toolbar pada seleksi teks → toggle bold", async ({ pag
   await page.keyboard.press("Escape");
   expect(await contentText(page, textId)).toContain("bold");
 });
+
+test("AC ED-125: textStyle per range (size & weight) via bubble toolbar", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Mark TextStyle Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const canvas = page.getByTestId("editor-canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("canvas tidak terlihat");
+
+  await page.keyboard.press("t");
+  await page.mouse.click(box.x + 80, box.y + 80);
+  const textId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  await expect(canvas.locator(`[data-node-id="${textId}"] .ProseMirror`)).toBeFocused();
+  await page.keyboard.type("Halo");
+  await page.keyboard.press("Shift+Home");
+  await expect(page.getByTestId("text-bubble-toolbar")).toBeVisible();
+
+  // Size per range (mark textStyle).
+  await page.getByTestId("mark-size").fill("28");
+  await page.getByTestId("mark-size").press("Enter");
+  await expect.poll(() => contentText(page, textId)).toContain("textStyle");
+  expect(await contentText(page, textId)).toContain("fontSize");
+
+  // Weight per range (select, tanpa popover).
+  await page.getByTestId("mark-weight").selectOption("700");
+  await expect.poll(() => contentText(page, textId)).toContain("fontWeight");
+  // Warna per range dites round-trip di converter (yjs/rich-text.test); popover color diuji di e2e color picker.
+});

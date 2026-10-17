@@ -80,6 +80,41 @@ describe("rich text ↔ Y.XmlFragment (DM-058, T0.8.5)", () => {
     expect((fragment.get(0) as Y.XmlElement).getAttributes()).toEqual({ level: 2, align: "center" });
   });
 
+  it("mark textStyle round-trip & buang atribut null (ED-125)", () => {
+    const styled: RichTextDoc = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "warna",
+              marks: [{ type: "textStyle", attrs: { color: "#ff0000", fontWeight: 700 } }],
+            },
+          ],
+        },
+      ],
+    };
+    expect(RichTextDocSchema.parse(yXmlFragmentToRichText(attached(styled).fragment))).toEqual(styled);
+
+    // y-prosemirror menulis atribut mark yang belum diisi sebagai `null` → harus dibuang, bukan disimpan.
+    const ydoc = new Y.Doc();
+    const fragment = new Y.XmlFragment();
+    ydoc.getMap("root").set("content", fragment);
+    const paragraph = new Y.XmlElement("paragraph");
+    fragment.insert(0, [paragraph]);
+    const text = new Y.XmlText();
+    paragraph.insert(0, [text]);
+    text.applyDelta([
+      { insert: "x", attributes: { textStyle: { color: "#00ff00", fontWeight: null, fontSize: null } } },
+    ]);
+    const parsed = RichTextDocSchema.parse(yXmlFragmentToRichText(fragment));
+    const block = parsed.content[0];
+    const inline = block?.type === "paragraph" ? block.content?.[0] : undefined;
+    expect(inline).toEqual({ type: "text", text: "x", marks: [{ type: "textStyle", attrs: { color: "#00ff00" } }] });
+  });
+
   it("edit teks konkuren dari dua klien digabung per karakter (bukan last-writer-wins)", () => {
     const a = jsonToYDoc(heroDocument());
     const b = new Y.Doc();
