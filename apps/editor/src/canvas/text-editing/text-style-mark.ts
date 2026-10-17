@@ -6,12 +6,17 @@ type Length = { value: number; unit: string };
 const isLength = (value: unknown): value is Length =>
   !!value && typeof value === "object" && "value" in value && typeof (value as Length).value === "number";
 
+const FONT_SIZE = /^([\d.]+)(px|rem|em|%)$/;
+// Atribut yang DIDUKUNG & diimpor dari HTML (DM-013): color, font-weight, font-size. `font-family` sengaja TIDAK
+// diimpor (paste membuang font asing, ED-125). Mark hanya dipasang bila ada ≥1 atribut didukung — kalau tidak,
+// span akan jadi mark `textStyle` kosong yang ditolak schema (RichTextDoc: textStyle wajib ≥1 atribut).
+const hasSupportedStyle = (element: HTMLElement): boolean =>
+  element.style.color !== "" || element.style.fontWeight !== "" || FONT_SIZE.test(element.style.fontSize);
+
 export const TextStyleMark = Mark.create({
   name: "textStyle",
   parseHTML() {
-    return [
-      { tag: "span", getAttrs: (node) => (node instanceof HTMLElement && node.hasAttribute("style") ? {} : false) },
-    ];
+    return [{ tag: "span", getAttrs: (node) => (node instanceof HTMLElement && hasSupportedStyle(node) ? {} : false) }];
   },
   renderHTML({ HTMLAttributes }) {
     return ["span", mergeAttributes(HTMLAttributes), 0];
@@ -32,16 +37,18 @@ export const TextStyleMark = Mark.create({
       fontSize: {
         default: null,
         parseHTML: (element) => {
-          const match = element.style.fontSize.match(/^([\d.]+)(px|rem|em|%)$/);
+          const match = FONT_SIZE.exec(element.style.fontSize);
           return match ? { value: Number(match[1]), unit: match[2] } : null;
         },
         renderHTML: (attrs) =>
           isLength(attrs.fontSize) ? { style: `font-size: ${attrs.fontSize.value}${attrs.fontSize.unit}` } : {},
       },
-      // Family per-range jarang di-set dari UI (picker family = node), tapi disimpan agar tidak hilang saat round-trip.
+      // Family per-range tidak di-set dari UI (picker family = node) & disimpan/di-round-trip lewat Yjs, bukan HTML.
+      // `parseHTML` sengaja TIDAK membaca `font-family`: paste dari Word/Docs/dll membuang font asing (ED-125), bukan
+      // mengimpornya (mis. "Comic Sans"). Attr & renderHTML tetap ada untuk nilai yang di-set programatik.
       fontFamily: {
         default: null,
-        parseHTML: (element) => element.style.fontFamily || null,
+        parseHTML: () => null,
         renderHTML: (attrs) =>
           typeof attrs.fontFamily === "string" ? { style: `font-family: ${attrs.fontFamily}` } : {},
       },
