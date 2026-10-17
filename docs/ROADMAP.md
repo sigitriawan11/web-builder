@@ -1034,9 +1034,11 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 - [ ] **T2.10.3** Image fill (cover/contain/tile, focal point) — ED-104 · `apps/editor` · Verifikasi: e2e
 - [ ] **T2.10.4** (P1) Gradient fill di document-model & renderer (UI linear di M4) — DM-029 · `packages/document-model`, `packages/renderer` · Verifikasi: unit test CSS gradient
 - [ ] **T2.10.5** Stroke (warna, tebal, posisi inside/center/outside, per sisi, dash) — ED-106, DM-030 · `apps/editor`, `packages/renderer` · Verifikasi: unit test CSS outline/box-shadow
-- [ ] **T2.10.6** Corner radius (seragam & per sudut) — ED-107 · `apps/editor` · Verifikasi: e2e
+- [x] **T2.10.6** Corner radius (seragam & per sudut) — ED-107 · `apps/editor` · Verifikasi: e2e
+  - Catatan: ✅ 2026-10-17 — `RadiusSection` (node frame/shape/image): input radius seragam + toggle ke per-sudut (TL/TR/BR/BL). `updateStyle radius` (Length tunggal atau object 4 sudut) per node satu transaksi; renderer sudah memetakan ke `border-radius`/`border-*-radius`. i18n `inspector.radius*`. Verifikasi: **e2e** `editor-inspector.spec` (uniform 8px → `border-radius:8px`; per-sudut TL=12).
 - [ ] **T2.10.7** Effects: drop shadow & inner shadow (multi) — ED-108, DM-031 · `apps/editor`, `packages/renderer` · Verifikasi: unit test CSS
-- [ ] **T2.10.8** Opacity layer — ED-110, DM-031 · `apps/editor` · Verifikasi: e2e; shortcut angka 1–0
+- [x] **T2.10.8** Opacity layer — ED-110, DM-031 · `apps/editor` · Verifikasi: e2e; shortcut angka 1–0
+  - Catatan: ✅ 2026-10-17 — field `opacity` (0–1) **ditambah ke style schema** (aditif, tanpa bump versi; `schema.lock` diperbarui) + renderer `opacity:N` (0 valid). `OpacitySection` (input 0–100% → 0–1) + **shortcut angka** `use-opacity-shortcut` (1–9 = 10–90%, 0 = 100%; node terkunci dilewati). Verifikasi: **e2e** (input 50% → 0.5 + canvas `opacity:0.5`; tekan 3 → 0.3; 0 → 1). 609 doc-model + 143 renderer hijau.
 - [ ] **T2.10.9** Overflow / clip content — ED-112 · `apps/editor`, `packages/renderer` · Verifikasi: unit test
 - [ ] **T2.10.10** Interaction states hover & pressed sebagai style variant di dokumen + renderer CSS `:hover`/`:active` — DM-040 · `packages/document-model`, `packages/renderer` · Verifikasi: snapshot CSS
 

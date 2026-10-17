@@ -28,6 +28,7 @@ import { type InteractionAdapterDeps, useInteractionMachine } from "./interactio
 import { useLockHide } from "./interactions/use-lock-hide";
 import { useMeasure } from "./interactions/use-measure";
 import { useNudge } from "./interactions/use-nudge";
+import { useOpacityShortcut } from "./interactions/use-opacity-shortcut";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { usePixelGridShortcut } from "./interactions/use-pixel-grid-shortcut";
 import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
@@ -106,6 +107,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useAlignShortcuts(runtime);
   useAutoLayoutShortcut(runtime);
   usePixelGridShortcut();
+  useOpacityShortcut(runtime);
   useMeasure(viewportRef, runtime);
   useCreateTool(viewportRef, runtime);
   useEmptyTextCleanup(runtime);

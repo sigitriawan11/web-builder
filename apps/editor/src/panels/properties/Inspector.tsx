@@ -19,7 +19,9 @@ import { AutoLayoutSection } from "./AutoLayoutSection";
 import { FillSection } from "./FillSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { isMixed, mixedValue } from "./mixed";
+import { OpacitySection } from "./OpacitySection";
 import { PositionSizeSection } from "./PositionSizeSection";
+import { RadiusSection } from "./RadiusSection";
 
 // ED-008: sidebar kanan (default 280 px, 240–400) — tab Design & Settings. Tanpa seleksi: properti page aktif;
 // multi-seleksi: hanya properti bersama, nilai berbeda = "Mixed". Kontrol properti lengkap (layout, fill, stroke,
@@ -92,6 +94,8 @@ function DesignTab({
       {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AutoLayoutSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <FillSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <RadiusSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <OpacitySection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
     </>
   );
 }

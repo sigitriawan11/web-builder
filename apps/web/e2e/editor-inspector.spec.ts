@@ -280,3 +280,102 @@ test("T2.8.10 ED-088: toggle absolute position untuk anak auto-layout", async ({
   await page.getByTestId("inspector").getByTestId("inspector-absolute").click();
   await expect.poll(posType).toBe("flow");
 });
+
+test("T2.10.6 ED-107: corner radius seragam & per sudut", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Radius Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            position: { type: "absolute", x: 20, y: 20 },
+            size: {
+              width: { mode: "fixed", value: 100, unit: "px" },
+              height: { mode: "fixed", value: 100, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  const inspector = page.getByTestId("inspector");
+  const radiusDoc = () =>
+    page.evaluate((id) => {
+      const d = window.__editorTestApi?.getDoc() as {
+        nodes: Record<string, { style: { base: { radius?: unknown } } }>;
+      };
+      return d?.nodes[id]?.style.base.radius;
+    }, frame);
+
+  // Uniform 8px.
+  await inspector.getByTestId("radius-uniform").fill("8");
+  await inspector.getByTestId("radius-uniform").press("Enter");
+  await expect.poll(radiusDoc).toMatchObject({ value: 8, unit: "px" });
+  await expect(page.getByTestId("editor-canvas").locator(`[data-node-id="${frame}"]`)).toHaveCSS(
+    "border-radius",
+    "8px",
+  );
+
+  // Per sudut: TL=12.
+  await inspector.getByTestId("radius-per-corner").click();
+  await inspector.getByTestId("radius-topLeft").fill("12");
+  await inspector.getByTestId("radius-topLeft").press("Enter");
+  await expect.poll(radiusDoc).toMatchObject({ topLeft: { value: 12, unit: "px" } });
+});
+
+test("T2.10.8 ED-110: opacity layer via input & shortcut angka 1–0", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Opacity Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            position: { type: "absolute", x: 20, y: 20 },
+            size: {
+              width: { mode: "fixed", value: 100, unit: "px" },
+              height: { mode: "fixed", value: 100, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  const opacityDoc = () =>
+    page.evaluate((id) => {
+      const d = window.__editorTestApi?.getDoc() as {
+        nodes: Record<string, { style: { base: { opacity?: number } } }>;
+      };
+      return d?.nodes[id]?.style.base.opacity;
+    }, frame);
+  const canvasNode = page.getByTestId("editor-canvas").locator(`[data-node-id="${frame}"]`);
+
+  // Input 50% → 0.5.
+  await page.getByTestId("inspector").getByTestId("inspector-opacity").fill("50");
+  await page.getByTestId("inspector").getByTestId("inspector-opacity").press("Enter");
+  await expect.poll(opacityDoc).toBe(0.5);
+  await expect(canvasNode).toHaveCSS("opacity", "0.5");
+
+  // Shortcut: tekan 3 → 0.3; 0 → 1.
+  await page.getByTestId("editor-canvas").click({ position: { x: 300, y: 300 } });
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+  await page.keyboard.press("3");
+  await expect.poll(opacityDoc).toBe(0.3);
+  await page.keyboard.press("0");
+  await expect.poll(opacityDoc).toBe(1);
+});

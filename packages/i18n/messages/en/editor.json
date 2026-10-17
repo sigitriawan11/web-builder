@@ -216,7 +216,14 @@
     "color": "Color",
     "colorHex": "Hex color",
     "swatches": "Document colors",
-    "token": "Token"
+    "token": "Token",
+    "radius": "Corner radius",
+    "radiusPerCorner": "Radius per corner",
+    "radius_topLeft": "Top-left radius",
+    "radius_topRight": "Top-right radius",
+    "radius_bottomRight": "Bottom-right radius",
+    "radius_bottomLeft": "Bottom-left radius",
+    "opacity": "Opacity"
   },
   "nodeType": {
     "page": "Page",

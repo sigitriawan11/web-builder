@@ -391,6 +391,8 @@ export function styleDeclarations(style: Style, ctx: DeclarationContext): Declar
   if (style.radius) radius(style.radius, out);
   if (style.typography) typography(style.typography, ctx, out);
   if (style.color) out.push(["color", colorToCss(style.color)]);
+  // DM-031/ED-110: opacity layer (0 valid → cek undefined).
+  if (style.opacity !== undefined) out.push(["opacity", String(style.opacity)]);
   if (style.transform) transform(style.transform, out);
   // Terakhir: `position: absolute` menang atas `relative` dari layout none; constraints memakai ukuran parent.
   if (style.position) position(style, ctx, out);

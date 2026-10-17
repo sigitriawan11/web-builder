@@ -216,7 +216,14 @@
     "color": "Warna",
     "colorHex": "Warna hex",
     "swatches": "Warna dokumen",
-    "token": "Token"
+    "token": "Token",
+    "radius": "Radius sudut",
+    "radiusPerCorner": "Radius per sudut",
+    "radius_topLeft": "Radius kiri-atas",
+    "radius_topRight": "Radius kanan-atas",
+    "radius_bottomRight": "Radius kanan-bawah",
+    "radius_bottomLeft": "Radius kiri-bawah",
+    "opacity": "Opasitas"
   },
   "nodeType": {
     "page": "Page",

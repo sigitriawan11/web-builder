@@ -237,6 +237,8 @@ const styleShape = {
   color: ColorSchema,
   // DM-033: transform (rotate/scale/translate/flip); tidak memengaruhi layout flex.
   transform: TransformSchema,
+  // DM-031/ED-110: opacity layer node (0–1).
+  opacity: z.number().min(0).max(1),
 };
 
 // DM-034: strict — tidak ada `customCss`/`className`/key tak dikenal; kebutuhan baru = field schema + migrasi.
