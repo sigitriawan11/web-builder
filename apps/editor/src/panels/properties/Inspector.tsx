@@ -27,6 +27,7 @@ import { OpacitySection } from "./OpacitySection";
 import { PositionSizeSection } from "./PositionSizeSection";
 import { RadiusSection } from "./RadiusSection";
 import { StrokeSection } from "./StrokeSection";
+import { TagSelect } from "./TagSelect";
 import { TypographySection } from "./TypographySection";
 
 // ED-008: sidebar kanan (default 280 px, 240–400) — tab Design & Settings. Tanpa seleksi: properti page aktif;
@@ -112,14 +113,35 @@ function DesignTab({
   );
 }
 
-function SettingsTab({ nodes, page }: { nodes: readonly Node[]; page: ReactNode }) {
+function SettingsTab({
+  nodes,
+  page,
+  runtime,
+  readOnly,
+}: {
+  nodes: readonly Node[];
+  page: ReactNode;
+  runtime: CanvasRuntime | null;
+  readOnly: boolean;
+}) {
   const t = useT();
   // ED-033: tanpa seleksi → pengaturan page aktif.
   if (nodes.length === 0) return <>{page}</>;
+  // ED-218: satu node → tag bisa diganti (dropdown); multi-seleksi → tampilkan nilai (Mixed) read-only.
+  const single = nodes.length === 1 ? nodes[0] : null;
   return (
     <InspectorSection id="html" title={t("inspector.html")}>
       <InspectorRow label={t("inspector.tag")}>
-        <Value value={mixedValue(nodes.map((node) => node.tag ?? DEFAULT_TAG[node.type]))} />
+        {single && runtime ? (
+          <TagSelect
+            runtime={runtime}
+            node={single}
+            current={single.tag ?? DEFAULT_TAG[single.type]}
+            readOnly={readOnly}
+          />
+        ) : (
+          <Value value={mixedValue(nodes.map((node) => node.tag ?? DEFAULT_TAG[node.type]))} />
+        )}
       </InspectorRow>
       <InspectorRow label={t("inspector.visible")}>
         <Value
@@ -195,7 +217,7 @@ export function Inspector({
         {rightTab === "design" ? (
           <DesignTab pageId={pageId} nodes={nodes} runtime={runtime ?? null} readOnly={readOnly} />
         ) : (
-          <SettingsTab nodes={nodes} page={pageSettings} />
+          <SettingsTab nodes={nodes} page={pageSettings} runtime={runtime ?? null} readOnly={readOnly} />
         )}
       </div>
     </aside>
