@@ -323,7 +323,9 @@
     "altText": "Teks alternatif (alt)",
     "altPlaceholder": "Deskripsikan gambar singkat",
     "decorative": "Dekoratif (tanpa alt)",
-    "altWarning": "Tambahkan alt text atau tandai dekoratif untuk aksesibilitas."
+    "altWarning": "Tambahkan alt text atau tandai dekoratif untuk aksesibilitas.",
+    "anchorId": "Anchor ID",
+    "anchorPlaceholder": "mis. tentang-kami"
   },
   "nodeType": {
     "page": "Page",

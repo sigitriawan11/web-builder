@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { jsonEqual } from "../query/normalize-overrides";
-import { NodeIdSchema, NodeSchema } from "../schema";
+import { HtmlIdSchema, NodeIdSchema, NodeSchema } from "../schema";
 import { cloneJson } from "../yjs/clone-json";
 import { yNodeToJson } from "../yjs/mapping";
 import { type CommandContext, type CommandResult, defineCommand, fail } from "./command";
+import { locate } from "./limits";
 import { moveNode } from "./move-node";
 import { childrenOf, nodesMap, parentIdOf, type YNode } from "./y-access";
 
@@ -75,6 +76,44 @@ export const setTag = defineCommand({
   aiExposed: true,
   input: z.strictObject({ id: NodeIdSchema, tag: z.string().min(1).max(20) }),
   run: (ctx, input) => updateFields(ctx, [input.id], { tag: input.tag }),
+});
+
+export const setHtmlId = defineCommand({
+  name: "setHtmlId",
+  description: {
+    id: "Pasang/hapus Anchor ID (htmlId) node — slug unik per page untuk tautan #anchor (DM-008/ED-220).",
+    en: "Set/remove a node's Anchor ID (htmlId) — a slug unique per page for #anchor links (DM-008/ED-220).",
+  },
+  aiExposed: true,
+  input: z.strictObject({ id: NodeIdSchema, htmlId: HtmlIdSchema.nullable() }),
+  run(ctx, input) {
+    const nodes = nodesMap(ctx.doc);
+    const yNode = nodes.get(input.id);
+    if (!yNode)
+      return fail("NOT_FOUND", { id: `Node "${input.id}" tidak ditemukan`, en: `Node "${input.id}" not found` }, [
+        "id",
+      ]);
+    if (input.htmlId === null) {
+      if (yNode.get("htmlId") !== undefined) yNode.delete("htmlId");
+      return { ok: true, value: undefined, affected: [input.id] };
+    }
+    // htmlId unik per page (DM-008): cek node lain di page yang sama.
+    const pageId = locate(nodes, input.id).pageId;
+    for (const [otherId, other] of nodes) {
+      if (otherId === input.id || other.get("htmlId") !== input.htmlId) continue;
+      if (locate(nodes, otherId).pageId === pageId) {
+        return fail(
+          "INVALID_RESULT",
+          {
+            id: `htmlId "${input.htmlId}" sudah dipakai di page yang sama`,
+            en: `htmlId "${input.htmlId}" is already used on the same page`,
+          },
+          ["htmlId"],
+        );
+      }
+    }
+    return updateFields(ctx, [input.id], { htmlId: input.htmlId });
+  },
 });
 
 export const reorderNode = defineCommand({

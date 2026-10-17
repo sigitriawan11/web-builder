@@ -2,7 +2,7 @@ import { replaceText, setImage, setLink, setNodeProps, setTextContent } from "./
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
 import { moveNode } from "./move-node";
-import { renameNode, reorderNode, setLocked, setTag, setVisible } from "./node-fields";
+import { renameNode, reorderNode, setHtmlId, setLocked, setTag, setVisible } from "./node-fields";
 import { createPage, deletePage, reorderPages, updatePage } from "./pages";
 import { clearBreakpointOverrides, setBreakpointOverride, setLayoutMode, setSettings } from "./style-commands";
 import { duplicateNodes, insertSubtree } from "./subtree";
@@ -39,6 +39,7 @@ export {
   reorderPages,
   replaceText,
   setBreakpointOverride,
+  setHtmlId,
   setImage,
   setLayoutMode,
   setLink,
@@ -74,6 +75,7 @@ export const COMMANDS = {
   replaceText,
   setImage,
   setLink,
+  setHtmlId,
   setNodeProps,
   createPage,
   updatePage,

@@ -323,7 +323,9 @@
     "altText": "Alt text",
     "altPlaceholder": "Briefly describe the image",
     "decorative": "Decorative (no alt)",
-    "altWarning": "Add alt text or mark it decorative for accessibility."
+    "altWarning": "Add alt text or mark it decorative for accessibility.",
+    "anchorId": "Anchor ID",
+    "anchorPlaceholder": "e.g. about-us"
   },
   "nodeType": {
     "page": "Page",

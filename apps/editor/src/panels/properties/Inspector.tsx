@@ -14,6 +14,7 @@ import {
   uiPreferencesStore,
 } from "../../store/ui-preferences";
 import { ResizeHandle } from "../ResizeHandle";
+import { AnchorIdField } from "./AnchorIdField";
 import { AppearanceSection } from "./AppearanceSection";
 import { AutoLayoutHint } from "./AutoLayoutHint";
 import { AutoLayoutSection } from "./AutoLayoutSection";
@@ -149,6 +150,11 @@ function SettingsTab({
           format={(visible: boolean) => (visible ? t("inspector.yes") : t("inspector.no"))}
         />
       </InspectorRow>
+      {single && single.type !== "page" && runtime ? (
+        <InspectorRow label={t("inspector.anchorId")}>
+          <AnchorIdField runtime={runtime} node={single} readOnly={readOnly} />
+        </InspectorRow>
+      ) : null}
     </InspectorSection>
   );
 }
