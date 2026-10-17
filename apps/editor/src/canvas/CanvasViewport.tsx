@@ -24,6 +24,7 @@ import { FramesContext, useFrameActivation } from "./frames/frames-context";
 import { useAlignShortcuts } from "./interactions/use-align-shortcuts";
 import { useAutoLayoutShortcut } from "./interactions/use-auto-layout-shortcut";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
+import { useClipboardShortcuts } from "./interactions/use-clipboard-shortcuts";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLockHide } from "./interactions/use-lock-hide";
 import { useMeasure } from "./interactions/use-measure";
@@ -102,6 +103,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useZoomShortcuts(runtime);
   useSectionShortcuts(runtime);
   useWrapShortcut(runtime);
+  useClipboardShortcuts(runtime);
   useSelectionNav(runtime);
   useSelectAll(runtime);
   useLockHide(runtime);

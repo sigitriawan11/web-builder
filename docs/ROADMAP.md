@@ -1104,10 +1104,14 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.14 — Clipboard
 
-- [ ] **T2.14.1** Copy, cut, paste (format internal + HTML/teks plain), paste ke parent terpilih — ED-190 · `apps/editor/src/commands/clipboard` · Verifikasi: e2e copy-paste 3 node; ID baru
-- [ ] **T2.14.2** Paste in place (`Mod+Shift+V`) — ED-191 · `apps/editor` · Verifikasi: e2e posisi sama
-- [ ] **T2.14.3** Duplicate (`Mod+D`) dengan offset/urutan — ED-193 · `apps/editor` · Verifikasi: e2e
+- [x] **T2.14.1** Copy, cut, paste (format internal + HTML/teks plain), paste ke parent terpilih — ED-190 · `apps/editor/src/commands/clipboard` · Verifikasi: e2e copy-paste 3 node; ID baru
+  - Catatan (2026-10-17): copy/cut/paste via `use-clipboard-shortcuts` (serialize subtree → clipboard-store in-memory + best-effort system clipboard `text/html` payload `data-platform-clipboard`); paste rekonstruksi id baru (insertSubtree); target: frame terpilih(bukan sumber)→dalamnya, lain→sibling, kosong→page; cut=copy+deleteNodes (1 undo). e2e `editor-clipboard` (3 level, id baru).
+- [x] **T2.14.2** Paste in place (`Mod+Shift+V`) — ED-191 · `apps/editor` · Verifikasi: e2e posisi sama
+  - Catatan (2026-10-17): paste in place `Mod+Shift+V` (offset 0). e2e posisi sama.
+- [x] **T2.14.3** Duplicate (`Mod+D`) dengan offset/urutan — ED-193 · `apps/editor` · Verifikasi: e2e
+  - Catatan (2026-10-17): duplicate `Mod+D` → `duplicateNodes` offset +10. e2e page bertambah.
 - [ ] **T2.14.4** Paste gambar & teks dari luar (gambar → upload; teks → text node) — ED-190, ED-160 · `apps/editor` · Verifikasi: e2e paste teks
+  - Catatan (2026-10-17): **ditunda** — paste gambar butuh upload (Epic 2.12); paste teks dari luar = polish menyusul.
 
 #### Epic 2.15 — Responsif dasar & preview
 
@@ -1143,6 +1147,7 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 - [ ] **T2.19.1** Suite Playwright interaksi utama (select, drag, resize, auto-layout, teks, layers, clipboard, undo) — ED-239 · `e2e/editor` · Verifikasi: ≥ 15 skenario lulus CI
 - [ ] **T2.19.2** Visual regression WYSIWYG: renderer editor vs static untuk 10 fixture × 3 breakpoint (Docker untuk font konsisten) — ED-240 · `e2e/visual` · Verifikasi: baseline dibuat; diff 0
 - [ ] **T2.19.3** Dogfooding: owner membuat 2 landing page dari nol; catat bug sebagai task baru — §M2.d · manual · Verifikasi: daftar bug masuk roadmap
+  - Bug ditemukan crosscheck (2026-10-17): `InlineTextEditor` me-mount `<div class=text-editor-host>` di dalam node teks `<p>` → warning React "div cannot be a descendant of p" (editor-only, SPA tanpa SSR, fungsional jalan). **Perbaiki**: render host editor bukan sebagai anak `<p>` (mis. node teks jadi `<div>` saat edit, atau portal). Masuk daftar bug M2.
 
 #### Epic 2.20 — Sisa M2 & penutup
 
