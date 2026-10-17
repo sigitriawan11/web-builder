@@ -247,6 +247,7 @@
     "valign_middle": "Middle",
     "valign_bottom": "Bottom",
     "textDecoration": "Decoration",
+    "bold": "Bold",
     "italic": "Italic",
     "underline": "Underline",
     "strikethrough": "Strikethrough",

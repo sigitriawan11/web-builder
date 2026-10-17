@@ -6,6 +6,7 @@ import { UndoContext } from "../../document/undo-context";
 import type { UndoController } from "../../document/undo-controller";
 import { NodeStoreContext } from "../../document/use-node";
 import { textEditingStore } from "../../store/text-editing-store";
+import { BubbleToolbar } from "./BubbleToolbar";
 import { richTextExtensions } from "./rich-text-extensions";
 
 /**
@@ -66,5 +67,10 @@ export function InlineTextEditor({ nodeId }: { nodeId: string }) {
     },
     [extensions],
   );
-  return <EditorContent editor={editor} className="text-editor-host" />;
+  return (
+    <>
+      <EditorContent editor={editor} className="text-editor-host" />
+      <BubbleToolbar editor={editor} />
+    </>
+  );
 }

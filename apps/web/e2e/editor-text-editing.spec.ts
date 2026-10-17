@@ -60,3 +60,27 @@ test("AC ED-121: ketik '- ' → bullet list; dirender <ul><li>", async ({ page }
 
   expect(await contentText(page, textId)).toContain("bulletList");
 });
+
+test("AC ED-125: bubble toolbar pada seleksi teks → toggle bold", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Bubble Toolbar Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const canvas = page.getByTestId("editor-canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("canvas tidak terlihat");
+
+  await page.keyboard.press("t");
+  await page.mouse.click(box.x + 80, box.y + 80);
+  const textId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  await expect(canvas.locator(`[data-node-id="${textId}"] .ProseMirror`)).toBeFocused();
+  await page.keyboard.type("Halo");
+  // Pilih seluruh teks baris → bubble toolbar muncul.
+  await page.keyboard.press("Shift+Home");
+  await expect(page.getByTestId("text-bubble-toolbar")).toBeVisible();
+
+  await page.getByTestId("mark-bold").click();
+  await page.keyboard.press("Escape");
+  expect(await contentText(page, textId)).toContain("bold");
+});
