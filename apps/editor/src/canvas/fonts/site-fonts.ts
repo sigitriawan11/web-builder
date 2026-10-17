@@ -43,10 +43,13 @@ export async function loadSiteFont(
   family: string,
   weights: readonly number[],
   FontFaceCtor: typeof FontFace = FontFace,
+  // Nama pendaftaran FontFace. Default = ber-namespace (font dasar canvas, RenderScope). Font per-node yang
+  // dipilih user (ED-116) didaftarkan dengan nama family mentah agar cocok dengan output renderer (`fontStack`).
+  registeredAs: string = siteFontFamilyName(family),
 ): Promise<FontLoadResult> {
   const results = await Promise.allSettled(
     weights.map(async (weight) => {
-      const face = new FontFaceCtor(siteFontFamilyName(family), `url(${fontsourceUrl(family, weight)})`, {
+      const face = new FontFaceCtor(registeredAs, `url(${fontsourceUrl(family, weight)})`, {
         weight: String(weight),
         style: "normal",
         display: "swap",

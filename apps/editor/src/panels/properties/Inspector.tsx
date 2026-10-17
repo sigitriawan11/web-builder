@@ -25,6 +25,7 @@ import { OpacitySection } from "./OpacitySection";
 import { PositionSizeSection } from "./PositionSizeSection";
 import { RadiusSection } from "./RadiusSection";
 import { StrokeSection } from "./StrokeSection";
+import { TypographySection } from "./TypographySection";
 
 // ED-008: sidebar kanan (default 280 px, 240–400) — tab Design & Settings. Tanpa seleksi: properti page aktif;
 // multi-seleksi: hanya properti bersama, nilai berbeda = "Mixed". Kontrol properti lengkap (layout, fill, stroke,
@@ -96,6 +97,7 @@ function DesignTab({
       {runtime ? <AutoLayoutHint runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AutoLayoutSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <TypographySection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <FillSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <StrokeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <RadiusSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}

@@ -9,6 +9,10 @@
 
 export type Surface = "app" | "editor" | "marketing" | "api";
 
+// ED-116: font situs di-lazy-load dari Fontsource (woff2) lewat CDN jsDelivr (sementara; dicerminkan ke CDN
+// platform saat katalog font dibuat — spec 07). Diizinkan di `font-src` agar FontFace tidak diblokir CSP.
+export const FONT_CDN_ORIGIN = "https://cdn.jsdelivr.net";
+
 export interface SecurityEnv {
   isDev: boolean;
   isProduction: boolean;
@@ -42,7 +46,7 @@ export function buildCsp(surface: Exclude<Surface, "api">, env: SecurityEnv, non
     ["script-src", scriptSrc],
     ["style-src", ["'self'", "'unsafe-inline'"]],
     ["img-src", ["'self'", "data:", "blob:", ...env.imageOrigins]],
-    ["font-src", ["'self'", "data:"]],
+    ["font-src", ["'self'", "data:", FONT_CDN_ORIGIN]],
     ["connect-src", connectSrc],
     ["worker-src", ["'self'", "blob:"]],
     // Iframe Turnstile (ACC-004, halaman login).
