@@ -264,6 +264,8 @@ const styleShape = {
   strokes: StrokesSchema,
   radius: RadiusSchema,
   typography: TypographySchema,
+  // ED-119: perataan vertikal teks dalam box tinggi tetap (flex column justify-content). Hanya bermakna untuk text.
+  textAlignVertical: z.enum(["top", "middle", "bottom"]),
   // Warna teks/ikon (diwariskan ke turunan seperti CSS `color`).
   color: ColorSchema,
   // DM-033: transform (rotate/scale/translate/flip); tidak memengaruhi layout flex.

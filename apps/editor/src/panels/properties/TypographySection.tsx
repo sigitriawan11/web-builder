@@ -1,6 +1,16 @@
 import { addFont, applyStylePatch, type Node, resolveStyle, runCommand, updateStyle } from "@platform/document-model";
 import { cn, Input, Popover, PopoverContent, PopoverTrigger } from "@platform/ui";
-import { ChevronDownIcon } from "lucide-react";
+import {
+  AlignCenterIcon,
+  AlignJustifyIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
+  AlignVerticalJustifyCenterIcon,
+  AlignVerticalJustifyEndIcon,
+  AlignVerticalJustifyStartIcon,
+  ChevronDownIcon,
+} from "lucide-react";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
@@ -102,6 +112,23 @@ export function TypographySection({
 
   const weightMixed = fieldValue("fontWeight");
 
+  // ED-119: horizontal = typography.textAlign; vertical = style.textAlignVertical (updateStyle langsung).
+  const textAlign = mixedValue(texts.map((node) => effective(node)?.textAlign as string | undefined));
+  const vAlign = mixedValue(texts.map((node) => resolveStyle(node.style, "base").textAlignVertical));
+  const setVertical = (value: "top" | "middle" | "bottom") => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runtime.doc.transact(() => {
+      for (const node of texts) {
+        runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+          ids: [node.id],
+          patch: { textAlignVertical: value },
+        });
+      }
+    }, runtime.origin);
+    runtime.undo.stopCapturing();
+  };
+
   return (
     <InspectorSection id="typography" title={t("inspector.typography")}>
       <InspectorRow label={t("inspector.font")}>
@@ -165,7 +192,88 @@ export function TypographySection({
           }
         />
       </InspectorRow>
+      <InspectorRow label={t("inspector.textAlign")}>
+        <div className="flex gap-1">
+          <ToggleButtons
+            label={t("inspector.textAlign")}
+            value={isMixed(textAlign) ? null : ((textAlign as string | undefined) ?? null)}
+            readOnly={readOnly}
+            onChange={(value) => commitTypography(() => ({ textAlign: value }))}
+            options={[
+              { id: "left", icon: <AlignLeftIcon className="size-3.5" />, title: t("inspector.textAlign_left") },
+              { id: "center", icon: <AlignCenterIcon className="size-3.5" />, title: t("inspector.textAlign_center") },
+              { id: "right", icon: <AlignRightIcon className="size-3.5" />, title: t("inspector.textAlign_right") },
+              {
+                id: "justify",
+                icon: <AlignJustifyIcon className="size-3.5" />,
+                title: t("inspector.textAlign_justify"),
+              },
+            ]}
+          />
+          <ToggleButtons
+            label={t("inspector.textAlignVertical")}
+            value={isMixed(vAlign) ? null : ((vAlign as string | undefined) ?? null)}
+            readOnly={readOnly}
+            onChange={(value) => setVertical(value as "top" | "middle" | "bottom")}
+            options={[
+              {
+                id: "top",
+                icon: <AlignVerticalJustifyStartIcon className="size-3.5" />,
+                title: t("inspector.valign_top"),
+              },
+              {
+                id: "middle",
+                icon: <AlignVerticalJustifyCenterIcon className="size-3.5" />,
+                title: t("inspector.valign_middle"),
+              },
+              {
+                id: "bottom",
+                icon: <AlignVerticalJustifyEndIcon className="size-3.5" />,
+                title: t("inspector.valign_bottom"),
+              },
+            ]}
+          />
+        </div>
+      </InspectorRow>
     </InspectorSection>
+  );
+}
+
+// Grup tombol toggle (perataan teks). role=toolbar agar lolos useSemanticElements (bukan role=group).
+function ToggleButtons({
+  label,
+  value,
+  options,
+  readOnly,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  options: readonly { id: string; icon: ReactNode; title: string }[];
+  readOnly: boolean;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div role="toolbar" aria-label={label} className="flex gap-0.5">
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          disabled={readOnly}
+          aria-pressed={value === option.id}
+          aria-label={option.title}
+          title={option.title}
+          data-testid={`talign-${option.id}`}
+          onClick={() => onChange(option.id)}
+          className={cn(
+            "flex size-7 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40",
+            value === option.id && "bg-accent text-foreground",
+          )}
+        >
+          {option.icon}
+        </button>
+      ))}
+    </div>
   );
 }
 

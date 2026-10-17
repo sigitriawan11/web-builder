@@ -45,6 +45,12 @@ const ALIGN: Record<string, string> = {
   stretch: "stretch",
   baseline: "baseline",
 };
+// ED-119: perataan vertikal teks (flex column justify-content).
+const VERTICAL_ALIGN: Record<"top" | "middle" | "bottom", string> = {
+  top: "flex-start",
+  middle: "center",
+  bottom: "flex-end",
+};
 
 function layout(value: LayoutStyle, out: Declaration[]): void {
   // `none`: anak bebas (absolute) → node jadi containing block.
@@ -401,6 +407,14 @@ export function styleDeclarations(style: Style, ctx: DeclarationContext): Declar
   if (style.strokes) strokes(style.strokes, out);
   if (style.radius) radius(style.radius, out);
   if (style.typography) typography(style.typography, ctx, out);
+  // ED-119: perataan vertikal teks → flex column + justify-content (hanya bila node bukan container flex).
+  if (style.textAlignVertical && !style.layout) {
+    out.push(
+      ["display", "flex"],
+      ["flex-direction", "column"],
+      ["justify-content", VERTICAL_ALIGN[style.textAlignVertical]],
+    );
+  }
   if (style.color) out.push(["color", colorToCss(style.color)]);
   // DM-031/ED-108: efek bayangan → box-shadow (innerShadow = inset).
   if (style.effects) effects(style.effects, out);

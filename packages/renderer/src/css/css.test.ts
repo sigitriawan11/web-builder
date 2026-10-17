@@ -310,6 +310,22 @@ describe("interaction states (DM-040)", () => {
   });
 });
 
+describe("textAlignVertical (ED-119)", () => {
+  it("vertical align → flex column + justify-content; diabaikan bila node container flex", () => {
+    expect(decl({ textAlignVertical: "middle" })).toMatchObject({
+      display: "flex",
+      "flex-direction": "column",
+      "justify-content": "center",
+    });
+    expect(decl({ textAlignVertical: "top" })["justify-content"]).toBe("flex-start");
+    expect(decl({ textAlignVertical: "bottom" })["justify-content"]).toBe("flex-end");
+    // Node dengan layout flex: perataan vertikal teks tidak menimpa layout.
+    expect(decl({ textAlignVertical: "middle", layout: { mode: "flex", direction: "row" } })["flex-direction"]).toBe(
+      "row",
+    );
+  });
+});
+
 describe("constraintDeclarations (ED-098)", () => {
   const box = { x: 10, y: 20, width: 40, height: 30 };
   const parent = { width: 200, height: 100 };
