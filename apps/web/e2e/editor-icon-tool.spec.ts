@@ -11,7 +11,14 @@ const doc = (page: Page) =>
   page.evaluate(
     () =>
       window.__editorTestApi?.getDoc() as {
-        nodes: Record<string, { type: string; props?: { set?: string; name?: string } }>;
+        nodes: Record<
+          string,
+          {
+            type: string;
+            props?: { set?: string; name?: string };
+            style?: { base?: { position?: { type?: string } } };
+          }
+        >;
       },
   );
 
@@ -31,6 +38,8 @@ test("AC ED-046: cari 'phone' → sisip node icon Lucide; kembali ke Move; ter-r
   const iconId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
   const node = (await doc(page)).nodes[iconId];
   expect(node).toMatchObject({ type: "icon", props: { set: "lucide", name: "phone" } });
+  // ED-037: disisipkan di page freeform → absolute agar bisa digeser (bukan flow child yang hanya bisa resize).
+  expect(node?.style?.base?.position?.type).toBe("absolute");
   // Dirender span berisi SVG (DM-015).
   const el = page.getByTestId("editor-canvas").locator(`[data-node-id="${iconId}"]`);
   expect(await el.evaluate((node) => node.tagName)).toBe("SPAN");
