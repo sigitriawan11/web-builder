@@ -1049,7 +1049,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.11 — Typography & rich text
 
-- [ ] **T2.11.1** Inline text editing dengan Tiptap (masuk/keluar edit, Esc, klik luar), commit satu transaksi — ED-115 · `apps/editor/src/canvas/text` · Verifikasi: e2e ketik → undo 1 langkah per sesi edit
+- [x] **T2.11.1** Inline text editing dengan Tiptap (masuk/keluar edit, Esc, klik luar), commit satu transaksi — ED-115 · `apps/editor/src/canvas/text` · Verifikasi: e2e ketik → undo 1 langkah per sesi edit
+  - Catatan (2026-10-17): sudah terimplementasi bersama text tool (T2.4.6) — `InlineTextEditor` (Tiptap + `ySyncPlugin`), masuk edit via text tool/double-click, keluar via Esc (`handleKeyDown`) & klik-luar (`use-text-editing-interactions`), **satu sesi = satu langkah undo** via `undo.beginGroup()`/`group.end()`. Ditambah e2e `editor-text-editing.spec.ts` (ketik sesi → undo sekali → seluruh teks hilang satu langkah). Checkbox sebelumnya belum dicentang.
 - [ ] **T2.11.2** Font family picker (Google Fonts list, search, preview, lazy load) + `addFont` ke theme — ED-116 · `apps/editor/src/panels/properties/typography` · Verifikasi: e2e ganti font → canvas berubah
 - [ ] **T2.11.3** Weight, size, line height, letter spacing — ED-117 · `apps/editor` · Verifikasi: e2e
 - [ ] **T2.11.4** Alignment horizontal & vertikal — ED-119 · `apps/editor` · Verifikasi: e2e
