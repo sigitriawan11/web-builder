@@ -9,12 +9,17 @@ export function ColorInput({
   value,
   onChange,
   swatches,
+  tokens,
+  onPickToken,
   readOnly,
   testId,
 }: {
   value: string;
   onChange: (hex: string) => void;
   swatches?: readonly string[];
+  // ED-129: token warna tema (path + warna ter-resolve untuk preview); memilih → simpan ref `{$token}`.
+  tokens?: readonly { path: string; color: string }[];
+  onPickToken?: (path: string) => void;
   readOnly?: boolean;
   testId?: string;
 }) {
@@ -60,6 +65,25 @@ export function ColorInput({
                 onClick={() => onChange(swatch)}
               />
             ))}
+          </div>
+        ) : null}
+        {tokens && tokens.length > 0 ? (
+          <div className="space-y-1">
+            <span className="text-xs text-muted-foreground">{t("inspector.token")}</span>
+            <div className="flex flex-wrap gap-1">
+              {tokens.map((token) => (
+                <button
+                  key={token.path}
+                  type="button"
+                  aria-label={token.path}
+                  title={token.path}
+                  data-testid={testId ? `${testId}-token-${token.path}` : undefined}
+                  className="size-5 rounded border border-border"
+                  style={{ background: token.color }}
+                  onClick={() => onPickToken?.(token.path)}
+                />
+              ))}
+            </div>
           </div>
         ) : null}
       </PopoverContent>

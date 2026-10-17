@@ -1,7 +1,18 @@
-import { type Fill, type Node, resolveStyle, runCommand, updateStyle } from "@platform/document-model";
+import {
+  type Fill,
+  isTokenRef,
+  listTokenPaths,
+  type Node,
+  resolveStyle,
+  resolveToken,
+  runCommand,
+  updateStyle,
+} from "@platform/document-model";
 import { Eye, EyeOff, Plus, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
+import { useDocTheme } from "../../document/use-doc-theme";
 import { ColorInput } from "./color/ColorInput";
 import { InspectorSection } from "./InspectorSection";
 
@@ -18,6 +29,34 @@ export function FillSection({
   readOnly: boolean;
 }) {
   const t = useT();
+  const theme = useDocTheme(runtime.doc);
+  // ED-129: token warna tema untuk dipilih di picker (path + warna ter-resolve untuk preview).
+  const colorTokens = useMemo(() => {
+    if (!theme) return [];
+    return listTokenPaths(theme)
+      .filter((path) => path.startsWith("color."))
+      .flatMap((path) => {
+        try {
+          const resolved = resolveToken(theme, path);
+          return typeof resolved === "string" ? [{ path, color: resolved }] : [];
+        } catch {
+          return [];
+        }
+      });
+  }, [theme]);
+  const colorHex = (color: unknown): string => {
+    if (typeof color === "string") return color;
+    if (isTokenRef(color) && theme) {
+      try {
+        const resolved = resolveToken(theme, color.$token);
+        if (typeof resolved === "string") return resolved;
+      } catch {
+        // fallback di bawah
+      }
+    }
+    return "#000000";
+  };
+
   const node = nodes[0];
   if (!node || !nodes.every((n) => FILLABLE.has(n.type))) return null;
   const fills = resolveStyle(node.style, "base").fills ?? [];
@@ -49,13 +88,15 @@ export function FillSection({
             {fill.type === "solid" ? (
               <>
                 <ColorInput
-                  value={typeof fill.color === "string" ? fill.color : "#000000"}
+                  value={colorHex(fill.color)}
                   readOnly={readOnly}
                   testId={`fill-color-${index}`}
+                  tokens={colorTokens}
                   onChange={(hex) => update(index, { color: hex })}
+                  onPickToken={(path) => update(index, { color: { $token: path } })}
                 />
                 <span className="flex-1 truncate tabular-nums text-muted-foreground">
-                  {typeof fill.color === "string" ? fill.color : t("inspector.token")}
+                  {isTokenRef(fill.color) ? fill.color.$token : fill.color}
                 </span>
               </>
             ) : (
