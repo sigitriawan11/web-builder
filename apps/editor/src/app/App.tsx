@@ -10,6 +10,8 @@ import { parseEditorRoute } from "./router";
 // Rute produk dimuat terpisah (membawa CSS Tailwind/token UI) — lihat SiteEditor.tsx.
 const SiteEditor = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteEditor })));
 const SiteNotFound = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteNotFound })));
+// Overlay preview memuat renderer statis — dipisah dari bundle utama; di playground dipakai untuk e2e.
+const PreviewOverlay = lazy(() => import("./PreviewOverlay").then((module) => ({ default: module.PreviewOverlay })));
 
 // Bootstrap editor (ARCHITECTURE §5.2): providers → error boundary → rute.
 export function App() {
@@ -45,5 +47,12 @@ let playgroundRuntime: CanvasRuntime | null = null;
 
 function PlaygroundCanvas() {
   playgroundRuntime ??= createPlaygroundRuntime(window.location.search);
-  return <CanvasViewport runtime={playgroundRuntime} />;
+  return (
+    <>
+      <CanvasViewport runtime={playgroundRuntime} />
+      <Suspense fallback={null}>
+        <PreviewOverlay runtime={playgroundRuntime} pageId={playgroundRuntime.pageId} />
+      </Suspense>
+    </>
+  );
 }

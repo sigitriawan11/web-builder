@@ -32,6 +32,7 @@ import { Toolbar } from "./chrome/Toolbar";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { useT } from "./i18n";
 import { LanguageMenu, ProfileLocaleSync } from "./LanguageMenu";
+import { PreviewOverlay } from "./PreviewOverlay";
 // Tailwind + token UI hanya dimuat rute produk (modul ini di-lazy-load): playground canvas M0 & mode isolasi
 // eksperimennya (prefix/none, ADR-012) tetap tanpa preflight global.
 import "../styles/app.css";
@@ -205,6 +206,7 @@ function DocumentWorkspace({
           />
         }
       />
+      <PreviewOverlay runtime={runtime} pageId={activePageId} />
       <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
         <CanvasViewport runtime={runtime} />
         {devToolsEnabled() ? (

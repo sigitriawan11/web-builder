@@ -33,6 +33,7 @@ import { useNudge } from "./interactions/use-nudge";
 import { useOpacityShortcut } from "./interactions/use-opacity-shortcut";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { usePixelGridShortcut } from "./interactions/use-pixel-grid-shortcut";
+import { usePreviewShortcut } from "./interactions/use-preview-shortcut";
 import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
 import { useSelectAll } from "./interactions/use-select-all";
 import { useSelectionNav } from "./interactions/use-selection-nav";
@@ -106,6 +107,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useWrapShortcut(runtime);
   useClipboardShortcuts(runtime);
   useBreakpointShortcut();
+  usePreviewShortcut();
   useSelectionNav(runtime);
   useSelectAll(runtime);
   useLockHide(runtime);

@@ -125,6 +125,12 @@
     "resize": "Ubah lebar panel",
     "comingSoon": "Segera hadir."
   },
+  "preview": {
+    "device": "Perangkat",
+    "page": "Halaman",
+    "close": "Tutup preview",
+    "title": "Preview"
+  },
   "layers": {
     "expand": "Luaskan",
     "collapse": "Ciutkan",

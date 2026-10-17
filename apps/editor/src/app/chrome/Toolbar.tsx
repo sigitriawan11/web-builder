@@ -50,6 +50,7 @@ import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useUndoState } from "../../document/use-undo-state";
 import { IconPicker } from "../../panels/icons/IconPicker";
 import { BREAKPOINT_OPTIONS, breakpointStore } from "../../store/breakpoint-store";
+import { previewModeStore } from "../../store/preview-mode-store";
 import { uiPreferencesStore } from "../../store/ui-preferences";
 import { TOOLS, toolDefinition } from "../../tools/tool-catalog";
 import { type ToolId, toolStore } from "../../tools/tool-store";
@@ -363,7 +364,12 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
         {language}
         <div className="mx-1 h-6 w-px bg-border" />
         <ToolbarButton label={t("toolbar.mode")} icon={<PaletteIcon />} disabled data-testid="toolbar-mode" />
-        <ToolbarButton label={t("toolbar.preview")} icon={<EyeIcon />} disabled data-testid="toolbar-preview" />
+        <ToolbarButton
+          label={t("toolbar.preview")}
+          icon={<EyeIcon />}
+          data-testid="toolbar-preview"
+          onClick={() => previewModeStore.getState().toggle()}
+        />
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="inline-flex">

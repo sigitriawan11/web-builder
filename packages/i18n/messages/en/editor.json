@@ -125,6 +125,12 @@
     "resize": "Resize panel",
     "comingSoon": "Coming soon."
   },
+  "preview": {
+    "device": "Device",
+    "page": "Page",
+    "close": "Close preview",
+    "title": "Preview"
+  },
   "layers": {
     "expand": "Expand",
     "collapse": "Collapse",
