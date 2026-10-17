@@ -37,6 +37,35 @@ describe("rich text ↔ Y.XmlFragment (DM-058, T0.8.5)", () => {
     expect(RichTextDocSchema.parse(yXmlFragmentToRichText(fragment))).toEqual(SAMPLE);
   });
 
+  it("round-trip lossless: list bullet & numbered bersarang (DM-013/ED-121)", () => {
+    const list: RichTextDoc = {
+      type: "doc",
+      content: [
+        {
+          type: "bulletList",
+          content: [
+            { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Satu" }] }] },
+            {
+              type: "listItem",
+              content: [
+                { type: "paragraph", content: [{ type: "text", text: "Dua" }] },
+                {
+                  type: "orderedList",
+                  attrs: { start: 3 },
+                  content: [
+                    { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Nested" }] }] },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const { fragment } = attached(list);
+    expect(RichTextDocSchema.parse(yXmlFragmentToRichText(fragment))).toEqual(list);
+  });
+
   it("encoding mengikuti y-prosemirror: elemen per blok, satu XmlText per deretan teks, mark = atribut format", () => {
     const { fragment } = attached(SAMPLE);
     const paragraph = fragment.get(1);
