@@ -1085,11 +1085,14 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 - [x] **T2.13.1** Tree layers dengan react-arborist (virtualized), urutan sesuai keputusan OPEN 02#4 — ED-136 · `apps/editor/src/panels/layers` · Verifikasi: e2e 2.000 node scroll lancar
   - Catatan (2026-10-17): `LayersPanel` (react-arborist Tree, virtualized, tinggi dari ResizeObserver) + `useLayerTree` (rebuild per frame via `afterTransaction`). **Urutan Figma** (OPEN 02#4): kebalikan urutan dokumen per level (atas = paling depan); `children` dokumen tetap urutan DOM. Seleksi sinkron dua arah dengan `selectionStore`. **Dependency baru `react-arborist@3.16.0`** (stack-approved; peer `react>=16.14` cocok React 19; >2 minggu; Lampiran D). Verifikasi: e2e `editor-layers` (tree tampil, klik→select, select→highlight). Benchmark 2.000 node = T2.18.3.
-- [ ] **T2.13.2** Rename layer (double-click, F2) — ED-137 · `apps/editor/src/panels/layers` · Verifikasi: e2e
+- [x] **T2.13.2** Rename layer (double-click, F2) — ED-137 · `apps/editor/src/panels/layers` · Verifikasi: e2e
+  - Catatan (2026-10-17): Rename inline via double-click & F2 di `LayersPanel` → `renameNode`. Verifikasi: e2e `editor-layers`.
 - [ ] **T2.13.3** Drag reorder & reparent di layers (validasi nesting tag) — ED-138 · `apps/editor/src/panels/layers` · Verifikasi: e2e
-- [ ] **T2.13.4** Toggle visibility & lock di baris layer — ED-139 · `apps/editor/src/panels/layers` · Verifikasi: e2e
+- [x] **T2.13.4** Toggle visibility & lock di baris layer — ED-139 · `apps/editor/src/panels/layers` · Verifikasi: e2e
+  - Catatan (2026-10-17): Toggle visibility (`setVisible`) & lock (`setLocked`) per baris (hover-reveal). Verifikasi: e2e `editor-layers`.
 - [ ] **T2.13.5** Collapse & expand (Alt+klik = rekursif), auto-expand ke seleksi — ED-140 · `apps/editor/src/panels/layers` · Verifikasi: e2e
-- [ ] **T2.13.6** Ikon per tipe node — ED-141 · `apps/editor/src/panels/layers` · Verifikasi: snapshot
+- [x] **T2.13.6** Ikon per tipe node — ED-141 · `apps/editor/src/panels/layers` · Verifikasi: snapshot
+  - Catatan (2026-10-17): Ikon per tipe node (`TYPE_ICON` di `LayerRow`). Verifikasi: tampil di e2e `editor-layers`.
 - [ ] **T2.13.7** Multi-select & keyboard di layers (Shift range, Mod toggle, panah) — ED-143 · `apps/editor/src/panels/layers` · Verifikasi: e2e
 - [ ] **T2.13.8** Frame selection / wrap in frame (`Mod+Alt+G`) — ED-146 · `apps/editor/src/commands` · Verifikasi: unit test command `wrapInFrame`
 - [ ] **T2.13.9** (P1) Group & ungroup (sesuai keputusan OPEN 02#6) + node `group` — ED-144, ED-145, DM-012 · `apps/editor`, `packages/document-model` · Verifikasi: unit test; e2e `Mod+G`

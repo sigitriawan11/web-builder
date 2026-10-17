@@ -1,17 +1,21 @@
-import type { Node } from "@platform/document-model";
+import { type Node, renameNode, runCommand, setLocked, setVisible } from "@platform/document-model";
 import { cn } from "@platform/ui";
 import {
   ChevronDownIcon,
   ChevronRightIcon,
+  EyeIcon,
+  EyeOffIcon,
   FrameIcon,
   ImageIcon,
+  LockIcon,
+  LockOpenIcon,
   type LucideIcon,
   SmileIcon,
   SquareIcon,
   StickyNoteIcon,
   TypeIcon,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { type NodeRendererProps, Tree } from "react-arborist";
 import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
@@ -29,11 +33,28 @@ const TYPE_ICON: Record<Node["type"], LucideIcon> = {
   icon: SmileIcon,
 };
 
+interface LayerActions {
+  runtime: CanvasRuntime;
+  readOnly: boolean;
+  editingId: string | null;
+  setEditingId: (id: string | null) => void;
+}
+const LayerActionsContext = createContext<LayerActions | null>(null);
+
 // ED-136: tree layers virtualized (react-arborist). Seleksi ikut store seleksi canvas (dua arah).
-export function LayersPanel({ runtime, pageId }: { runtime: CanvasRuntime; pageId: string; readOnly: boolean }) {
+export function LayersPanel({
+  runtime,
+  pageId,
+  readOnly,
+}: {
+  runtime: CanvasRuntime;
+  pageId: string;
+  readOnly: boolean;
+}) {
   const tree = useLayerTree(runtime.doc, runtime.nodeStore, pageId);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const [editingId, setEditingId] = useState<string | null>(null);
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return;
@@ -45,32 +66,51 @@ export function LayersPanel({ runtime, pageId }: { runtime: CanvasRuntime; pageI
   }, []);
 
   return (
-    <div ref={containerRef} className="min-h-0 flex-1" data-testid="layers-tree">
-      {size.height > 0 ? (
-        <Tree<LayerNode>
-          data={tree}
-          width={size.width}
-          height={size.height}
-          rowHeight={24}
-          indent={12}
-          openByDefault
-          disableDrag
-          disableDrop
-          disableMultiSelection
-        >
-          {LayerRow}
-        </Tree>
-      ) : null}
-    </div>
+    <LayerActionsContext.Provider value={{ runtime, readOnly, editingId, setEditingId }}>
+      <div ref={containerRef} className="min-h-0 flex-1" data-testid="layers-tree">
+        {size.height > 0 ? (
+          <Tree<LayerNode>
+            data={tree}
+            width={size.width}
+            height={size.height}
+            rowHeight={24}
+            indent={12}
+            openByDefault
+            disableDrag
+            disableDrop
+            disableMultiSelection
+          >
+            {LayerRow}
+          </Tree>
+        ) : null}
+      </div>
+    </LayerActionsContext.Provider>
   );
 }
 
 function LayerRow({ node, style }: NodeRendererProps<LayerNode>) {
   const t = useT();
+  const actions = useContext(LayerActionsContext);
   const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
   const selected = selectedIds.includes(node.id);
-  const Icon = TYPE_ICON[node.data.type];
-  const name = node.data.name || t(`nodeType.${node.data.type}`);
+  const { type, name: rawName, visible, locked } = node.data;
+  const Icon = TYPE_ICON[type];
+  const name = rawName || t(`nodeType.${type}`);
+  const editing = actions?.editingId === node.id;
+
+  const withUndo = (fn: (ctx: { doc: CanvasRuntime["doc"]; origin: CanvasRuntime["origin"] }) => void) => {
+    if (!actions || actions.readOnly) return;
+    const { runtime } = actions;
+    runtime.undo.stopCapturing();
+    fn({ doc: runtime.doc, origin: runtime.origin });
+    runtime.undo.stopCapturing();
+  };
+  const commitRename = (value: string) => {
+    const next = value.trim();
+    if (next && next !== rawName) withUndo((ctx) => runCommand(ctx, renameNode, { id: node.id, name: next }));
+    actions?.setEditingId(null);
+  };
+
   return (
     <div
       style={style}
@@ -84,12 +124,15 @@ function LayerRow({ node, style }: NodeRendererProps<LayerNode>) {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           selectionStore.getState().select([node.id]);
+        } else if (event.key === "F2" && !actions?.readOnly) {
+          event.preventDefault();
+          actions?.setEditingId(node.id);
         }
       }}
       className={cn(
-        "flex h-6 cursor-default items-center gap-1 rounded px-1 text-xs",
+        "group flex h-6 cursor-default items-center gap-1 rounded px-1 text-xs",
         selected ? "bg-accent text-foreground" : "hover:bg-accent/50",
-        !node.data.visible && "opacity-40",
+        !visible && "opacity-40",
       )}
     >
       <span style={{ paddingLeft: node.level * 12 }} className="flex items-center gap-1">
@@ -111,7 +154,62 @@ function LayerRow({ node, style }: NodeRendererProps<LayerNode>) {
         )}
         <Icon className="size-3.5 shrink-0 text-muted-foreground" />
       </span>
-      <span className="flex-1 truncate">{name}</span>
+      {editing ? (
+        <input
+          // biome-ignore lint/a11y/noAutofocus: edit nama dimulai eksplisit (dbl-click/F2) → fokus wajar.
+          autoFocus
+          defaultValue={rawName}
+          aria-label={t("layers.rename")}
+          data-testid={`layer-name-input-${node.id}`}
+          className="h-5 min-w-0 flex-1 rounded border border-ring bg-background px-1 text-xs"
+          onClick={(event) => event.stopPropagation()}
+          onBlur={(event) => commitRename(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            event.stopPropagation();
+            if (event.key === "Enter") commitRename(event.currentTarget.value);
+            else if (event.key === "Escape") actions?.setEditingId(null);
+          }}
+        />
+      ) : (
+        // biome-ignore lint/a11y/noStaticElementInteractions: dbl-click rename; aksi utama (select/F2) ada di baris.
+        <span className="flex-1 truncate" onDoubleClick={() => !actions?.readOnly && actions?.setEditingId(node.id)}>
+          {name}
+        </span>
+      )}
+      {!editing && !actions?.readOnly ? (
+        <>
+          <button
+            type="button"
+            aria-label={locked ? t("layers.unlock") : t("layers.lock")}
+            data-testid={`layer-lock-${node.id}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              withUndo((ctx) => runCommand(ctx, setLocked, { ids: [node.id], locked: !locked }));
+            }}
+            className={cn(
+              "text-muted-foreground hover:text-foreground",
+              locked ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+            )}
+          >
+            {locked ? <LockIcon className="size-3" /> : <LockOpenIcon className="size-3" />}
+          </button>
+          <button
+            type="button"
+            aria-label={visible ? t("layers.hide") : t("layers.show")}
+            data-testid={`layer-visible-${node.id}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              withUndo((ctx) => runCommand(ctx, setVisible, { ids: [node.id], visible: !visible }));
+            }}
+            className={cn(
+              "text-muted-foreground hover:text-foreground",
+              visible ? "opacity-0 group-hover:opacity-100" : "opacity-100",
+            )}
+          >
+            {visible ? <EyeIcon className="size-3" /> : <EyeOffIcon className="size-3" />}
+          </button>
+        </>
+      ) : null}
     </div>
   );
 }

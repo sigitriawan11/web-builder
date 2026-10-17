@@ -126,7 +126,12 @@
   },
   "layers": {
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "rename": "Rename layer",
+    "show": "Show",
+    "hide": "Hide",
+    "lock": "Lock",
+    "unlock": "Unlock"
   },
   "inspector": {
     "label": "Inspector",

@@ -126,7 +126,12 @@
   },
   "layers": {
     "expand": "Luaskan",
-    "collapse": "Ciutkan"
+    "collapse": "Ciutkan",
+    "rename": "Ganti nama layer",
+    "show": "Tampilkan",
+    "hide": "Sembunyikan",
+    "lock": "Kunci",
+    "unlock": "Buka kunci"
   },
   "inspector": {
     "label": "Inspector",

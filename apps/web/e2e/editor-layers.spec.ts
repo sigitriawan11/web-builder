@@ -52,3 +52,44 @@ test("AC ED-136: tree layers tampil & seleksi sinkron dua arah", async ({ page }
   await expect(page.getByTestId(`layer-${frame}`)).toHaveAttribute("aria-selected", "true");
   await expect(page.getByTestId(`layer-${child}`)).toHaveAttribute("aria-selected", "false");
 });
+
+const nodeField = (page: import("@playwright/test").Page, id: string, field: string) =>
+  page.evaluate(
+    ({ id, field }) => {
+      const docu = window.__editorTestApi?.getDoc() as { nodes: Record<string, Record<string, unknown>> } | undefined;
+      return docu?.nodes[id]?.[field];
+    },
+    { id, field },
+  );
+
+test("AC ED-137/ED-139: rename (F2/dbl-click), toggle visibility & lock di baris layer", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layer Row Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: { base: { position: { type: "absolute", x: 40, y: 40 }, size: sizeFixed(200, 160) } },
+      })
+    ).value,
+  );
+  await expect(page.getByTestId(`layer-${frame}`)).toBeVisible();
+
+  // Rename via double-click → input → Enter.
+  await page.getByTestId(`layer-${frame}`).dblclick();
+  await page.getByTestId(`layer-name-input-${frame}`).fill("Hero");
+  await page.getByTestId(`layer-name-input-${frame}`).press("Enter");
+  await expect.poll(() => nodeField(page, frame, "name")).toBe("Hero");
+
+  // Toggle visibility & lock.
+  await page.getByTestId(`layer-${frame}`).hover();
+  await page.getByTestId(`layer-visible-${frame}`).click();
+  await expect.poll(() => nodeField(page, frame, "visible")).toBe(false);
+  await page.getByTestId(`layer-${frame}`).hover();
+  await page.getByTestId(`layer-lock-${frame}`).click();
+  await expect.poll(() => nodeField(page, frame, "locked")).toBe(true);
+});
