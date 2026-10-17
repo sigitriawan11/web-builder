@@ -76,3 +76,33 @@ test("AC ED-034: edit konten di Desktop tampil di semua frame; override mobile t
   await expect(mobileNode).toHaveCSS("color", "rgb(255, 0, 0)");
   await expect(desktopNode).not.toHaveCSS("color", "rgb(255, 0, 0)");
 });
+
+test("AC ED-173: Alt+Shift+3 pindah ke Mobile & mempertahankan seleksi", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Breakpoint Shortcut Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: {
+          base: {
+            position: { type: "absolute", x: 40, y: 40 },
+            size: {
+              width: { mode: "fixed", value: 100, unit: "px" },
+              height: { mode: "fixed", value: 80, unit: "px" },
+            },
+          },
+        },
+      })
+    ).value,
+  );
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
+
+  await page.keyboard.press("Alt+Shift+Digit3");
+  await expect(page.getByTestId("breakpoint-mobile")).toHaveAttribute("aria-pressed", "true");
+  // Seleksi tetap setelah ganti breakpoint (AC ED-173).
+  expect(await page.evaluate(() => window.__editorTestApi?.getSelection() ?? [])).toEqual([frame]);
+});

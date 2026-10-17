@@ -1115,7 +1115,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.15 — Responsif dasar & preview
 
-- [ ] **T2.15.1** Breakpoint switcher (preview: desktop/tablet/mobile) — ED-173 · `apps/editor/src/app/chrome` · Verifikasi: e2e
+- [x] **T2.15.1** Breakpoint switcher (preview: desktop/tablet/mobile) — ED-173 · `apps/editor/src/app/chrome` · Verifikasi: e2e
+  - Catatan (2026-10-17): device switcher (Desktop/Tablet/Mobile + Show all) sudah ada di Toolbar → `breakpointStore.active` (fokus frame). Ditambah shortcut **Alt+Shift+1/2/3** (`use-breakpoint-shortcut`). Verifikasi: e2e `editor-frames`/`editor-toolbar` (frame per breakpoint, switch) + AC ED-173 (shortcut ke Mobile mempertahankan seleksi). Indikator warna tablet/mobile = polish kecil menyusul.
 - [ ] **T2.15.2** Preview device & custom width (disimpan per OPEN 02#3) — ED-174 · `apps/editor` · Verifikasi: e2e lebar 1024
 - [ ] **T2.15.3** Preview mode di dalam editor (tanpa chrome, interaktif) — ED-004, ED-207 · `apps/editor` · Verifikasi: e2e link antar page bekerja di preview
 - [ ] **T2.15.4** Link navigasi pada node (page, URL, anchor, WA) + interaksi `navigate`/`scrollTo` di dokumen — ED-181, DM-055 · `apps/editor`, `packages/renderer` · Verifikasi: e2e klik di preview pindah page
