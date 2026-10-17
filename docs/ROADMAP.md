@@ -1138,7 +1138,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.17 — Aksesibilitas output & semantic HTML
 
-- [ ] **T2.17.1** Alt text gambar (field + peringatan jika kosong) — ED-210 · `apps/editor` · Verifikasi: e2e
+- [x] **T2.17.1** Alt text gambar (field + peringatan jika kosong) — ED-210 · `apps/editor` · Verifikasi: e2e
+  - Catatan (2026-10-18): `ImageSection` di inspector (muncul saat satu node image terpilih): field **Alt text** (→ `props.image.alt`, commit onBlur/Enter) + checkbox **Dekoratif** (→ `props.decorative`; alt disabled & `alt=""` disengaja) + badge peringatan bila bukan dekoratif & alt kosong. Logika `needsAltWarning` diuji unit (3). **Verifikasi e2e tidak dibuat** (playground e2e tak memuat Inspector — sama seperti LinkSection; verifikasi lewat unit). Renderer sudah mengeluarkan `alt` pada `<img>`. Checklist pra-publish "gambar tanpa alt" = M4. "Buat alt dengan AI" = M6.
 - [ ] **T2.17.2** Heading level & struktur (outline h1–h6, peringatan h1 ganda) — ED-211 · `apps/editor` · Verifikasi: unit test analyzer
 - [ ] **T2.17.3** Pengaturan tag per node (section, header, nav, main, footer, article, ul/li, button, a) — ED-218 · `apps/editor/src/panels/properties` · Verifikasi: e2e; snapshot HTML
 - [ ] **T2.17.4** Validasi nesting tag (a dalam a, button dalam a, li tanpa ul) — ED-219, DM-009 · `packages/document-model`, `apps/editor` · Verifikasi: unit test

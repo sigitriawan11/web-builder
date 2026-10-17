@@ -318,7 +318,12 @@
     "effect_x": "X",
     "effect_y": "Y",
     "effect_blur": "Blur",
-    "effect_spread": "Spread"
+    "effect_spread": "Spread",
+    "image": "Image",
+    "altText": "Alt text",
+    "altPlaceholder": "Briefly describe the image",
+    "decorative": "Decorative (no alt)",
+    "altWarning": "Add alt text or mark it decorative for accessibility."
   },
   "nodeType": {
     "page": "Page",

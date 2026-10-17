@@ -19,6 +19,7 @@ import { AutoLayoutHint } from "./AutoLayoutHint";
 import { AutoLayoutSection } from "./AutoLayoutSection";
 import { EffectsSection } from "./EffectsSection";
 import { FillSection } from "./FillSection";
+import { ImageSection } from "./ImageSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { LinkSection } from "./LinkSection";
 import { isMixed, mixedValue } from "./mixed";
@@ -105,6 +106,7 @@ function DesignTab({
       {runtime ? <EffectsSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <OpacitySection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AppearanceSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <ImageSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <LinkSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
     </>
   );

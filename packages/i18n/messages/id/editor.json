@@ -318,7 +318,12 @@
     "effect_x": "X",
     "effect_y": "Y",
     "effect_blur": "Blur",
-    "effect_spread": "Spread"
+    "effect_spread": "Spread",
+    "image": "Gambar",
+    "altText": "Teks alternatif (alt)",
+    "altPlaceholder": "Deskripsikan gambar singkat",
+    "decorative": "Dekoratif (tanpa alt)",
+    "altWarning": "Tambahkan alt text atau tandai dekoratif untuk aksesibilitas."
   },
   "nodeType": {
     "page": "Page",
