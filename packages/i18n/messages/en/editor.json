@@ -124,6 +124,10 @@
     "resize": "Resize panel",
     "comingSoon": "Coming soon."
   },
+  "layers": {
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
   "inspector": {
     "label": "Inspector",
     "resize": "Resize inspector",

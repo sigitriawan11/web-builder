@@ -1083,7 +1083,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.13 — Layers panel
 
-- [ ] **T2.13.1** Tree layers dengan react-arborist (virtualized), urutan sesuai keputusan OPEN 02#4 — ED-136 · `apps/editor/src/panels/layers` · Verifikasi: e2e 2.000 node scroll lancar
+- [x] **T2.13.1** Tree layers dengan react-arborist (virtualized), urutan sesuai keputusan OPEN 02#4 — ED-136 · `apps/editor/src/panels/layers` · Verifikasi: e2e 2.000 node scroll lancar
+  - Catatan (2026-10-17): `LayersPanel` (react-arborist Tree, virtualized, tinggi dari ResizeObserver) + `useLayerTree` (rebuild per frame via `afterTransaction`). **Urutan Figma** (OPEN 02#4): kebalikan urutan dokumen per level (atas = paling depan); `children` dokumen tetap urutan DOM. Seleksi sinkron dua arah dengan `selectionStore`. **Dependency baru `react-arborist@3.16.0`** (stack-approved; peer `react>=16.14` cocok React 19; >2 minggu; Lampiran D). Verifikasi: e2e `editor-layers` (tree tampil, klik→select, select→highlight). Benchmark 2.000 node = T2.18.3.
 - [ ] **T2.13.2** Rename layer (double-click, F2) — ED-137 · `apps/editor/src/panels/layers` · Verifikasi: e2e
 - [ ] **T2.13.3** Drag reorder & reparent di layers (validasi nesting tag) — ED-138 · `apps/editor/src/panels/layers` · Verifikasi: e2e
 - [ ] **T2.13.4** Toggle visibility & lock di baris layer — ED-139 · `apps/editor/src/panels/layers` · Verifikasi: e2e
@@ -2782,6 +2783,7 @@ Catat setiap perubahan struktural: task ditambah/dipecah/dipindah/dibatalkan, ke
 
 | Tanggal | Fase/Task | Perubahan | Alasan | Oleh |
 |---|---|---|---|---|
+| 2026-10-17 | T2.13.1 (dependency) | **Dependency baru `react-arborist@3.16.0`** untuk tree layers (ED-136). | Stack-approved (CLAUDE.md); peer `react>=16.14` cocok React 19.3; v3.16.0 rilis 2026-07-25 (>2 minggu), bundle dnd sendiri (tanpa react-dnd tambahan seperti 4.x); 4.x <2 minggu. | Claude Code (rekomendasi, mohon dikonfirmasi) |
 | 2026-10-17 | T2.11.7 / ED-122 | Tautan teks mendukung tipe **URL/email/telepon/WhatsApp**; **page/anchor/asset ditunda ke T2.15.4** (butuh picker page/node yang belum ada di konteks edit teks). | Tipe standalone cukup untuk MVP teks; link page/anchor berbagi infra picker dengan navigasi node (T2.15.4). | Claude Code (rekomendasi, mohon dikonfirmasi) |
 | 2026-10-17 | T2.11.9 / ED-125 | Converter rich text `attributesToMarks` di-harden: **buang atribut mark `null`/`undefined`** (y-prosemirror menserialisasi atribut belum-diisi sebagai null; skema textStyle = opsional, bukan nullable). Mark `textStyle` custom (color/weight/size/family). | Tanpa strip-null, mark textStyle parsial gagal validasi → node teks rusak. Owner menyetujui strip-null. | Claude Code (disetujui owner) |
 | 2026-10-17 | T2.11.4 / ED-119 | Field style **aditif** `textAlignVertical` (top/middle/bottom) untuk perataan vertikal teks (renderer → flex column justify-content). schema.lock diperbarui tanpa bump versi. Shortcut Mod+Alt+L/T/R/J ditunda ke T2.16. | Perataan vertikal butuh field baru (tidak ada di schema); aditif aman selama M2. Shortcut dikerjakan bersama sistem shortcut. | Claude Code (rekomendasi, mohon dikonfirmasi) |

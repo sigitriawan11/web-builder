@@ -117,8 +117,8 @@ export function LeftSidebar({ pages, layers, insert }: LeftSidebarProps) {
                 </div>
               ) : null}
             </section>
-            <section className="flex-1 p-2" data-testid="layers-section">
-              <h2 className="mb-1 text-xs font-semibold">{t("sidebar.tab.layers")}</h2>
+            <section className="flex min-h-0 flex-1 flex-col p-2" data-testid="layers-section">
+              <h2 className="mb-1 shrink-0 text-xs font-semibold">{t("sidebar.tab.layers")}</h2>
               <PanelErrorBoundary name="layers">
                 {layers ?? <p className="text-xs text-muted-foreground">{t("sidebar.comingSoon")}</p>}
               </PanelErrorBoundary>

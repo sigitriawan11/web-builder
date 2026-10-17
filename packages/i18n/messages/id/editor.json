@@ -124,6 +124,10 @@
     "resize": "Ubah lebar panel",
     "comingSoon": "Segera hadir."
   },
+  "layers": {
+    "expand": "Luaskan",
+    "collapse": "Ciutkan"
+  },
   "inspector": {
     "label": "Inspector",
     "resize": "Ubah lebar inspector",
