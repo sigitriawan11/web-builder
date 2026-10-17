@@ -424,7 +424,14 @@
     "panelLayers": "Panel: Layers",
     "panelAssets": "Panel: Assets",
     "panelInsert": "Panel: Insert",
-    "panelPages": "Panel: Pages"
+    "panelPages": "Panel: Pages",
+    "copy": "Copy",
+    "cut": "Cut",
+    "paste": "Paste",
+    "bringForward": "Bring forward",
+    "sendBackward": "Send backward",
+    "bringToFront": "Bring to front",
+    "sendToBack": "Send to back"
   },
   "palette": {
     "title": "Command palette",
@@ -434,5 +441,9 @@
     "goToLayer": "Go to layer",
     "empty": "No results",
     "close": "Close"
+  },
+  "contextMenu": {
+    "title": "Node actions",
+    "empty": "Canvas actions"
   }
 }

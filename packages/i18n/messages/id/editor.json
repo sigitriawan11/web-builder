@@ -424,7 +424,14 @@
     "panelLayers": "Panel: Layers",
     "panelAssets": "Panel: Assets",
     "panelInsert": "Panel: Insert",
-    "panelPages": "Panel: Pages"
+    "panelPages": "Panel: Pages",
+    "copy": "Salin",
+    "cut": "Potong",
+    "paste": "Tempel",
+    "bringForward": "Maju satu",
+    "sendBackward": "Mundur satu",
+    "bringToFront": "Ke paling depan",
+    "sendToBack": "Ke paling belakang"
   },
   "palette": {
     "title": "Command palette",
@@ -434,5 +441,9 @@
     "goToLayer": "Ke layer",
     "empty": "Tidak ada hasil",
     "close": "Tutup"
+  },
+  "contextMenu": {
+    "title": "Aksi node",
+    "empty": "Aksi kanvas"
   }
 }

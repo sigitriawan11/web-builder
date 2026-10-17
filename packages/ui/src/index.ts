@@ -7,6 +7,19 @@ export { Button, type ButtonProps, buttonVariants } from "./components/Button";
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./components/Card";
 export { Checkbox } from "./components/Checkbox";
 export {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "./components/ContextMenu";
+export {
   Dialog,
   DialogClose,
   DialogContent,

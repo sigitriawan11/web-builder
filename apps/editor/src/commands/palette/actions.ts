@@ -8,6 +8,7 @@ import {
 } from "@platform/document-model";
 import type { AlignEdge, DistributeAxis } from "../../canvas/align";
 import { applyAlign, applyDistribute } from "../../canvas/align-commands";
+import { applyZOrder } from "../../canvas/arrange-commands";
 import { removeAutoLayoutFromSelection, toggleAutoLayout } from "../../canvas/auto-layout/apply";
 import { zoomStep } from "../../canvas/camera-commands";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
@@ -91,6 +92,10 @@ export const PALETTE_ACTIONS: readonly PaletteAction[] = [
   alignAction("align.bottom", "bottom"),
   distributeAction("distribute.h", "horizontal"),
   distributeAction("distribute.v", "vertical"),
+  { id: "arrange.forward", enabled: () => sel().length === 1, run: (r) => applyZOrder(r, "forward") },
+  { id: "arrange.backward", enabled: () => sel().length === 1, run: (r) => applyZOrder(r, "backward") },
+  { id: "arrange.front", enabled: () => sel().length === 1, run: (r) => applyZOrder(r, "front") },
+  { id: "arrange.back", enabled: () => sel().length === 1, run: (r) => applyZOrder(r, "back") },
   { id: "node.addLink", enabled: () => sel().length === 1, run: () => nodeLinkStore.getState().requestOpen() },
   { id: "view.preview", run: () => previewModeStore.getState().toggle() },
   { id: "zoom.in", run: () => zoomStep("in") },

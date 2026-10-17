@@ -15,6 +15,7 @@ import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
+import { CanvasContextMenu } from "../commands/context-menu/CanvasContextMenu";
 import { CommandPalette } from "../commands/palette/CommandPalette";
 import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
@@ -209,7 +210,7 @@ function DocumentWorkspace({
       />
       <PreviewOverlay runtime={runtime} pageId={activePageId} />
       <CommandPalette runtime={runtime} />
-      <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
+      <CanvasContextMenu runtime={runtime} className="relative min-w-0 flex-1">
         <CanvasViewport runtime={runtime} />
         {devToolsEnabled() ? (
           <div className="absolute top-2 left-1/2 z-20 -translate-x-1/2 rounded-md border bg-background p-1 shadow-sm">
@@ -218,7 +219,7 @@ function DocumentWorkspace({
         ) : null}
         {/* ED-229: mode lihat saja — pointer ke canvas ditahan (server juga menolak update koneksi read-only). */}
         {readOnly ? <div className="absolute inset-0 z-10 cursor-not-allowed" data-testid="read-only-blocker" /> : null}
-      </div>
+      </CanvasContextMenu>
       <Inspector
         pageId={activePageId}
         runtime={runtime}

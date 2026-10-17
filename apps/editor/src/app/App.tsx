@@ -15,6 +15,9 @@ const PreviewOverlay = lazy(() => import("./PreviewOverlay").then((module) => ({
 const CommandPalette = lazy(() =>
   import("../commands/palette/CommandPalette").then((module) => ({ default: module.CommandPalette })),
 );
+const CanvasContextMenu = lazy(() =>
+  import("../commands/context-menu/CanvasContextMenu").then((module) => ({ default: module.CanvasContextMenu })),
+);
 
 // Bootstrap editor (ARCHITECTURE §5.2): providers → error boundary → rute.
 export function App() {
@@ -51,12 +54,12 @@ let playgroundRuntime: CanvasRuntime | null = null;
 function PlaygroundCanvas() {
   playgroundRuntime ??= createPlaygroundRuntime(window.location.search);
   return (
-    <>
-      <CanvasViewport runtime={playgroundRuntime} />
-      <Suspense fallback={null}>
-        <PreviewOverlay runtime={playgroundRuntime} pageId={playgroundRuntime.pageId} />
-        <CommandPalette runtime={playgroundRuntime} />
-      </Suspense>
-    </>
+    <Suspense fallback={null}>
+      <CanvasContextMenu runtime={playgroundRuntime} style={{ display: "contents" }}>
+        <CanvasViewport runtime={playgroundRuntime} />
+      </CanvasContextMenu>
+      <PreviewOverlay runtime={playgroundRuntime} pageId={playgroundRuntime.pageId} />
+      <CommandPalette runtime={playgroundRuntime} />
+    </Suspense>
   );
 }

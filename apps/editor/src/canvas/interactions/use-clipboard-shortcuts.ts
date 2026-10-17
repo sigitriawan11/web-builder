@@ -46,7 +46,7 @@ function serializeSubtree(runtime: CanvasRuntime, rootIds: readonly string[]): S
   return { rootIds: [...rootIds], nodes };
 }
 
-function copy(runtime: CanvasRuntime): Subtree | null {
+export function copy(runtime: CanvasRuntime): Subtree | null {
   const roots = selectionRoots(runtime, selectionStore.getState().selectedIds);
   if (roots.length === 0) return null;
   const subtree = serializeSubtree(runtime, roots);
@@ -108,7 +108,7 @@ function pasteParent(runtime: CanvasRuntime, roots: Set<string>): string {
   return runtime.pageId;
 }
 
-async function paste(runtime: CanvasRuntime, inPlace: boolean): Promise<void> {
+export async function paste(runtime: CanvasRuntime, inPlace: boolean): Promise<void> {
   if (runtime.isReadOnly()) return;
   const raw = (await readSystemPayload()) ?? clipboardStore.getState().entry?.payload ?? null;
   if (!raw) return;
@@ -134,7 +134,7 @@ async function paste(runtime: CanvasRuntime, inPlace: boolean): Promise<void> {
   }
 }
 
-function duplicate(runtime: CanvasRuntime): void {
+export function duplicate(runtime: CanvasRuntime): void {
   if (runtime.isReadOnly()) return;
   const roots = selectionRoots(runtime, selectionStore.getState().selectedIds);
   if (roots.length === 0) return;
@@ -149,7 +149,7 @@ function duplicate(runtime: CanvasRuntime): void {
   }
 }
 
-function cut(runtime: CanvasRuntime): void {
+export function cut(runtime: CanvasRuntime): void {
   if (runtime.isReadOnly()) return;
   if (!copy(runtime)) return;
   const roots = selectionRoots(runtime, selectionStore.getState().selectedIds);
