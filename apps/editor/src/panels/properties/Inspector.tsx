@@ -14,6 +14,7 @@ import {
   uiPreferencesStore,
 } from "../../store/ui-preferences";
 import { ResizeHandle } from "../ResizeHandle";
+import { AppearanceSection } from "./AppearanceSection";
 import { AutoLayoutHint } from "./AutoLayoutHint";
 import { AutoLayoutSection } from "./AutoLayoutSection";
 import { EffectsSection } from "./EffectsSection";
@@ -100,6 +101,7 @@ function DesignTab({
       {runtime ? <RadiusSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <EffectsSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <OpacitySection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <AppearanceSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
     </>
   );
 }

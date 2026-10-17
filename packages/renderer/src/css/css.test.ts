@@ -256,6 +256,21 @@ describe("pemetaan style → CSS (spec 07 §4.2)", () => {
     expect(Object.fromEntries(nodeDeclarations(image, {}))).toEqual({ display: "block", "object-fit": "cover" });
   });
 
+  // ED-112 AC: clip content off (prop absen/false) → tidak ada `overflow:hidden`, anak boleh melimpah.
+  it("deklarasi node: clipContent off → tanpa overflow", () => {
+    const doc = heroDocument();
+    const hero = doc.nodes.n_hero000001;
+    if (hero?.type !== "frame") throw new Error("fixture berubah");
+    hero.props = {};
+    expect(
+      Object.fromEntries(nodeDeclarations(hero, { layout: { mode: "flex", direction: "column" } })),
+    ).not.toHaveProperty("overflow");
+    hero.props = { clipContent: false };
+    expect(
+      Object.fromEntries(nodeDeclarations(hero, { layout: { mode: "flex", direction: "column" } })),
+    ).not.toHaveProperty("overflow");
+  });
+
   it("string CSS di-escape (nama font, URL)", () => {
     expect(cssString('Font "Aneh"\nBaris')).toBe('"Font \\"Aneh\\"\\a Baris"');
   });

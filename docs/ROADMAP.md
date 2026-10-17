@@ -1042,7 +1042,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
   - Catatan: ✅ 2026-10-17 — field `effects: ShadowSchema[]` **ditambah ke style schema** (aditif, `schema.lock` diperbarui) + renderer `effects()` → `box-shadow` (innerShadow = `inset`, multi digabung koma). `EffectsSection`: daftar bayangan (tambah/hapus), tipe drop/inner, X/Y/blur/spread, warna. Verifikasi: **e2e** `editor-inspector.spec` (tambah → box-shadow; blur 10; inner → `inset`; hapus). 609 doc-model + 143 renderer hijau.
 - [x] **T2.10.8** Opacity layer — ED-110, DM-031 · `apps/editor` · Verifikasi: e2e; shortcut angka 1–0
   - Catatan: ✅ 2026-10-17 — field `opacity` (0–1) **ditambah ke style schema** (aditif, tanpa bump versi; `schema.lock` diperbarui) + renderer `opacity:N` (0 valid). `OpacitySection` (input 0–100% → 0–1) + **shortcut angka** `use-opacity-shortcut` (1–9 = 10–90%, 0 = 100%; node terkunci dilewati). Verifikasi: **e2e** (input 50% → 0.5 + canvas `opacity:0.5`; tekan 3 → 0.3; 0 → 1). 609 doc-model + 143 renderer hijau.
-- [ ] **T2.10.9** Overflow / clip content — ED-112 · `apps/editor`, `packages/renderer` · Verifikasi: unit test
+- [x] **T2.10.9** Overflow / clip content — ED-112 · `apps/editor`, `packages/renderer` · Verifikasi: unit test
+  - Catatan (2026-10-17): checkbox "Clip content" (section Appearance, frame) → `props.clipContent` via `setNodeProps` → renderer `overflow:hidden` (sudah ada). Unit test renderer off-case (`css.test.ts`) + e2e `editor-clip-content.spec.ts`. **Overflow scroll** (horizontal/vertical) = P1, ditunda ke M4 sesuai spec ED-112.
 - [ ] **T2.10.10** Interaction states hover & pressed sebagai style variant di dokumen + renderer CSS `:hover`/`:active` — DM-040 · `packages/document-model`, `packages/renderer` · Verifikasi: snapshot CSS
 
 #### Epic 2.11 — Typography & rich text
