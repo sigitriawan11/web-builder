@@ -126,3 +126,39 @@ test("AC ED-143: multi-select Shift (rentang) & Mod (toggle) di layers", async (
   await page.getByTestId(`layer-${b}`).click({ modifiers: ["ControlOrMeta"] });
   await expect.poll(sel).toEqual([a, c].sort());
 });
+
+test("AC ED-140: collapse frame → anak tersembunyi; select anak di canvas → auto-expand", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layer Collapse Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await firstPageId(page);
+  const frame = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: pageId,
+        type: "frame",
+        style: { base: { position: { type: "absolute", x: 40, y: 40 }, size: sizeFixed(200, 160) } },
+      })
+    ).value,
+  );
+  const child = String(
+    (
+      await editorCommand(page, "createNode", {
+        parentId: frame,
+        type: "shape",
+        props: { shape: "rect" },
+        style: { base: { size: sizeFixed(80, 80) } },
+      })
+    ).value,
+  );
+  await expect(page.getByTestId(`layer-${child}`)).toBeVisible();
+
+  // Collapse frame → anak tidak dirender.
+  await page.getByTestId(`layer-toggle-${frame}`).click();
+  await expect(page.getByTestId(`layer-${child}`)).toHaveCount(0);
+
+  // Select anak di canvas → tree auto-expand ke node itu.
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), child);
+  await expect(page.getByTestId(`layer-${child}`)).toBeVisible();
+});

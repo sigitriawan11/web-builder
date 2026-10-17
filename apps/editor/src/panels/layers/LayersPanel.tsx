@@ -16,7 +16,7 @@ import {
   TypeIcon,
 } from "lucide-react";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { type NodeRendererProps, Tree } from "react-arborist";
+import { type NodeRendererProps, Tree, type TreeApi } from "react-arborist";
 import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
@@ -40,6 +40,8 @@ interface LayerActions {
   setEditingId: (id: string | null) => void;
   // ED-143: klik dengan modifier — Shift = rentang, Mod = toggle, selain itu seleksi tunggal.
   onRowClick: (id: string, event: { shiftKey: boolean; metaKey: boolean; ctrlKey: boolean }) => void;
+  // ED-140: Alt+klik toggle = rekursif (buka/tutup seluruh subtree).
+  recursiveToggle: (data: LayerNode, open: boolean) => void;
 }
 const LayerActionsContext = createContext<LayerActions | null>(null);
 
@@ -47,6 +49,14 @@ function flattenIds(nodes: readonly LayerNode[], out: string[] = []): string[] {
   for (const node of nodes) {
     out.push(node.id);
     if (node.children) flattenIds(node.children, out);
+  }
+  return out;
+}
+
+function containerIds(node: LayerNode, out: string[] = []): string[] {
+  if (node.children) {
+    out.push(node.id);
+    for (const child of node.children) containerIds(child, out);
   }
   return out;
 }
@@ -65,7 +75,21 @@ export function LayersPanel({
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const treeRef = useRef<TreeApi<LayerNode> | null>(null);
   const flatIds = useMemo(() => flattenIds(tree), [tree]);
+  const recursiveToggle = (data: LayerNode, open: boolean) => {
+    const api = treeRef.current;
+    if (!api) return;
+    for (const id of containerIds(data)) (open ? api.open : api.close).call(api, id);
+  };
+  // ED-140: buka otomatis ke node terseleksi (buka semua ancestornya).
+  useEffect(() => {
+    const expand = (ids: readonly string[]) => {
+      for (const id of ids) treeRef.current?.openParents(id);
+    };
+    expand(selectionStore.getState().selectedIds);
+    return selectionStore.subscribe((state) => expand(state.selectedIds));
+  }, []);
   const onRowClick: LayerActions["onRowClick"] = (id, event) => {
     const store = selectionStore.getState();
     const anchor = store.anchorId;
@@ -96,10 +120,11 @@ export function LayersPanel({
   }, []);
 
   return (
-    <LayerActionsContext.Provider value={{ runtime, readOnly, editingId, setEditingId, onRowClick }}>
+    <LayerActionsContext.Provider value={{ runtime, readOnly, editingId, setEditingId, onRowClick, recursiveToggle }}>
       <div ref={containerRef} className="min-h-0 flex-1" data-testid="layers-tree">
         {size.height > 0 ? (
           <Tree<LayerNode>
+            ref={treeRef}
             data={tree}
             width={size.width}
             height={size.height}
@@ -175,7 +200,8 @@ function LayerRow({ node, style }: NodeRendererProps<LayerNode>) {
             data-testid={`layer-toggle-${node.id}`}
             onClick={(event) => {
               event.stopPropagation();
-              node.toggle();
+              if (event.altKey) actions?.recursiveToggle(node.data, !node.isOpen);
+              else node.toggle();
             }}
             className="flex size-3.5 items-center justify-center text-muted-foreground"
           >

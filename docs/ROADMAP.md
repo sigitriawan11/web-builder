@@ -1090,7 +1090,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 - [ ] **T2.13.3** Drag reorder & reparent di layers (validasi nesting tag) — ED-138 · `apps/editor/src/panels/layers` · Verifikasi: e2e
 - [x] **T2.13.4** Toggle visibility & lock di baris layer — ED-139 · `apps/editor/src/panels/layers` · Verifikasi: e2e
   - Catatan (2026-10-17): Toggle visibility (`setVisible`) & lock (`setLocked`) per baris (hover-reveal). Verifikasi: e2e `editor-layers`.
-- [ ] **T2.13.5** Collapse & expand (Alt+klik = rekursif), auto-expand ke seleksi — ED-140 · `apps/editor/src/panels/layers` · Verifikasi: e2e
+- [x] **T2.13.5** Collapse & expand (Alt+klik = rekursif), auto-expand ke seleksi — ED-140 · `apps/editor/src/panels/layers` · Verifikasi: e2e
+  - Catatan (2026-10-17): toggle per node; **Alt+klik = rekursif** (buka/tutup subtree via TreeApi open/close), **auto-expand ke seleksi** (`openParents` saat selectionStore berubah). e2e `editor-layers` (collapse → anak hilang; select anak → auto-expand).
 - [x] **T2.13.6** Ikon per tipe node — ED-141 · `apps/editor/src/panels/layers` · Verifikasi: snapshot
   - Catatan (2026-10-17): Ikon per tipe node (`TYPE_ICON` di `LayerRow`). Verifikasi: tampil di e2e `editor-layers`.
 - [x] **T2.13.7** Multi-select & keyboard di layers (Shift range, Mod toggle, panah) — ED-143 · `apps/editor/src/panels/layers` · Verifikasi: e2e
