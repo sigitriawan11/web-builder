@@ -33,6 +33,9 @@ export const LINT_ISSUE_CODES = [
   "IMAGE_MISSING_ALT",
   "LIMIT_WARNING",
   "NESTED_LINK",
+  // ED-219/DM-009: nesting tag.
+  "LI_OUTSIDE_LIST",
+  "MULTIPLE_MAIN",
 ] as const;
 
 export const ISSUE_CODES = [...STRUCTURE_ISSUE_CODES, ...REFERENCE_ISSUE_CODES, ...LINT_ISSUE_CODES] as const;

@@ -151,3 +151,26 @@ describe("lint NESTED_LINK", () => {
     expect(nested.sort()).toEqual(["n_heroimg001", "n_herottl001"]);
   });
 });
+
+// T2.17.4: DM-009/ED-219 — nesting tag (li di luar ul/ol, >1 main per page).
+describe("lint nesting (ED-219)", () => {
+  const codes = (doc: SiteDocument, code: string) =>
+    lintDocument(doc)
+      .filter((warning) => warning.code === code)
+      .map((warning) => warning.nodeId);
+
+  it("li di luar ul/ol → LI_OUTSIDE_LIST; di dalam ul → bersih", () => {
+    const doc = heroDocument();
+    (doc.nodes.n_herottl001 as unknown as Record<string, unknown>).tag = "li"; // parent = section (div)
+    expect(codes(doc, "LI_OUTSIDE_LIST")).toEqual(["n_herottl001"]);
+
+    (doc.nodes.n_hero000001 as unknown as Record<string, unknown>).tag = "ul";
+    expect(codes(doc, "LI_OUTSIDE_LIST")).toEqual([]);
+  });
+
+  it("frame bertag main (selain wrapper page) → MULTIPLE_MAIN", () => {
+    const doc = heroDocument();
+    (doc.nodes.n_hero000001 as unknown as Record<string, unknown>).tag = "main";
+    expect(codes(doc, "MULTIPLE_MAIN")).toEqual(["n_hero000001"]);
+  });
+});
