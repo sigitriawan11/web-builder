@@ -208,7 +208,15 @@
     "constraint_topBottom": "Atas & bawah",
     "autoLayoutHint": "Gunakan Auto layout agar frame ini rapi di HP.",
     "convert": "Konversi",
-    "dismiss": "Tutup"
+    "dismiss": "Tutup",
+    "fill": "Fill",
+    "addFill": "Tambah fill",
+    "removeFill": "Hapus fill",
+    "fillVisible": "Tampil/sembunyikan fill",
+    "color": "Warna",
+    "colorHex": "Warna hex",
+    "swatches": "Warna dokumen",
+    "token": "Token"
   },
   "nodeType": {
     "page": "Page",

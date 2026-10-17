@@ -208,7 +208,15 @@
     "constraint_topBottom": "Top & bottom",
     "autoLayoutHint": "Use Auto layout so this frame stays tidy on mobile.",
     "convert": "Convert",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "fill": "Fill",
+    "addFill": "Add fill",
+    "removeFill": "Remove fill",
+    "fillVisible": "Toggle fill visibility",
+    "color": "Color",
+    "colorHex": "Hex color",
+    "swatches": "Document colors",
+    "token": "Token"
   },
   "nodeType": {
     "page": "Page",

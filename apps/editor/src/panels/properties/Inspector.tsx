@@ -16,6 +16,7 @@ import {
 import { ResizeHandle } from "../ResizeHandle";
 import { AutoLayoutHint } from "./AutoLayoutHint";
 import { AutoLayoutSection } from "./AutoLayoutSection";
+import { FillSection } from "./FillSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { isMixed, mixedValue } from "./mixed";
 import { PositionSizeSection } from "./PositionSizeSection";
@@ -90,6 +91,7 @@ function DesignTab({
       {runtime ? <AutoLayoutHint runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AutoLayoutSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <FillSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
     </>
   );
 }
