@@ -32,6 +32,7 @@ import { useMeasure } from "./interactions/use-measure";
 import { useNodeLinkShortcut } from "./interactions/use-node-link-shortcut";
 import { useNudge } from "./interactions/use-nudge";
 import { useOpacityShortcut } from "./interactions/use-opacity-shortcut";
+import { usePaletteShortcut } from "./interactions/use-palette-shortcut";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { usePixelGridShortcut } from "./interactions/use-pixel-grid-shortcut";
 import { usePreviewShortcut } from "./interactions/use-preview-shortcut";
@@ -109,6 +110,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   useClipboardShortcuts(runtime);
   useBreakpointShortcut();
   usePreviewShortcut();
+  usePaletteShortcut();
   useNodeLinkShortcut(runtime);
   useSelectionNav(runtime);
   useSelectAll(runtime);

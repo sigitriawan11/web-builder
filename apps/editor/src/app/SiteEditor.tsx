@@ -15,6 +15,7 @@ import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
+import { CommandPalette } from "../commands/palette/CommandPalette";
 import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
 import { NodeStoreContext, useNodeFromStore } from "../document/use-node";
@@ -207,6 +208,7 @@ function DocumentWorkspace({
         }
       />
       <PreviewOverlay runtime={runtime} pageId={activePageId} />
+      <CommandPalette runtime={runtime} />
       <div className="relative min-w-0 flex-1" data-testid="editor-canvas">
         <CanvasViewport runtime={runtime} />
         {devToolsEnabled() ? (

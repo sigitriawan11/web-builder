@@ -12,6 +12,9 @@ const SiteEditor = lazy(() => import("./SiteEditor").then((module) => ({ default
 const SiteNotFound = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteNotFound })));
 // Overlay preview memuat renderer statis — dipisah dari bundle utama; di playground dipakai untuk e2e.
 const PreviewOverlay = lazy(() => import("./PreviewOverlay").then((module) => ({ default: module.PreviewOverlay })));
+const CommandPalette = lazy(() =>
+  import("../commands/palette/CommandPalette").then((module) => ({ default: module.CommandPalette })),
+);
 
 // Bootstrap editor (ARCHITECTURE §5.2): providers → error boundary → rute.
 export function App() {
@@ -52,6 +55,7 @@ function PlaygroundCanvas() {
       <CanvasViewport runtime={playgroundRuntime} />
       <Suspense fallback={null}>
         <PreviewOverlay runtime={playgroundRuntime} pageId={playgroundRuntime.pageId} />
+        <CommandPalette runtime={playgroundRuntime} />
       </Suspense>
     </>
   );
