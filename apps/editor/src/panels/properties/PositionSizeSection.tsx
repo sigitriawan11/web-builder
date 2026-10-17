@@ -194,39 +194,43 @@ export function PositionSizeSection({
         </div>
       </InspectorRow>
       <InspectorRow label={t("inspector.size")}>
-        <div className="grid grid-cols-2 gap-1">
+        <div className="flex flex-col gap-1">
           <div className="flex gap-1">
-            <NumberInput
-              label={t("inspector.width")}
-              scrubLabel="W"
-              value={widthValue}
-              min={1}
-              testId="inspector-width"
-              onCommit={(update) =>
-                commit(
-                  update,
-                  (_node, i) => rects[i]?.width,
-                  (node, value) => setSize(node, "width", value),
-                )
-              }
-            />
+            <div className="min-w-0 flex-1">
+              <NumberInput
+                label={t("inspector.width")}
+                scrubLabel="W"
+                value={widthValue}
+                min={1}
+                testId="inspector-width"
+                onCommit={(update) =>
+                  commit(
+                    update,
+                    (_node, i) => rects[i]?.width,
+                    (node, value) => setSize(node, "width", value),
+                  )
+                }
+              />
+            </div>
             <SizeModeSelect axis="width" value={sizeModeValue("width")} readOnly={readOnly} onChange={setSizeMode} />
           </div>
           <div className="flex gap-1">
-            <NumberInput
-              label={t("inspector.height")}
-              scrubLabel="H"
-              value={heightValue}
-              min={1}
-              testId="inspector-height"
-              onCommit={(update) =>
-                commit(
-                  update,
-                  (_node, i) => rects[i]?.height,
-                  (node, value) => setSize(node, "height", value),
-                )
-              }
-            />
+            <div className="min-w-0 flex-1">
+              <NumberInput
+                label={t("inspector.height")}
+                scrubLabel="H"
+                value={heightValue}
+                min={1}
+                testId="inspector-height"
+                onCommit={(update) =>
+                  commit(
+                    update,
+                    (_node, i) => rects[i]?.height,
+                    (node, value) => setSize(node, "height", value),
+                  )
+                }
+              />
+            </div>
             <SizeModeSelect axis="height" value={sizeModeValue("height")} readOnly={readOnly} onChange={setSizeMode} />
           </div>
         </div>
@@ -336,7 +340,7 @@ function SizeModeSelect({
       disabled={readOnly}
       value={isMixed(value) ? "" : String(value)}
       onChange={(event) => onChange(axis, event.target.value as "fixed" | "hug" | "fill")}
-      className="h-7 min-w-0 shrink rounded border border-transparent bg-muted/50 px-1 text-xs hover:border-border focus:border-ring"
+      className="h-7 w-24 shrink-0 rounded border border-transparent bg-muted/50 px-1 text-xs hover:border-border focus:border-ring"
     >
       {isMixed(value) ? (
         <option value="" disabled>
