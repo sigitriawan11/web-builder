@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { handlePositions, MIN_SIZE_FOR_EDGE_HANDLES, sizeLabel, unionRect } from "./selection-geometry";
+import { HANDLE_OUTSET, handlePositions, MIN_SIZE_FOR_EDGE_HANDLES, sizeLabel, unionRect } from "./selection-geometry";
 
 describe("unionRect", () => {
   it("menggabungkan beberapa rect; kosong → null", () => {
@@ -14,7 +14,7 @@ describe("unionRect", () => {
 });
 
 describe("handlePositions (ED-060)", () => {
-  it("8 handle: 4 sudut + 4 sisi di titik yang tepat", () => {
+  it("node besar: 8 handle (4 sudut + 4 sisi) di tepi kotak, tanpa offset", () => {
     const handles = handlePositions({ x: 100, y: 50, width: 200, height: 80 });
 
     expect(Object.fromEntries(handles.map(({ handle, x, y }) => [handle, [x, y]]))).toEqual({
@@ -29,7 +29,7 @@ describe("handlePositions (ED-060)", () => {
     });
   });
 
-  it(`node lebih kecil dari ${MIN_SIZE_FOR_EDGE_HANDLES}px screen hanya menampilkan sudut`, () => {
+  it(`node lebih kecil dari ${MIN_SIZE_FOR_EDGE_HANDLES}px screen: hanya sudut, digeser keluar ${HANDLE_OUTSET}px`, () => {
     expect(handlePositions({ x: 0, y: 0, width: 20, height: 100 }).map(({ handle }) => handle)).toEqual([
       "nw",
       "ne",
@@ -37,7 +37,16 @@ describe("handlePositions (ED-060)", () => {
       "sw",
     ]);
     expect(handlePositions({ x: 0, y: 0, width: 100, height: 23 })).toHaveLength(4);
-    expect(handlePositions({ x: 0, y: 0, width: 24, height: 24 })).toHaveLength(8);
+    // Ikon 24px (dulu 8 handle menumpuk): kini 4 sudut di luar kotak agar bisa digrab.
+    const o = HANDLE_OUTSET;
+    expect(
+      Object.fromEntries(handlePositions({ x: 0, y: 0, width: 24, height: 24 }).map((h) => [h.handle, [h.x, h.y]])),
+    ).toEqual({
+      nw: [-o, -o],
+      ne: [24 + o, -o],
+      se: [24 + o, 24 + o],
+      sw: [-o, 24 + o],
+    });
   });
 });
 

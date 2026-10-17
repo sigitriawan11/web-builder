@@ -18,27 +18,32 @@ export function unionRect(rects: readonly Box[]): Box | null {
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
 
-// ED-060: handle sisi disembunyikan bila node lebih kecil dari ini (px screen); sudut tetap tampil.
-export const MIN_SIZE_FOR_EDGE_HANDLES = 24;
+// ED-060: node kecil (px screen) → sisi disembunyikan & sudut digeser ke luar kotak agar bisa digrab (badan tetap
+// bebas untuk pindah). Node ≥ ambang ini: handle di tepi kotak seperti biasa.
+export const MIN_SIZE_FOR_EDGE_HANDLES = 40;
+// Pergeseran sudut ke luar kotak untuk node kecil (≈ setengah area klik handle 10×10 + jarak). Tanpa ini handle
+// menumpuk badan node mungil (mis. ikon 24px) sehingga drag selalu terbaca "pindah", bukan resize.
+export const HANDLE_OUTSET = 8;
 
 const CORNERS: ResizeHandle[] = ["nw", "ne", "se", "sw"];
 const EDGES: ResizeHandle[] = ["n", "e", "s", "w"];
 
-// Titik pusat tiap handle pada kotak screen.
+// Titik pusat tiap handle pada kotak screen. Node kecil: sudut digeser keluar `HANDLE_OUTSET` px, sisi disembunyikan.
 export function handlePositions(box: Box): { handle: ResizeHandle; x: number; y: number }[] {
   const { x, y, width, height } = box;
+  const small = width < MIN_SIZE_FOR_EDGE_HANDLES || height < MIN_SIZE_FOR_EDGE_HANDLES;
+  const o = small ? HANDLE_OUTSET : 0;
   const position: Record<ResizeHandle, { x: number; y: number }> = {
-    nw: { x, y },
-    n: { x: x + width / 2, y },
-    ne: { x: x + width, y },
-    e: { x: x + width, y: y + height / 2 },
-    se: { x: x + width, y: y + height },
-    s: { x: x + width / 2, y: y + height },
-    sw: { x, y: y + height },
-    w: { x, y: y + height / 2 },
+    nw: { x: x - o, y: y - o },
+    n: { x: x + width / 2, y: y - o },
+    ne: { x: x + width + o, y: y - o },
+    e: { x: x + width + o, y: y + height / 2 },
+    se: { x: x + width + o, y: y + height + o },
+    s: { x: x + width / 2, y: y + height + o },
+    sw: { x: x - o, y: y + height + o },
+    w: { x: x - o, y: y + height / 2 },
   };
-  const showEdges = width >= MIN_SIZE_FOR_EDGE_HANDLES && height >= MIN_SIZE_FOR_EDGE_HANDLES;
-  return [...CORNERS, ...(showEdges ? EDGES : [])].map((handle) => ({ handle, ...position[handle] }));
+  return [...CORNERS, ...(small ? [] : EDGES)].map((handle) => ({ handle, ...position[handle] }));
 }
 
 export type AxisMode = "fixed" | "hug" | "fill" | undefined;
