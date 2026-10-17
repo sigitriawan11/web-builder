@@ -9,6 +9,9 @@ import {
   AlignVerticalJustifyEndIcon,
   AlignVerticalJustifyStartIcon,
   ChevronDownIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+  UnderlineIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -111,6 +114,14 @@ export function TypographySection({
   };
 
   const weightMixed = fieldValue("fontWeight");
+
+  // ED-120: decoration/case/italic — semua field typography yang sudah ada.
+  const decoration = mixedValue(texts.map((node) => effective(node)?.textDecoration as string | undefined));
+  const fontStyle = mixedValue(texts.map((node) => effective(node)?.fontStyle as string | undefined));
+  const textCase = mixedValue(texts.map((node) => effective(node)?.textTransform as string | undefined));
+  const italicOn = !isMixed(fontStyle) && fontStyle === "italic";
+  const underlineOn = !isMixed(decoration) && decoration === "underline";
+  const strikeOn = !isMixed(decoration) && decoration === "lineThrough";
 
   // ED-119: horizontal = typography.textAlign; vertical = style.textAlignVertical (updateStyle langsung).
   const textAlign = mixedValue(texts.map((node) => effective(node)?.textAlign as string | undefined));
@@ -235,7 +246,85 @@ export function TypographySection({
           />
         </div>
       </InspectorRow>
+      <InspectorRow label={t("inspector.textDecoration")}>
+        <div className="flex items-center gap-1">
+          <IconToggle
+            active={italicOn}
+            icon={<ItalicIcon className="size-3.5" />}
+            title={t("inspector.italic")}
+            testId="italic"
+            readOnly={readOnly}
+            onClick={() => commitTypography(() => ({ fontStyle: italicOn ? "normal" : "italic" }))}
+          />
+          <IconToggle
+            active={underlineOn}
+            icon={<UnderlineIcon className="size-3.5" />}
+            title={t("inspector.underline")}
+            testId="underline"
+            readOnly={readOnly}
+            onClick={() => commitTypography(() => ({ textDecoration: underlineOn ? "none" : "underline" }))}
+          />
+          <IconToggle
+            active={strikeOn}
+            icon={<StrikethroughIcon className="size-3.5" />}
+            title={t("inspector.strikethrough")}
+            testId="strikethrough"
+            readOnly={readOnly}
+            onClick={() => commitTypography(() => ({ textDecoration: strikeOn ? "none" : "lineThrough" }))}
+          />
+          <select
+            aria-label={t("inspector.textCase")}
+            data-testid="text-case"
+            disabled={readOnly}
+            value={isMixed(textCase) ? "" : String(textCase ?? "none")}
+            onChange={(event) => commitTypography(() => ({ textTransform: event.target.value }))}
+            className="h-7 flex-1 rounded border border-transparent bg-muted/50 px-1 text-xs hover:border-border focus:border-ring"
+          >
+            {isMixed(textCase) ? <option value="" disabled /> : null}
+            {(["none", "uppercase", "lowercase", "capitalize"] as const).map((option) => (
+              <option key={option} value={option}>
+                {t(`inspector.case_${option}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </InspectorRow>
     </InspectorSection>
+  );
+}
+
+// Toggle boolean mandiri (italic/underline/strike).
+function IconToggle({
+  active,
+  icon,
+  title,
+  testId,
+  readOnly,
+  onClick,
+}: {
+  active: boolean;
+  icon: ReactNode;
+  title: string;
+  testId: string;
+  readOnly: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={readOnly}
+      aria-pressed={active}
+      aria-label={title}
+      title={title}
+      data-testid={testId}
+      onClick={onClick}
+      className={cn(
+        "flex size-7 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40",
+        active && "bg-accent text-foreground",
+      )}
+    >
+      {icon}
+    </button>
   );
 }
 

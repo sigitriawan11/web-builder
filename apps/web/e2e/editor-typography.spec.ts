@@ -89,3 +89,35 @@ test("AC ED-119: alignment horizontal (text-align) & vertikal (fixed height 200 
   await page.getByTestId("talign-center").click();
   await expect(node).toHaveCSS("text-align", "center");
 });
+
+test("AC ED-120: italic, underline, uppercase → tersimpan & tercermin di canvas", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Text Style Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+
+  const canvas = page.getByTestId("editor-canvas");
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("canvas tidak terlihat");
+
+  await page.keyboard.press("t");
+  await page.mouse.click(box.x + 80, box.y + 80);
+  const textId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  await expect(canvas.locator(`[data-node-id="${textId}"] .ProseMirror`)).toBeFocused();
+  await page.keyboard.type("Halo");
+  await page.keyboard.press("Escape");
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), textId);
+
+  await page.getByTestId("italic").click();
+  await page.getByTestId("underline").click();
+  await page.getByTestId("text-case").selectOption("uppercase");
+
+  await expect
+    .poll(() => typographyOf(page, textId))
+    .toMatchObject({ fontStyle: "italic", textDecoration: "underline", textTransform: "uppercase" });
+
+  const node = canvas.locator(`[data-node-id="${textId}"]`);
+  await expect(node).toHaveCSS("font-style", "italic");
+  await expect(node).toHaveCSS("text-transform", "uppercase");
+  expect(await node.evaluate((el) => getComputedStyle(el).textDecorationLine)).toContain("underline");
+});
