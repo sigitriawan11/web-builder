@@ -9,6 +9,7 @@ import { FrameLabels } from "./overlay/FrameLabels";
 import { MeasureOverlay } from "./overlay/MeasureOverlay";
 import { PixelGridOverlay } from "./overlay/PixelGridOverlay";
 import { ReorderOverlay } from "./overlay/ReorderOverlay";
+import { RulerOverlay } from "./overlay/RulerOverlay";
 import { SelectionOverlay } from "./overlay/SelectionOverlay";
 import { SnapGuidesOverlay } from "./overlay/SnapGuidesOverlay";
 import { Toasts } from "./overlay/Toasts";
@@ -34,6 +35,7 @@ export function CanvasOverlay() {
       <MeasureOverlay />
       <FrameLabels />
       <DrawPreview />
+      <RulerOverlay />
       <Toasts />
       <div className="overlay-zoom-indicator">{Math.round(zoom * 100)}%</div>
     </div>

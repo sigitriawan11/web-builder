@@ -35,6 +35,8 @@ const PreferencesSchema = z.object({
   snapToPixelGrid: z.boolean().catch(true),
   // ED-074: tampilkan garis pixel grid saat zoom ≥ 800% (toggle Shift+').
   pixelGridVisible: z.boolean().catch(true),
+  // ED-029: penggaris horizontal & vertikal di tepi canvas (toggle Shift+R). Default mati.
+  rulersVisible: z.boolean().catch(false),
 });
 export type UiPreferences = z.infer<typeof PreferencesSchema>;
 
@@ -50,6 +52,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   showAllFrames: false,
   snapToPixelGrid: true,
   pixelGridVisible: true,
+  rulersVisible: false,
 };
 
 export const clampSidebarWidth = (width: number) =>

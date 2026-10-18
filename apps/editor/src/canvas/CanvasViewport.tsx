@@ -38,6 +38,7 @@ import { usePaletteShortcut } from "./interactions/use-palette-shortcut";
 import { usePanInteractions } from "./interactions/use-pan-interactions";
 import { usePixelGridShortcut } from "./interactions/use-pixel-grid-shortcut";
 import { usePreviewShortcut } from "./interactions/use-preview-shortcut";
+import { useRulerShortcut } from "./interactions/use-ruler-shortcut";
 import { useSectionShortcuts } from "./interactions/use-section-shortcuts";
 import { useSelectAll } from "./interactions/use-select-all";
 import { useSelectionNav } from "./interactions/use-selection-nav";
@@ -124,6 +125,7 @@ export function CanvasViewport({ runtime, imageUpload }: { runtime: CanvasRuntim
   useAlignShortcuts(runtime);
   useAutoLayoutShortcut(runtime);
   usePixelGridShortcut();
+  useRulerShortcut();
   useOpacityShortcut(runtime);
   useMeasure(viewportRef, runtime);
   useCreateTool(viewportRef, runtime);
