@@ -24,6 +24,7 @@ import { type Constraints, propagateConstraints } from "../constraints";
 import { screenDeltaToWorld, screenPoint, screenToWorld } from "../geometry/coordinates";
 import type { GeometryStore, WorldRect } from "../geometry/geometry-store";
 import type { InteractionState } from "../interactions/interaction-machine";
+import { equalSpacingSnap } from "../snapping/equal-spacing";
 import { computeSnap, type Rect } from "../snapping/snap";
 import { moveDelta, movedPosition } from "./move";
 import { absoluteDropPosition, type ChildBox, insertionMarker, reorderIndex } from "./reorder";
@@ -337,8 +338,18 @@ export function useDragSessions(deps: DragSessionDeps): void {
       const union = unionBounds(rects);
       if (!union) return { ...raw, guides: [] };
       const movingAt: Rect = { x: union.x + raw.dx, y: union.y + raw.dy, width: union.width, height: union.height };
-      const snap = computeSnap(movingAt, snapCandidates(items.map((item) => item.id)), 5 / cameraStore.getState().zoom);
-      return { dx: raw.dx + snap.dx, dy: raw.dy + snap.dy, guides: snap.guides };
+      const threshold = 5 / cameraStore.getState().zoom;
+      const candidates = snapCandidates(items.map((item) => item.id));
+      const snap = computeSnap(movingAt, candidates, threshold);
+      // ED-077: equal-spacing — hanya di sumbu yang belum ter-snap oleh alignment tepi/pusat.
+      const spacing = equalSpacingSnap(
+        { ...movingAt, x: movingAt.x + snap.dx, y: movingAt.y + snap.dy },
+        candidates,
+        threshold,
+      );
+      const dx = snap.dx !== 0 ? snap.dx : spacing.dx;
+      const dy = snap.dy !== 0 ? snap.dy : spacing.dy;
+      return { dx: raw.dx + dx, dy: raw.dy + dy, guides: snap.guides };
     };
 
     const endMove = () => {
