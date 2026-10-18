@@ -15,6 +15,7 @@ const security: SecurityEnv = {
   connectOrigins: [
     origin(env.PUBLIC_API_URL),
     origin(env.PUBLIC_REALTIME_URL),
+    ...(env.PUBLIC_UPLOAD_URL ? [origin(env.PUBLIC_UPLOAD_URL)] : []),
     ...(env.NEXT_PUBLIC_SENTRY_DSN ? [origin(env.NEXT_PUBLIC_SENTRY_DSN)] : []),
   ],
   imageOrigins: [origin(env.PUBLIC_ASSETS_URL)],

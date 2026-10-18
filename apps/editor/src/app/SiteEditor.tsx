@@ -1,6 +1,6 @@
 import { userOrigin } from "@platform/document-model";
 import { isApiError } from "@platform/sdk";
-import { useSite } from "@platform/sdk/react";
+import { usePlatformApi, useSite } from "@platform/sdk/react";
 import type { Site } from "@platform/shared/contracts";
 import { Button } from "@platform/ui";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -115,7 +115,7 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
         data-requested-page-id={requestedPage ?? ""}
       >
         {session && status !== "loading" ? (
-          <DocumentWorkspace session={session} workspace={workspace} onOpenPage={openPage} />
+          <DocumentWorkspace session={session} workspace={workspace} siteId={site.id} onOpenPage={openPage} />
         ) : (
           <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
         )}
@@ -183,16 +183,20 @@ function useEditAccessOrEditing(session: DocumentSession | null): string {
 function DocumentWorkspace({
   session,
   workspace,
+  siteId,
   onOpenPage,
 }: {
   session: DocumentSession;
   workspace: WorkspaceRuntime;
+  siteId: string;
   onOpenPage(pageId: string): void;
 }) {
+  const api = usePlatformApi();
   const { runtime, pageOrder, schemaVersion, outdated, readOnly, activePageId } = workspace;
   // ED-230: dokumen dari editor yang lebih baru → tidak ada canvas/runtime (tidak bisa diedit).
   if (outdated && schemaVersion !== null) return <EditorOutdated version={schemaVersion} />;
   if (!runtime || !activePageId) return null;
+  const imageUpload = { siteId, assets: api.assets, readOnly };
   return (
     <NodeStoreContext.Provider value={runtime.nodeStore}>
       {/* ED-242: test API hanya di build dev (ter-tree-shake dari production). */}
@@ -213,7 +217,7 @@ function DocumentWorkspace({
       <PreviewOverlay runtime={runtime} pageId={activePageId} />
       <CommandPalette runtime={runtime} />
       <CanvasContextMenu runtime={runtime} className="relative min-w-0 flex-1">
-        <CanvasViewport runtime={runtime} />
+        <CanvasViewport runtime={runtime} imageUpload={imageUpload} />
         {devToolsEnabled() ? (
           <div className="absolute top-2 left-1/2 z-20 -translate-x-1/2 rounded-md border bg-background p-1 shadow-sm">
             <DevInsertBar runtime={runtime} readOnly={readOnly} />

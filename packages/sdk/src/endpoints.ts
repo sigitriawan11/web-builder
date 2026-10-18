@@ -1,10 +1,13 @@
 import {
   type AcceptConsentsBody,
+  AssetSummarySchema,
   ConsentStatusSchema,
   type CreateSiteBody,
   dataEnvelope,
   type ListSitesQuery,
   listEnvelope,
+  type PresignUploadRequest,
+  PresignUploadResponseSchema,
   ProfileSchema,
   RealtimeTokenResponseSchema,
   SessionInfoSchema,
@@ -51,6 +54,23 @@ export function createPlatformApi(client: ApiClient) {
       rename: (siteId: string, body: UpdateSiteBody) =>
         client.request("PATCH", `/v1/sites/${siteId}`, { body, schema: dataEnvelope(SiteSchema) }).then(unwrap),
       remove: (siteId: string) => client.request("DELETE", `/v1/sites/${siteId}`),
+    },
+    assets: {
+      // Upload aset (ARCHITECTURE §9.9): presign → PUT langsung ke storage → complete (antre image-processing).
+      presign: (siteId: string, body: PresignUploadRequest) =>
+        client
+          .request("POST", `/v1/sites/${siteId}/assets`, { body, schema: dataEnvelope(PresignUploadResponseSchema) })
+          .then(unwrap),
+      complete: (siteId: string, assetId: string) =>
+        client
+          .request("POST", `/v1/sites/${siteId}/assets/${assetId}/complete`, {
+            schema: dataEnvelope(AssetSummarySchema),
+          })
+          .then(unwrap),
+      get: (siteId: string, assetId: string) =>
+        client
+          .request("GET", `/v1/sites/${siteId}/assets/${assetId}`, { schema: dataEnvelope(AssetSummarySchema) })
+          .then(unwrap),
     },
     account: {
       profile: () => client.request("GET", "/v1/account/profile", { schema: dataEnvelope(ProfileSchema) }).then(unwrap),

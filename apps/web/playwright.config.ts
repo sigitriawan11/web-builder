@@ -37,8 +37,19 @@ const stackEnv = {
   PUBLIC_APP_URL: APP_URL,
   APP_ENV: "local",
 };
+// Object storage (MinIO lokal) untuk upload aset e2e (T2.12.*). api & worker memakainya.
+const s3Env = {
+  S3_ENDPOINT: process.env.S3_ENDPOINT ?? "http://localhost:9000",
+  S3_REGION: "auto",
+  S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID ?? "minioadmin",
+  S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY ?? "minioadmin",
+  S3_BUCKET_UPLOADS: "uploads",
+  S3_BUCKET_ASSETS: "assets",
+  S3_FORCE_PATH_STYLE: "true",
+};
 const apiEnv = {
   ...stackEnv,
+  ...s3Env,
   API_PORT: String(API_PORT),
   BETTER_AUTH_URL: `${APP_URL}/api/auth`,
   PUBLIC_REALTIME_URL: REALTIME_URL,
@@ -54,8 +65,9 @@ const realtimeEnv = {
 };
 const workerEnv = {
   ...stackEnv,
+  ...s3Env,
   WORKER_HEALTH_PORT: String(WORKER_HEALTH_PORT),
-  WORKER_QUEUES: "email,dead-letter",
+  WORKER_QUEUES: "email,dead-letter,image-processing",
   LOG_LEVEL: "warn",
 };
 
@@ -100,6 +112,8 @@ export default defineConfig({
         SENTRY_DSN,
         SENTRY_ENVIRONMENT: "e2e",
         EDITOR_ORIGIN: `http://localhost:${EDITOR_PORT}`,
+        // Upload presigned ke MinIO (ED-160) — origin diizinkan di CSP connect-src.
+        PUBLIC_UPLOAD_URL: s3Env.S3_ENDPOINT,
         APP_ENV: "local",
         NEXT_DIST_DIR: ".next-e2e",
       },

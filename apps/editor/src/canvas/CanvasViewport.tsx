@@ -26,6 +26,7 @@ import { useAutoLayoutShortcut } from "./interactions/use-auto-layout-shortcut";
 import { useBreakpointShortcut } from "./interactions/use-breakpoint-shortcut";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { useClipboardShortcuts } from "./interactions/use-clipboard-shortcuts";
+import { type ImageUploadContext, useImageDrop } from "./interactions/use-image-drop";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLockHide } from "./interactions/use-lock-hide";
 import { useMeasure } from "./interactions/use-measure";
@@ -84,7 +85,8 @@ function runtimeDeps(runtime: CanvasRuntime) {
 }
 
 // Viewport canvas untuk satu dokumen (`runtime`): playground M0 (fixture) maupun editor situs (Y.Doc realtime).
-export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
+// `imageUpload` hanya diisi editor situs (butuh siteId & API) → drag-drop gambar aktif; playground = undefined.
+export function CanvasViewport({ runtime, imageUpload }: { runtime: CanvasRuntime; imageUpload?: ImageUploadContext }) {
   const viewportRef = useRef<HTMLElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
   const deps = useMemo(() => runtimeDeps(runtime), [runtime]);
@@ -112,6 +114,7 @@ export function CanvasViewport({ runtime }: { runtime: CanvasRuntime }) {
   usePreviewShortcut();
   usePaletteShortcut();
   useNodeLinkShortcut(runtime);
+  useImageDrop(viewportRef, runtime, imageUpload);
   useSelectionNav(runtime);
   useSelectAll(runtime);
   useLockHide(runtime);

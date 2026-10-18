@@ -1,23 +1,21 @@
 import type { AssetEntry } from "@platform/document-model";
-import type { ApiClient } from "@platform/sdk";
+import type { PlatformApi } from "@platform/sdk";
 import {
+  type AllowedImageMime,
   type AssetSummary,
-  AssetSummarySchema,
   assetKindForMime,
-  dataEnvelope,
   MAX_IMAGE_UPLOAD_BYTES,
-  PresignUploadResponseSchema,
 } from "@platform/shared/contracts";
 
 // Orkestrasi upload gambar dari editor (ED-160, ARCHITECTURE §9.9): presign → PUT langsung ke storage → complete
-// (antre image-processing). Murni terhadap transport: ApiClient untuk /v1 + `httpPut` untuk PUT presigned (bisa
-// di-fake di test). Validasi mime/ukuran di sisi klien juga (fail cepat sebelum request).
+// (antre image-processing). Murni terhadap transport: endpoint `assets` dari PlatformApi + `httpPut` (bisa di-fake di
+// test). Validasi mime/ukuran di klien juga (fail cepat sebelum request).
 
 export class UploadError extends Error {}
 
 export interface UploadDeps {
   siteId: string;
-  client: ApiClient;
+  assets: Pick<PlatformApi["assets"], "presign" | "complete">;
   // PUT ke URL presigned (bukan lewat /api). Default: fetch global.
   httpPut?: (
     url: string,
@@ -45,31 +43,22 @@ export async function uploadImage(file: File, deps: UploadDeps): Promise<UploadR
   const kind = assetKindForMime(file.type);
   if (!kind) throw new UploadError("unsupported-type");
 
-  const presign = await deps.client.request("POST", `/v1/sites/${deps.siteId}/assets`, {
-    body: { mime: file.type, sizeBytes: file.size, fileName: file.name },
-    schema: dataEnvelope(PresignUploadResponseSchema),
+  const presign = await deps.assets.presign(deps.siteId, {
+    // Sudah divalidasi allowlist oleh validateImageUpload di atas.
+    mime: file.type as AllowedImageMime,
+    sizeBytes: file.size,
+    fileName: file.name,
   });
 
-  const put = await (deps.httpPut ?? defaultPut)(presign.data.uploadUrl, {
+  const put = await (deps.httpPut ?? defaultPut)(presign.uploadUrl, {
     method: "PUT",
-    headers: presign.data.headers,
+    headers: presign.headers,
     body: file,
   });
   if (!put.ok) throw new UploadError(`upload-failed-${put.status}`);
 
-  const complete = await deps.client.request(
-    "POST",
-    `/v1/sites/${deps.siteId}/assets/${presign.data.assetId}/complete`,
-    {
-      schema: dataEnvelope(AssetSummarySchema),
-    },
-  );
-
-  return {
-    assetId: presign.data.assetId,
-    status: complete.data.status,
-    entry: { kind, mime: file.type },
-  };
+  const complete = await deps.assets.complete(deps.siteId, presign.assetId);
+  return { assetId: presign.assetId, status: complete.status, entry: { kind, mime: file.type } };
 }
 
 const defaultPut: NonNullable<UploadDeps["httpPut"]> = async (url, init) => {

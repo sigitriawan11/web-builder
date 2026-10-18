@@ -16,6 +16,8 @@ export const WebEnvSchema = z.object({
   PUBLIC_API_URL: z.url(),
   PUBLIC_REALTIME_URL: z.url(),
   PUBLIC_ASSETS_URL: z.url(),
+  // Origin storage tempat browser PUT upload presigned (MinIO lokal / R2 prod) — diizinkan di connect-src (ED-160).
+  PUBLIC_UPLOAD_URL: z.url().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.union([z.url(), z.literal("")]).optional(),
   // Cloudflare Turnstile site key (publik, ACC-004); lokal = kunci uji Cloudflare.
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1),
