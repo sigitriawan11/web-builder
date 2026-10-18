@@ -4,7 +4,7 @@ import { queryKeys, usePlatformApi, useSite } from "@platform/sdk/react";
 import type { Site } from "@platform/shared/contracts";
 import { Button } from "@platform/ui";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import * as Y from "yjs";
 import { useStore } from "zustand";
 import { CanvasViewport } from "../canvas/CanvasViewport";
@@ -199,15 +199,19 @@ function DocumentWorkspace({
   const api = usePlatformApi();
   const queryClient = useQueryClient();
   const { runtime, pageOrder, schemaVersion, outdated, readOnly, activePageId } = workspace;
+  // Identitas stabil: hook canvas (useImageTool cleanup meng-clear antrean stamp) tak boleh re-run tiap render.
+  const imageUpload = useMemo(
+    () => ({
+      siteId,
+      assets: api.assets,
+      readOnly,
+      onUploaded: () => queryClient.invalidateQueries({ queryKey: queryKeys.assets.all }),
+    }),
+    [siteId, api.assets, readOnly, queryClient],
+  );
   // ED-230: dokumen dari editor yang lebih baru → tidak ada canvas/runtime (tidak bisa diedit).
   if (outdated && schemaVersion !== null) return <EditorOutdated version={schemaVersion} />;
   if (!runtime || !activePageId) return null;
-  const imageUpload = {
-    siteId,
-    assets: api.assets,
-    readOnly,
-    onUploaded: () => queryClient.invalidateQueries({ queryKey: queryKeys.assets.all }),
-  };
   return (
     <NodeStoreContext.Provider value={runtime.nodeStore}>
       {/* ED-242: test API hanya di build dev (ter-tree-shake dari production). */}

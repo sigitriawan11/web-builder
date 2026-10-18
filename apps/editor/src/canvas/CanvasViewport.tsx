@@ -9,6 +9,7 @@ import { useUndoShortcuts } from "../document/use-undo-shortcuts";
 import { breakpointStore } from "../store/breakpoint-store";
 import { uiPreferencesStore } from "../store/ui-preferences";
 import { recordEditorAction, reportError } from "../telemetry/telemetry";
+import { useImageTool } from "../tools/image/use-image-tool";
 import { useHoverHighlight } from "../tools/select/use-hover-highlight";
 import { type SelectToolDeps, useSelectTool } from "../tools/select/use-select-tool";
 import { useToolShortcuts } from "../tools/use-tool-shortcuts";
@@ -115,6 +116,7 @@ export function CanvasViewport({ runtime, imageUpload }: { runtime: CanvasRuntim
   usePaletteShortcut();
   useNodeLinkShortcut(runtime);
   useImageDrop(viewportRef, runtime, imageUpload);
+  useImageTool(viewportRef, runtime, imageUpload);
   useSelectionNav(runtime);
   useSelectAll(runtime);
   useLockHide(runtime);

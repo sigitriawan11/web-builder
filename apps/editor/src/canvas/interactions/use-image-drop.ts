@@ -74,13 +74,28 @@ async function placeImage(
   }
 }
 
-/** Buat node image untuk asset yang SUDAH terdaftar/terupload — dipakai drop (setelah upload) & pustaka media (ED-161).
- * Satu transaksi (registerAsset + createNode) = satu undo; node baru langsung terpilih. */
+interface FixedDim {
+  mode: "fixed";
+  value: number;
+  unit: "px";
+}
+
+/** Buat node image untuk asset yang SUDAH terdaftar/terupload — dipakai drop (setelah upload), pustaka media (ED-161)
+ * & image tool (ED-045). Satu transaksi (registerAsset + createNode) = satu undo; node baru langsung terpilih.
+ * `size`/`position` opsional (image tool memakai ukuran natural ter-clamp + posisi klik). */
 export function insertImageNode(
   runtime: CanvasRuntime,
-  input: { assetId: string; entry: AssetEntry; name: string; parentId: string },
+  input: {
+    assetId: string;
+    entry: AssetEntry;
+    name: string;
+    parentId: string;
+    size?: { width: FixedDim; height: FixedDim };
+    position?: { type: "absolute"; x: number; y: number };
+  },
 ): string | null {
   const ctx = { doc: runtime.doc, origin: runtime.origin };
+  const size = input.size ?? { width: DEFAULT_SIZE, height: DEFAULT_HEIGHT };
   runtime.undo.stopCapturing();
   let newId: string | null = null;
   runtime.doc.transact(() => {
@@ -90,7 +105,7 @@ export function insertImageNode(
       type: "image",
       name: input.name,
       props: { image: { assetId: input.assetId }, fit: "cover" },
-      style: { base: { size: { width: DEFAULT_SIZE, height: DEFAULT_HEIGHT } } },
+      style: { base: { size, ...(input.position ? { position: input.position } : {}) } },
     });
     if (result.ok) newId = result.value;
   }, runtime.origin);

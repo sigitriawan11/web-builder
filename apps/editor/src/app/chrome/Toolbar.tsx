@@ -42,16 +42,18 @@ import {
   TypeIcon,
   Undo2Icon,
 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { useStore } from "zustand";
 import { zoomStep, zoomTo } from "../../canvas/camera-commands";
 import { cameraStore } from "../../canvas/camera-store";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useUndoState } from "../../document/use-undo-state";
 import { IconPicker } from "../../panels/icons/IconPicker";
+import { validateImageUpload } from "../../services/upload/upload";
 import { BREAKPOINT_OPTIONS, breakpointStore } from "../../store/breakpoint-store";
 import { previewModeStore } from "../../store/preview-mode-store";
 import { uiPreferencesStore } from "../../store/ui-preferences";
+import { imageStampStore } from "../../tools/image/image-stamp-store";
 import { TOOLS, toolDefinition } from "../../tools/tool-catalog";
 import { type ToolId, toolStore } from "../../tools/tool-store";
 import { useT } from "../i18n";
@@ -106,6 +108,15 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
   const [shape, setShape] = useState<ToolId>("rectangle");
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const selectTool = (tool: ToolId) => toolStore.getState().dispatch({ type: "selectTool", tool });
+  // ED-045: image tool — pilih file (multi), antre stamp, aktifkan tool (klik kanvas = taruh). Ukuran natural dibaca
+  // saat penempatan (sinkron di sini agar tool langsung aktif).
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const onImageFiles = (files: readonly File[]) => {
+    const valid = files.filter((file) => !validateImageUpload(file)).map((file) => ({ file }));
+    if (valid.length === 0) return;
+    imageStampStore.getState().setPending(valid);
+    selectTool("image");
+  };
   const toolLabel = (tool: ToolId) => t(`toolbar.tool.${tool}`);
   const firstShortcut = (tool: ToolId) => toolDefinition(tool).shortcuts[0];
   const ShapeIcon = TOOL_ICONS[shape];
@@ -254,7 +265,27 @@ export function Toolbar({ siteName, pageTitle, runtime, status, language }: Tool
           </DropdownMenu>
         </div>
         {toolButton("text")}
-        {toolButton("image")}
+        <ToolbarButton
+          label={toolLabel("image")}
+          shortcut={firstShortcut("image")}
+          pressed={activeTool === "image"}
+          icon={<ImageIcon />}
+          data-testid="tool-image"
+          onClick={() => imageInputRef.current?.click()}
+        />
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          hidden
+          data-testid="tool-image-file"
+          onChange={(event) => {
+            const picked = event.target.files ? [...event.target.files] : [];
+            event.target.value = "";
+            onImageFiles(picked);
+          }}
+        />
         {runtime ? (
           <Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
             <PopoverTrigger asChild>

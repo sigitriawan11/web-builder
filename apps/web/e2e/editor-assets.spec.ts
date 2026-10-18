@@ -190,6 +190,34 @@ test("AC ED-224: 100 gambar di satu page tidak memuat >20 sebelum scroll/pan (la
   expect(requested.size).toBeGreaterThan(0); // sanity: mekanisme memang menembak permintaan untuk yang terlihat
 });
 
+test("AC ED-045: image tool — pilih 5 file lalu 5 klik → 5 node image", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Image Tool Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  // Pilih 5 file di input image tool (tersembunyi) → antre stamp + tool jadi "image".
+  const buffer = Buffer.from(PNG_BASE64, "base64");
+  const files = Array.from({ length: 5 }, (_, i) => ({ name: `img${i}.png`, mimeType: "image/png", buffer }));
+  await page.getByTestId("tool-image-file").setInputFiles(files);
+  await expect(page.getByTestId("tool-image")).toHaveAttribute("aria-pressed", "true");
+
+  // Klik 5× di titik berbeda → tiap klik menaruh satu gambar (urut).
+  const viewport = page.getByTestId("editor-viewport");
+  for (let i = 0; i < 5; i++) {
+    await viewport.click({ position: { x: 120 + i * 10, y: 90 + i * 55 } });
+  }
+
+  // 5 node image dengan asset terbentuk; tool kembali ke Move setelah stamp terakhir (ED-037).
+  await expect
+    .poll(
+      async () =>
+        Object.values((await getDoc(page)).nodes).filter((n) => n.type === "image" && n.props?.image?.assetId).length,
+      { timeout: 20_000 },
+    )
+    .toBe(5);
+  await expect(page.getByTestId("tool-select")).toHaveAttribute("aria-pressed", "true");
+});
+
 // Tunggu node image baru (yang belum ada di `known`) muncul & punya assetId.
 async function waitForImageNode(page: Page, known: Set<string>): Promise<string> {
   let id = "";
