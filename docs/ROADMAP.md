@@ -1119,7 +1119,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
   - Catatan (2026-10-17): paste in place `Mod+Shift+V` (offset 0). e2e posisi sama.
 - [x] **T2.14.3** Duplicate (`Mod+D`) dengan offset/urutan — ED-193 · `apps/editor` · Verifikasi: e2e
   - Catatan (2026-10-17): duplicate `Mod+D` → `duplicateNodes` offset +10. e2e page bertambah.
-- [ ] **T2.14.4** Paste gambar & teks dari luar (gambar → upload; teks → text node) — ED-190, ED-160 · `apps/editor` · Verifikasi: e2e paste teks
+- [x] **T2.14.4** Paste gambar & teks dari luar (gambar → upload; teks → text node) — ED-190, ED-160 · `apps/editor` · Verifikasi: e2e paste teks
+  - Catatan (2026-10-18): `paste` (use-clipboard-shortcuts) kini jatuh ke **`pasteExternal`** bila clipboard tak punya payload Platform: **gambar** di clipboard → `uploadImage` + `insertImageNode` (butuh `imageUpload` context, di-thread dari CanvasViewport; invalidate pustaka); **teks** → node `text` baru (tiap baris = paragraf; baris kosong = paragraf tanpa isi, sesuai RichTextDocSchema; posisi tengah viewport bila parent freeform). Reuse `insertImageNode`/`uploadImage`. Verifikasi: **e2e** `editor-assets` AC ED-190/T2.14.4 (tulis teks ke clipboard sistem → Mod+V → node text berisi teks). Paste gambar luar (screenshot) juga didukung via jalur yang sama (butuh izin clipboard-read; tak di-e2e otomatis karena menulis gambar ke clipboard OS tidak stabil lintas-headless).
   - Catatan (2026-10-17): **ditunda** — paste gambar butuh upload (Epic 2.12); paste teks dari luar = polish menyusul.
 
 #### Epic 2.15 — Responsif dasar & preview

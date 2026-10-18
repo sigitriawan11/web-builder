@@ -110,7 +110,7 @@ export function CanvasViewport({ runtime, imageUpload }: { runtime: CanvasRuntim
   useZoomShortcuts(runtime);
   useSectionShortcuts(runtime);
   useWrapShortcut(runtime);
-  useClipboardShortcuts(runtime);
+  useClipboardShortcuts(runtime, imageUpload);
   useBreakpointShortcut();
   usePreviewShortcut();
   usePaletteShortcut();

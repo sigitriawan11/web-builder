@@ -1,4 +1,5 @@
 import {
+  createNode,
   deleteNodes,
   duplicateNodes,
   insertSubtree,
@@ -9,10 +10,14 @@ import {
 } from "@platform/document-model";
 import { useEffect } from "react";
 import { isEditableEvent } from "../../commands/is-editable-target";
+import { UploadError, uploadImage, validateImageUpload } from "../../services/upload/upload";
 import { clipboardStore } from "../../store/clipboard-store";
 import { selectionStore } from "../../store/selection-store";
 import { showToastText } from "../../store/toast-store";
+import { cameraStore } from "../camera-store";
 import type { CanvasRuntime } from "../canvas-runtime";
+import { screenPoint, screenToWorld } from "../geometry/coordinates";
+import { type ImageUploadContext, insertImageNode } from "./use-image-drop";
 
 // ED-190/191/193: copy/cut/paste/paste-in-place/duplicate. Payload = subtree JSON (string). Mekanisme utama =
 // clipboard store in-memory (andal, lintas-tab via system clipboard best-effort). Node di-rekonstruksi dengan ID baru
@@ -109,12 +114,19 @@ function pasteParent(runtime: CanvasRuntime, roots: Set<string>): string {
   return runtime.pageId;
 }
 
-export async function paste(runtime: CanvasRuntime, inPlace: boolean): Promise<void> {
+export async function paste(runtime: CanvasRuntime, inPlace: boolean, upload?: ImageUploadContext): Promise<void> {
   if (runtime.isReadOnly()) return;
   const raw = (await readSystemPayload()) ?? clipboardStore.getState().entry?.payload ?? null;
-  if (!raw) return;
+  // ED-190/T2.14.4: tanpa payload Platform → paste dari luar (gambar → upload+node image; teks → node text).
+  if (!raw) {
+    await pasteExternal(runtime, upload);
+    return;
+  }
   const parsed = SubtreeSchema.safeParse(JSON.parse(raw));
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    await pasteExternal(runtime, upload);
+    return;
+  }
   const subtree = parsed.data;
   if (!inPlace) {
     const step = (clipboardStore.getState().pasteCount + 1) * 10;
@@ -136,6 +148,93 @@ export async function paste(runtime: CanvasRuntime, inPlace: boolean): Promise<v
     // ED-228: paste ditolak (mis. melewati batas node, DM-076) → toast error, dokumen tidak berubah (atomik).
     showToastText(result.error.message);
   }
+}
+
+// ED-190/T2.14.4: paste dari sumber luar. Gambar di clipboard → upload + node image; selain itu teks → node text.
+async function pasteExternal(runtime: CanvasRuntime, upload: ImageUploadContext | undefined): Promise<void> {
+  const file = upload ? await readClipboardImage() : null;
+  if (file && upload) {
+    if (validateImageUpload(file)) {
+      showToastText({ id: "File gambar tidak didukung", en: "Unsupported image file" });
+      return;
+    }
+    try {
+      const { assetId, entry } = await uploadImage(file, { siteId: upload.siteId, assets: upload.assets });
+      insertImageNode(runtime, { assetId, entry, name: file.name, parentId: pasteParent(runtime, new Set()) });
+      upload.onUploaded?.();
+    } catch (error) {
+      if (error instanceof UploadError) showToastText({ id: "Gagal mengunggah gambar", en: "Image upload failed" });
+      else throw error;
+    }
+    return;
+  }
+  const text = await readClipboardText();
+  if (text.trim()) insertTextNode(runtime, text);
+}
+
+async function readClipboardImage(): Promise<File | null> {
+  try {
+    if (!navigator.clipboard?.read) return null;
+    for (const item of await navigator.clipboard.read()) {
+      const imageType = item.types.find((type) => type.startsWith("image/"));
+      if (imageType) return new File([await item.getType(imageType)], "pasted-image", { type: imageType });
+    }
+  } catch {
+    // izin ditolak / tak ada gambar → coba teks
+  }
+  return null;
+}
+
+async function readClipboardText(): Promise<string> {
+  try {
+    return (await navigator.clipboard?.readText?.()) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+// World point di tengah viewport (lokal terhadap parent) untuk menaruh node baru dari paste luar.
+function viewportCenterLocal(runtime: CanvasRuntime, parentId: string): { x: number; y: number } {
+  const rect = document.getElementById("editor-viewport")?.getBoundingClientRect();
+  const center = screenPoint((rect?.left ?? 0) + (rect?.width ?? 0) / 2, (rect?.top ?? 0) + (rect?.height ?? 0) / 2);
+  const world = screenToWorld(center, cameraStore.getState(), { left: rect?.left ?? 0, top: rect?.top ?? 0 });
+  const parentRect = runtime.geometry.store.getRect(parentId);
+  return { x: Math.round(world.x - (parentRect?.x ?? 0)), y: Math.round(world.y - (parentRect?.y ?? 0)) };
+}
+
+function insertTextNode(runtime: CanvasRuntime, text: string): void {
+  const parentId = pasteParent(runtime, new Set());
+  const parent = runtime.nodeStore.getNode(parentId);
+  const parentIsFlow = parent?.style.base?.layout?.mode === "flex";
+  // Tiap baris → satu paragraf; baris kosong = paragraf tanpa isi (schema: inline text wajib min 1 char).
+  const content = {
+    type: "doc" as const,
+    content: text
+      .split(/\r?\n/)
+      .map((line) =>
+        line.length > 0
+          ? { type: "paragraph" as const, content: [{ type: "text" as const, text: line }] }
+          : { type: "paragraph" as const },
+      ),
+  };
+  const size = { width: { mode: "hug" as const }, height: { mode: "hug" as const } };
+  const base = parentIsFlow
+    ? { size, typography: { $token: "type.body" } }
+    : {
+        size,
+        typography: { $token: "type.body" },
+        position: { type: "absolute" as const, ...viewportCenterLocal(runtime, parentId) },
+      };
+  runtime.undo.stopCapturing();
+  const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, createNode, {
+    parentId,
+    type: "text",
+    props: { content, autoSize: "width" },
+    style: { base },
+  });
+  runtime.undo.stopCapturing();
+  if (result.ok) selectionStore.getState().select([result.value]);
+  else showToastText(result.error.message);
 }
 
 export function duplicate(runtime: CanvasRuntime): void {
@@ -166,7 +265,7 @@ export function cut(runtime: CanvasRuntime): void {
   else showToastText(result.error.message);
 }
 
-export function useClipboardShortcuts(runtime: CanvasRuntime): void {
+export function useClipboardShortcuts(runtime: CanvasRuntime, upload?: ImageUploadContext): void {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (isEditableEvent(event)) return;
@@ -177,7 +276,7 @@ export function useClipboardShortcuts(runtime: CanvasRuntime): void {
         cut(runtime);
       } else if (event.code === "KeyV") {
         event.preventDefault();
-        void paste(runtime, event.shiftKey); // Shift = paste in place (ED-191)
+        void paste(runtime, event.shiftKey, upload); // Shift = paste in place (ED-191); upload = paste gambar luar
       } else if (event.code === "KeyD" && !event.shiftKey) {
         event.preventDefault();
         duplicate(runtime);
@@ -185,5 +284,5 @@ export function useClipboardShortcuts(runtime: CanvasRuntime): void {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [runtime]);
+  }, [runtime, upload]);
 }

@@ -271,6 +271,34 @@ test("AC ED-104: image fill pada frame — tambah via upload lalu ubah mode (fit
   await expect.poll(async () => (await imageFill())?.fit).toBe("tile");
 });
 
+test("AC ED-190/T2.14.4: paste teks dari luar → node text", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Paste Text Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  await page.evaluate(() => navigator.clipboard.writeText("Halo dunia paste"));
+  await page.getByTestId("editor-viewport").click({ position: { x: 60, y: 60 } });
+  await page.keyboard.press("ControlOrMeta+v");
+
+  // Node text terbentuk berisi teks clipboard (konten rich-text: paragraf → inline text).
+  const pastedText = () =>
+    page.evaluate(() => {
+      const doc = window.__editorTestApi?.getDoc() as {
+        nodes: Record<
+          string,
+          { type: string; props?: { content?: { content?: { content?: { text?: string }[] }[] } } }
+        >;
+      };
+      const node = Object.values(doc.nodes).find((n) => n.type === "text");
+      return (node?.props?.content?.content ?? [])
+        .flatMap((block) => block.content ?? [])
+        .map((inline) => inline.text ?? "")
+        .join("");
+    });
+  await expect.poll(pastedText, { timeout: 10_000 }).toContain("Halo dunia paste");
+});
+
 // Tunggu node image baru (yang belum ada di `known`) muncul & punya assetId.
 async function waitForImageNode(page: Page, known: Set<string>): Promise<string> {
   let id = "";
