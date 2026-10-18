@@ -11,6 +11,7 @@ import { RenderScope } from "../render-root/RenderRoot";
 import { createEditorRenderEnv, RenderEnvContext } from "../render-root/render-env";
 import type { FrameMode, FrameSpec } from "./frame-layout";
 import { IframeFrame } from "./IframeFrame";
+import { useFrameCulling } from "./use-frame-culling";
 
 interface CanvasFramesProps {
   pageId: string;
@@ -81,6 +82,7 @@ function FrameContent({
 
 // ED-034: page dirender di satu atau beberapa breakpoint frame berdampingan.
 export function CanvasFrames({ pageId, frames, activeBreakpoint, mode, scopeClassName, siteFont }: CanvasFramesProps) {
+  const cullRef = useFrameCulling();
   return frames.map((frame) =>
     mode === "iframe" ? (
       <IframeFrame key={frame.breakpoint} frame={frame} siteFont={siteFont}>
@@ -89,6 +91,8 @@ export function CanvasFrames({ pageId, frames, activeBreakpoint, mode, scopeClas
     ) : (
       <div
         key={frame.breakpoint}
+        // ED-021 Level 1: observasi culling (frame non-aktif di luar viewport → content-visibility:hidden).
+        ref={frame.breakpoint === activeBreakpoint ? undefined : cullRef}
         className={`bp-frame bp-${frame.breakpoint}`}
         data-breakpoint={frame.breakpoint}
         style={{ position: "absolute", left: frame.x, top: 0, width: frame.width, minHeight: frame.minHeight }}
