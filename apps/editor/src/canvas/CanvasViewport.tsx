@@ -29,6 +29,7 @@ import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { useClipboardShortcuts } from "./interactions/use-clipboard-shortcuts";
 import { type ImageUploadContext, useImageDrop } from "./interactions/use-image-drop";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
+import { useLayerSearchShortcut } from "./interactions/use-layer-search-shortcut";
 import { useLockHide } from "./interactions/use-lock-hide";
 import { useMeasure } from "./interactions/use-measure";
 import { useNodeLinkShortcut } from "./interactions/use-node-link-shortcut";
@@ -115,6 +116,7 @@ export function CanvasViewport({ runtime, imageUpload }: { runtime: CanvasRuntim
   useBreakpointShortcut();
   usePreviewShortcut();
   usePaletteShortcut();
+  useLayerSearchShortcut();
   useNodeLinkShortcut(runtime);
   useImageDrop(viewportRef, runtime, imageUpload);
   useImageTool(viewportRef, runtime, imageUpload);

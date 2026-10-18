@@ -18,6 +18,7 @@ import { SaveIndicator } from "../collaboration/SaveIndicator";
 import { SessionBanners } from "../collaboration/SessionBanners";
 import { useDocumentSession } from "../collaboration/use-document-session";
 import { CanvasContextMenu } from "../commands/context-menu/CanvasContextMenu";
+import { LayerSearch } from "../commands/layer-search/LayerSearch";
 import { CommandPalette } from "../commands/palette/CommandPalette";
 import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
@@ -232,6 +233,7 @@ function DocumentWorkspace({
       />
       <PreviewOverlay runtime={runtime} pageId={activePageId} />
       <CommandPalette runtime={runtime} />
+      <LayerSearch runtime={runtime} />
       <CanvasContextMenu runtime={runtime} className="relative min-w-0 flex-1">
         <CanvasViewport runtime={runtime} imageUpload={imageUpload} />
         {devToolsEnabled() ? (

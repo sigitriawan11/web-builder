@@ -484,5 +484,11 @@
   "contextMenu": {
     "title": "Aksi node",
     "empty": "Aksi kanvas"
+  },
+  "layerSearch": {
+    "title": "Cari layer",
+    "placeholder": "Cari layer berdasarkan nama atau teks…",
+    "empty": "Tidak ada layer yang cocok.",
+    "close": "Tutup"
   }
 }

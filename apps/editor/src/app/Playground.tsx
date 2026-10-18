@@ -3,6 +3,7 @@ import { CanvasViewport } from "../canvas/CanvasViewport";
 import type { CanvasRuntime } from "../canvas/canvas-runtime";
 import { createPlaygroundRuntime } from "../canvas/playground-runtime";
 import { CanvasContextMenu } from "../commands/context-menu/CanvasContextMenu";
+import { LayerSearch } from "../commands/layer-search/LayerSearch";
 import { CommandPalette } from "../commands/palette/CommandPalette";
 import { PreviewOverlay } from "./PreviewOverlay";
 
@@ -26,6 +27,7 @@ export function Playground() {
       </CanvasContextMenu>
       <PreviewOverlay runtime={playgroundRuntime} pageId={playgroundRuntime.pageId} />
       <CommandPalette runtime={playgroundRuntime} />
+      <LayerSearch runtime={playgroundRuntime} />
     </Suspense>
   );
 }
