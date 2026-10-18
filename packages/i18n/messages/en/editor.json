@@ -126,6 +126,8 @@
     "comingSoon": "Coming soon."
   },
   "assets": {
+    "media": "Media",
+    "icons": "Icons",
     "search": "Search assets…",
     "empty": "No assets yet. Drag an image onto the canvas to upload.",
     "emptySearch": "No matching assets.",

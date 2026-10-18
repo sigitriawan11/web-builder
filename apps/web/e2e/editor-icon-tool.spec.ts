@@ -50,3 +50,17 @@ test("AC ED-046: cari 'phone' → sisip node icon Lucide; kembali ke Move; ter-r
   await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
   await expect(page.getByTestId("editor-canvas").locator(`[data-node-id="${iconId}"] svg`)).toBeAttached();
 });
+
+test("AC ED-163: tab Assets → Icons → cari 'phone' → sisip node icon", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Assets Icons Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  await page.getByTestId("left-tab-assets").click();
+  await page.getByTestId("assets-view-icons").click();
+  await page.getByTestId("icon-search").fill("phone");
+  await page.getByTestId("icon-option-phone").click();
+
+  const iconId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  expect((await doc(page)).nodes[iconId]).toMatchObject({ type: "icon", props: { set: "lucide", name: "phone" } });
+});

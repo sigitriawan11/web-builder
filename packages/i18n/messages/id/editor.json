@@ -126,6 +126,8 @@
     "comingSoon": "Segera hadir."
   },
   "assets": {
+    "media": "Media",
+    "icons": "Ikon",
     "search": "Cari aset…",
     "empty": "Belum ada aset. Seret gambar ke kanvas untuk mengunggah.",
     "emptySearch": "Tidak ada aset yang cocok.",

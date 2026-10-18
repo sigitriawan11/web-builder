@@ -7,6 +7,8 @@ import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { insertImageNode } from "../../canvas/interactions/use-image-drop";
 import { showToastText } from "../../store/toast-store";
+import { IconBrowser } from "../icons/IconBrowser";
+import { insertIconNode } from "../icons/insert-icon";
 
 // ED-161: pustaka media per situs — grid aset, pencarian nama, hapus, info (dimensi/ukuran), pakai ulang (klik =
 // sisipkan ke halaman aktif). Thumbnail dari endpoint content (redirect presigned varian webp).
@@ -33,6 +35,7 @@ export function AssetsPanel({
   readOnly: boolean;
 }) {
   const t = useT();
+  const [view, setView] = useState<"media" | "icons">("media");
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
   useEffect(() => {
@@ -63,12 +66,72 @@ export function AssetsPanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col p-2" data-testid="assets-panel">
+      <div role="tablist" aria-label={t("sidebar.tab.assets")} className="mb-2 flex shrink-0 gap-1">
+        {(["media", "icons"] as const).map((v) => (
+          <button
+            key={v}
+            type="button"
+            role="tab"
+            aria-selected={view === v}
+            data-testid={`assets-view-${v}`}
+            onClick={() => setView(v)}
+            className={cn(
+              "rounded px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground",
+              view === v && "bg-accent text-foreground",
+            )}
+          >
+            {t(`assets.${v}`)}
+          </button>
+        ))}
+      </div>
+
+      {view === "icons" ? (
+        // ED-163: browser ikon Lucide di tab Assets — klik = sisip node icon ke frame/page terpilih.
+        <IconBrowser onPick={(name) => !readOnly && insertIconNode(runtime, name)} />
+      ) : (
+        <MediaLibrary
+          siteId={siteId}
+          readOnly={readOnly}
+          input={input}
+          search={search}
+          onInput={setInput}
+          assets={assets}
+          onInsert={onInsert}
+          onDelete={onDelete}
+        />
+      )}
+    </div>
+  );
+}
+
+function MediaLibrary({
+  siteId,
+  readOnly,
+  input,
+  search,
+  onInput,
+  assets,
+  onInsert,
+  onDelete,
+}: {
+  siteId: string;
+  readOnly: boolean;
+  input: string;
+  search: string;
+  onInput: (value: string) => void;
+  assets: ReturnType<typeof useSiteAssets>;
+  onInsert: (asset: AssetSummary) => void;
+  onDelete: (asset: AssetSummary) => void;
+}) {
+  const t = useT();
+  return (
+    <>
       <div className="relative mb-2 shrink-0">
         <SearchIcon className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
         <input
           type="search"
           value={input}
-          onChange={(event) => setInput(event.target.value)}
+          onChange={(event) => onInput(event.target.value)}
           placeholder={t("assets.search")}
           aria-label={t("assets.search")}
           data-testid="assets-search"
@@ -105,7 +168,7 @@ export function AssetsPanel({
           ))}
         </ul>
       )}
-    </div>
+    </>
   );
 }
 
