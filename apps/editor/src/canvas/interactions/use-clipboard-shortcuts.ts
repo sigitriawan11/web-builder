@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { isEditableEvent } from "../../commands/is-editable-target";
 import { clipboardStore } from "../../store/clipboard-store";
 import { selectionStore } from "../../store/selection-store";
+import { showToastText } from "../../store/toast-store";
 import type { CanvasRuntime } from "../canvas-runtime";
 
 // ED-190/191/193: copy/cut/paste/paste-in-place/duplicate. Payload = subtree JSON (string). Mekanisme utama =
@@ -131,6 +132,9 @@ export async function paste(runtime: CanvasRuntime, inPlace: boolean): Promise<v
     selectionStore
       .getState()
       .select(subtree.rootIds.map((id) => result.value.idMap[id]).filter((v): v is string => !!v));
+  } else {
+    // ED-228: paste ditolak (mis. melewati batas node, DM-076) → toast error, dokumen tidak berubah (atomik).
+    showToastText(result.error.message);
   }
 }
 
@@ -146,6 +150,8 @@ export function duplicate(runtime: CanvasRuntime): void {
   runtime.undo.stopCapturing();
   if (result.ok) {
     selectionStore.getState().select(roots.map((id) => result.value.idMap[id]).filter((v): v is string => !!v));
+  } else {
+    showToastText(result.error.message);
   }
 }
 
@@ -154,9 +160,10 @@ export function cut(runtime: CanvasRuntime): void {
   if (!copy(runtime)) return;
   const roots = selectionRoots(runtime, selectionStore.getState().selectedIds);
   runtime.undo.stopCapturing();
-  runCommand({ doc: runtime.doc, origin: runtime.origin }, deleteNodes, { ids: roots });
+  const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, deleteNodes, { ids: roots });
   runtime.undo.stopCapturing();
-  selectionStore.getState().clear();
+  if (result.ok) selectionStore.getState().clear();
+  else showToastText(result.error.message);
 }
 
 export function useClipboardShortcuts(runtime: CanvasRuntime): void {

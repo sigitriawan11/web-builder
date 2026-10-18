@@ -232,6 +232,15 @@ body,
   box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
 }
 
+/* ED-228: toast error/warning dibedakan warna dari info (default gelap). */
+.overlay-toast[data-kind="error"] {
+  background: rgb(153 27 27 / 95%);
+}
+
+.overlay-toast[data-kind="warning"] {
+  background: rgb(146 64 14 / 95%);
+}
+
 /* ED-037: preview gambar node baru. */
 .overlay-draw-preview {
   position: absolute;
