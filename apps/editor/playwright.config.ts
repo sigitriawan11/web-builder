@@ -7,6 +7,8 @@ export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
   reporter: "list",
+  // CI: 2 retry untuk meredam flakiness waktu (muat chunk lazy + render fixture besar saat runner terbebani); lokal 0.
+  retries: process.env.CI ? 2 : 0,
   use: {
     baseURL: `http://localhost:${PORT}/editor/`,
     trace: "retain-on-failure",

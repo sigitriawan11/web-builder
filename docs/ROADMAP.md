@@ -1161,7 +1161,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.19 — Testing editor
 
-- [ ] **T2.19.1** Suite Playwright interaksi utama (select, drag, resize, auto-layout, teks, layers, clipboard, undo) — ED-239 · `e2e/editor` · Verifikasi: ≥ 15 skenario lulus CI
+- [x] **T2.19.1** Suite Playwright interaksi utama (select, drag, resize, auto-layout, teks, layers, clipboard, undo) — ED-239 · `e2e/editor` · Verifikasi: ≥ 15 skenario lulus CI
+  - Catatan (2026-10-18): suite e2e editor sudah luas — **134 skenario chromium hijau** (jauh > 15): select/hit-test, move/drag (drag-commit), resize (8 handle), auto-layout (reorder/wrap), teks (text-editing + paste), clipboard, undo, zoom/pan/marquee/frames/overlay/geometry/interactions/fonts/render + baru: preview, node-link, shortcuts (data-driven), palette, context-menu. **Layers drag** diuji unit (`docDropIndex`) karena react-arborist pakai HTML5 DnD (Lampiran D). Ditambah `retries: CI?2:0` di `playwright.config` untuk meredam flakiness waktu (muat chunk lazy + render fixture besar saat runner terbebani). Firefox juga dijalankan untuk sebagian besar spec.
 - [ ] **T2.19.2** Visual regression WYSIWYG: renderer editor vs static untuk 10 fixture × 3 breakpoint (Docker untuk font konsisten) — ED-240 · `e2e/visual` · Verifikasi: baseline dibuat; diff 0
 - [ ] **T2.19.3** Dogfooding: owner membuat 2 landing page dari nol; catat bug sebagai task baru — §M2.d · manual · Verifikasi: daftar bug masuk roadmap
   - Bug ditemukan crosscheck (2026-10-17): `InlineTextEditor` me-mount `<div class=text-editor-host>` di dalam node teks `<p>` → warning React "div cannot be a descendant of p" (editor-only, SPA tanpa SSR, fungsional jalan). **Perbaiki**: render host editor bukan sebagai anak `<p>` (mis. node teks jadi `<div>` saat edit, atau portal). Masuk daftar bug M2.
