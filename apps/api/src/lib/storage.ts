@@ -10,8 +10,8 @@ export interface AssetStorage {
   readonly assetsBucket: string;
   /** URL presigned PUT; browser wajib mengirim `Content-Type` & `Content-Length` yang sama persis. */
   presignUpload(input: { key: string; contentType: string; contentLength: number }): Promise<string>;
-  /** URL presigned GET untuk menyajikan varian aset (bucket assets) ke editor (ED-161). */
-  presignDownload(input: { key: string }): Promise<string>;
+  /** URL presigned GET untuk menyajikan objek ke editor (ED-161). Bucket default = assets; uploads untuk fallback asli. */
+  presignDownload(input: { key: string; bucket?: string }): Promise<string>;
 }
 
 // Presigned PUT berumur pendek (ED/ARCH: upload harus segera). 5 menit cukup untuk mulai upload.
@@ -38,8 +38,8 @@ export function createAssetStorage(env: ApiEnv): AssetStorage {
         }),
         { expiresIn: PRESIGN_EXPIRES_S },
       ),
-    presignDownload: ({ key }) =>
-      getSignedUrl(client, new GetObjectCommand({ Bucket: env.S3_BUCKET_ASSETS, Key: key }), {
+    presignDownload: ({ key, bucket }) =>
+      getSignedUrl(client, new GetObjectCommand({ Bucket: bucket ?? env.S3_BUCKET_ASSETS, Key: key }), {
         expiresIn: PRESIGN_EXPIRES_S,
       }),
   };

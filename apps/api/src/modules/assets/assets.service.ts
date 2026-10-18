@@ -99,15 +99,18 @@ export function createAssetsService(deps: { db: Db; storage: AssetStorage; queue
       if (!removed) throw new AppError("NOT_FOUND");
     },
 
-    /** URL presigned GET varian webp aset `ready` — disajikan `<img>` editor (ED-161). Null jika belum siap. */
+    /** URL presigned GET untuk `<img>` editor (ED-161): varian webp bila `ready`, kalau masih diproses pakai file asli
+     * (bucket uploads) agar gambar langsung tampil (ED-224). `rejected`/tak ada → null (404). */
     async contentUrl(tenant: SiteTenant, assetId: string): Promise<string | null> {
       assertCan(tenant, "site.read");
       const row = await repository.findScoped(tenant, db, assetId);
-      if (row?.status !== "ready") return null;
-      const variants = (row.variants ?? {}) as Record<string, unknown>;
-      const webpKey = variants.webp;
-      if (typeof webpKey !== "string") return null;
-      return storage.presignDownload({ key: webpKey });
+      if (!row || row.status === "rejected") return null;
+      if (row.status === "ready") {
+        const webpKey = (row.variants ?? ({} as Record<string, unknown>)).webp;
+        if (typeof webpKey === "string") return storage.presignDownload({ key: webpKey });
+      }
+      // Belum diproses (pending) — sajikan file asli dari bucket uploads agar tidak 404 selama worker bekerja.
+      return storage.presignDownload({ key: row.storageKey, bucket: storage.uploadsBucket });
     },
   };
 }

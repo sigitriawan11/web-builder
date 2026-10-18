@@ -213,11 +213,28 @@ describe("pustaka media (T2.12.4, ED-161)", () => {
     expect(res.headers.location).toContain(`assets/x/${assetId}/full.webp`);
   });
 
-  it("content aset belum ready → 404", async () => {
+  it("content aset belum ready (pending) → redirect ke file asli (uploads) agar langsung tampil", async () => {
     const presign = await request(target)
       .post(assetsUrl(aliceSiteId))
       .set(as(alice))
       .send({ mime: "image/png", sizeBytes: 10 });
+    const res = await request(target)
+      .get(`${assetsUrl(aliceSiteId)}/${presign.body.data.assetId}/content`)
+      .set(as(alice))
+      .redirects(0);
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toContain(presign.body.data.storageKey); // file asli di bucket uploads
+  });
+
+  it("content aset rejected → 404", async () => {
+    const presign = await request(target)
+      .post(assetsUrl(aliceSiteId))
+      .set(as(alice))
+      .send({ mime: "image/png", sizeBytes: 10 });
+    await testDb.db
+      .update(schema.assets)
+      .set({ status: "rejected" })
+      .where(eq(schema.assets.id, presign.body.data.assetId));
     const res = await request(target)
       .get(`${assetsUrl(aliceSiteId)}/${presign.body.data.assetId}/content`)
       .set(as(alice))

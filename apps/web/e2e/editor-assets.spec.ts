@@ -140,6 +140,56 @@ test("AC ED-165: inspector Image — ubah fit, titik fokus, dan ganti gambar (pe
   expect(JSON.stringify((await getDoc(page)).nodes[firstId]?.style?.base?.size)).toBe(sizeBefore); // ukuran sama
 });
 
+test("AC ED-224: 100 gambar di satu page tidak memuat >20 sebelum scroll/pan (lazy)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Lazy Images Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  // Hitung tiap permintaan ke endpoint content (fake asset → 404, tapi permintaan tetap tercatat = indikasi dimuat).
+  const requested = new Set<string>();
+  page.on("request", (req) => {
+    const match = req.url().match(/\/assets\/[^/]+\/content/);
+    if (match) requested.add(req.url());
+  });
+
+  // Zoom 100% lebih dulu agar hanya bagian atas page terlihat (fokus kanvas → shortcut aktif).
+  await page.getByTestId("editor-viewport").click({ position: { x: 10, y: 10 } });
+  await page.keyboard.press("Shift+0");
+
+  // Seed 100 node image absolute, berjarak jauh secara vertikal (jauh melebihi viewport).
+  await page.evaluate(() => {
+    const api = window.__editorTestApi;
+    if (!api) throw new Error("test API tidak ada");
+    const doc = api.getDoc() as { nodes: Record<string, { type: string }> };
+    const pageId = Object.entries(doc.nodes).find(([, node]) => node.type === "page")?.[0];
+    if (!pageId) throw new Error("page tidak ada");
+    for (let i = 0; i < 100; i++) {
+      const id = `ast_lazy${String(i).padStart(7, "0")}`;
+      api.runCommand("registerAsset", { id, entry: { kind: "image", mime: "image/png" } });
+      api.runCommand("createNode", {
+        parentId: pageId,
+        type: "image",
+        props: { image: { assetId: id }, fit: "cover" },
+        style: {
+          base: {
+            size: {
+              width: { mode: "fixed", value: 200, unit: "px" },
+              height: { mode: "fixed", value: 200, unit: "px" },
+            },
+            position: { type: "absolute", x: 0, y: i * 1000 },
+          },
+        },
+      });
+    }
+  });
+
+  // Beri waktu lazy-load observer menyelesaikan permintaan untuk gambar yang terlihat.
+  await expect.poll(async () => (await getDoc(page)).nodes, { timeout: 5_000 }).toBeTruthy();
+  await page.waitForTimeout(1500);
+  expect(requested.size).toBeLessThanOrEqual(20);
+  expect(requested.size).toBeGreaterThan(0); // sanity: mekanisme memang menembak permintaan untuk yang terlihat
+});
+
 // Tunggu node image baru (yang belum ada di `known`) muncul & punya assetId.
 async function waitForImageNode(page: Page, known: Set<string>): Promise<string> {
   let id = "";
