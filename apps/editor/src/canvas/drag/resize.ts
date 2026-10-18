@@ -78,6 +78,22 @@ export function resizeRect(
 }
 
 /**
+ * ED-067: resize multi-seleksi proporsional. Satu node di bounding box gabungan diskalakan posisi & ukurannya
+ * relatif ke box: `x` baru = tepi kiri grup baru + (offset node dari kiri grup lama) × skalaX; ukuran × skala.
+ * Skala dari perubahan box gabungan (`startGroup` → `nextGroup`). Membulatkan ke integer (konsisten dgn resizeRect).
+ */
+export function scaleRectInGroup(startGroup: WorldRect, nextGroup: WorldRect, rect: WorldRect): WorldRect {
+  const scaleX = startGroup.width > 0 ? nextGroup.width / startGroup.width : 1;
+  const scaleY = startGroup.height > 0 ? nextGroup.height / startGroup.height : 1;
+  return {
+    x: Math.round(nextGroup.x + (rect.x - startGroup.x) * scaleX),
+    y: Math.round(nextGroup.y + (rect.y - startGroup.y) * scaleY),
+    width: clampSize(rect.width * scaleX),
+    height: clampSize(rect.height * scaleY),
+  };
+}
+
+/**
  * Patch style untuk hasil resize (ED-065): hanya dimensi yang di-drag yang berubah, dan menjadi Fixed
  * (dari Hug/Fill). Node absolute ikut digeser bila tepi kiri/atas yang ditarik.
  */

@@ -27,7 +27,7 @@ import type { InteractionState } from "../interactions/interaction-machine";
 import { computeSnap, type Rect } from "../snapping/snap";
 import { moveDelta, movedPosition } from "./move";
 import { absoluteDropPosition, type ChildBox, insertionMarker, reorderIndex } from "./reorder";
-import { resizePatch, resizeRect } from "./resize";
+import { resizePatch, resizeRect, scaleRectInGroup } from "./resize";
 import { clearPreviewTranslate, setPreviewTranslate } from "./transform-preview";
 
 export interface DragSessionDeps {
@@ -73,6 +73,55 @@ export function useDragSessions(deps: DragSessionDeps): void {
   useEffect(() => {
     // Rect awal node diukur sekali saat drag dimulai, bukan di setiap pointermove (AC ED-019).
     let resizing: { nodeId: string; start: WorldRect; position: PositionStyle | undefined } | null = null;
+    // ED-067: resize multi-seleksi — bounding box gabungan + rect/posisi awal tiap anggota (diukur sekali).
+    let groupResize: {
+      startGroup: WorldRect;
+      members: { id: string; start: WorldRect; position: PositionStyle | undefined }[];
+    } | null = null;
+
+    const isGroupResize = () => selectionStore.getState().selectedIds.length > 1;
+
+    // ED-067: patch per anggota saat bounding box gabungan di-resize (skala proporsional posisi & ukuran).
+    const groupResizePatches = (state: ResizeState): { id: string; patch: StylePatch }[] => {
+      if (!groupResize) {
+        const ids = selectionStore.getState().selectedIds;
+        const members = ids.flatMap((id) => {
+          const start = deps.geometry.getRect(id);
+          const node = deps.nodeStore.getNode(id);
+          if (!start || !node) return [];
+          return [{ id, start, position: resolveStyle(node.style, "base").position }];
+        });
+        const startGroup = unionBounds(members.map((m) => m.start));
+        if (!startGroup || members.length === 0) return [];
+        groupResize = { startGroup, members };
+      }
+      const delta = screenDeltaToWorld(
+        state.current.x - state.origin.x,
+        state.current.y - state.origin.y,
+        cameraStore.getState().zoom,
+      );
+      const nextGroup = resizeRect(groupResize.startGroup, state.handle, delta, {
+        aspect: state.shiftKey,
+        fromCenter: state.altKey,
+      });
+      return groupResize.members.map((member) => {
+        const scaled = scaleRectInGroup(groupResize?.startGroup as WorldRect, nextGroup, member.start);
+        const patch: StylePatch = {
+          size: {
+            width: { mode: "fixed", value: scaled.width, unit: "px" },
+            height: { mode: "fixed", value: scaled.height, unit: "px" },
+          },
+        };
+        // Edge case ED-067: anak auto-layout (flow) → hanya ukuran; posisi dikendalikan flex. Absolute → ikut digeser.
+        if (member.position?.type === "absolute") {
+          patch.position = {
+            x: member.position.x + (scaled.x - member.start.x),
+            y: member.position.y + (scaled.y - member.start.y),
+          };
+        }
+        return { id: member.id, patch };
+      });
+    };
 
     // ED-065: patch style hasil resize; dipakai sama persis untuk preview & commit.
     const resizePatchFor = (state: ResizeState) => {
@@ -332,8 +381,12 @@ export function useDragSessions(deps: DragSessionDeps): void {
 
     const unsubscribeState = interactionStore.subscribe(({ state }) => {
       if (state.type === "dragResize") {
-        const patch = resizePatchFor(state);
-        if (patch) previewStore.getState().setStyle(state.nodeId, patch);
+        if (isGroupResize()) {
+          for (const { id, patch } of groupResizePatches(state)) previewStore.getState().setStyle(id, patch);
+        } else {
+          const patch = resizePatchFor(state);
+          if (patch) previewStore.getState().setStyle(state.nodeId, patch);
+        }
       } else if (state.type === "dragMove") {
         if (!moving && !reordering) {
           const ids = draggedIds(state);
@@ -403,6 +456,23 @@ export function useDragSessions(deps: DragSessionDeps): void {
       }
 
       if (drag.type !== "dragResize") return;
+
+      // ED-067: resize multi-seleksi → terapkan patch berskala ke semua anggota (satu transaksi = satu undo).
+      if (groupResize) {
+        const patches = effect.type === "commit" ? groupResizePatches(drag) : [];
+        const ids = groupResize.members.map((member) => member.id);
+        groupResize = null;
+        if (patches.length > 0) {
+          deps.undoBoundary();
+          deps.opContext.doc.transact(() => {
+            for (const { id, patch } of patches) runCommand(deps.opContext, updateStyle, { ids: [id], patch });
+          }, deps.opContext.origin);
+          deps.undoBoundary();
+        }
+        previewStore.getState().clear(ids);
+        return;
+      }
+
       const startRect = resizing?.nodeId === drag.nodeId ? resizing.start : null;
       const patch = effect.type === "commit" ? resizePatchFor(drag) : null;
       resizing = null;

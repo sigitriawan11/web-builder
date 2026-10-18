@@ -68,10 +68,13 @@ export function SelectionOverlay({ nodeStore, geometry }: SelectionOverlayProps)
   };
   const single = selectedIds.length === 1 && selectedIds[0] ? describeSingle(nodeStore, selectedIds[0]) : null;
   const label = sizeLabel(world, single?.modes ?? { width: "fixed", height: "fixed" }, single?.inAutoLayout ?? false);
-  // Handle resize hanya untuk satu node (resize multi-seleksi menyusul bersama transform, M2); page root tidak
-  // bisa di-resize lebar (ED-036) → tanpa handle.
-  const onlyId = selectedIds.length === 1 ? selectedIds[0] : undefined;
-  const handleNode = onlyId && nodeStore.getNode(onlyId)?.type !== "page" ? onlyId : undefined;
+  // ED-065/ED-067: handle resize untuk satu node atau bounding box gabungan multi-seleksi (skala proporsional di
+  // drag session). Page root tak bisa di-resize lebar (ED-036) → seleksi yang memuat page tidak menampilkan handle.
+  // `data-handle-node` = anggota pertama; drag session mendeteksi multi-seleksi lalu menskala semua anggota.
+  const resizable =
+    selectedIds.length > 0 &&
+    selectedIds.every((id) => nodeStore.getNode(id) != null && nodeStore.getNode(id)?.type !== "page");
+  const handleNode = resizable ? selectedIds[0] : undefined;
 
   return (
     <>

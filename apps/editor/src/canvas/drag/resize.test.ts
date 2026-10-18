@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ResizeHandle } from "../interactions/interaction-machine";
-import { MAX_SIZE_PX, MIN_SIZE_PX, resizePatch, resizeRect } from "./resize";
+import { MAX_SIZE_PX, MIN_SIZE_PX, resizePatch, resizeRect, scaleRectInGroup } from "./resize";
 
 const start = { x: 100, y: 50, width: 200, height: 100 };
 const delta = { dx: 30, dy: 20 };
@@ -141,5 +141,36 @@ describe("resize → mode sizing Fixed (ED-065/ED-084)", () => {
       width: { mode: "fixed", value: 260, unit: "px" },
       height: { mode: "fixed", value: 130, unit: "px" },
     });
+  });
+});
+
+describe("scaleRectInGroup (ED-067 resize multi-seleksi proporsional)", () => {
+  it("AC: dua kotak 100×100 berjarak 100 di-resize 2× → 200×200 berjarak 200", () => {
+    // box1 (0,0,100,100), box2 (200,0,100,100): kanan box1 = 100, kiri box2 = 200 → jarak 100.
+    const box1 = { x: 0, y: 0, width: 100, height: 100 };
+    const box2 = { x: 200, y: 0, width: 100, height: 100 };
+    const startGroup = { x: 0, y: 0, width: 300, height: 100 };
+    const nextGroup = { x: 0, y: 0, width: 600, height: 200 }; // 2×
+
+    const r1 = scaleRectInGroup(startGroup, nextGroup, box1);
+    const r2 = scaleRectInGroup(startGroup, nextGroup, box2);
+    expect(r1).toEqual({ x: 0, y: 0, width: 200, height: 200 });
+    expect(r2).toEqual({ x: 400, y: 0, width: 200, height: 200 });
+    // Jarak antar kotak = kiri box2 − kanan box1 = 400 − 200 = 200.
+    expect(r2.x - (r1.x + r1.width)).toBe(200);
+  });
+
+  it("menggeser origin grup ikut menggeser anggota", () => {
+    const startGroup = { x: 100, y: 100, width: 200, height: 200 };
+    const nextGroup = { x: 150, y: 120, width: 100, height: 100 }; // mengecil ke 0.5×, origin pindah
+    const child = { x: 100, y: 100, width: 100, height: 100 }; // pojok kiri-atas grup
+    expect(scaleRectInGroup(startGroup, nextGroup, child)).toEqual({ x: 150, y: 120, width: 50, height: 50 });
+  });
+
+  it("grup berukuran 0 pada satu sumbu tidak membagi nol (skala 1)", () => {
+    const startGroup = { x: 0, y: 0, width: 0, height: 100 };
+    const nextGroup = { x: 0, y: 0, width: 50, height: 200 };
+    const child = { x: 0, y: 10, width: 0, height: 40 };
+    expect(scaleRectInGroup(startGroup, nextGroup, child)).toEqual({ x: 0, y: 20, width: 1, height: 80 });
   });
 });
