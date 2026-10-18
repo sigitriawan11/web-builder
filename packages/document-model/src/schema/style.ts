@@ -16,7 +16,7 @@ function patchShape<S extends z.ZodRawShape>(shape: S): PatchShape<S> {
   return patched as PatchShape<S>;
 }
 
-// ── Layout (DM-026: none | flex; grid P1 · M2 — `mode: "grid"` ditolak sampai fiturnya dibangun) ──────────
+// ── Layout (DM-026: none | flex | grid) — grid ditambah di v3 (P1 · M2) ──────────────────────────────────
 
 const paddingShape = {
   top: LengthSchema,
@@ -39,6 +39,36 @@ const flexShape = {
   justify: z.enum(["start", "center", "end", "spaceBetween", "spaceAround", "spaceEvenly"]),
 };
 
+// DM-026: grid track. `repeat` → repeat(count, minmax(min,1fr)); `autoFill` → repeat(auto-fill, minmax(min,1fr));
+// `explicit` → daftar track (panjang tetap atau minmax).
+const GridTrackSchema = z.discriminatedUnion("type", [
+  z.strictObject({ type: z.literal("auto") }),
+  z.strictObject({
+    type: z.literal("repeat"),
+    count: z.number().int().positive().max(100),
+    min: LengthSchema.optional(),
+  }),
+  z.strictObject({ type: z.literal("autoFill"), min: LengthSchema }),
+  z.strictObject({
+    type: z.literal("explicit"),
+    tracks: z
+      .array(z.union([LengthSchema, z.strictObject({ min: LengthSchema, max: LengthSchema })]))
+      .min(1)
+      .max(50),
+  }),
+]);
+
+const gridShape = {
+  columns: GridTrackSchema,
+  rows: GridTrackSchema,
+  gap: LengthSchema,
+  columnGap: LengthSchema,
+  rowGap: LengthSchema,
+  padding: PaddingSchema,
+  alignItems: z.enum(["start", "center", "end", "stretch"]),
+  justifyItems: z.enum(["start", "center", "end", "stretch"]),
+};
+
 export const LayoutSchema = z.discriminatedUnion("mode", [
   z.strictObject({ mode: z.literal("none") }),
   z
@@ -48,20 +78,32 @@ export const LayoutSchema = z.discriminatedUnion("mode", [
       mode: true,
       direction: true,
     }),
+  // DM-011/DM-026 (grid P1 · M2): container CSS grid. `columns` wajib; sisanya opsional.
+  z
+    .strictObject({ mode: z.literal("grid"), ...gridShape })
+    .partial()
+    .required({ mode: true, columns: true }),
 ]);
 
-// Layout di-merge per field; `padding` ikut deep merge (DM-036 aturan 1).
+// Layout di-merge per field; `padding` ikut deep merge (DM-036 aturan 1). Patch memuat field flex & grid (opsional).
 const LayoutPatchSchema = z.strictObject({
-  mode: z.enum(["none", "flex"]).optional(),
-  ...patchShape({ ...flexShape, padding: PaddingPatchSchema }),
+  mode: z.enum(["none", "flex", "grid"]).optional(),
+  ...patchShape({ ...flexShape, ...gridShape, padding: PaddingPatchSchema }),
 });
 
 // Perilaku anak di parent flex (DM-026 `FlexChildStyle`). `order` (P2) & `gridColumn`/`gridRow` (grid P1 · M2)
 // ditambah bersama fiturnya. `grow`/`shrink` biasanya diturunkan dari size `fill`; manual = advanced.
+// DM-026 grid placement anak: baris/kolom mulai + span.
+const gridLineSchema = z.strictObject({
+  start: z.number().int().optional(),
+  span: z.number().int().positive().optional(),
+});
 const flexChildShape = {
   alignSelf: z.enum(["auto", "start", "center", "end", "stretch"]),
   grow: z.number().min(0).max(1000),
   shrink: z.number().min(0).max(1000),
+  gridColumn: gridLineSchema,
+  gridRow: gridLineSchema,
 };
 export const FlexChildSchema = z.strictObject(flexChildShape).partial();
 const FlexChildPatchSchema = z.strictObject(patchShape(flexChildShape));
@@ -303,6 +345,7 @@ export const ResponsiveStyleSchema = z.strictObject({
 
 export type Padding = z.infer<typeof PaddingSchema>;
 export type LayoutStyle = z.infer<typeof LayoutSchema>;
+export type GridTrack = z.infer<typeof GridTrackSchema>;
 export type Dimension = z.infer<typeof DimensionSchema>;
 export type SizeStyle = z.infer<typeof SizeSchema>;
 export type FlexChildStyle = z.infer<typeof FlexChildSchema>;

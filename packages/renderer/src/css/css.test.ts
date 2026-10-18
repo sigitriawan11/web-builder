@@ -182,6 +182,55 @@ describe("pemetaan style → CSS (spec 07 §4.2)", () => {
     });
   });
 
+  it("layout grid: repeat/autoFill/explicit → grid-template; gap, align/justify-items, padding (DM-026)", () => {
+    expect(
+      decl({
+        layout: {
+          mode: "grid",
+          columns: { type: "repeat", count: 3, min: px(240) },
+          gap: px(16),
+          alignItems: "center",
+          justifyItems: "stretch",
+          padding: { top: px(8) },
+        },
+      }),
+    ).toEqual({
+      display: "grid",
+      "grid-template-columns": "repeat(3, minmax(240px, 1fr))",
+      gap: "16px",
+      "align-items": "center",
+      "justify-items": "stretch",
+      padding: "8px 0 0 0",
+    });
+    expect(decl({ layout: { mode: "grid", columns: { type: "autoFill", min: px(200) }, rowGap: px(12) } })).toEqual({
+      display: "grid",
+      "grid-template-columns": "repeat(auto-fill, minmax(200px, 1fr))",
+      "row-gap": "12px",
+    });
+    expect(
+      decl({
+        layout: {
+          mode: "grid",
+          columns: { type: "explicit", tracks: [px(100), { min: px(100), max: px(300) }] },
+          rows: { type: "auto" },
+          columnGap: px(8),
+        },
+      }),
+    ).toEqual({
+      display: "grid",
+      "grid-template-columns": "100px minmax(100px, 300px)",
+      "grid-template-rows": "auto",
+      "column-gap": "8px",
+    });
+  });
+
+  it("flexChild grid placement → grid-column/grid-row (DM-026)", () => {
+    expect(decl({ flexChild: { gridColumn: { start: 2, span: 2 }, gridRow: { span: 3 } } })).toEqual({
+      "grid-column": "2 / span 2",
+      "grid-row": "span 3",
+    });
+  });
+
   it("fills: solid tunggal, berlapis (urutan dibalik), gambar (cover/tile, focal point), tersembunyi dilewati", () => {
     expect(decl({ fills: [{ type: "solid", color: { $token: "color.primary" }, opacity: 0.5 }] })).toEqual({
       "background-color": "color-mix(in srgb, var(--t-color-primary) 50%, transparent)",

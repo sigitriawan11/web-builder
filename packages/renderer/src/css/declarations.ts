@@ -1,8 +1,10 @@
 import type {
   Dimension,
   Fill,
+  GridTrack,
   LayoutStyle,
   Node,
+  Padding,
   RadiusValue,
   SizeStyle,
   Stroke,
@@ -52,10 +54,57 @@ const VERTICAL_ALIGN: Record<"top" | "middle" | "bottom", string> = {
   bottom: "flex-end",
 };
 
+// DM-026: GridTrack → nilai grid-template. `repeat`/`autoFill` pakai minmax(min,1fr); `explicit` = daftar track.
+function gridTrackToCss(track: GridTrack): string {
+  switch (track.type) {
+    case "auto":
+      return "auto";
+    case "repeat":
+      return `repeat(${track.count}, minmax(${track.min ? lengthToCss(track.min) : "0"}, 1fr))`;
+    case "autoFill":
+      return `repeat(auto-fill, minmax(${lengthToCss(track.min)}, 1fr))`;
+    case "explicit":
+      return track.tracks
+        .map((t) => ("min" in t ? `minmax(${lengthToCss(t.min)}, ${lengthToCss(t.max)})` : lengthToCss(t)))
+        .join(" ");
+  }
+}
+
+// DM-026: padding (sebagian valid, sisi lain 0) — dipakai flex & grid.
+function paddingDecl(padding: Padding | undefined, out: Declaration[]): void {
+  if (!padding) return;
+  out.push([
+    "padding",
+    [padding.top, padding.right, padding.bottom, padding.left]
+      .map((side) => (side ? lengthToCss(side) : "0"))
+      .join(" "),
+  ]);
+}
+
+// DM-026: {start, span} → nilai grid-column/grid-row.
+function gridLineToCss(line: { start?: number | undefined; span?: number | undefined }): string {
+  if (line.start !== undefined && line.span !== undefined) return `${line.start} / span ${line.span}`;
+  if (line.span !== undefined) return `span ${line.span}`;
+  if (line.start !== undefined) return `${line.start}`;
+  return "auto";
+}
+
 function layout(value: LayoutStyle, out: Declaration[]): void {
   // `none`: anak bebas (absolute) → node jadi containing block.
   if (value.mode === "none") {
     out.push(["position", "relative"]);
+    return;
+  }
+  if (value.mode === "grid") {
+    out.push(["display", "grid"], ["grid-template-columns", gridTrackToCss(value.columns)]);
+    if (value.rows) out.push(["grid-template-rows", gridTrackToCss(value.rows)]);
+    if (value.gap) out.push(["gap", lengthToCss(value.gap)]);
+    if (value.columnGap) out.push(["column-gap", lengthToCss(value.columnGap)]);
+    if (value.rowGap) out.push(["row-gap", lengthToCss(value.rowGap)]);
+    // Self-alignment grid memakai nilai mentah (start/center/end/stretch), bukan flex-start.
+    if (value.alignItems) out.push(["align-items", value.alignItems]);
+    if (value.justifyItems) out.push(["justify-items", value.justifyItems]);
+    paddingDecl(value.padding, out);
     return;
   }
   out.push(["display", "flex"], ["flex-direction", value.direction]);
@@ -68,16 +117,7 @@ function layout(value: LayoutStyle, out: Declaration[]): void {
   const [rowGap, columnGap] = value.direction === "row" ? [cross, main] : [main, cross];
   if (rowGap) out.push(["row-gap", rowGap]);
   if (columnGap) out.push(["column-gap", columnGap]);
-  // DM-026: padding sebagian valid, sisi lain 0.
-  const { padding } = value;
-  if (padding) {
-    out.push([
-      "padding",
-      [padding.top, padding.right, padding.bottom, padding.left]
-        .map((side) => (side ? lengthToCss(side) : "0"))
-        .join(" "),
-    ]);
-  }
+  paddingDecl(value.padding, out);
 }
 
 function dimension(axis: "width" | "height", value: Dimension, parent: ParentLayout, out: Declaration[]): void {
@@ -398,10 +438,13 @@ export function styleDeclarations(style: Style, ctx: DeclarationContext): Declar
   if (style.layout) layout(style.layout, out);
   if (style.size) size(style.size, ctx.parent, out);
   if (style.flexChild) {
-    const { alignSelf, grow, shrink } = style.flexChild;
+    const { alignSelf, grow, shrink, gridColumn, gridRow } = style.flexChild;
     if (alignSelf) out.push(["align-self", ALIGN[alignSelf] ?? alignSelf]);
     if (grow !== undefined) out.push(["flex-grow", String(grow)]);
     if (shrink !== undefined) out.push(["flex-shrink", String(shrink)]);
+    // DM-026: penempatan anak di grid (start / span).
+    if (gridColumn) out.push(["grid-column", gridLineToCss(gridColumn)]);
+    if (gridRow) out.push(["grid-row", gridLineToCss(gridRow)]);
   }
   if (style.fills) fills(style.fills, ctx, out);
   if (style.strokes) strokes(style.strokes, out);

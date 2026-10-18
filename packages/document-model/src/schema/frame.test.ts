@@ -6,7 +6,7 @@ import { jsonToYDoc, yDocToJson } from "../yjs/mapping";
 import { SiteDocumentSchema } from "./document";
 import type { Node, SiteDocument } from "./index";
 
-// T1.8.6: frame & layout flex (DM-011, DM-026). Grid = P1 · M2 → ditolak sampai dibangun.
+// T1.8.6: frame & layout flex (DM-011, DM-026). Grid (P1 · M2) ditambah di schema v3.
 const SECTION = "n_hero000001";
 const TITLE = "n_herottl001";
 
@@ -75,12 +75,51 @@ describe("frame flex (DM-011, DM-026)", () => {
   });
 
   it.each([
-    ["grid (P1 · M2)", { mode: "grid", columns: { type: "repeat", count: 3 } }],
     ["reverse (P2)", { mode: "flex", direction: "row", reverse: true }],
     ["justify asing", { mode: "flex", direction: "row", justify: "spaceBetweenish" }],
     ["flex tanpa direction", { mode: "flex" }],
+    ["grid tanpa columns", { mode: "grid", gap: { value: 8, unit: "px" } }],
+    ["grid columns tipe asing", { mode: "grid", columns: { type: "weird" } }],
   ])("%s ditolak", (_label, layout) => {
     expect(valid(withSectionStyle({ base: { layout } }))).toBe(false);
+  });
+
+  // DM-011/DM-026 (grid P1 · M2): layout grid valid di frame.
+  it.each([
+    [
+      "repeat",
+      {
+        mode: "grid",
+        columns: { type: "repeat", count: 3, min: { value: 240, unit: "px" } },
+        gap: { $token: "space.6" },
+      },
+    ],
+    [
+      "autoFill",
+      {
+        mode: "grid",
+        columns: { type: "autoFill", min: { value: 200, unit: "px" } },
+        rowGap: { value: 16, unit: "px" },
+      },
+    ],
+    [
+      "explicit + align",
+      {
+        mode: "grid",
+        columns: {
+          type: "explicit",
+          tracks: [
+            { value: 100, unit: "px" },
+            { min: { value: 100, unit: "px" }, max: { value: 300, unit: "px" } },
+          ],
+        },
+        alignItems: "center",
+        justifyItems: "stretch",
+        padding: { top: { value: 8, unit: "px" } },
+      },
+    ],
+  ])("grid %s diterima", (_label, layout) => {
+    expect(valid(withSectionStyle({ base: { layout } }))).toBe(true);
   });
 });
 
