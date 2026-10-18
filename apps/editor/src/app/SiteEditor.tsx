@@ -8,6 +8,7 @@ import * as Y from "yjs";
 import { useStore } from "zustand";
 import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
+import { configureAssetUrl } from "../canvas/render-root/asset-url";
 import type { DocumentSession } from "../collaboration/document-session";
 import { discardLocalDocument } from "../collaboration/document-session";
 import { EditAccessGate } from "../collaboration/EditAccessGate";
@@ -21,6 +22,7 @@ import { DevInsertBar, devToolsEnabled } from "../dev/DevInsertBar";
 import { isNewerThanEditor, reloadOnceForSchema, useDocumentSchemaVersion } from "../document/schema-gate";
 import { NodeStoreContext, useNodeFromStore } from "../document/use-node";
 import { usePageOrder } from "../document/use-page-order";
+import { AssetsPanel } from "../panels/assets/AssetsPanel";
 import { InsertPanel } from "../panels/insert/InsertPanel";
 import { LeftSidebar } from "../panels/LeftSidebar";
 import { LayersPanel } from "../panels/layers/LayersPanel";
@@ -75,6 +77,8 @@ function EditorShell({ site, pageId }: { site: Site; pageId: string | null }) {
   const t = useT();
   useEffect(() => {
     void setTelemetryScope({ siteId: site.id });
+    // Asset disajikan API situs ini (ED-161): aktifkan URL `<img>` nyata di canvas.
+    configureAssetUrl(site.id);
   }, [site.id]);
   const { session, status } = useDocumentSession(site.documentId);
   // ED-032: page yang diminta (`?page=` awal, lalu klik di Pages panel) — URL diperbarui tanpa reload.
@@ -204,6 +208,7 @@ function DocumentWorkspace({
       <LeftSidebar
         layers={<LayersPanel runtime={runtime} pageId={activePageId} readOnly={readOnly} />}
         insert={<InsertPanel runtime={runtime} readOnly={readOnly} />}
+        assets={<AssetsPanel runtime={runtime} siteId={siteId} readOnly={readOnly} />}
         pages={
           <PagesPanel
             runtime={runtime}

@@ -41,6 +41,7 @@ export type PresignUploadResponse = z.infer<typeof PresignUploadResponseSchema>;
 export const AssetSummarySchema = z.object({
   id: z.string(),
   kind: z.enum(["image", "video", "file", "font", "svg"]),
+  fileName: z.string().nullable(),
   mime: z.string(),
   sizeBytes: z.number(),
   width: z.number().nullable(),

@@ -125,6 +125,18 @@
     "resize": "Ubah lebar panel",
     "comingSoon": "Segera hadir."
   },
+  "assets": {
+    "search": "Cari aset…",
+    "empty": "Belum ada aset. Seret gambar ke kanvas untuk mengunggah.",
+    "emptySearch": "Tidak ada aset yang cocok.",
+    "processing": "Memproses…",
+    "failed": "Gagal diproses",
+    "insert": "Sisipkan ke halaman",
+    "delete": "Hapus aset",
+    "deleteConfirm": "Hapus aset ini dari pustaka?",
+    "loadError": "Gagal memuat pustaka.",
+    "retry": "Coba lagi"
+  },
   "preview": {
     "device": "Perangkat",
     "page": "Halaman",

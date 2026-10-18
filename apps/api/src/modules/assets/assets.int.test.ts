@@ -37,6 +37,7 @@ const fakeStorage: AssetStorage = {
   assetsBucket: "assets",
   presignUpload: async ({ key, contentType }) =>
     `http://minio.test/uploads/${key}?ct=${encodeURIComponent(contentType)}`,
+  presignDownload: async ({ key }) => `http://minio.test/assets/${key}?sig=test`,
 };
 
 async function register(): Promise<TestUser> {
@@ -172,5 +173,87 @@ describe("assets upload (T2.12.1, ED-160)", () => {
       .set(as(alice))
       .send();
     expect(res.status).toBe(404);
+  });
+});
+
+describe("pustaka media (T2.12.4, ED-161)", () => {
+  async function presignReady(fileName: string): Promise<string> {
+    const presign = await request(target)
+      .post(assetsUrl(aliceSiteId))
+      .set(as(alice))
+      .send({ mime: "image/png", sizeBytes: 2048, fileName });
+    const assetId = presign.body.data.assetId as string;
+    await testDb.db
+      .update(schema.assets)
+      .set({ status: "ready", width: 100, height: 80, variants: { webp: `assets/x/${assetId}/full.webp` } })
+      .where(eq(schema.assets.id, assetId));
+    return assetId;
+  }
+
+  it("list mengembalikan aset situs (terbaru dulu) & filter nama", async () => {
+    await presignReady("alpha-banner.png");
+    const beta = await presignReady("beta-logo.png");
+
+    const all = await request(target).get(assetsUrl(aliceSiteId)).set(as(alice));
+    expect(all.status).toBe(200);
+    expect(all.body.data.length).toBeGreaterThanOrEqual(2);
+    expect(all.body.data[0].id).toBe(beta); // terbaru dulu
+
+    const filtered = await request(target).get(assetsUrl(aliceSiteId)).query({ search: "beta" }).set(as(alice));
+    expect(filtered.body.data.map((a: { fileName: string }) => a.fileName)).toEqual(["beta-logo.png"]);
+  });
+
+  it("content redirect 302 ke URL presigned varian webp", async () => {
+    const assetId = await presignReady("hero.png");
+    const res = await request(target)
+      .get(`${assetsUrl(aliceSiteId)}/${assetId}/content`)
+      .set(as(alice))
+      .redirects(0);
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toContain(`assets/x/${assetId}/full.webp`);
+  });
+
+  it("content aset belum ready → 404", async () => {
+    const presign = await request(target)
+      .post(assetsUrl(aliceSiteId))
+      .set(as(alice))
+      .send({ mime: "image/png", sizeBytes: 10 });
+    const res = await request(target)
+      .get(`${assetsUrl(aliceSiteId)}/${presign.body.data.assetId}/content`)
+      .set(as(alice))
+      .redirects(0);
+    expect(res.status).toBe(404);
+  });
+
+  it("delete menyembunyikan aset (soft delete) & tidak muncul di list", async () => {
+    const assetId = await presignReady("hapus-ku.png");
+    const del = await request(target)
+      .delete(`${assetsUrl(aliceSiteId)}/${assetId}`)
+      .set(as(alice));
+    expect(del.status).toBe(204);
+    const list = await request(target).get(assetsUrl(aliceSiteId)).set(as(alice));
+    expect(list.body.data.some((a: { id: string }) => a.id === assetId)).toBe(false);
+    const [row] = await testDb.db.select().from(schema.assets).where(eq(schema.assets.id, assetId));
+    expect(row?.deletedAt).toBeTruthy();
+  });
+
+  it("isolasi tenant: Bob tidak bisa list/hapus/lihat content aset situs Alice", async () => {
+    const assetId = await presignReady("rahasia.png");
+    expect((await request(target).get(assetsUrl(aliceSiteId)).set(as(bob))).status).toBe(404);
+    expect(
+      (
+        await request(target)
+          .delete(`${assetsUrl(aliceSiteId)}/${assetId}`)
+          .set(as(bob))
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await request(target)
+          .get(`${assetsUrl(aliceSiteId)}/${assetId}/content`)
+          .set(as(bob))
+          .redirects(0)
+      ).status,
+    ).toBe(404);
   });
 });

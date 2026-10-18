@@ -1,5 +1,6 @@
-// SEMENTARA (spike M0): URL asset dibangun dari assetId + CDN (DM-057) setelah upload ada (M2).
-// Sampai saat itu semua gambar memakai placeholder netral yang sama.
+// URL asset untuk `<img>`/background canvas (DM-057). Di editor situs, asset disajikan API lewat redirect presigned
+// (`/api/v1/sites/:siteId/assets/:assetId/content`, ED-161) — origin page (app.*) → proxy → api. Playground (tanpa
+// siteId) & asset yang belum siap memakai placeholder netral yang sama.
 const PLACEHOLDER_SVG =
   "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80' preserveAspectRatio='xMidYMid slice'>" +
   "<rect width='120' height='80' fill='#E7E1D8'/>" +
@@ -8,6 +9,14 @@ const PLACEHOLDER_SVG =
 
 const PLACEHOLDER_URL = `data:image/svg+xml,${encodeURIComponent(PLACEHOLDER_SVG)}`;
 
-export function assetUrl(_assetId: string): string {
-  return PLACEHOLDER_URL;
+let assetBase: string | null = null;
+
+/** Dipanggil sekali saat editor situs mount (SiteEditor) — mengaktifkan URL asset nyata lewat API. */
+export function configureAssetUrl(siteId: string): void {
+  assetBase = `/api/v1/sites/${encodeURIComponent(siteId)}/assets`;
+}
+
+export function assetUrl(assetId: string): string {
+  if (!assetBase || !assetId) return PLACEHOLDER_URL;
+  return `${assetBase}/${encodeURIComponent(assetId)}/content`;
 }

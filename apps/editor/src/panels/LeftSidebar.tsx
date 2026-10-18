@@ -23,6 +23,7 @@ interface LeftSidebarProps {
   pages: ReactNode;
   layers?: ReactNode;
   insert?: ReactNode;
+  assets?: ReactNode;
 }
 
 export function useLeftSidebarShortcuts(): void {
@@ -52,7 +53,7 @@ export function useLeftSidebarShortcuts(): void {
   }, []);
 }
 
-export function LeftSidebar({ pages, layers, insert }: LeftSidebarProps) {
+export function LeftSidebar({ pages, layers, insert, assets }: LeftSidebarProps) {
   const t = useT();
   const profile = useProfile();
   const userId = profile.data?.id ?? null;
@@ -126,6 +127,8 @@ export function LeftSidebar({ pages, layers, insert }: LeftSidebarProps) {
           </>
         ) : leftTab === "insert" && insert ? (
           <PanelErrorBoundary name="insert">{insert}</PanelErrorBoundary>
+        ) : leftTab === "assets" && assets ? (
+          <PanelErrorBoundary name="assets">{assets}</PanelErrorBoundary>
         ) : (
           <p className="p-3 text-xs text-muted-foreground" data-testid={`left-placeholder-${leftTab}`}>
             {t("sidebar.comingSoon")}

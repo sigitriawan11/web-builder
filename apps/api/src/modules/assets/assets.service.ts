@@ -19,6 +19,7 @@ function toSummary(row: repository.AssetRow): AssetSummary {
   return {
     id: row.id,
     kind: row.kind,
+    fileName: row.fileName,
     mime: row.mime,
     sizeBytes: row.sizeBytes,
     width: row.width,
@@ -28,6 +29,9 @@ function toSummary(row: repository.AssetRow): AssetSummary {
     createdAt: row.createdAt.toISOString(),
   };
 }
+
+// Pustaka media (ED-161): batasi jumlah agar respons ringan; paginasi lanjut menyusul bila perlu.
+const LIST_LIMIT = 200;
 
 export function createAssetsService(deps: { db: Db; storage: AssetStorage; queues?: QueueProducer }) {
   const { db, storage } = deps;
@@ -45,6 +49,7 @@ export function createAssetsService(deps: { db: Db; storage: AssetStorage; queue
         id: assetId,
         kind,
         storageKey,
+        fileName: input.fileName ?? null,
         mime: input.mime,
         sizeBytes: input.sizeBytes,
         uploadedBy: tenant.actor.userId,
@@ -75,6 +80,34 @@ export function createAssetsService(deps: { db: Db; storage: AssetStorage; queue
       const row = await repository.findScoped(tenant, db, assetId);
       if (!row) throw new AppError("NOT_FOUND");
       return toSummary(row);
+    },
+
+    /** Pustaka media situs (ED-161): daftar aset (terbaru dulu), opsional difilter nama file. */
+    async list(tenant: SiteTenant, options: { search?: string }): Promise<AssetSummary[]> {
+      assertCan(tenant, "site.read");
+      const rows = await repository.listScoped(tenant, db, {
+        ...(options.search ? { search: options.search } : {}),
+        limit: LIST_LIMIT,
+      });
+      return rows.map(toSummary);
+    },
+
+    /** Hapus aset dari pustaka (soft delete; objek storage di-GC saat purge). */
+    async remove(tenant: SiteTenant, assetId: string): Promise<void> {
+      assertCan(tenant, "site.edit");
+      const removed = await repository.softDelete(tenant, db, assetId);
+      if (!removed) throw new AppError("NOT_FOUND");
+    },
+
+    /** URL presigned GET varian webp aset `ready` — disajikan `<img>` editor (ED-161). Null jika belum siap. */
+    async contentUrl(tenant: SiteTenant, assetId: string): Promise<string | null> {
+      assertCan(tenant, "site.read");
+      const row = await repository.findScoped(tenant, db, assetId);
+      if (row?.status !== "ready") return null;
+      const variants = (row.variants ?? {}) as Record<string, unknown>;
+      const webpKey = variants.webp;
+      if (typeof webpKey !== "string") return null;
+      return storage.presignDownload({ key: webpKey });
     },
   };
 }

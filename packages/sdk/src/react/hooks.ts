@@ -35,6 +35,7 @@ export const useWorkspaceMe = (workspaceId: string) => useQuery(useQueries().wor
 export const useSites = (workspaceId: string, query: Partial<ListSitesQuery> = {}) =>
   useQuery(useQueries().sites(workspaceId, query));
 export const useSite = (siteId: string) => useQuery(useQueries().site(siteId));
+export const useSiteAssets = (siteId: string, search = "") => useQuery(useQueries().siteAssets(siteId, search));
 export const useProfile = () => useQuery(useQueries().profile());
 export const useConsents = () => useQuery(useQueries().consents());
 export const useSessions = () => useQuery(useQueries().sessions());
@@ -44,3 +45,4 @@ export const useRenameSite = () => useMutation({ mutationFn: useMutations().rena
 export const useRemoveSite = () => useMutation({ mutationFn: useMutations().removeSite });
 export const useUpdateProfile = () => useMutation({ mutationFn: useMutations().updateProfile });
 export const useRevokeSession = () => useMutation({ mutationFn: useMutations().revokeSession });
+export const useRemoveAsset = () => useMutation({ mutationFn: useMutations().removeAsset });

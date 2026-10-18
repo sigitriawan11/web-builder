@@ -65,4 +65,19 @@ test("AC ED-160: drop file gambar → node image dibuat & asset diproses ready",
       [siteId, assetId],
     );
   await expect.poll(status, { timeout: 20_000 }).toBe("ready");
+
+  // ED-161: pustaka media — buka tab Assets, aset `ready` muncul sebagai tile dengan thumbnail dari endpoint content.
+  await page.getByTestId("left-tab-assets").click();
+  const tile = page.locator(`[data-testid="asset-tile"][data-asset-id="${assetId}"]`);
+  await expect(tile).toBeVisible();
+  await expect(tile).toHaveAttribute("data-status", "ready");
+  // Thumbnail mengikuti redirect content → URL presigned (bukan gambar rusak).
+  await expect
+    .poll(() => tile.locator("img").evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 10_000 })
+    .toBeGreaterThan(0);
+
+  // Hapus aset dari pustaka (konfirmasi) → tile hilang.
+  page.once("dialog", (dialog) => dialog.accept());
+  await tile.getByTestId("asset-delete").click();
+  await expect(tile).toHaveCount(0);
 });

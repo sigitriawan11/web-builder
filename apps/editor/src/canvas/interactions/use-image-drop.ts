@@ -1,4 +1,4 @@
-import { createNode, registerAsset, runCommand } from "@platform/document-model";
+import { type AssetEntry, createNode, registerAsset, runCommand } from "@platform/document-model";
 import type { PlatformApi } from "@platform/sdk";
 import { type RefObject, useEffect } from "react";
 import { UploadError, uploadImage } from "../../services/upload/upload";
@@ -64,24 +64,34 @@ async function placeImage(
 ): Promise<void> {
   try {
     const { assetId, entry } = await uploadImage(file, { siteId: upload.siteId, assets: upload.assets });
-    const ctx = { doc: runtime.doc, origin: runtime.origin };
-    runtime.undo.stopCapturing();
-    let newId: string | null = null;
-    runtime.doc.transact(() => {
-      runCommand(ctx, registerAsset, { id: assetId, entry });
-      const result = runCommand(ctx, createNode, {
-        parentId,
-        type: "image",
-        name: file.name,
-        props: { image: { assetId }, fit: "cover" },
-        style: { base: { size: { width: DEFAULT_SIZE, height: DEFAULT_HEIGHT } } },
-      });
-      if (result.ok) newId = result.value;
-    }, runtime.origin);
-    runtime.undo.stopCapturing();
-    if (newId) selectionStore.getState().select([newId]);
+    insertImageNode(runtime, { assetId, entry, name: file.name, parentId });
   } catch (error) {
     if (error instanceof UploadError) showToastText({ id: "Gagal mengunggah gambar", en: "Image upload failed" });
     else throw error;
   }
+}
+
+/** Buat node image untuk asset yang SUDAH terdaftar/terupload — dipakai drop (setelah upload) & pustaka media (ED-161).
+ * Satu transaksi (registerAsset + createNode) = satu undo; node baru langsung terpilih. */
+export function insertImageNode(
+  runtime: CanvasRuntime,
+  input: { assetId: string; entry: AssetEntry; name: string; parentId: string },
+): string | null {
+  const ctx = { doc: runtime.doc, origin: runtime.origin };
+  runtime.undo.stopCapturing();
+  let newId: string | null = null;
+  runtime.doc.transact(() => {
+    runCommand(ctx, registerAsset, { id: input.assetId, entry: input.entry });
+    const result = runCommand(ctx, createNode, {
+      parentId: input.parentId,
+      type: "image",
+      name: input.name,
+      props: { image: { assetId: input.assetId }, fit: "cover" },
+      style: { base: { size: { width: DEFAULT_SIZE, height: DEFAULT_HEIGHT } } },
+    });
+    if (result.ok) newId = result.value;
+  }, runtime.origin);
+  runtime.undo.stopCapturing();
+  if (newId) selectionStore.getState().select([newId]);
+  return newId;
 }

@@ -13,6 +13,10 @@ export const queryKeys = {
     list: (workspaceId: string, query: Partial<ListSitesQuery> = {}) => ["sites", "list", workspaceId, query] as const,
     detail: (siteId: string) => ["sites", "detail", siteId] as const,
   },
+  assets: {
+    all: ["assets"] as const,
+    list: (siteId: string, search: string) => ["assets", "list", siteId, search] as const,
+  },
   account: {
     all: ["account"] as const,
     profile: ["account", "profile"] as const,
@@ -33,6 +37,11 @@ export function createQueries(api: PlatformApi) {
       }),
     site: (siteId: string) =>
       queryOptions({ queryKey: queryKeys.sites.detail(siteId), queryFn: () => api.sites.get(siteId) }),
+    siteAssets: (siteId: string, search = "") =>
+      queryOptions({
+        queryKey: queryKeys.assets.list(siteId, search),
+        queryFn: () => api.assets.list(siteId, search ? { search } : {}),
+      }),
     profile: () => queryOptions({ queryKey: queryKeys.account.profile, queryFn: () => api.account.profile() }),
     consents: () => queryOptions({ queryKey: queryKeys.account.consents, queryFn: () => api.account.consents() }),
     sessions: () => queryOptions({ queryKey: queryKeys.account.sessions, queryFn: () => api.account.sessions() }),
@@ -71,6 +80,10 @@ export function createMutations(api: PlatformApi, queryClient: QueryClient) {
     revokeSession: async (sessionId: string) => {
       await api.account.revokeSession(sessionId);
       await queryClient.invalidateQueries({ queryKey: queryKeys.account.sessions });
+    },
+    removeAsset: async (input: { siteId: string; assetId: string }) => {
+      await api.assets.remove(input.siteId, input.assetId);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.assets.all });
     },
   };
 }

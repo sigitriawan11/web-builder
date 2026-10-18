@@ -125,6 +125,18 @@
     "resize": "Resize panel",
     "comingSoon": "Coming soon."
   },
+  "assets": {
+    "search": "Search assets…",
+    "empty": "No assets yet. Drag an image onto the canvas to upload.",
+    "emptySearch": "No matching assets.",
+    "processing": "Processing…",
+    "failed": "Processing failed",
+    "insert": "Insert into page",
+    "delete": "Delete asset",
+    "deleteConfirm": "Delete this asset from the library?",
+    "loadError": "Failed to load the library.",
+    "retry": "Retry"
+  },
   "preview": {
     "device": "Device",
     "page": "Page",

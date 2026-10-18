@@ -30,6 +30,8 @@ export const assets = pgTable(
     siteId: uuid().references(() => sites.id, { onDelete: "restrict" }),
     kind: assetKindEnum().notNull(),
     storageKey: text().notNull(),
+    // Nama file asli saat upload — ditampilkan & dicari di pustaka media (ED-161). Null = upload lama / tanpa nama.
+    fileName: text(),
     mime: text().notNull(),
     sizeBytes: bigint({ mode: "number" }).notNull(),
     width: integer(),

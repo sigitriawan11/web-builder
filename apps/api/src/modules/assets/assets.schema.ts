@@ -8,3 +8,9 @@ const AssetParams = z.object({ siteId: z.uuid(), assetId: z.string().regex(/^ast
 export const presignRequest = { params: SiteParams, body: PresignUploadRequestSchema };
 export const completeRequest = { params: AssetParams };
 export const getAssetRequest = { params: AssetParams };
+export const listRequest = {
+  params: SiteParams,
+  query: z.object({ search: z.string().trim().min(1).max(255).optional() }),
+};
+export const deleteRequest = { params: AssetParams };
+export const contentRequest = { params: AssetParams };

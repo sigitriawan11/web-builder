@@ -71,6 +71,12 @@ export function createPlatformApi(client: ApiClient) {
         client
           .request("GET", `/v1/sites/${siteId}/assets/${assetId}`, { schema: dataEnvelope(AssetSummarySchema) })
           .then(unwrap),
+      // Pustaka media (ED-161): daftar aset situs, opsional difilter nama file.
+      list: (siteId: string, query: { search?: string } = {}) =>
+        client
+          .request("GET", `/v1/sites/${siteId}/assets`, { query, schema: dataEnvelope(z.array(AssetSummarySchema)) })
+          .then(unwrap),
+      remove: (siteId: string, assetId: string) => client.request("DELETE", `/v1/sites/${siteId}/assets/${assetId}`),
     },
     account: {
       profile: () => client.request("GET", "/v1/account/profile", { schema: dataEnvelope(ProfileSchema) }).then(unwrap),
