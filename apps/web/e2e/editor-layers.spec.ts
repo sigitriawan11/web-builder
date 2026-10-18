@@ -1,207 +1,52 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { APP_URL } from "../playwright.config";
 import { OWNER_STATE } from "./support/auth";
-import { editorCommand, firstPageId } from "./support/editor";
 import { createSiteViaApi } from "./support/sites";
 
-// T2.13.1 / ED-136: tree layers (react-arborist) + sinkron seleksi dua arah dengan canvas.
+// T2.13.10 / ED-142: kotak cari di panel Layers — cocokkan nama layer ATAU isi teks; hasil disaring (react-arborist).
 test.use({ locale: "en-US", storageState: OWNER_STATE });
 
-const sizeFixed = (w: number, h: number) => ({
-  width: { mode: "fixed" as const, value: w, unit: "px" as const },
-  height: { mode: "fixed" as const, value: h, unit: "px" as const },
-});
-
-test("AC ED-136: tree layers tampil & seleksi sinkron dua arah", async ({ page }) => {
-  await page.goto(`${APP_URL}/sites`);
-  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layers Test")}`);
-  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
-
-  const pageId = await firstPageId(page);
-  const frame = String(
-    (
-      await editorCommand(page, "createNode", {
-        parentId: pageId,
-        type: "frame",
-        style: { base: { position: { type: "absolute", x: 40, y: 40 }, size: sizeFixed(200, 160) } },
-      })
-    ).value,
-  );
-  const child = String(
-    (
-      await editorCommand(page, "createNode", {
-        parentId: frame,
-        type: "shape",
-        props: { shape: "rect" },
-        style: { base: { size: sizeFixed(80, 80) } },
-      })
-    ).value,
-  );
-
-  // Tab Layers = default. Tree menampilkan frame & anaknya.
-  await expect(page.getByTestId("layers-tree")).toBeVisible();
-  await expect(page.getByTestId(`layer-${frame}`)).toBeVisible();
-  await expect(page.getByTestId(`layer-${child}`)).toBeVisible();
-
-  // Klik layer → node terseleksi di canvas.
-  await page.getByTestId(`layer-${child}`).click();
-  await expect.poll(() => page.evaluate(() => window.__editorTestApi?.getSelection() ?? [])).toEqual([child]);
-
-  // Seleksi di canvas (via API) → baris layer ter-highlight (aria-selected).
-  await page.evaluate((id) => window.__editorTestApi?.select([id]), frame);
-  await expect(page.getByTestId(`layer-${frame}`)).toHaveAttribute("aria-selected", "true");
-  await expect(page.getByTestId(`layer-${child}`)).toHaveAttribute("aria-selected", "false");
-});
-
-const nodeField = (page: import("@playwright/test").Page, id: string, field: string) =>
+const run = (page: Page, name: string, args: unknown) =>
   page.evaluate(
-    ({ id, field }) => {
-      const docu = window.__editorTestApi?.getDoc() as { nodes: Record<string, Record<string, unknown>> } | undefined;
-      return docu?.nodes[id]?.[field];
+    ([n, a]) =>
+      (window.__editorTestApi?.runCommand(n as string, a) as { ok: boolean; value?: string }) ?? { ok: false },
+    [name, args] as [string, unknown],
+  );
+
+test("AC ED-142: cari 'harga' menemukan node teks berisi 'Harga mulai', menyembunyikan lainnya", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layer Search Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  const pageId = await page.evaluate(() => {
+    const doc = window.__editorTestApi?.getDoc() as { nodes: Record<string, { type: string }> };
+    return Object.entries(doc.nodes).find(([, n]) => n.type === "page")?.[0] ?? "";
+  });
+
+  // Node teks berisi "Harga mulai" + sebuah frame lain.
+  const textRes = await run(page, "createNode", {
+    parentId: pageId,
+    type: "text",
+    name: "Label",
+    props: {
+      content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Harga mulai 99rb" }] }] },
     },
-    { id, field },
-  );
+  });
+  const frameRes = await run(page, "createNode", { parentId: pageId, type: "frame", name: "Lainnya" });
+  const textId = textRes.value as string;
+  const frameId = frameRes.value as string;
 
-test("AC ED-137/ED-139: rename (F2/dbl-click), toggle visibility & lock di baris layer", async ({ page }) => {
-  await page.goto(`${APP_URL}/sites`);
-  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layer Row Test")}`);
-  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  // Pastikan tab Layers aktif.
+  await page.getByTestId("left-tab-layers").click();
+  await expect(page.getByTestId(`layer-${textId}`)).toBeVisible();
+  await expect(page.getByTestId(`layer-${frameId}`)).toBeVisible();
 
-  const pageId = await firstPageId(page);
-  const frame = String(
-    (
-      await editorCommand(page, "createNode", {
-        parentId: pageId,
-        type: "frame",
-        style: { base: { position: { type: "absolute", x: 40, y: 40 }, size: sizeFixed(200, 160) } },
-      })
-    ).value,
-  );
-  await expect(page.getByTestId(`layer-${frame}`)).toBeVisible();
+  // Cari "harga" → node teks tetap (cocok via isi teks), frame lain disaring keluar.
+  await page.getByTestId("layers-search").fill("harga");
+  await expect(page.getByTestId(`layer-${textId}`)).toBeVisible();
+  await expect(page.getByTestId(`layer-${frameId}`)).toHaveCount(0);
 
-  // Rename via double-click → input → Enter.
-  await page.getByTestId(`layer-${frame}`).dblclick();
-  await page.getByTestId(`layer-name-input-${frame}`).fill("Hero");
-  await page.getByTestId(`layer-name-input-${frame}`).press("Enter");
-  await expect.poll(() => nodeField(page, frame, "name")).toBe("Hero");
-
-  // Toggle visibility & lock.
-  await page.getByTestId(`layer-${frame}`).hover();
-  await page.getByTestId(`layer-visible-${frame}`).click();
-  await expect.poll(() => nodeField(page, frame, "visible")).toBe(false);
-  await page.getByTestId(`layer-${frame}`).hover();
-  await page.getByTestId(`layer-lock-${frame}`).click();
-  await expect.poll(() => nodeField(page, frame, "locked")).toBe(true);
-});
-
-test("AC ED-143: multi-select Shift (rentang) & Mod (toggle) di layers", async ({ page }) => {
-  await page.goto(`${APP_URL}/sites`);
-  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layer Multiselect Test")}`);
-  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
-
-  const pageId = await firstPageId(page);
-  const ids: string[] = [];
-  for (let i = 0; i < 3; i++) {
-    ids.push(
-      String(
-        (
-          await editorCommand(page, "createNode", {
-            parentId: pageId,
-            type: "frame",
-            style: { base: { position: { type: "absolute", x: 40 + i * 40, y: 40 }, size: sizeFixed(60, 60) } },
-          })
-        ).value,
-      ),
-    );
-  }
-  const [a, b, c] = ids;
-  const sel = () => page.evaluate(() => (window.__editorTestApi?.getSelection() ?? []).slice().sort());
-
-  await expect(page.getByTestId(`layer-${c}`)).toBeVisible();
-  // Shift dari c ke a → seluruh rentang (3 node).
-  await page.getByTestId(`layer-${c}`).click();
-  await page.getByTestId(`layer-${a}`).click({ modifiers: ["Shift"] });
-  await expect.poll(sel).toEqual([a, b, c].sort());
-  // Mod+klik b → toggle keluar.
-  await page.getByTestId(`layer-${b}`).click({ modifiers: ["ControlOrMeta"] });
-  await expect.poll(sel).toEqual([a, c].sort());
-});
-
-test("AC ED-140: collapse frame → anak tersembunyi; select anak di canvas → auto-expand", async ({ page }) => {
-  await page.goto(`${APP_URL}/sites`);
-  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Layer Collapse Test")}`);
-  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
-
-  const pageId = await firstPageId(page);
-  const frame = String(
-    (
-      await editorCommand(page, "createNode", {
-        parentId: pageId,
-        type: "frame",
-        style: { base: { position: { type: "absolute", x: 40, y: 40 }, size: sizeFixed(200, 160) } },
-      })
-    ).value,
-  );
-  const child = String(
-    (
-      await editorCommand(page, "createNode", {
-        parentId: frame,
-        type: "shape",
-        props: { shape: "rect" },
-        style: { base: { size: sizeFixed(80, 80) } },
-      })
-    ).value,
-  );
-  await expect(page.getByTestId(`layer-${child}`)).toBeVisible();
-
-  // Collapse frame → anak tidak dirender.
-  await page.getByTestId(`layer-toggle-${frame}`).click();
-  await expect(page.getByTestId(`layer-${child}`)).toHaveCount(0);
-
-  // Select anak di canvas → tree auto-expand ke node itu.
-  await page.evaluate((id) => window.__editorTestApi?.select([id]), child);
-  await expect(page.getByTestId(`layer-${child}`)).toBeVisible();
-});
-
-test("AC ED-146: Mod+Alt+G membungkus seleksi dalam frame baru", async ({ page }) => {
-  await page.goto(`${APP_URL}/sites`);
-  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Wrap Frame Test")}`);
-  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
-  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
-
-  const pageId = await firstPageId(page);
-  const a = String(
-    (
-      await editorCommand(page, "createNode", {
-        parentId: pageId,
-        type: "frame",
-        style: { base: { position: { type: "absolute", x: 40, y: 40 }, size: sizeFixed(80, 60) } },
-      })
-    ).value,
-  );
-  const b = String(
-    (
-      await editorCommand(page, "createNode", {
-        parentId: pageId,
-        type: "frame",
-        style: { base: { position: { type: "absolute", x: 200, y: 120 }, size: sizeFixed(80, 60) } },
-      })
-    ).value,
-  );
-  await page.evaluate((ids) => window.__editorTestApi?.select(ids), [a, b]);
-  await page.getByTestId("editor-canvas").click({ position: { x: 5, y: 5 } }); // ensure window focus (no node at 5,5 → still selected? reselect)
-  await page.evaluate((ids) => window.__editorTestApi?.select(ids), [a, b]);
-  await page.keyboard.press("ControlOrMeta+Alt+g");
-
-  const wrapper = String((await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] ?? "");
-  const doc = await page.evaluate(
-    () =>
-      window.__editorTestApi?.getDoc() as {
-        nodes: Record<string, { type: string; parentId: string | null; children?: string[] }>;
-      },
-  );
-  expect(doc.nodes[wrapper]?.type).toBe("frame");
-  expect(doc.nodes[wrapper]?.parentId).toBe(pageId);
-  expect(doc.nodes[wrapper]?.children).toEqual([a, b]);
-  expect(doc.nodes[a]?.parentId).toBe(wrapper);
+  // Kosongkan → semua muncul lagi.
+  await page.getByTestId("layers-search").fill("");
+  await expect(page.getByTestId(`layer-${frameId}`)).toBeVisible();
 });

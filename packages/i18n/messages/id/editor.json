@@ -152,7 +152,9 @@
     "show": "Tampilkan",
     "hide": "Sembunyikan",
     "lock": "Kunci",
-    "unlock": "Buka kunci"
+    "unlock": "Buka kunci",
+    "search": "Cari layer…",
+    "searchEmpty": "Tidak ada layer cocok."
   },
   "inspector": {
     "label": "Inspector",

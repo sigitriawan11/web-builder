@@ -152,7 +152,9 @@
     "show": "Show",
     "hide": "Hide",
     "lock": "Lock",
-    "unlock": "Unlock"
+    "unlock": "Unlock",
+    "search": "Find layers…",
+    "searchEmpty": "No matching layers."
   },
   "inspector": {
     "label": "Inspector",

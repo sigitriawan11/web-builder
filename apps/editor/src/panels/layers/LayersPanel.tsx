@@ -1,4 +1,12 @@
-import { moveNode, type Node, renameNode, runCommand, setLocked, setVisible } from "@platform/document-model";
+import {
+  moveNode,
+  type Node,
+  plainText,
+  renameNode,
+  runCommand,
+  setLocked,
+  setVisible,
+} from "@platform/document-model";
 import { cn } from "@platform/ui";
 import {
   ChevronDownIcon,
@@ -11,12 +19,14 @@ import {
   LockIcon,
   LockOpenIcon,
   type LucideIcon,
+  SearchIcon,
   SmileIcon,
   SquareIcon,
   StickyNoteIcon,
   TypeIcon,
 } from "lucide-react";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import type { NodeApi } from "react-arborist";
 import { type NodeRendererProps, Tree, type TreeApi } from "react-arborist";
 import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
@@ -73,10 +83,19 @@ export function LayersPanel({
   pageId: string;
   readOnly: boolean;
 }) {
+  const t = useT();
   const tree = useLayerTree(runtime.doc, runtime.nodeStore, pageId);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  // ED-142: cocokkan nama layer ATAU isi teks (plainText). react-arborist menyaring + membuka ancestor otomatis.
+  const searchMatch = (node: NodeApi<LayerNode>, term: string): boolean => {
+    const doc = runtime.nodeStore.getNode(node.data.id);
+    const text = doc?.type === "text" ? plainText(doc.props.content) : "";
+    return `${node.data.name} ${text}`.toLowerCase().includes(term.toLowerCase());
+  };
   const treeRef = useRef<TreeApi<LayerNode> | null>(null);
   const flatIds = useMemo(() => flattenIds(tree), [tree]);
   const recursiveToggle = (data: LayerNode, open: boolean) => {
@@ -155,22 +174,38 @@ export function LayersPanel({
 
   return (
     <LayerActionsContext.Provider value={{ runtime, readOnly, editingId, setEditingId, onRowClick, recursiveToggle }}>
-      <div ref={containerRef} className="min-h-0 flex-1" data-testid="layers-tree">
-        {size.height > 0 ? (
-          <Tree<LayerNode>
-            ref={treeRef}
-            data={tree}
-            width={size.width}
-            height={size.height}
-            rowHeight={24}
-            indent={12}
-            openByDefault
-            disableMultiSelection
-            onMove={handleMove}
-          >
-            {LayerRow}
-          </Tree>
-        ) : null}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="relative mb-1 shrink-0">
+          <SearchIcon className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder={t("layers.search")}
+            aria-label={t("layers.search")}
+            data-testid="layers-search"
+            className="h-7 w-full rounded border bg-background pr-2 pl-7 text-xs outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div ref={containerRef} className="min-h-0 flex-1" data-testid="layers-tree">
+          {size.height > 0 ? (
+            <Tree<LayerNode>
+              ref={treeRef}
+              data={tree}
+              width={size.width}
+              height={size.height}
+              rowHeight={24}
+              indent={12}
+              openByDefault
+              disableMultiSelection
+              onMove={handleMove}
+              searchTerm={search}
+              searchMatch={searchMatch}
+            >
+              {LayerRow}
+            </Tree>
+          ) : null}
+        </div>
       </div>
     </LayerActionsContext.Provider>
   );
