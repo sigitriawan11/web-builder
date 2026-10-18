@@ -14,4 +14,6 @@ playwright-report/
 test-results/
 # Trace Chrome benchmark (BENCH_TRACE=1) berukuran puluhan MB; data mentah tabel tetap di-commit.
 apps/editor/bench/results/traces/
+# Hasil run benchmark (BENCH_JSON summary + report) = artefak CI, bukan di-commit; baseline.json di-commit terpisah.
+apps/editor/bench/results/
 apps/web/e2e/.auth/

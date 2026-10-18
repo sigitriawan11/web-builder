@@ -1,0 +1,74 @@
+# Benchmark canvas nightly (ED-241/T2.18.4): ukur fps pan/zoom/drag + latensi seleksi pada fixture 200 & 2.000 node,
+# bandingkan dengan baseline; regresi > 20% → job gagal. Baseline di-seed/refresh di runner lewat `workflow_dispatch`
+# dengan input `update_baseline=true` (angka headless runner ≠ laptop referensi, jadi baseline harus dari runner).
+# Angka headless = indikatif (ED-022); nightly = jaring regresi kasar, bukan pengukuran resmi.
+name: Benchmark nightly
+
+on:
+  schedule:
+    # 20:00 UTC = 03:00 WIB (setelah E2E nightly).
+    - cron: "0 20 * * *"
+  workflow_dispatch:
+    inputs:
+      update_baseline:
+        description: "Tulis hasil run ini sebagai baseline baru (commit ke apps/editor/bench/baseline.json)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: bench-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  TURBO_TELEMETRY_DISABLED: "1"
+  CI: "true"
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: cp .env.example .env
+      - run: pnpm install --frozen-lockfile
+      - name: Browser Playwright
+        run: pnpm --filter @platform/editor exec playwright install --with-deps chromium
+      - name: Benchmark canvas → summary
+        env:
+          BENCH_JSON: bench/results/summary.json
+          # Hanya isolasi shadow (default produk) di CI agar durasi terjaga; variant lain diukur di laptop referensi.
+          BENCH_VARIANTS: shadow
+        run: pnpm --filter @platform/editor bench:canvas
+      - name: Cek regresi vs baseline (> 20% → gagal)
+        run: |
+          node apps/editor/bench/check-regression.mjs \
+            --current apps/editor/bench/results/summary.json \
+            --baseline apps/editor/bench/baseline.json \
+            --threshold 0.2 \
+            --report apps/editor/bench/results/report.md
+      - name: Artefak benchmark
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-canvas
+          path: |
+            apps/editor/bench/results/summary.json
+            apps/editor/bench/results/report.md
+          retention-days: 30
+      - name: Refresh baseline (workflow_dispatch update_baseline)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baseline }}
+        run: |
+          cp apps/editor/bench/results/summary.json apps/editor/bench/baseline.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add apps/editor/bench/baseline.json
+          git commit -m "chore(bench): refresh canvas benchmark baseline (ED-241)"
+          git push

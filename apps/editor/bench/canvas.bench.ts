@@ -1,3 +1,5 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { type Browser, expect, type Page, test } from "@playwright/test";
 
 // T0.7.3 / ED-022: harness benchmark canvas yang mengisi tabel §M0.e ROADMAP sekaligus.
@@ -413,5 +415,28 @@ test.afterAll(async ({ browser }) => {
     console.log(
       `\n\`\`\`json\n${JSON.stringify({ date: new Date().toISOString(), durationMs: DURATION_MS, machine, results: raw }, null, 2)}\n\`\`\``,
     );
+  }
+
+  // T2.18.4/ED-241: ringkasan metrik rata (median) per skenario.variant untuk perbandingan regresi CI nightly.
+  // `.fps` = makin tinggi makin baik; `.ms` = makin rendah makin baik (arah dipakai check-bench-regression.mjs).
+  const jsonPath = process.env.BENCH_JSON;
+  if (jsonPath) {
+    const median = (values: number[]) => {
+      const sorted = [...values].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 ? (sorted[mid] ?? 0) : ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2;
+    };
+    const metrics: Record<string, number> = {};
+    for (const [scenario, byVariant] of results) {
+      for (const [variant, measures] of byVariant) {
+        const fps = measures.flatMap((m) => (m.kind === "frames" ? [m.stats.fps] : []));
+        const ms = measures.flatMap((m) => (m.kind === "latency" ? [m.stats.p50Ms] : []));
+        if (fps.length) metrics[`${scenario}.${variant}.fps`] = round(median(fps));
+        if (ms.length) metrics[`${scenario}.${variant}.ms`] = round(median(ms));
+      }
+    }
+    mkdirSync(dirname(jsonPath), { recursive: true });
+    writeFileSync(jsonPath, `${JSON.stringify({ date: new Date().toISOString(), machine, metrics }, null, 2)}\n`);
+    console.log(`\nBENCH_JSON → ${jsonPath} (${Object.keys(metrics).length} metrik)`);
   }
 });
