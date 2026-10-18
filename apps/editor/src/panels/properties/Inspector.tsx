@@ -62,11 +62,13 @@ function DesignTab({
   pageId,
   nodes,
   runtime,
+  siteId,
   readOnly,
 }: {
   pageId: string;
   nodes: readonly Node[];
   runtime: CanvasRuntime | null;
+  siteId: string | undefined;
   readOnly: boolean;
 }) {
   const t = useT();
@@ -109,7 +111,7 @@ function DesignTab({
       {runtime ? <EffectsSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <OpacitySection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AppearanceSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
-      {runtime ? <ImageSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <ImageSection runtime={runtime} nodes={nodes} siteId={siteId} readOnly={readOnly} /> : null}
       {runtime ? <LinkSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
     </>
   );
@@ -200,11 +202,14 @@ export function Inspector({
   pageId,
   pageSettings,
   runtime,
+  siteId,
   readOnly = false,
 }: {
   pageId: string;
   pageSettings: ReactNode;
   runtime?: CanvasRuntime | null;
+  // Editor situs: untuk ganti gambar dari pustaka/upload (ED-165). Playground tidak mengopernya.
+  siteId?: string;
   readOnly?: boolean;
 }) {
   const t = useT();
@@ -258,7 +263,7 @@ export function Inspector({
         className="min-h-0 flex-1 overflow-y-auto"
       >
         {rightTab === "design" ? (
-          <DesignTab pageId={pageId} nodes={nodes} runtime={runtime ?? null} readOnly={readOnly} />
+          <DesignTab pageId={pageId} nodes={nodes} runtime={runtime ?? null} siteId={siteId} readOnly={readOnly} />
         ) : (
           <SettingsTab nodes={nodes} page={pageSettings} runtime={runtime ?? null} readOnly={readOnly} />
         )}

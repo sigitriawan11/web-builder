@@ -13,6 +13,8 @@ export interface ImageUploadContext {
   siteId: string;
   assets: PlatformApi["assets"];
   readOnly: boolean;
+  // Dipanggil setelah upload+daftar sukses — agar pustaka media (AssetsPanel) menyegarkan daftarnya.
+  onUploaded?: () => void;
 }
 
 const DEFAULT_SIZE = { mode: "fixed" as const, value: 300, unit: "px" as const };
@@ -65,6 +67,7 @@ async function placeImage(
   try {
     const { assetId, entry } = await uploadImage(file, { siteId: upload.siteId, assets: upload.assets });
     insertImageNode(runtime, { assetId, entry, name: file.name, parentId });
+    upload.onUploaded?.();
   } catch (error) {
     if (error instanceof UploadError) showToastText({ id: "Gagal mengunggah gambar", en: "Image upload failed" });
     else throw error;
