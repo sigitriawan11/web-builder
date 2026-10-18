@@ -1,4 +1,4 @@
-import { replaceText, setImage, setLink, setNodeProps, setTextContent } from "./content";
+import { registerAsset, replaceText, setImage, setLink, setNodeProps, setTextContent } from "./content";
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
 import { moveNode } from "./move-node";
@@ -34,6 +34,7 @@ export {
   duplicateNodes,
   insertSubtree,
   moveNode,
+  registerAsset,
   renameNode,
   reorderNode,
   reorderPages,
@@ -72,6 +73,7 @@ export const COMMANDS = {
   clearBreakpointOverrides,
   setSettings,
   setTextContent,
+  registerAsset,
   replaceText,
   setImage,
   setLink,

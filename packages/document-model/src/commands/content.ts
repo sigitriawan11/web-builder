@@ -2,6 +2,8 @@ import * as Y from "yjs";
 import { z } from "zod";
 import { plainText } from "../query/rich-text";
 import {
+  AssetEntrySchema,
+  AssetIdSchema,
   AssetRefSchema,
   LinkValueSchema,
   NodeIdSchema,
@@ -242,6 +244,21 @@ export const setLink = defineCommand({
     if (targetError) return targetError;
     yProps.set("link", cloneJson(input.link));
     return { ok: true, value: undefined, affected: [input.id] };
+  },
+});
+
+export const registerAsset = defineCommand({
+  name: "registerAsset",
+  description: {
+    id: "Daftarkan asset (AssetEntry) ke dokumen agar bisa dirujuk node image/link/font (DM-057).",
+    en: "Register an asset (AssetEntry) in the document so image/link/font nodes can reference it (DM-057).",
+  },
+  // Upload = aksi user; AI image-gen (M6) memakai jalur sendiri.
+  aiExposed: false,
+  input: z.strictObject({ id: AssetIdSchema, entry: AssetEntrySchema }),
+  run(ctx, input) {
+    ctx.doc.getMap<unknown>(YDOC_KEYS.assets).set(input.id, cloneJson(input.entry));
+    return { ok: true, value: undefined, affected: [] };
   },
 });
 

@@ -29,22 +29,24 @@ export const PresignUploadRequestSchema = z.strictObject({
 });
 export type PresignUploadRequest = z.infer<typeof PresignUploadRequestSchema>;
 
-export interface PresignUploadResponse {
-  assetId: string;
-  storageKey: string;
-  uploadUrl: string;
+export const PresignUploadResponseSchema = z.object({
+  assetId: z.string(),
+  storageKey: z.string(),
+  uploadUrl: z.url(),
   // Header yang WAJIB dikirim browser pada PUT agar cocok tanda tangan presigned.
-  headers: { "Content-Type": string };
-}
+  headers: z.object({ "Content-Type": z.string() }),
+});
+export type PresignUploadResponse = z.infer<typeof PresignUploadResponseSchema>;
 
-export interface AssetSummary {
-  id: string;
-  kind: "image" | "video" | "file" | "font" | "svg";
-  mime: string;
-  sizeBytes: number;
-  width: number | null;
-  height: number | null;
-  blurhash: string | null;
-  status: "pending" | "ready" | "rejected";
-  createdAt: string;
-}
+export const AssetSummarySchema = z.object({
+  id: z.string(),
+  kind: z.enum(["image", "video", "file", "font", "svg"]),
+  mime: z.string(),
+  sizeBytes: z.number(),
+  width: z.number().nullable(),
+  height: z.number().nullable(),
+  blurhash: z.string().nullable(),
+  status: z.enum(["pending", "ready", "rejected"]),
+  createdAt: z.string(),
+});
+export type AssetSummary = z.infer<typeof AssetSummarySchema>;
