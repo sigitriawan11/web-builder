@@ -12,6 +12,7 @@ import { Redis } from "ioredis";
 import type { WorkerEnv } from "./config/env";
 import { createEmailProvider } from "./email/provider";
 import { createHealthApp, listen } from "./health/health-server";
+import { createImageStorage } from "./lib/storage";
 import { createProcessors } from "./processors";
 import type { ProcessorRegistry } from "./processors/types";
 import { registerCleanupSchedules } from "./runtime/schedules";
@@ -61,6 +62,7 @@ function createResources(env: WorkerEnv): WorkerResources {
   );
   const processors = createProcessors({
     db,
+    storage: createImageStorage(env),
     email: {
       db,
       provider: emailProvider,

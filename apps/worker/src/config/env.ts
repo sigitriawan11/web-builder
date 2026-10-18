@@ -43,6 +43,17 @@ export const workerEnvSchema = {
   EMAIL_REPLY_TO: envField.string().optional(),
   // Basis link di email (halaman web).
   PUBLIC_APP_URL: envField.url(),
+  // Object storage S3-compatible (MinIO lokal / R2) — processor image-processing (ARCHITECTURE §9.9).
+  S3_ENDPOINT: envField.url(),
+  S3_REGION: envField.string().default("auto"),
+  S3_ACCESS_KEY_ID: envField.string(),
+  S3_SECRET_ACCESS_KEY: envField.secret(8),
+  S3_BUCKET_UPLOADS: envField.string().default("uploads"),
+  S3_BUCKET_ASSETS: envField.string().default("assets"),
+  S3_FORCE_PATH_STYLE: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
 };
 
 export type WorkerEnv = ReturnType<typeof loadWorkerEnv>;

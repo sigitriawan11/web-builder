@@ -22,12 +22,14 @@
     "vitest": "5.0.4"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.726.1",
     "@bull-board/api": "9.10.1",
     "@bull-board/express": "9.10.1",
     "@platform/db": "workspace:*",
     "@platform/i18n": "workspace:*",
     "@platform/shared": "workspace:*",
     "@react-email/render": "2.1.0",
+    "blurhash": "2.0.5",
     "bullmq": "6.3.10",
     "express": "5.2.1",
     "ioredis": "6.0.0",
@@ -35,6 +37,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-email": "6.10.0",
+    "sharp": "0.33.5",
     "zod": "4.6.7"
   }
 }
