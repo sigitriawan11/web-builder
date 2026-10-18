@@ -34,7 +34,7 @@ export function authTestApp(
   testDb: TestDb,
   redis: Redis,
   queues: QueueProducer = recordingQueues(),
-  extra: Pick<AppDeps, "verifyCaptcha" | "mountRoutes" | "internalJwtSecret"> & {
+  extra: Pick<AppDeps, "verifyCaptcha" | "mountRoutes" | "internalJwtSecret" | "storage"> & {
     google?: { clientId: string; clientSecret: string; redirectUri?: string };
   } = {},
 ) {
@@ -57,6 +57,7 @@ export function authTestApp(
     db: testDb.db,
     auth,
     redis,
+    queues,
     rateLimitPrefix: `rl-test:${uuidv7()}`,
     realtime: { tokenSecret: TEST_REALTIME_SECRET, url: "ws://realtime.localhost:4100" },
     ...appExtra,

@@ -9,6 +9,7 @@ import { type ReadinessCheck, readinessHandler } from "./health/readiness";
 import { createInternalRouter } from "./internal/internal.routes";
 import { mountAt } from "./lib/mount";
 import type { Redis } from "./lib/redis";
+import type { AssetStorage } from "./lib/storage";
 import { authSession } from "./middleware/auth-session";
 import { bodyParsers } from "./middleware/body-parsers";
 import { type ErrorReporter, errorHandler, notFound } from "./middleware/error-handler";
@@ -44,6 +45,8 @@ export interface AppDeps {
   internalJwtSecret?: string;
   // Producer job untuk service (enqueue lewat `withTransaction` + afterCommit).
   queues?: QueueProducer;
+  // Object storage (presigned upload aset, ARCHITECTURE §9.9); bila ada, `/v1/sites/:siteId/assets` dipasang.
+  storage?: AssetStorage;
   // Pengecekan `/health/ready` (DB, Redis, storage) — dirakit server dari dependensi nyata.
   readinessChecks?: Readonly<Record<string, ReadinessCheck>>;
   // Untuk test & komposisi: router tambahan dipasang sebelum handler 404/error.
@@ -146,7 +149,12 @@ export function createApp(deps: AppDeps): Express {
     mountAt(
       app,
       "/v1/sites/:siteId",
-      createSiteScopeRouter({ db: deps.db, ...(deps.redis ? { redis: deps.redis } : {}) }),
+      createSiteScopeRouter({
+        db: deps.db,
+        ...(deps.redis ? { redis: deps.redis } : {}),
+        ...(deps.storage ? { storage: deps.storage } : {}),
+        ...(deps.queues ? { queues: deps.queues } : {}),
+      }),
     );
     if (deps.realtime) {
       mountAt(

@@ -13,6 +13,12 @@ const baseEnv = {
   // Redis sengaja tidak tersedia: server tetap start & shutdown rapi (rate limit pakai limiter cadangan).
   REDIS_URL: "redis://127.0.0.1:1",
   S3_ENDPOINT: "http://127.0.0.1:1",
+  S3_REGION: "auto",
+  S3_ACCESS_KEY_ID: "minioadmin",
+  S3_SECRET_ACCESS_KEY: "minioadmin",
+  S3_BUCKET_UPLOADS: "uploads",
+  S3_BUCKET_ASSETS: "assets",
+  S3_FORCE_PATH_STYLE: true,
   INTERNAL_JWT_SECRET: "test-internal-secret-0123456789abcdef",
   BETTER_AUTH_SECRET: "test-better-auth-secret-0123456789abcdef",
   BETTER_AUTH_URL: "http://app.localhost:3000/api/auth",
@@ -36,7 +42,7 @@ describe("server & graceful shutdown (T1.4.1)", () => {
     const port = await freePort();
     const child = spawn(process.execPath, ["--import", "tsx", "src/main.ts"], {
       cwd: new URL("..", import.meta.url).pathname,
-      env: { ...process.env, ...baseEnv, API_PORT: String(port), DATABASE_POOL_MAX: "2" },
+      env: { ...process.env, ...baseEnv, API_PORT: String(port), DATABASE_POOL_MAX: "2", S3_FORCE_PATH_STYLE: "true" },
       stdio: ["ignore", "pipe", "pipe"],
     });
     let output = "";

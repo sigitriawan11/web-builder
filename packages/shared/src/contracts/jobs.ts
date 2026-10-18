@@ -93,6 +93,9 @@ export const JOB_PAYLOADS = {
   publish: z.object({ ...jobBase, siteId: UuidV7Schema, deploymentId: UuidV7Schema }),
   // Dedupe dengan jobId `thumb:<documentId>:<snapshotId>`.
   thumbnails: z.object({ ...jobBase, documentId: UuidV7Schema, snapshotId: UuidV7Schema }),
+  // Pemrosesan gambar setelah upload (ARCHITECTURE §9.9): cek magic bytes, strip EXIF, varian, blurhash, sha256 →
+  // status ready/rejected. `assetId` = ID dokumen (`ast_…`); worker membaca storageKey/workspace dari tabel `assets`.
+  "image-processing": z.object({ ...jobBase, assetId: z.string().regex(/^ast_[0-9a-z]{6,24}$/) }),
   // Email transaksional (ACC-271): template (nama = type katalog ACC-270) + penerima; worker merender isi dalam
   // bahasa user. Pengecualian "hanya ID": URL bertoken dibuat Better Auth saat request dan tidak bisa dimuat ulang
   // worker, jadi ikut payload (token berumur pendek; payload tidak pernah dicatat ke log).

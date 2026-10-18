@@ -13,6 +13,7 @@ import { turnstileVerifier } from "./auth/captcha";
 import type { ApiEnv } from "./config/env";
 import { storageCheck } from "./health/readiness";
 import { createRedis, waitForRedis } from "./lib/redis";
+import { createAssetStorage } from "./lib/storage";
 import { createQueueProducer } from "./queues/producer";
 
 // Batas tunggu request yang sedang berjalan saat shutdown, sebelum koneksi dipaksa tutup.
@@ -108,6 +109,7 @@ export async function startServer(
     ),
     redis,
     queues,
+    storage: createAssetStorage(env),
     internalJwtSecret: env.INTERNAL_JWT_SECRET,
     readinessChecks: {
       db: async () => {

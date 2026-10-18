@@ -11,8 +11,19 @@ export const apiEnvSchema = {
   DATABASE_URL: envField.url(),
   DATABASE_POOL_MAX: envField.int().default(10),
   REDIS_URL: envField.url(),
-  // Object storage S3-compatible (MinIO lokal / R2), ARCHITECTURE §15.4.
+  // Object storage S3-compatible (MinIO lokal / R2), ARCHITECTURE §15.4 & §9.9 (upload presigned).
   S3_ENDPOINT: envField.url(),
+  S3_REGION: envField.string().default("auto"),
+  S3_ACCESS_KEY_ID: envField.string(),
+  S3_SECRET_ACCESS_KEY: envField.secret(8),
+  // Bucket upload mentah (presigned PUT) & bucket asset publik (varian hasil proses).
+  S3_BUCKET_UPLOADS: envField.string().default("uploads"),
+  S3_BUCKET_ASSETS: envField.string().default("assets"),
+  // MinIO lokal butuh path-style (bucket di path, bukan subdomain); R2 virtual-hosted.
+  S3_FORCE_PATH_STYLE: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
   // JWT service-to-service (ARCHITECTURE §9.3).
   INTERNAL_JWT_SECRET: envField.secret(32),
   // Better Auth (ARCHITECTURE §9.1): URL publik auth = PUBLIC_APP_URL + /api/auth.
