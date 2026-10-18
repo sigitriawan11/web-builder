@@ -7,6 +7,7 @@ import { restoreDocument } from "../yjs/storage";
 import { v0ToV1 } from "./v0-to-v1";
 import { v1ToV2 } from "./v1-to-v2";
 import { v2ToV3 } from "./v2-to-v3";
+import { v3ToV4 } from "./v3-to-v4";
 
 // DM-071: migrasi berurutan — `MIGRATIONS[n]` mengubah vN → vN+1. Murni, tanpa I/O. Migrasi tidak boleh menghapus
 // data user tanpa jejak (pindahkan ke `metadata.ext.migrated` bila tidak bisa dipetakan).
@@ -18,6 +19,7 @@ export const MIGRATIONS: Readonly<Record<number, Migration>> = {
   0: v0ToV1,
   1: v1ToV2,
   2: v2ToV3,
+  3: v3ToV4,
 };
 
 export type MigrationErrorCode = "INVALID_DOCUMENT" | "FUTURE_VERSION" | "MISSING_MIGRATION";

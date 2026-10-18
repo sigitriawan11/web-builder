@@ -160,13 +160,35 @@ const PositionPatchSchema = z.strictObject({
   constraints: ConstraintsSchema.nullable().optional(),
 });
 
-// ── Fills (DM-029: solid & image P0 · M1; gradient P1 · M2) ─────────────────
+// ── Fills (DM-029: solid & image P0 · M1; gradient P1 · M2 — ditambah di schema v4) ─────────────────
+
+// Stop gradient: offset 0..1, warna literal/token. 2–10 stop dengan offset menaik (DM-029).
+const GradientStopsSchema = z
+  .array(z.strictObject({ offset: z.number().min(0).max(1), color: ColorSchema }))
+  .min(2)
+  .max(10)
+  .refine(
+    (stops) => stops.every((stop, index) => index === 0 || stop.offset >= (stops[index - 1]?.offset ?? 0)),
+    "offset stop harus menaik",
+  );
 
 export const FillSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("solid"),
     color: ColorSchema,
     opacity: z.number().min(0).max(1).optional(),
+    visible: z.boolean().optional(),
+  }),
+  z.strictObject({
+    type: z.literal("linearGradient"),
+    angle: z.number(),
+    stops: GradientStopsSchema,
+    visible: z.boolean().optional(),
+  }),
+  z.strictObject({
+    type: z.literal("radialGradient"),
+    center: z.strictObject({ x: z.number(), y: z.number() }).optional(),
+    stops: GradientStopsSchema,
     visible: z.boolean().optional(),
   }),
   z.strictObject({

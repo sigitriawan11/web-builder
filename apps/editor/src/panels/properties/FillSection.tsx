@@ -134,7 +134,7 @@ export function FillSection({
                   {isTokenRef(fill.color) ? fill.color.$token : fill.color}
                 </span>
               </>
-            ) : (
+            ) : fill.type === "image" ? (
               <>
                 {siteId ? (
                   <img
@@ -158,6 +158,9 @@ export function FillSection({
                   ))}
                 </NativeSelect>
               </>
+            ) : (
+              // Gradient (DM-029): edit stops di inspector = M4; di sini label saja agar fill tetap terlihat/terhapus.
+              <span className="flex-1 truncate text-muted-foreground">{t("inspector.fillGradient")}</span>
             )}
             <button
               type="button"

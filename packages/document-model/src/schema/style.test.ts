@@ -58,11 +58,51 @@ describe("position (DM-028)", () => {
 });
 
 describe("fills (DM-029)", () => {
-  it("solid & image; maks 8; gradient (P1) belum diterima", () => {
+  it("solid, image & gradient (DM-029); maks 8 fill", () => {
     expect(valid({ fills: [{ type: "image", image: { assetId: "ast_bg00000001" }, fit: "tile" }] })).toBe(true);
     expect(valid({ fills: [{ type: "image", image: { assetId: "ast_bg00000001" }, fit: "fill" }] })).toBe(false);
     expect(valid({ fills: Array.from({ length: 9 }, () => ({ type: "solid", color: "#000000" })) })).toBe(false);
-    expect(valid({ fills: [{ type: "linearGradient", angle: 90, stops: [] }] })).toBe(false);
+  });
+
+  it("gradient (P1 · M2): linear/radial valid; stops 2–10 & offset menaik", () => {
+    const stops = [
+      { offset: 0, color: "#ff0000" },
+      { offset: 1, color: { $token: "color.primary" } },
+    ];
+    expect(valid({ fills: [{ type: "linearGradient", angle: 90, stops }] })).toBe(true);
+    expect(valid({ fills: [{ type: "radialGradient", center: { x: 0.5, y: 0.5 }, stops }] })).toBe(true);
+    expect(valid({ fills: [{ type: "radialGradient", stops }] })).toBe(true); // center opsional
+    // < 2 stop ditolak.
+    expect(valid({ fills: [{ type: "linearGradient", angle: 0, stops: [{ offset: 0, color: "#000000" }] }] })).toBe(
+      false,
+    );
+    // offset menurun ditolak.
+    expect(
+      valid({
+        fills: [
+          {
+            type: "linearGradient",
+            angle: 0,
+            stops: [
+              { offset: 1, color: "#000" },
+              { offset: 0, color: "#fff" },
+            ],
+          },
+        ],
+      }),
+    ).toBe(false);
+    // > 10 stop ditolak.
+    expect(
+      valid({
+        fills: [
+          {
+            type: "linearGradient",
+            angle: 0,
+            stops: Array.from({ length: 11 }, (_, i) => ({ offset: i / 10, color: "#000000" })),
+          },
+        ],
+      }),
+    ).toBe(false);
   });
 
   it("asset fill gambar wajib terdaftar & dipertahankan gcAssets", () => {

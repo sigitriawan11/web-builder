@@ -224,6 +224,22 @@ describe("pemetaan style → CSS (spec 07 §4.2)", () => {
     });
   });
 
+  it("gradient fill → linear/radial-gradient CSS (DM-029)", () => {
+    const stops = [
+      { offset: 0, color: "#ff0000" },
+      { offset: 1, color: { $token: "color.primary" } },
+    ];
+    expect(decl({ fills: [{ type: "linearGradient", angle: 90, stops }] })).toEqual({
+      "background-image": "linear-gradient(90deg, #ff0000 0%, var(--t-color-primary) 100%)",
+    });
+    expect(decl({ fills: [{ type: "radialGradient", center: { x: 0.5, y: 0.25 }, stops }] })).toEqual({
+      "background-image": "radial-gradient(circle at 50% 25%, #ff0000 0%, var(--t-color-primary) 100%)",
+    });
+    expect(decl({ fills: [{ type: "radialGradient", stops }] })).toEqual({
+      "background-image": "radial-gradient(circle, #ff0000 0%, var(--t-color-primary) 100%)",
+    });
+  });
+
   it("flexChild grid placement → grid-column/grid-row (DM-026)", () => {
     expect(decl({ flexChild: { gridColumn: { start: 2, span: 2 }, gridRow: { span: 3 } } })).toEqual({
       "grid-column": "2 / span 2",

@@ -245,6 +245,7 @@
     "fillModeFill": "Fill",
     "fillModeFit": "Fit",
     "fillModeTile": "Tile",
+    "fillGradient": "Gradient",
     "removeFill": "Remove fill",
     "fillVisible": "Toggle fill visibility",
     "color": "Color",

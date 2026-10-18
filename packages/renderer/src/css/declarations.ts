@@ -159,6 +159,16 @@ function solidColor(fill: Extract<Fill, { type: "solid" }>): string {
   return fill.opacity === undefined ? color : `color-mix(in srgb, ${color} ${fill.opacity * 100}%, transparent)`;
 }
 
+// DM-029: gradient → fungsi CSS. Linear: `${angle}deg` (0 = ke atas). Radial: `circle at cx% cy%` (center opsional).
+function gradientCss(fill: Extract<Fill, { type: "linearGradient" | "radialGradient" }>): string {
+  const stops = fill.stops.map((stop) => `${colorToCss(stop.color)} ${stop.offset * 100}%`).join(", ");
+  if (fill.type === "linearGradient") return `linear-gradient(${fill.angle}deg, ${stops})`;
+  const center = fill.center;
+  return center
+    ? `radial-gradient(circle at ${center.x * 100}% ${center.y * 100}%, ${stops})`
+    : `radial-gradient(circle, ${stops})`;
+}
+
 // DM-029: index 0 = layer paling bawah; layer CSS pertama = paling atas → urutan dibalik.
 function fills(value: readonly Fill[], ctx: DeclarationContext, out: Declaration[]): void {
   const visible = value.filter((fill) => fill.visible !== false);
@@ -166,6 +176,10 @@ function fills(value: readonly Fill[], ctx: DeclarationContext, out: Declaration
   const [only] = visible;
   if (visible.length === 1 && only?.type === "solid") {
     out.push(["background-color", solidColor(only)]);
+    return;
+  }
+  if (visible.length === 1 && (only?.type === "linearGradient" || only?.type === "radialGradient")) {
+    out.push(["background-image", gradientCss(only)]);
     return;
   }
   const layers = [...visible].reverse();
@@ -177,6 +191,7 @@ function fills(value: readonly Fill[], ctx: DeclarationContext, out: Declaration
           const color = solidColor(fill);
           return `linear-gradient(${color}, ${color})`;
         }
+        if (fill.type === "linearGradient" || fill.type === "radialGradient") return gradientCss(fill);
         return `url(${cssString(ctx.assetUrl(fill.image.assetId))})`;
       })
       .join(", "),

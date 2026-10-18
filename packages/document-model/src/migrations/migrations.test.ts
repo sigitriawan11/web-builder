@@ -106,7 +106,7 @@ describe("migrateYDoc (alur load server)", () => {
     const origins: unknown[] = [];
     doc.on("afterTransaction", (transaction: Y.Transaction) => origins.push(transaction.origin));
 
-    expect(migrateYDoc(doc)).toEqual({ fromVersion: 0, toVersion: CURRENT_SCHEMA_VERSION, applied: [0, 1, 2] });
+    expect(migrateYDoc(doc)).toEqual({ fromVersion: 0, toVersion: CURRENT_SCHEMA_VERSION, applied: [0, 1, 2, 3] });
     expect(origins).toEqual([systemOrigin("migration")]);
     expect(undo.canUndo()).toBe(false);
     const migrated = SiteDocumentSchema.parse(yDocToJson(doc));
