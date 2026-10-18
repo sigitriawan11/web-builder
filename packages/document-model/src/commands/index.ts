@@ -1,6 +1,7 @@
 import { registerAsset, replaceText, setImage, setLink, setNodeProps, setTextContent } from "./content";
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
+import { groupNodes, ungroup } from "./group";
 import { moveNode } from "./move-node";
 import { renameNode, reorderNode, setHtmlId, setLocked, setTag, setVisible } from "./node-fields";
 import { createPage, deletePage, reorderPages, updatePage } from "./pages";
@@ -32,6 +33,7 @@ export {
   deleteNodes,
   deletePage,
   duplicateNodes,
+  groupNodes,
   insertSubtree,
   moveNode,
   registerAsset,
@@ -50,6 +52,7 @@ export {
   setTag,
   setTextContent,
   setVisible,
+  ungroup,
   updatePage,
   updateStyle,
   wrapInFrame,

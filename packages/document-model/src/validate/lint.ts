@@ -21,6 +21,7 @@ const DEFAULT_TAG: Record<Node["type"], string> = {
   image: "img",
   shape: "div",
   icon: "span",
+  group: "div",
 };
 const effectiveTag = (node: Node): string => node.tag ?? DEFAULT_TAG[node.type];
 

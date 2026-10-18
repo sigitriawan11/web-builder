@@ -184,6 +184,18 @@ export const IconNodeSchema = z.strictObject({
   props: IconPropsSchema,
 });
 
+// DM-012: group — pembungkus tanpa style visual (fills/strokes/layout/padding ditolak invariant). Props kosong;
+// anak selalu absolute relatif ke group. Container (punya children) seperti frame, tetapi non-semantik (tag div).
+export const GroupNodeSchema = z.strictObject({
+  ...baseShape,
+  ...childrenShape,
+  id: ChildIdSchema,
+  type: z.literal("group"),
+  parentId: NodeIdSchema,
+  tag: z.enum(["div"]).optional(),
+  props: z.strictObject({}),
+});
+
 export const NodeSchema = z.discriminatedUnion("type", [
   PageNodeSchema,
   FrameNodeSchema,
@@ -191,12 +203,14 @@ export const NodeSchema = z.discriminatedUnion("type", [
   ImageNodeSchema,
   ShapeNodeSchema,
   IconNodeSchema,
+  GroupNodeSchema,
 ]);
 
 export type PageNode = z.infer<typeof PageNodeSchema>;
 export type FrameNode = z.infer<typeof FrameNodeSchema>;
 export type ShapeNode = z.infer<typeof ShapeNodeSchema>;
 export type IconNode = z.infer<typeof IconNodeSchema>;
+export type GroupNode = z.infer<typeof GroupNodeSchema>;
 export type TextNode = z.infer<typeof TextNodeSchema>;
 export type ImageNode = z.infer<typeof ImageNodeSchema>;
 export type Node = z.infer<typeof NodeSchema>;

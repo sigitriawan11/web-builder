@@ -17,6 +17,7 @@ const DEFAULT_TAG: Record<Node["type"], string> = {
   image: "img",
   shape: "div",
   icon: "span",
+  group: "div",
 };
 
 export interface RenderEnv {
@@ -103,6 +104,15 @@ export function renderNodeElement(
       if (frameLink) return <Link attributes={{ ...attributes, ...frameLink }}>{children}</Link>;
       return (
         <Box tag={node.tag ?? DEFAULT_TAG.frame} attributes={attributes}>
+          {children}
+        </Box>
+      );
+    }
+    case "group": {
+      // DM-012: group = div non-semantik, bounding box dari style (posisi absolute + size); anak absolute relatif ke
+      // group. Tanpa fills/layout; containing block dari position absolute pada style.
+      return (
+        <Box tag={node.tag ?? DEFAULT_TAG.group} attributes={attributes}>
           {children}
         </Box>
       );

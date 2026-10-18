@@ -365,7 +365,8 @@
     "text": "Text",
     "image": "Image",
     "shape": "Shape",
-    "icon": "Icon"
+    "icon": "Icon",
+    "group": "Group"
   },
   "bottomBar": {
     "label": "Bottom bar",

@@ -489,8 +489,9 @@ export function styleDeclarations(style: Style, ctx: DeclarationContext): Declar
 /** Deklarasi tingkat node (di luar style): containing block, clip, gambar, frame berlink. */
 export function nodeDeclarations(node: Node, style: Style): Declaration[] {
   const out: Declaration[] = [];
-  const container = node.type === "page" || node.type === "frame";
-  // Frame & page = containing block anak absolute (seperti frame Figma), juga di auto-layout.
+  // DM-012: group juga containing block anak absolute (anak selalu absolute relatif ke group).
+  const container = node.type === "page" || node.type === "frame" || node.type === "group";
+  // Frame/page/group = containing block anak absolute (seperti frame Figma), juga di auto-layout.
   if (container && style.position?.type !== "absolute" && style.layout?.mode !== "none")
     out.push(["position", "relative"]);
   if (node.type === "frame") {

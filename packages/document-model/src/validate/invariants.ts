@@ -92,6 +92,21 @@ export function checkStructure(doc: DocShape, report: IssueReporter): void {
     }
 
     if (node.type === "image") checkNoHug(node, report);
+
+    // DM-012: group tanpa style visual (fills/strokes/layout/padding). Posisi/size/opacity/transform/effects OK.
+    if (node.type === "group") {
+      for (const breakpoint of BREAKPOINTS) {
+        const style = node.style[breakpoint];
+        for (const field of ["fills", "strokes", "layout"] as const) {
+          if (style?.[field] != null) {
+            report("CONTAINER_TYPE", ["nodes", node.id, "style", breakpoint, field], {
+              id: `Group tidak boleh punya ${field}`,
+              en: `A group node cannot have ${field}`,
+            });
+          }
+        }
+      }
+    }
   }
 
   const listedChildren = new Set<string>();

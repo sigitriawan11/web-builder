@@ -7,7 +7,7 @@ import { defineCommand, fail } from "./command";
 import { exceeds, locate, pageNodeCount } from "./limits";
 import { childrenOf, nodesMap } from "./y-access";
 
-const CreatableTypeSchema = z.enum(["frame", "text", "image", "shape", "icon"]);
+const CreatableTypeSchema = z.enum(["frame", "text", "image", "shape", "icon", "group"]);
 type CreatableType = z.infer<typeof CreatableTypeSchema>;
 
 const MAX_ID_ATTEMPTS = 5;
@@ -22,6 +22,8 @@ const DEFAULT_BASE_STYLE: Record<CreatableType, Style> = {
     size: { width: { mode: "fixed", value: 100, unit: "px" }, height: { mode: "fixed", value: 100, unit: "px" } },
   },
   icon: { size: { width: { mode: "fixed", value: 24, unit: "px" }, height: { mode: "fixed", value: 24, unit: "px" } } },
+  // Group: style diisi eksplisit oleh groupNodes (posisi bbox); default kosong.
+  group: {},
 };
 
 // Image tidak punya default props karena asset wajib dipilih pemanggil.
@@ -33,6 +35,7 @@ const DEFAULT_PROPS: Record<CreatableType, Record<string, unknown>> = {
   // diisi pemanggil; dibiarkan {} agar validasi menuntun bila tidak diberi.
   shape: { shape: "rect" },
   icon: { set: "lucide", name: "square" },
+  group: {},
 };
 
 const DEFAULT_NAME: Record<CreatableType, string> = {
@@ -41,6 +44,7 @@ const DEFAULT_NAME: Record<CreatableType, string> = {
   image: "Image",
   shape: "Shape",
   icon: "Icon",
+  group: "Group",
 };
 
 export const createNode = defineCommand({
@@ -99,7 +103,7 @@ export const createNode = defineCommand({
       parentId: input.parentId,
       visible: true,
       locked: false,
-      ...(type === "frame" ? { children: [] } : {}),
+      ...(type === "frame" || type === "group" ? { children: [] } : {}),
       style: {
         base: { ...DEFAULT_BASE_STYLE[type], ...style?.base },
         ...(style?.tablet ? { tablet: style.tablet } : {}),

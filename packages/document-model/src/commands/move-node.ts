@@ -94,7 +94,9 @@ export const moveNode = defineCommand({
     }
 
     let position: { x: number; y: number } | null = null;
-    if (input.keepVisualPosition && baseLayoutMode(newParent) === "none") {
+    // DM-012: group (tanpa layout) juga freeform — anaknya selalu absolute relatif ke group.
+    const freeformTarget = baseLayoutMode(newParent) === "none" || nodeType(newParent) === "group";
+    if (input.keepVisualPosition && freeformTarget) {
       position = input.measured
         ? {
             x: input.measured.node.x - input.measured.newParent.x,

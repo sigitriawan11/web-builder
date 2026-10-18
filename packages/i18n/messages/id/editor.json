@@ -365,7 +365,8 @@
     "text": "Teks",
     "image": "Gambar",
     "shape": "Bentuk",
-    "icon": "Ikon"
+    "icon": "Ikon",
+    "group": "Grup"
   },
   "bottomBar": {
     "label": "Bar bawah",

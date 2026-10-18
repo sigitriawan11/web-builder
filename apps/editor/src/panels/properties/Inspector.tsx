@@ -56,6 +56,7 @@ const DEFAULT_TAG: Record<Node["type"], string> = {
   image: "img",
   shape: "div",
   icon: "span",
+  group: "div",
 };
 
 function DesignTab({

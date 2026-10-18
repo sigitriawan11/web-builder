@@ -27,6 +27,7 @@ import { useAutoLayoutShortcut } from "./interactions/use-auto-layout-shortcut";
 import { useBreakpointShortcut } from "./interactions/use-breakpoint-shortcut";
 import { useBrowserGuards } from "./interactions/use-browser-guards";
 import { useClipboardShortcuts } from "./interactions/use-clipboard-shortcuts";
+import { useGroupShortcut } from "./interactions/use-group-shortcut";
 import { type ImageUploadContext, useImageDrop } from "./interactions/use-image-drop";
 import { type InteractionAdapterDeps, useInteractionMachine } from "./interactions/use-interaction-machine";
 import { useLayerSearchShortcut } from "./interactions/use-layer-search-shortcut";
@@ -112,6 +113,7 @@ export function CanvasViewport({ runtime, imageUpload }: { runtime: CanvasRuntim
   useZoomShortcuts(runtime);
   useSectionShortcuts(runtime);
   useWrapShortcut(runtime);
+  useGroupShortcut(runtime);
   useClipboardShortcuts(runtime, imageUpload);
   useBreakpointShortcut();
   usePreviewShortcut();

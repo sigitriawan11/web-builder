@@ -6,6 +6,7 @@ import {
   EyeIcon,
   EyeOffIcon,
   FrameIcon,
+  GroupIcon,
   ImageIcon,
   LockIcon,
   LockOpenIcon,
@@ -31,6 +32,7 @@ const TYPE_ICON: Record<Node["type"], LucideIcon> = {
   image: ImageIcon,
   shape: SquareIcon,
   icon: SmileIcon,
+  group: GroupIcon,
 };
 
 interface LayerActions {
