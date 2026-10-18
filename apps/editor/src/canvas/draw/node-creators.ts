@@ -86,6 +86,35 @@ export function createShape(shape: "rect" | "ellipse"): (context: CreateContext)
   };
 }
 
+// ED-043: line tool. Drag menentukan orientasi (sumbu dominan) → garis horizontal/vertikal dirender sebagai div tipis
+// (tebal = stroke weight, warna hitam). Di auto-layout, garis horizontal memakai width Fill → divider responsif (AC).
+// Garis miring (rotasi) & Shift-snap 15° menyusul (P1 lanjutan).
+const LINE_WEIGHT = 2;
+export function createLine(context: CreateContext, moved: boolean): string | null {
+  const horizontal = !moved || context.rect.width >= context.rect.height;
+  const length = Math.max(1, Math.round(horizontal ? context.rect.width : context.rect.height));
+  const weight = { mode: "fixed" as const, value: LINE_WEIGHT, unit: "px" as const };
+  const long = { mode: "fixed" as const, value: Math.max(length, 1), unit: "px" as const };
+  const size = horizontal ? { width: long, height: weight } : { width: weight, height: long };
+  const base: Record<string, unknown> = { fills: [{ type: "solid", color: "#000000" }] };
+  if (context.parentIsFlow) {
+    // Divider di auto-layout: horizontal → width Fill (responsif); vertikal → tetap panjang fixed.
+    base.size = horizontal ? { width: { mode: "fill" as const }, height: weight } : size;
+  } else {
+    base.size = size;
+    base.position = { type: "absolute" as const, x: Math.round(context.rect.x), y: Math.round(context.rect.y) };
+  }
+  const result = runCommand(ctxOf(context.runtime), createNode, {
+    parentId: context.parentId,
+    index: context.index,
+    type: "shape",
+    name: "Line",
+    props: { shape: "line" },
+    style: { base },
+  });
+  return result.ok ? result.value : null;
+}
+
 /**
  * ED-040: section full-width di page root + inner container (struktur `section > div.container`), auto-layout
  * vertikal. Satu transaksi (createNode section → createNode container). Mengembalikan ID section.

@@ -6,6 +6,7 @@ export const CREATOR_TOOL_IDS = [
   "section",
   "rectangle",
   "ellipse",
+  "line",
   "text",
   "icon",
 ] as const satisfies readonly ToolId[];
