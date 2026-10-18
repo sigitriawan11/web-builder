@@ -34,6 +34,7 @@ for (const mode of ["class", "iframe"]) {
   test.describe(`bpMode=${mode}`, () => {
     test("tiga frame dengan style per breakpoint (DM-036)", async ({ page }) => {
       await page.goto(`?fixture=hero&frames=all&bpMode=${mode}`);
+      await page.waitForFunction(() => "__spike" in window);
 
       await expect(page.locator(".bp-frame")).toHaveCount(3);
       await expect(nodeIn(page, mode, "base", "n_hero000001")).toHaveCSS("padding-top", "64px");
@@ -45,6 +46,7 @@ for (const mode of ["class", "iframe"]) {
 
     test("edit konten tampil di semua frame; patch mobile tidak mengubah Desktop (AC ED-034)", async ({ page }) => {
       await page.goto(`?fixture=hero&frames=all&bpMode=${mode}`);
+      await page.waitForFunction(() => "__spike" in window);
 
       await runCommand(page, "updateStyle", {
         ids: ["n_hero000001"],
@@ -70,6 +72,7 @@ for (const mode of ["class", "iframe"]) {
     ]) {
       test(`hit-test titik screen → node yang tepat di zoom ${zoom * 100}%`, async ({ page }) => {
         await page.goto(`?fixture=hero&frames=all&bpMode=${mode}&zoom=${zoom}&x=${x}&y=20`);
+        await page.waitForFunction(() => "__spike" in window);
         const hitTest = (point: { x: number; y: number }) =>
           page.evaluate(({ x, y }) => (window as unknown as { __spike: Spike }).__spike.hitTest(x, y), point);
 

@@ -18,21 +18,22 @@ export function unionRect(rects: readonly Box[]): Box | null {
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
 
-// ED-060: node kecil (px screen) → sisi disembunyikan & sudut digeser ke luar kotak agar bisa digrab (badan tetap
-// bebas untuk pindah). Node ≥ ambang ini: handle di tepi kotak seperti biasa.
-export const MIN_SIZE_FOR_EDGE_HANDLES = 40;
-// Pergeseran sudut ke luar kotak untuk node kecil (≈ setengah area klik handle 10×10 + jarak). Tanpa ini handle
-// menumpuk badan node mungil (mis. ikon 24px) sehingga drag selalu terbaca "pindah", bukan resize.
+// ED-060: handle SISI disembunyikan bila node < 24px screen (hanya 4 sudut).
+export const MIN_SIZE_FOR_EDGE_HANDLES = 24;
+// Di bawah ambang ini, semua handle digeser ke LUAR kotak agar bisa digrab tanpa menumpuk badan node (mis. ikon 24px
+// yang drag-nya selalu terbaca "pindah"); independen dari sembunyi-sisi agar node 24–40px tetap punya 8 handle (ED-060).
+export const MIN_SIZE_FOR_FLUSH_HANDLES = 40;
+// Pergeseran handle ke luar kotak untuk node kecil (≈ setengah area klik handle 10×10 + jarak).
 export const HANDLE_OUTSET = 8;
 
 const CORNERS: ResizeHandle[] = ["nw", "ne", "se", "sw"];
 const EDGES: ResizeHandle[] = ["n", "e", "s", "w"];
 
-// Titik pusat tiap handle pada kotak screen. Node kecil: sudut digeser keluar `HANDLE_OUTSET` px, sisi disembunyikan.
+// Titik pusat tiap handle pada kotak screen. Node < 24px: sisi disembunyikan; node < 40px: handle digeser keluar.
 export function handlePositions(box: Box): { handle: ResizeHandle; x: number; y: number }[] {
   const { x, y, width, height } = box;
-  const small = width < MIN_SIZE_FOR_EDGE_HANDLES || height < MIN_SIZE_FOR_EDGE_HANDLES;
-  const o = small ? HANDLE_OUTSET : 0;
+  const hideEdges = width < MIN_SIZE_FOR_EDGE_HANDLES || height < MIN_SIZE_FOR_EDGE_HANDLES;
+  const o = width < MIN_SIZE_FOR_FLUSH_HANDLES || height < MIN_SIZE_FOR_FLUSH_HANDLES ? HANDLE_OUTSET : 0;
   const position: Record<ResizeHandle, { x: number; y: number }> = {
     nw: { x: x - o, y: y - o },
     n: { x: x + width / 2, y: y - o },
@@ -43,7 +44,7 @@ export function handlePositions(box: Box): { handle: ResizeHandle; x: number; y:
     sw: { x: x - o, y: y + height + o },
     w: { x: x - o, y: y + height / 2 },
   };
-  return [...CORNERS, ...(small ? [] : EDGES)].map((handle) => ({ handle, ...position[handle] }));
+  return [...CORNERS, ...(hideEdges ? [] : EDGES)].map((handle) => ({ handle, ...position[handle] }));
 }
 
 export type AxisMode = "fixed" | "hug" | "fill" | undefined;

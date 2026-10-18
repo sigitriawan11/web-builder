@@ -14,6 +14,7 @@ type Spike = {
 
 async function open(page: Page) {
   await page.goto("?fixture=autolayout&zoom=1&x=0&y=0");
+  await page.waitForFunction(() => "__spike" in window);
   await expect(nodeLocator(page, ROW)).toBeVisible();
   await page.evaluate(() => {
     const w = window as unknown as { __spike: Spike; __updates: number };
@@ -131,6 +132,7 @@ test("section hanya bisa di-drop ke page: drag Fitur 1 ke atas Hero mengurutkan 
   page,
 }) => {
   await page.goto("?fixture=landing200&zoom=0.25&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   const ids = await page.evaluate(() => {
     const nodes = (
       window as unknown as {

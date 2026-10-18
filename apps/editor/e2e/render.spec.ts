@@ -23,5 +23,6 @@ test("canvas merender dokumen dari Y.Doc dan mengikuti perubahan lewat op", asyn
 
 test("fixture landing2000 dirender lengkap", async ({ page }) => {
   await page.goto("?fixture=landing2000");
-  await expect(page.locator("[data-node-id]")).toHaveCount(2000);
+  // 2.000 node + muat chunk playground (lazy, ED-226) bisa > default 5s saat mesin terbebani suite penuh.
+  await expect(page.locator("[data-node-id]")).toHaveCount(2000, { timeout: 15_000 });
 });

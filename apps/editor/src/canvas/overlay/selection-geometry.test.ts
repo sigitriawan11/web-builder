@@ -29,7 +29,7 @@ describe("handlePositions (ED-060)", () => {
     });
   });
 
-  it(`node lebih kecil dari ${MIN_SIZE_FOR_EDGE_HANDLES}px screen: hanya sudut, digeser keluar ${HANDLE_OUTSET}px`, () => {
+  it(`node < ${MIN_SIZE_FOR_EDGE_HANDLES}px screen: sisi disembunyikan (hanya 4 sudut, ED-060)`, () => {
     expect(handlePositions({ x: 0, y: 0, width: 20, height: 100 }).map(({ handle }) => handle)).toEqual([
       "nw",
       "ne",
@@ -37,15 +37,21 @@ describe("handlePositions (ED-060)", () => {
       "sw",
     ]);
     expect(handlePositions({ x: 0, y: 0, width: 100, height: 23 })).toHaveLength(4);
-    // Ikon 24px (dulu 8 handle menumpuk): kini 4 sudut di luar kotak agar bisa digrab.
+  });
+
+  it(`node 24–40px: tetap 8 handle (ED-060) tetapi digeser keluar ${HANDLE_OUTSET}px agar bisa digrab (mis. ikon 24px)`, () => {
+    const handles = handlePositions({ x: 0, y: 0, width: 24, height: 24 });
+    expect(handles).toHaveLength(8);
     const o = HANDLE_OUTSET;
-    expect(
-      Object.fromEntries(handlePositions({ x: 0, y: 0, width: 24, height: 24 }).map((h) => [h.handle, [h.x, h.y]])),
-    ).toEqual({
+    expect(Object.fromEntries(handles.map((h) => [h.handle, [h.x, h.y]]))).toEqual({
       nw: [-o, -o],
+      n: [12, -o],
       ne: [24 + o, -o],
+      e: [24 + o, 12],
       se: [24 + o, 24 + o],
+      s: [12, 24 + o],
       sw: [-o, 24 + o],
+      w: [-o, 12],
     });
   });
 });

@@ -21,6 +21,7 @@ async function drag(
 test.describe("marquee top-level (dari luar page)", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("?fixture=landing200&zoom=0.25&x=20&y=20");
+    await page.waitForFunction(() => "__spike" in window);
     await expect(page.locator("[data-node-id]").first()).toBeVisible();
   });
 
@@ -82,6 +83,7 @@ test.describe("marquee top-level (dari luar page)", () => {
 
 test("marquee di dalam frame yang dimasuki memilih anak-anaknya (ED-053)", async ({ page }) => {
   await page.goto("?fixture=landing200&zoom=0.5&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   const id = await idsByName(page, ["Kartu 1", "Kartu 2"]);
   // Canvas memakai transform (bukan scroll): geser kamera agar Kartu 1 berada di atas layar.
   const before = await boxOf(nodeLocator(page, id["Kartu 1"]));

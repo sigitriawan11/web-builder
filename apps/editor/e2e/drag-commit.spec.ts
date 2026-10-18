@@ -12,6 +12,7 @@ type Spike = {
 
 async function setup(page: Page) {
   await page.goto("?fixture=hero&zoom=0.5&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   await page.evaluate(() => {
     const s = (window as unknown as { __spike: Spike }).__spike;
     (window as unknown as { __updates: number }).__updates = 0;

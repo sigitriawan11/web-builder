@@ -18,6 +18,7 @@ type Spike = {
 
 async function open(page: Page, zoom: number) {
   await page.goto(`?fixture=freeform&zoom=${zoom}&x=20&y=20`);
+  await page.waitForFunction(() => "__spike" in window);
   await expect(nodeLocator(page, CARD)).toBeVisible();
   await page.evaluate(() => {
     const w = window as unknown as { __spike: Spike; __updates: number };
@@ -132,6 +133,7 @@ test("kotak seleksi ikut bergeser selama drag; Esc mengembalikan semuanya tanpa 
 // Anak auto-layout memakai reorder (T0.6.5), bukan posisi absolute; Hero satu-satunya section → drop di tempat asal.
 test("node bukan absolute (anak auto-layout) tidak mendapat posisi absolute dari drag", async ({ page }) => {
   await page.goto("?fixture=hero&zoom=0.5&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   await page.evaluate(() => {
     const w = window as unknown as { __spike: Spike; __updates: number };
     w.__updates = 0;

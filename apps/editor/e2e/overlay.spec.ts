@@ -21,6 +21,7 @@ async function select(page: Page, ids: string[]) {
 for (const zoom of [0.5, 1, 4]) {
   test(`zoom ${zoom * 100}%: 8 handle berukuran tetap di sudut/sisi node, garis 1px (AC ED-060)`, async ({ page }) => {
     await page.goto(`?fixture=hero&zoom=${zoom}&x=20&y=${zoom === 4 ? -900 : 20}`);
+    await page.waitForFunction(() => "__spike" in window);
     await select(page, [IMAGE]);
     const handles = page.locator(".overlay-handle");
     await expect(handles).toHaveCount(8);
@@ -40,6 +41,7 @@ for (const zoom of [0.5, 1, 4]) {
 
 test("label ukuran: Hug/Fill untuk anak auto-layout, nama frame top-level di atas", async ({ page }) => {
   await page.goto("?fixture=hero&zoom=0.5&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
 
   await select(page, [IMAGE]);
   await expect(page.locator(".overlay-size-label")).toHaveText("Fill × 420");
@@ -52,12 +54,14 @@ test("label ukuran: Hug/Fill untuk anak auto-layout, nama frame top-level di ata
 
 test("node lebih kecil dari 24px screen hanya menampilkan 4 handle sudut", async ({ page }) => {
   await page.goto("?fixture=hero&zoom=0.05&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   await select(page, [IMAGE]);
   await expect(page.locator(".overlay-handle")).toHaveCount(4);
 });
 
 test("hover menunjuk node yang akan terpilih bila diklik (ED-038)", async ({ page }) => {
   await page.goto("?fixture=hero&zoom=0.5&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   const title = await boxOf(nodeLocator(page, "n_herottl001"));
   const hoverOutline = page.locator(".overlay-hover-outline");
 
@@ -78,6 +82,7 @@ test("hover menunjuk node yang akan terpilih bila diklik (ED-038)", async ({ pag
 test("handle & label disembunyikan saat edit teks", async ({ page }) => {
   // Zoom 100%: tinggi judul ≥ 24px screen sehingga 8 handle tampil (di 50% hanya sudut, sesuai ED-060).
   await page.goto("?fixture=hero&zoom=1&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   const title = nodeLocator(page, "n_herottl001");
   await title.dblclick();
   await expect(page.locator(".overlay-handle")).toHaveCount(8);
@@ -90,6 +95,7 @@ test("handle & label disembunyikan saat edit teks", async ({ page }) => {
 
 test("menekan handle memulai dragResize tanpa mengubah seleksi", async ({ page }) => {
   await page.goto("?fixture=hero&zoom=0.5&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   await select(page, [IMAGE]);
   const se = await boxOf(page.locator('.overlay-handle[data-handle="se"]'));
 
@@ -107,6 +113,7 @@ test("menekan handle memulai dragResize tanpa mengubah seleksi", async ({ page }
 test("screenshot overlay seleksi", async ({ page, browserName }) => {
   test.skip(browserName !== "chromium", "Baseline visual hanya Chromium (render font berbeda antar browser).");
   await page.goto("?fixture=hero&zoom=0.5&x=20&y=20");
+  await page.waitForFunction(() => "__spike" in window);
   await select(page, [IMAGE]);
   await expect(page.locator(".overlay-handle")).toHaveCount(8);
   const image = await boxOf(nodeLocator(page, IMAGE));
