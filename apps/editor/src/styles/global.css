@@ -174,6 +174,35 @@ body,
   border-style: dashed;
 }
 
+/* ED-096: helper auto-layout — area padding & pita gap (pink) + handle gap yang bisa di-drag. */
+.overlay-autolayout {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.overlay-al-padding {
+  position: absolute;
+  background: rgb(231 57 154 / 12%);
+}
+
+.overlay-al-gap {
+  position: absolute;
+  background: rgb(231 57 154 / 20%);
+}
+
+.overlay-al-gap-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 1px solid #ffffff;
+  border-radius: 3px;
+  background: #e5399a;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
 /* ED-029: penggaris horizontal & vertikal di tepi canvas (screen space, pointer-events none). */
 .overlay-rulers {
   position: absolute;

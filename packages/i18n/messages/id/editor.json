@@ -490,5 +490,8 @@
     "placeholder": "Cari layer berdasarkan nama atau teks…",
     "empty": "Tidak ada layer yang cocok.",
     "close": "Tutup"
+  },
+  "autoLayoutGuides": {
+    "gapHandle": "Gap"
   }
 }

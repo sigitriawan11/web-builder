@@ -490,5 +490,8 @@
     "placeholder": "Find a layer by name or text…",
     "empty": "No matching layers.",
     "close": "Close"
+  },
+  "autoLayoutGuides": {
+    "gapHandle": "Gap"
   }
 }

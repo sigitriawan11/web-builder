@@ -4,6 +4,7 @@ import { cameraStore } from "./camera-store";
 import { useCanvasRuntime } from "./canvas-runtime";
 import { GeometryOutline, outlineNodeFromSearch } from "./GeometryOutline";
 import { MarqueeOverlay } from "./MarqueeOverlay";
+import { AutoLayoutGuides } from "./overlay/AutoLayoutGuides";
 import { DrawPreview } from "./overlay/DrawPreview";
 import { FrameLabels } from "./overlay/FrameLabels";
 import { MeasureOverlay } from "./overlay/MeasureOverlay";
@@ -28,6 +29,7 @@ export function CanvasOverlay() {
       <PixelGridOverlay />
       {outlineNodeId && <GeometryOutline nodeId={outlineNodeId} />}
       {hoveredId && <GeometryOutline nodeId={hoveredId} className="overlay-hover-outline" />}
+      <AutoLayoutGuides />
       <SelectionOverlay nodeStore={runtime.nodeStore} geometry={runtime.geometry.store} />
       <MarqueeOverlay />
       <ReorderOverlay />
