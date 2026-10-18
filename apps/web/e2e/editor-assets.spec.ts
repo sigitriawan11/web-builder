@@ -218,6 +218,59 @@ test("AC ED-045: image tool — pilih 5 file lalu 5 klik → 5 node image", asyn
   await expect(page.getByTestId("tool-select")).toHaveAttribute("aria-pressed", "true");
 });
 
+test("AC ED-104: image fill pada frame — tambah via upload lalu ubah mode (fit)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Image Fill Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  // Buat frame via test API lalu seleksi → inspector Fill muncul.
+  const frameId = await page.evaluate(() => {
+    const api = window.__editorTestApi;
+    if (!api) throw new Error("test API tidak ada");
+    const doc = api.getDoc() as { nodes: Record<string, { type: string }> };
+    const pageId = Object.entries(doc.nodes).find(([, n]) => n.type === "page")?.[0];
+    const res = api.runCommand("createNode", {
+      parentId: pageId,
+      type: "frame",
+      style: {
+        base: {
+          size: {
+            width: { mode: "fixed", value: 320, unit: "px" },
+            height: { mode: "fixed", value: 200, unit: "px" },
+          },
+        },
+      },
+    }) as { ok: boolean; value?: string };
+    return res.value ?? "";
+  });
+  expect(frameId).not.toBe("");
+  await page.evaluate((id) => window.__editorTestApi?.select([id]), frameId);
+
+  // Tambah image fill via upload file.
+  const buffer = Buffer.from(PNG_BASE64, "base64");
+  await page.getByTestId("fill-image-add").click();
+  await page.getByTestId("fill-image-add-file").setInputFiles({ name: "bg.png", mimeType: "image/png", buffer });
+
+  // Fill gambar terpasang di frame (assetId terdaftar) & default mode cover.
+  const imageFill = () =>
+    page.evaluate((id) => {
+      const doc = window.__editorTestApi?.getDoc() as {
+        nodes: Record<
+          string,
+          { style?: { base?: { fills?: { type: string; fit?: string; image?: { assetId?: string } }[] } } }
+        >;
+      };
+      const fill = doc.nodes[id]?.style?.base?.fills?.find((f) => f.type === "image");
+      return fill ? { assetId: fill.image?.assetId ?? "", fit: fill.fit ?? "" } : null;
+    }, frameId);
+  await expect.poll(async () => (await imageFill())?.assetId ?? "", { timeout: 15_000 }).toMatch(/^ast_/);
+  expect((await imageFill())?.fit).toBe("cover");
+
+  // Ubah mode fill → tile (ED-104).
+  await page.getByTestId("fill-image-fit-0").selectOption("tile");
+  await expect.poll(async () => (await imageFill())?.fit).toBe("tile");
+});
+
 // Tunggu node image baru (yang belum ada di `known`) muncul & punya assetId.
 async function waitForImageNode(page: Page, known: Set<string>): Promise<string> {
   let id = "";

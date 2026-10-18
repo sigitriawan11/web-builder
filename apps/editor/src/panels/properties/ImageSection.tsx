@@ -7,24 +7,17 @@ import {
   setImage,
   setNodeProps,
 } from "@platform/document-model";
-import { usePlatformApi, useSiteAssets } from "@platform/sdk/react";
-import type { AssetSummary } from "@platform/shared/contracts";
-import { Button, Checkbox, cn, Input, NativeSelect, Popover, PopoverContent, PopoverTrigger } from "@platform/ui";
+import { Checkbox, cn, Input, NativeSelect } from "@platform/ui";
 import { AlertTriangleIcon, ImageOff } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
-import { UploadError, uploadImage, validateImageUpload } from "../../services/upload/upload";
-import { showToastText } from "../../store/toast-store";
+import { assetContentUrl, ImagePickerPopover } from "./ImagePickerPopover";
 import { InspectorSection } from "./InspectorSection";
 import { needsAltWarning } from "./image-alt";
 
 // ED-165/ED-210: node image terseleksi → inspector "Image": thumbnail, Ganti (pustaka/upload), fit, titik fokus,
 // alt, dekoratif, loading. Ganti gambar mempertahankan ukuran node & fit (AC ED-165). URL/stock menyusul.
-
-function contentUrl(siteId: string, assetId: string): string {
-  return `/api/v1/sites/${encodeURIComponent(siteId)}/assets/${encodeURIComponent(assetId)}/content`;
-}
 
 const FIT_OPTIONS = [
   { value: "cover", label: "inspector.fitCover" },
@@ -114,12 +107,20 @@ export function ImageSection({
       <div className="flex gap-2">
         <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded border bg-muted">
           {siteId ? (
-            <img src={contentUrl(siteId, image.assetId)} alt="" className="size-full object-cover" />
+            <img src={assetContentUrl(siteId, image.assetId)} alt="" className="size-full object-cover" />
           ) : (
             <ImageOff className="size-4 text-muted-foreground" />
           )}
         </div>
-        {siteId ? <ReplaceControl siteId={siteId} readOnly={readOnly} onReplace={replaceWith} /> : null}
+        {siteId ? (
+          <ImagePickerPopover
+            siteId={siteId}
+            readOnly={readOnly}
+            label={t("inspector.imageReplace")}
+            testIdPrefix="image-replace"
+            onPick={replaceWith}
+          />
+        ) : null}
       </div>
 
       <label className="flex flex-col gap-1 text-xs" htmlFor={`${fieldId}-fit`}>
@@ -211,96 +212,5 @@ export function ImageSection({
         </p>
       ) : null}
     </InspectorSection>
-  );
-}
-
-// Popover ganti gambar: upload file baru atau pilih dari pustaka media situs (ED-165).
-function ReplaceControl({
-  siteId,
-  readOnly,
-  onReplace,
-}: {
-  siteId: string;
-  readOnly: boolean;
-  onReplace: (assetId: string, entry: AssetEntry) => void;
-}) {
-  const t = useT();
-  const api = usePlatformApi();
-  const [open, setOpen] = useState(false);
-  const assets = useSiteAssets(siteId, "");
-  const fileRef = useRef<HTMLInputElement>(null);
-  // Segarkan pustaka saat popover dibuka (upload terbaru mungkin belum tercermin di cache query).
-  useEffect(() => {
-    if (open) void assets.refetch();
-  }, [open, assets.refetch]);
-
-  const pick = (asset: AssetSummary) => {
-    onReplace(asset.id, { kind: asset.kind === "svg" ? "svg" : "image", mime: asset.mime });
-    setOpen(false);
-  };
-  const onFile = async (file: File) => {
-    if (validateImageUpload(file)) {
-      showToastText({ id: "File gambar tidak didukung", en: "Unsupported image file" });
-      return;
-    }
-    try {
-      const { assetId, entry } = await uploadImage(file, { siteId, assets: api.assets });
-      onReplace(assetId, entry);
-      setOpen(false);
-    } catch (error) {
-      if (error instanceof UploadError) showToastText({ id: "Gagal mengunggah gambar", en: "Image upload failed" });
-      else throw error;
-    }
-  };
-
-  const ready = assets.data?.filter((asset) => asset.status === "ready") ?? [];
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button size="sm" variant="outline" disabled={readOnly} data-testid="image-replace" className="h-7 text-xs">
-          {t("inspector.imageReplace")}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="end" className="w-60 p-2">
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          hidden
-          data-testid="image-replace-file"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.value = "";
-            if (file) void onFile(file);
-          }}
-        />
-        <Button
-          size="sm"
-          variant="secondary"
-          className="mb-2 w-full text-xs"
-          disabled={readOnly}
-          onClick={() => fileRef.current?.click()}
-        >
-          {t("inspector.imageUploadNew")}
-        </Button>
-        <p className="mb-1 text-[10px] text-muted-foreground">{t("inspector.imageReplaceFromLibrary")}</p>
-        <ul className="grid max-h-48 grid-cols-3 gap-1 overflow-y-auto">
-          {ready.map((asset) => (
-            <li key={asset.id}>
-              <button
-                type="button"
-                onClick={() => pick(asset)}
-                title={asset.fileName ?? ""}
-                data-testid={`image-replace-asset-${asset.id}`}
-                className="aspect-square w-full overflow-hidden rounded border hover:border-ring"
-              >
-                <img src={contentUrl(siteId, asset.id)} alt="" className="size-full object-cover" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </PopoverContent>
-    </Popover>
   );
 }

@@ -105,7 +105,7 @@ function DesignTab({
       {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AutoLayoutSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <TypographySection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
-      {runtime ? <FillSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {runtime ? <FillSection runtime={runtime} nodes={nodes} siteId={siteId} readOnly={readOnly} /> : null}
       {runtime ? <StrokeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <RadiusSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <EffectsSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}

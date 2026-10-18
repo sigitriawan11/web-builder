@@ -1,31 +1,44 @@
 import {
+  type AssetEntry,
   type Fill,
   isTokenRef,
   listTokenPaths,
   type Node,
+  registerAsset,
   resolveStyle,
   resolveToken,
   runCommand,
   updateStyle,
 } from "@platform/document-model";
+import { NativeSelect } from "@platform/ui";
 import { Eye, EyeOff, Plus, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useDocTheme } from "../../document/use-doc-theme";
 import { ColorInput } from "./color/ColorInput";
+import { assetContentUrl, ImagePickerPopover } from "./ImagePickerPopover";
 import { InspectorSection } from "./InspectorSection";
 
-// ED-102/DM-029: fill solid (tambah/hapus/toggle/warna). Hanya untuk node yang mengizinkan fills (frame/shape/page).
+// ED-102/DM-029: fill solid; ED-104/DM-029: fill gambar (cover/contain/tile). Hanya untuk node fillable.
 const FILLABLE = new Set<Node["type"]>(["frame", "shape", "page"]);
+
+// Mode fill gambar (spec ED-104): cover=Fill, contain=Fit, tile=Tile.
+const IMAGE_FIT_OPTIONS = [
+  { value: "cover", label: "inspector.fillModeFill" },
+  { value: "contain", label: "inspector.fillModeFit" },
+  { value: "tile", label: "inspector.fillModeTile" },
+] as const;
 
 export function FillSection({
   runtime,
   nodes,
+  siteId,
   readOnly,
 }: {
   runtime: CanvasRuntime;
   nodes: readonly Node[];
+  siteId: string | undefined;
   readOnly: boolean;
 }) {
   const t = useT();
@@ -77,6 +90,28 @@ export function FillSection({
 
   const update = (index: number, patch: Partial<Extract<Fill, { type: "solid" }>>) =>
     setFills(fills.map((fill, i) => (i === index && fill.type === "solid" ? { ...fill, ...patch } : fill)));
+  const toggleVisible = (index: number) =>
+    setFills(fills.map((fill, i) => (i === index ? { ...fill, visible: fill.visible === false } : fill)));
+  const updateImageFit = (index: number, fit: "cover" | "contain" | "tile") =>
+    setFills(fills.map((fill, i) => (i === index && fill.type === "image" ? { ...fill, fit } : fill)));
+
+  // ED-104: tambah fill gambar — daftarkan asset + append fill (satu undo). Diterapkan ke semua node terseleksi.
+  const addImageFill = (assetId: string, entry: AssetEntry) => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runtime.doc.transact(() => {
+      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      runCommand(ctx, registerAsset, { id: assetId, entry });
+      for (const target of nodes) {
+        const current = resolveStyle(target.style, "base").fills ?? [];
+        runCommand(ctx, updateStyle, {
+          ids: [target.id],
+          patch: { fills: [...current, { type: "image", image: { assetId }, fit: "cover" }] as Fill[] },
+        });
+      }
+    }, runtime.origin);
+    runtime.undo.stopCapturing();
+  };
 
   return (
     <InspectorSection id="fills" title={t("inspector.fill")}>
@@ -100,7 +135,29 @@ export function FillSection({
                 </span>
               </>
             ) : (
-              <span className="flex-1 truncate text-muted-foreground">{t("nodeType.image")}</span>
+              <>
+                {siteId ? (
+                  <img
+                    src={assetContentUrl(siteId, fill.image.assetId)}
+                    alt=""
+                    className="size-5 shrink-0 rounded border object-cover"
+                  />
+                ) : null}
+                <NativeSelect
+                  value={fill.fit}
+                  disabled={readOnly}
+                  data-testid={`fill-image-fit-${index}`}
+                  aria-label={t("inspector.addImageFill")}
+                  onChange={(event) => updateImageFit(index, event.target.value as "cover" | "contain" | "tile")}
+                  className="h-7 flex-1 text-xs"
+                >
+                  {IMAGE_FIT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </>
             )}
             <button
               type="button"
@@ -108,7 +165,7 @@ export function FillSection({
               aria-label={t("inspector.fillVisible")}
               data-testid={`fill-visible-${index}`}
               className="text-muted-foreground hover:text-foreground disabled:opacity-40"
-              onClick={() => update(index, { visible: fill.visible === false })}
+              onClick={() => toggleVisible(index)}
             >
               {fill.visible === false ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
             </button>
@@ -124,16 +181,27 @@ export function FillSection({
             </button>
           </div>
         ))}
-        <button
-          type="button"
-          disabled={readOnly}
-          data-testid="fill-add"
-          className="flex items-center gap-1 self-start rounded px-1 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
-          onClick={() => setFills([...fills, { type: "solid", color: "#000000" }])}
-        >
-          <Plus className="size-3.5" />
-          {t("inspector.addFill")}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={readOnly}
+            data-testid="fill-add"
+            className="flex items-center gap-1 self-start rounded px-1 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+            onClick={() => setFills([...fills, { type: "solid", color: "#000000" }])}
+          >
+            <Plus className="size-3.5" />
+            {t("inspector.addFill")}
+          </button>
+          {siteId ? (
+            <ImagePickerPopover
+              siteId={siteId}
+              readOnly={readOnly}
+              label={t("inspector.addImageFill")}
+              testIdPrefix="fill-image-add"
+              onPick={addImageFill}
+            />
+          ) : null}
+        </div>
       </div>
     </InspectorSection>
   );
