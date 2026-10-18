@@ -1,23 +1,14 @@
 import { lazy, Suspense } from "react";
-import { CanvasViewport } from "../canvas/CanvasViewport";
-import type { CanvasRuntime } from "../canvas/canvas-runtime";
-import { createPlaygroundRuntime } from "../canvas/playground-runtime";
 import { AppErrorBoundary } from "./ErrorBoundary";
 import { initialLocale } from "./i18n";
 import { AppProviders } from "./providers";
 import { parseEditorRoute } from "./router";
 
-// Rute produk dimuat terpisah (membawa CSS Tailwind/token UI) — lihat SiteEditor.tsx.
+// Rute dimuat LAZY agar bundle awal (ED-226) hanya berisi shell app: engine canvas (Tiptap, dnd-kit, renderer) ikut
+// chunk rute (SiteEditor produk / Playground dev), bukan entry.
 const SiteEditor = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteEditor })));
 const SiteNotFound = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteNotFound })));
-// Overlay preview memuat renderer statis — dipisah dari bundle utama; di playground dipakai untuk e2e.
-const PreviewOverlay = lazy(() => import("./PreviewOverlay").then((module) => ({ default: module.PreviewOverlay })));
-const CommandPalette = lazy(() =>
-  import("../commands/palette/CommandPalette").then((module) => ({ default: module.CommandPalette })),
-);
-const CanvasContextMenu = lazy(() =>
-  import("../commands/context-menu/CanvasContextMenu").then((module) => ({ default: module.CanvasContextMenu })),
-);
+const Playground = lazy(() => import("./Playground").then((module) => ({ default: module.Playground })));
 
 // Bootstrap editor (ARCHITECTURE §5.2): providers → error boundary → rute.
 export function App() {
@@ -36,30 +27,5 @@ export function App() {
         </Suspense>
       </AppErrorBoundary>
     </AppProviders>
-  );
-}
-// Playground canvas M0 (fixture & parameter `?…` untuk e2e/benchmark canvas) hanya di dev; production → dashboard.
-function Playground() {
-  if (!import.meta.env.DEV) {
-    window.location.replace("/sites");
-    return null;
-  }
-  return <PlaygroundCanvas />;
-}
-
-// Satu per muat halaman (fixture dari `?fixture=`), hidup selama tab. Bukan initializer useState: StrictMode
-// memanggilnya dua kali sehingga `__spike` bisa menunjuk runtime yang dibuang.
-let playgroundRuntime: CanvasRuntime | null = null;
-
-function PlaygroundCanvas() {
-  playgroundRuntime ??= createPlaygroundRuntime(window.location.search);
-  return (
-    <Suspense fallback={null}>
-      <CanvasContextMenu runtime={playgroundRuntime} style={{ display: "contents" }}>
-        <CanvasViewport runtime={playgroundRuntime} />
-      </CanvasContextMenu>
-      <PreviewOverlay runtime={playgroundRuntime} pageId={playgroundRuntime.pageId} />
-      <CommandPalette runtime={playgroundRuntime} />
-    </Suspense>
   );
 }
