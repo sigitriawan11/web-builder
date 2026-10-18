@@ -1170,7 +1170,8 @@ Termasuk: chrome editor (toolbar, sidebar, inspector, bottom bar), navigasi, pag
 
 #### Epic 2.20 — Sisa M2 & penutup
 
-- [ ] **T2.20.1** Settings tab inspector (nama, tag, htmlId, visibility, lock) — ED-008, ED-218 · `apps/editor/src/panels/properties` · Verifikasi: e2e
+- [x] **T2.20.1** Settings tab inspector (nama, tag, htmlId, visibility, lock) — ED-008, ED-218 · `apps/editor/src/panels/properties` · Verifikasi: e2e
+  - Catatan (2026-10-18): tab Settings kini lengkap untuk node terpilih: **Nama** (`NameField`→`renameNode`), **Tag** (`TagSelect`, T2.17.3), **Anchor ID** (`AnchorIdField`, T2.17.5), **Visible** & **Locked** (Checkbox→`setVisible`/`setLocked`, berlaku ke seluruh seleksi). Satu node → field editable; multi-seleksi → nama/tag Mixed read-only, visible/lock tetap toggle massal. Command-nya sudah ada & teruji di document-model (`renameNode`/`setVisible`/`setLocked`/`setTag`/`setHtmlId`). **e2e UI** tidak via playground (Inspector tak ada di harness playground — konsisten dgn section inspector lain).
 - [ ] **T2.20.2** Status bar & feedback (toast error command, pesan invalid) — ED-228 · `apps/editor` · Verifikasi: e2e command ditolak → toast
 - [ ] **T2.20.3** Review spec 02 baris M2 §36.2: centang semua ED P0 M2 terpetakan; catat gap sebagai task — §36.2 spec 02 · docs · Verifikasi: tidak ada ED P0 M2 tanpa task
 

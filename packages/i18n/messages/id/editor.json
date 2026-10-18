@@ -325,7 +325,8 @@
     "decorative": "Dekoratif (tanpa alt)",
     "altWarning": "Tambahkan alt text atau tandai dekoratif untuk aksesibilitas.",
     "anchorId": "Anchor ID",
-    "anchorPlaceholder": "mis. tentang-kami"
+    "anchorPlaceholder": "mis. tentang-kami",
+    "locked": "Terkunci"
   },
   "nodeType": {
     "page": "Page",

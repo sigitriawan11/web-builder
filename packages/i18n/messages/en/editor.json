@@ -325,7 +325,8 @@
     "decorative": "Decorative (no alt)",
     "altWarning": "Add alt text or mark it decorative for accessibility.",
     "anchorId": "Anchor ID",
-    "anchorPlaceholder": "e.g. about-us"
+    "anchorPlaceholder": "e.g. about-us",
+    "locked": "Locked"
   },
   "nodeType": {
     "page": "Page",

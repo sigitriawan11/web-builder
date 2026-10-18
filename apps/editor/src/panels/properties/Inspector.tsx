@@ -1,5 +1,5 @@
-import type { Node } from "@platform/document-model";
-import { cn } from "@platform/ui";
+import { type Node, runCommand, setLocked, setVisible } from "@platform/document-model";
+import { Checkbox, cn } from "@platform/ui";
 import type { ReactNode } from "react";
 import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
@@ -24,6 +24,7 @@ import { ImageSection } from "./ImageSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { LinkSection } from "./LinkSection";
 import { isMixed, mixedValue } from "./mixed";
+import { NameField } from "./NameField";
 import { OpacitySection } from "./OpacitySection";
 import { PositionSizeSection } from "./PositionSizeSection";
 import { RadiusSection } from "./RadiusSection";
@@ -130,8 +131,32 @@ function SettingsTab({
   if (nodes.length === 0) return <>{page}</>;
   // ED-218: satu node → tag bisa diganti (dropdown); multi-seleksi → tampilkan nilai (Mixed) read-only.
   const single = nodes.length === 1 ? nodes[0] : null;
+  // ED-008: visibility/lock berlaku ke seluruh seleksi (setVisible/setLocked menerima daftar id).
+  const ids = nodes.map((node) => node.id);
+  const allVisible = nodes.every((node) => node.visible);
+  const allLocked = nodes.every((node) => node.locked);
+  const setVisibleAll = (visible: boolean) => {
+    if (!runtime || readOnly) return;
+    runtime.undo.stopCapturing();
+    runCommand({ doc: runtime.doc, origin: runtime.origin }, setVisible, { ids, visible });
+    runtime.undo.stopCapturing();
+  };
+  const setLockedAll = (locked: boolean) => {
+    if (!runtime || readOnly) return;
+    runtime.undo.stopCapturing();
+    runCommand({ doc: runtime.doc, origin: runtime.origin }, setLocked, { ids, locked });
+    runtime.undo.stopCapturing();
+  };
+
   return (
     <InspectorSection id="html" title={t("inspector.html")}>
+      <InspectorRow label={t("inspector.name")}>
+        {single && runtime ? (
+          <NameField runtime={runtime} node={single} readOnly={readOnly} />
+        ) : (
+          <Value value={mixedValue(nodes.map((node) => node.name))} />
+        )}
+      </InspectorRow>
       <InspectorRow label={t("inspector.tag")}>
         {single && runtime ? (
           <TagSelect
@@ -144,17 +169,29 @@ function SettingsTab({
           <Value value={mixedValue(nodes.map((node) => node.tag ?? DEFAULT_TAG[node.type]))} />
         )}
       </InspectorRow>
-      <InspectorRow label={t("inspector.visible")}>
-        <Value
-          value={mixedValue(nodes.map((node) => node.visible))}
-          format={(visible: boolean) => (visible ? t("inspector.yes") : t("inspector.no"))}
-        />
-      </InspectorRow>
       {single && single.type !== "page" && runtime ? (
         <InspectorRow label={t("inspector.anchorId")}>
           <AnchorIdField runtime={runtime} node={single} readOnly={readOnly} />
         </InspectorRow>
       ) : null}
+      <InspectorRow label={t("inspector.visible")}>
+        <Checkbox
+          checked={allVisible}
+          disabled={readOnly || !runtime}
+          data-testid="node-visible"
+          aria-label={t("inspector.visible")}
+          onCheckedChange={(next) => setVisibleAll(next === true)}
+        />
+      </InspectorRow>
+      <InspectorRow label={t("inspector.locked")}>
+        <Checkbox
+          checked={allLocked}
+          disabled={readOnly || !runtime}
+          data-testid="node-locked"
+          aria-label={t("inspector.locked")}
+          onCheckedChange={(next) => setLockedAll(next === true)}
+        />
+      </InspectorRow>
     </InspectorSection>
   );
 }
