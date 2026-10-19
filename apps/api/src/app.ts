@@ -151,6 +151,7 @@ export function createApp(deps: AppDeps): Express {
       createLibraryAdminRouter({
         db: deps.db,
         logger: deps.logger,
+        ...(deps.realtime ? { realtime: { tokenSecret: deps.realtime.tokenSecret, url: deps.realtime.url } } : {}),
         ...(deps.redis ? { redis: deps.redis } : {}),
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
       }),

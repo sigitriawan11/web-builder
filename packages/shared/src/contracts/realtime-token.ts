@@ -19,11 +19,15 @@ export const RealtimeTokenResponseSchema = z.object({
 });
 
 // Diverifikasi `apps/realtime` onAuthenticate; dokumen yang diminta harus sama dengan `docId` (ARCHITECTURE §5.5).
+// `kind` = jenis dokumen: `site` (default, token tenant) atau `component` (Mode Admin, token staf — CMP-010). Untuk
+// component, `siteId` null & `role` memetakan kapabilitas staf ke peran edit/baca (`editor`=bisa edit, `viewer`=baca
+// saja) agar logika read-only realtime berlaku tanpa perubahan.
 export const RealtimeTokenClaimsSchema = z.object({
   sub: UuidV7Schema, // userId
   docId: UuidV7Schema,
   siteId: UuidV7Schema.nullable(),
   role: WorkspaceRoleSchema,
+  kind: z.enum(["site", "component"]).default("site"),
   exp: z.number().int().positive(), // detik Unix (JWT)
 });
 

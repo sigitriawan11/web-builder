@@ -7,6 +7,7 @@ import type {
   deprecateRequest,
   editorSessionRequest,
   publishRequest,
+  realtimeTokenRequest,
   saveDraftRequest,
   usageRequest,
 } from "./library-admin.schema";
@@ -50,5 +51,10 @@ export function createLibraryAdminController(service: LibraryAdminService) {
   const editorSession: ValidatedHandler<typeof editorSessionRequest> = async (req, res) => {
     res.json({ data: await service.getEditorSession(actor(req), req.valid.params.id), meta: meta(res) });
   };
-  return { create, saveDraft, publish, deprecate, archive, usage, editorSession };
+  const realtimeToken: ValidatedHandler<typeof realtimeTokenRequest> = async (req, res) => {
+    const data = await service.issueRealtimeToken(actor(req), req.valid.params.id);
+    res.set("Cache-Control", "no-store"); // token berumur pendek; jangan di-cache.
+    res.json({ data, meta: meta(res) });
+  };
+  return { create, saveDraft, publish, deprecate, archive, usage, editorSession, realtimeToken };
 }

@@ -1,11 +1,20 @@
 import { eq, schema } from "@platform/db";
 import { createTestDb, type TestDb } from "@platform/db/testing";
 import { uuidv7 } from "@platform/shared";
+import { REALTIME_TOKEN_AUDIENCE, RealtimeTokenClaimsSchema } from "@platform/shared/contracts";
+import { verifyToken } from "@platform/shared/node";
 import type { Express } from "express";
 import { Redis } from "ioredis";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { authTestApp, sessionCookie, signUpBody, TEST_ORIGIN, uniqueEmail } from "../../auth/auth.test-harness";
+import {
+  authTestApp,
+  sessionCookie,
+  signUpBody,
+  TEST_ORIGIN,
+  TEST_REALTIME_SECRET,
+  uniqueEmail,
+} from "../../auth/auth.test-harness";
 import type { StaffRole } from "../../middleware/staff";
 
 // T3.3.7 (CMP-159): CRUD admin library. Fokus AC: role non-staf → 404 (permukaan tak bocor); publish transaksional
@@ -241,6 +250,54 @@ describe("admin library CRUD (CMP-159)", () => {
       canPublish: true,
     });
     expect(adminSession.body.data.component).toMatchObject({ id, kind: "element", status: "draft", hasDraft: true });
+  });
+
+  it("token realtime draft component (D3): staf → kind=component + role sesuai kapabilitas; non-staf → 404", async () => {
+    const admin = await register("library_admin");
+    const staff = await register("staff");
+    const plain = await register();
+    const made = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-token"));
+    const { id } = made.body.data as { id: string };
+    const [row] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    const draftDocumentId = row?.draftDocumentId ?? "";
+
+    // library_admin bisa edit → role editor.
+    const adminTok = await request(target)
+      .post(`/v1/admin/library/components/${id}/realtime-token`)
+      .set("cookie", admin)
+      .send({});
+    expect(adminTok.status).toBe(200);
+    expect(adminTok.headers["cache-control"]).toBe("no-store");
+    const claims = await verifyToken(TEST_REALTIME_SECRET, adminTok.body.data.token, {
+      audience: REALTIME_TOKEN_AUDIENCE,
+      claims: RealtimeTokenClaimsSchema,
+    });
+    expect(claims.ok && claims.value).toMatchObject({
+      docId: draftDocumentId,
+      siteId: null,
+      role: "editor",
+      kind: "component",
+    });
+
+    // staff read-only → role viewer.
+    const staffTok = await request(target)
+      .post(`/v1/admin/library/components/${id}/realtime-token`)
+      .set("cookie", staff)
+      .send({});
+    const staffClaims = await verifyToken(TEST_REALTIME_SECRET, staffTok.body.data.token, {
+      audience: REALTIME_TOKEN_AUDIENCE,
+      claims: RealtimeTokenClaimsSchema,
+    });
+    expect(staffClaims.ok && staffClaims.value.role).toBe("viewer");
+
+    // non-staf → 404.
+    expect(
+      (await request(target).post(`/v1/admin/library/components/${id}/realtime-token`).set("cookie", plain).send({}))
+        .status,
+    ).toBe(404);
   });
 
   it("sesi editor untuk user biasa (bukan staf) → 404", async () => {

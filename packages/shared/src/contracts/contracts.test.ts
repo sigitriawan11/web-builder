@@ -131,8 +131,14 @@ describe("realtime token (ARCHITECTURE §5.5)", () => {
       false,
     );
     const claims = { sub: id(), docId: id(), siteId: id(), role: "editor", exp: 1_790_000_000 };
-    expect(RealtimeTokenClaimsSchema.parse(claims)).toEqual(claims);
+    // `kind` default "site" (token situs lama tanpa field tetap valid); component → siteId null + kind component.
+    expect(RealtimeTokenClaimsSchema.parse(claims)).toEqual({ ...claims, kind: "site" });
+    expect(RealtimeTokenClaimsSchema.parse({ ...claims, siteId: null, kind: "component" })).toMatchObject({
+      kind: "component",
+      siteId: null,
+    });
     expect(RealtimeTokenClaimsSchema.safeParse({ ...claims, role: "superuser" }).success).toBe(false);
+    expect(RealtimeTokenClaimsSchema.safeParse({ ...claims, kind: "template" }).success).toBe(false);
   });
 });
 

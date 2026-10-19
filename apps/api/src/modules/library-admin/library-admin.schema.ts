@@ -60,3 +60,6 @@ export const usageRequest = { params: IdParams };
 
 // Bootstrap sesi editor Mode Admin (CMP-010): metadata component + kapabilitas user.
 export const editorSessionRequest = { params: IdParams };
+
+// Token realtime draft component (D3) — endpoint admin terpisah dari token situs.
+export const realtimeTokenRequest = { params: IdParams };

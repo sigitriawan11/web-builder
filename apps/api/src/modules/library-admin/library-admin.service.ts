@@ -9,8 +9,13 @@ import {
   validateComponentDefinition,
 } from "@platform/document-model";
 import { AppError, uuidv7 } from "@platform/shared";
-import type { LibraryEditorSession } from "@platform/shared/contracts";
-import type { Logger } from "@platform/shared/node";
+import {
+  type LibraryEditorSession,
+  REALTIME_TOKEN_AUDIENCE,
+  REALTIME_TOKEN_TTL_SECONDS,
+  type RealtimeTokenResponse,
+} from "@platform/shared/contracts";
+import { type Logger, signToken } from "@platform/shared/node";
 import type { z } from "zod";
 import { recordAudit } from "../../audit/audit.repository";
 import { findStaffRole, type StaffRole } from "../../middleware/staff.repository";
@@ -58,7 +63,12 @@ function validateDefinition(input: unknown): ComponentDefinition {
 // ComponentDefinition → kolom jsonb (`component_versions.definition`, `$type<Record<string,unknown>>`).
 const asJsonb = (def: ComponentDefinition): Record<string, unknown> => def as unknown as Record<string, unknown>;
 
-export function createLibraryAdminService(deps: { db: Db; logger: Logger }) {
+export function createLibraryAdminService(deps: {
+  db: Db;
+  logger: Logger;
+  // Konfigurasi realtime untuk token editor draft component (D3). Tanpa ini, endpoint token tidak dipasang.
+  realtime?: { tokenSecret: string; url: string; now?: () => number };
+}) {
   const { db, logger } = deps;
 
   async function audit(actor: StaffActor, action: string, componentId: string, metadata: Record<string, unknown>) {
@@ -219,6 +229,34 @@ export function createLibraryAdminService(deps: { db: Db; logger: Logger }) {
         },
         capabilities: capabilitiesFor(role),
       };
+    },
+
+    /**
+     * Token realtime 5 menit untuk draft Y.Doc component (D3, endpoint admin terpisah). Role staf → kapabilitas:
+     * bisa edit → `editor`, read-only (`staff`) → `viewer` (logika read-only realtime berlaku tanpa perubahan).
+     */
+    async issueRealtimeToken(actor: StaffActor, componentId: string): Promise<RealtimeTokenResponse> {
+      const realtime = deps.realtime;
+      if (!realtime) throw new AppError("INTERNAL_ERROR", undefined, { reason: "realtime_not_configured" });
+      const component = await repo.findComponent(db, componentId);
+      if (!component) throw new AppError("NOT_FOUND");
+      if (!component.draftDocumentId) throw new AppError("CONFLICT", undefined, { reason: "no_draft" });
+      const role = await findStaffRole(db, actor.userId);
+      if (!role) throw new AppError("NOT_FOUND");
+      const nowMs = realtime.now?.() ?? Date.now();
+      const token = await signToken(
+        realtime.tokenSecret,
+        {
+          sub: actor.userId,
+          docId: component.draftDocumentId,
+          siteId: null,
+          role: capabilitiesFor(role).canEditDraft ? ("editor" as const) : ("viewer" as const),
+          kind: "component" as const,
+        },
+        { expiresInSeconds: REALTIME_TOKEN_TTL_SECONDS, audience: REALTIME_TOKEN_AUDIENCE, now: () => nowMs },
+      );
+      const expiresAt = new Date((Math.floor(nowMs / 1000) + REALTIME_TOKEN_TTL_SECONDS) * 1000).toISOString();
+      return { token, url: realtime.url, expiresAt };
     },
   };
 }

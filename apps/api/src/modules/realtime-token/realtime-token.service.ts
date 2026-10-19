@@ -35,6 +35,7 @@ export function createRealtimeTokenService(deps: RealtimeTokenDeps) {
         docId: access.documentId,
         siteId: access.siteId,
         role: access.role,
+        kind: "site",
       };
       const token = await signToken(deps.secret, claims, {
         expiresInSeconds: REALTIME_TOKEN_TTL_SECONDS,

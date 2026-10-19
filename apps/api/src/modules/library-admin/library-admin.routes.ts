@@ -13,6 +13,7 @@ import {
   deprecateRequest,
   editorSessionRequest,
   publishRequest,
+  realtimeTokenRequest,
   saveDraftRequest,
   usageRequest,
 } from "./library-admin.schema";
@@ -30,10 +31,17 @@ const PUBLISH_ROLES = ["super_admin", "library_admin"] as const;
 export function createLibraryAdminRouter(deps: {
   db: Db;
   logger: Logger;
+  realtime?: { tokenSecret: string; url: string };
   redis?: Redis;
   rateLimitPrefix?: string;
 }): Router {
-  const controller = createLibraryAdminController(createLibraryAdminService({ db: deps.db, logger: deps.logger }));
+  const controller = createLibraryAdminController(
+    createLibraryAdminService({
+      db: deps.db,
+      logger: deps.logger,
+      ...(deps.realtime ? { realtime: deps.realtime } : {}),
+    }),
+  );
   const router = express.Router();
   const limiter = deps.redis
     ? [
@@ -65,5 +73,11 @@ export function createLibraryAdminRouter(deps: {
   router.post("/components/:id/archive", ...guard(PUBLISH_ROLES), ...validated(archiveRequest, controller.archive));
   router.get("/components/:id/usage", ...guard(READ_ROLES), ...validated(usageRequest, controller.usage));
   router.get("/components/:id", ...guard(READ_ROLES), ...validated(editorSessionRequest, controller.editorSession));
+  // Token realtime draft component (D3) — semua staf (viewer = read-only).
+  router.post(
+    "/components/:id/realtime-token",
+    ...guard(READ_ROLES),
+    ...validated(realtimeTokenRequest, controller.realtimeToken),
+  );
   return router;
 }
