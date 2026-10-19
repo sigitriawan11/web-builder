@@ -21,6 +21,8 @@ export const LibraryComponentSummarySchema = z.object({
   status: LibraryStatusSchema,
   latestVersion: z.string().nullable(),
   hasDraft: z.boolean(),
+  // Dokumen Yjs draft (kind=component) yang dibuka editor Mode Admin; null bila belum ada draft.
+  draftDocumentId: UuidV7Schema.nullable(),
 });
 
 // Kapabilitas user (dari `users.staff_role`) terhadap library (CMP-010 §tabel role).

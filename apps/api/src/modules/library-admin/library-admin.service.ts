@@ -226,6 +226,7 @@ export function createLibraryAdminService(deps: {
           status: component.status,
           latestVersion: component.latestVersion,
           hasDraft: component.draftDocumentId !== null,
+          draftDocumentId: component.draftDocumentId,
         },
         capabilities: capabilitiesFor(role),
       };

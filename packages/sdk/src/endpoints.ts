@@ -116,6 +116,13 @@ export function createPlatformApi(client: ApiClient) {
             schema: dataEnvelope(LibraryEditorSessionSchema),
           })
           .then(unwrap),
+      /** Token realtime 5 menit untuk draft Y.Doc component (D3). */
+      realtimeToken: (componentId: string) =>
+        client
+          .request("POST", `/v1/admin/library/components/${componentId}/realtime-token`, {
+            schema: dataEnvelope(RealtimeTokenResponseSchema),
+          })
+          .then(unwrap),
     },
   };
 }
