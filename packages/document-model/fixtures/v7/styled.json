@@ -1,0 +1,723 @@
+{
+  "schemaVersion": 7,
+  "meta": {
+    "title": "Toko Kue Budi",
+    "createdWith": "template"
+  },
+  "settings": {
+    "language": "id",
+    "seo": {
+      "titleTemplate": "%s · Toko Kue Budi",
+      "defaultTitle": "Toko Kue Budi"
+    },
+    "breakpoints": [
+      {
+        "id": "base",
+        "label": {
+          "id": "Desktop",
+          "en": "Desktop"
+        },
+        "maxWidth": null,
+        "previewWidth": 1440
+      },
+      {
+        "id": "tablet",
+        "label": {
+          "id": "Tablet",
+          "en": "Tablet"
+        },
+        "maxWidth": 991,
+        "previewWidth": 768
+      },
+      {
+        "id": "mobile",
+        "label": {
+          "id": "Mobile",
+          "en": "Mobile"
+        },
+        "maxWidth": 479,
+        "previewWidth": 390
+      }
+    ],
+    "manualResponsive": false,
+    "autoResponsive": {
+      "enabled": true,
+      "rules": {}
+    }
+  },
+  "theme": {
+    "tokens": {
+      "color": {
+        "primary": "#2563EB",
+        "primaryHover": "#1D4ED8",
+        "onPrimary": "#FFFFFF",
+        "background": "#FFFFFF",
+        "surface": "#F8FAFC",
+        "onSurface": "#0F172A",
+        "muted": "#64748B",
+        "border": "#E2E8F0",
+        "accent": "#F59E0B",
+        "success": "#16A34A",
+        "warning": "#D97706",
+        "danger": "#DC2626"
+      },
+      "typography": {
+        "display": {
+          "value": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 64,
+              "unit": "px"
+            },
+            "fontWeight": 800,
+            "lineHeight": 1.1
+          },
+          "tablet": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 52,
+              "unit": "px"
+            },
+            "fontWeight": 800,
+            "lineHeight": 1.1
+          },
+          "mobile": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 40,
+              "unit": "px"
+            },
+            "fontWeight": 800,
+            "lineHeight": 1.15
+          }
+        },
+        "h1": {
+          "value": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 48,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.15
+          },
+          "mobile": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 34,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.2
+          }
+        },
+        "h2": {
+          "value": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 36,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.2
+          },
+          "mobile": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.25
+          }
+        },
+        "h3": {
+          "fontFamily": {
+            "$token": "fontFamily.heading"
+          },
+          "fontSize": {
+            "value": 28,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.3
+        },
+        "h4": {
+          "fontFamily": {
+            "$token": "fontFamily.heading"
+          },
+          "fontSize": {
+            "value": 22,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.35
+        },
+        "body": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 16,
+            "unit": "px"
+          },
+          "fontWeight": 400,
+          "lineHeight": 1.6
+        },
+        "bodySm": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 14,
+            "unit": "px"
+          },
+          "fontWeight": 400,
+          "lineHeight": 1.55
+        },
+        "caption": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 12,
+            "unit": "px"
+          },
+          "fontWeight": 400,
+          "lineHeight": 1.5
+        },
+        "button": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 16,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.25
+        },
+        "overline": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 12,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.5,
+          "letterSpacing": {
+            "value": 0.08,
+            "unit": "em"
+          },
+          "textTransform": "uppercase"
+        }
+      },
+      "fontFamily": {
+        "heading": "Plus Jakarta Sans",
+        "body": "Inter",
+        "mono": "JetBrains Mono"
+      },
+      "space": {
+        "0": {
+          "value": 0,
+          "unit": "px"
+        },
+        "1": {
+          "value": 4,
+          "unit": "px"
+        },
+        "2": {
+          "value": 8,
+          "unit": "px"
+        },
+        "3": {
+          "value": 12,
+          "unit": "px"
+        },
+        "4": {
+          "value": 16,
+          "unit": "px"
+        },
+        "5": {
+          "value": 20,
+          "unit": "px"
+        },
+        "6": {
+          "value": 24,
+          "unit": "px"
+        },
+        "8": {
+          "value": 32,
+          "unit": "px"
+        },
+        "10": {
+          "value": 40,
+          "unit": "px"
+        },
+        "12": {
+          "value": 48,
+          "unit": "px"
+        },
+        "16": {
+          "value": 64,
+          "unit": "px"
+        },
+        "20": {
+          "value": 80,
+          "unit": "px"
+        },
+        "24": {
+          "value": 96,
+          "unit": "px"
+        }
+      },
+      "radius": {
+        "none": {
+          "value": 0,
+          "unit": "px"
+        },
+        "sm": {
+          "value": 4,
+          "unit": "px"
+        },
+        "md": {
+          "value": 8,
+          "unit": "px"
+        },
+        "lg": {
+          "value": 12,
+          "unit": "px"
+        },
+        "xl": {
+          "value": 16,
+          "unit": "px"
+        },
+        "full": {
+          "value": 9999,
+          "unit": "px"
+        }
+      },
+      "shadow": {
+        "sm": [
+          {
+            "type": "dropShadow",
+            "x": 0,
+            "y": 1,
+            "blur": 2,
+            "color": "#0F172A14"
+          }
+        ],
+        "md": [
+          {
+            "type": "dropShadow",
+            "x": 0,
+            "y": 4,
+            "blur": 16,
+            "color": "#0F172A1A"
+          }
+        ],
+        "lg": [
+          {
+            "type": "dropShadow",
+            "x": 0,
+            "y": 12,
+            "blur": 32,
+            "spread": -4,
+            "color": "#0F172A26"
+          }
+        ]
+      },
+      "size": {
+        "container": {
+          "value": 1200,
+          "unit": "px"
+        },
+        "contentNarrow": {
+          "value": 720,
+          "unit": "px"
+        }
+      }
+    },
+    "fonts": [
+      {
+        "family": "Plus Jakarta Sans",
+        "source": "google",
+        "weights": [
+          600,
+          700,
+          800
+        ],
+        "fallback": "sans-serif"
+      },
+      {
+        "family": "Inter",
+        "source": "google",
+        "weights": [
+          400,
+          600
+        ],
+        "fallback": "sans-serif"
+      },
+      {
+        "family": "JetBrains Mono",
+        "source": "google",
+        "weights": [
+          400
+        ],
+        "fallback": "monospace"
+      },
+      {
+        "family": "Poppins",
+        "source": "google",
+        "weights": [
+          400,
+          700
+        ],
+        "fallback": "sans-serif"
+      }
+    ]
+  },
+  "componentDeps": {},
+  "assets": {
+    "ast_cake000001": {
+      "kind": "image",
+      "width": 1600,
+      "height": 1067,
+      "mime": "image/jpeg"
+    },
+    "ast_bg00000001": {
+      "kind": "image",
+      "width": 1920,
+      "height": 1080,
+      "mime": "image/webp"
+    }
+  },
+  "pageOrder": [
+    "pg_home000001",
+    "pg_about00001"
+  ],
+  "nodes": {
+    "pg_home000001": {
+      "id": "pg_home000001",
+      "type": "page",
+      "name": "Home",
+      "parentId": null,
+      "children": [
+        "n_hero000001"
+      ],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column"
+          },
+          "size": {
+            "width": {
+              "mode": "fill"
+            }
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "color": {
+                "$token": "color.background"
+              }
+            }
+          ]
+        }
+      },
+      "props": {
+        "path": "/",
+        "title": "Home",
+        "isHome": true,
+        "seo": {
+          "title": "Beranda"
+        }
+      }
+    },
+    "n_hero000001": {
+      "id": "n_hero000001",
+      "type": "frame",
+      "name": "Hero",
+      "parentId": "pg_home000001",
+      "children": [
+        "n_herottl001",
+        "n_heroimg001"
+      ],
+      "visible": true,
+      "locked": false,
+      "tag": "section",
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column",
+            "gap": {
+              "$token": "space.6"
+            },
+            "align": "center",
+            "justify": "center",
+            "padding": {
+              "top": {
+                "$token": "space.16"
+              },
+              "right": {
+                "$token": "space.8"
+              },
+              "bottom": {
+                "$token": "space.16"
+              },
+              "left": {
+                "$token": "space.8"
+              }
+            }
+          },
+          "size": {
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "hug"
+            },
+            "minHeight": {
+              "value": 80,
+              "unit": "vh"
+            },
+            "maxWidth": {
+              "$token": "size.container"
+            }
+          },
+          "fills": [
+            {
+              "type": "image",
+              "image": {
+                "assetId": "ast_bg00000001",
+                "focalPoint": {
+                  "x": 0.5,
+                  "y": 0.3
+                }
+              },
+              "fit": "cover"
+            },
+            {
+              "type": "solid",
+              "color": {
+                "$token": "color.background",
+                "alpha": 0.6
+              },
+              "visible": false
+            }
+          ],
+          "radius": {
+            "topLeft": {
+              "$token": "radius.md"
+            },
+            "topRight": {
+              "value": 16,
+              "unit": "px"
+            }
+          },
+          "strokes": [
+            {
+              "color": "#e5e7eb",
+              "width": {
+                "value": 1,
+                "unit": "px"
+              },
+              "position": "inside",
+              "sides": {
+                "top": false
+              }
+            }
+          ],
+          "color": "#111827"
+        },
+        "mobile": {
+          "strokes": null,
+          "typography": {
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            }
+          }
+        }
+      },
+      "props": {
+        "role": "section"
+      }
+    },
+    "n_herottl001": {
+      "id": "n_herottl001",
+      "type": "text",
+      "name": "Hero / Title",
+      "parentId": "n_hero000001",
+      "visible": true,
+      "locked": false,
+      "tag": "h1",
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "hug"
+            }
+          },
+          "typography": {
+            "fontFamily": "Poppins",
+            "fontSize": {
+              "value": 56,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.2,
+            "letterSpacing": {
+              "value": -0.02,
+              "unit": "em"
+            },
+            "textTransform": "uppercase",
+            "textDecoration": "none",
+            "textAlign": "center",
+            "fontStyle": "normal"
+          },
+          "color": {
+            "$token": "color.primary"
+          }
+        },
+        "tablet": {
+          "typography": {
+            "fontWeight": null,
+            "lineHeight": {
+              "value": 40,
+              "unit": "px"
+            }
+          }
+        }
+      },
+      "props": {
+        "autoSize": "height",
+        "content": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "align": "center"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Kue rumahan, "
+                },
+                {
+                  "type": "text",
+                  "text": "fresh setiap hari",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "n_heroimg001": {
+      "id": "n_heroimg001",
+      "type": "image",
+      "name": "Hero / Photo",
+      "parentId": "n_hero000001",
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "size": {
+            "width": {
+              "mode": "fill"
+            },
+            "height": {
+              "mode": "fixed",
+              "value": 420,
+              "unit": "px"
+            }
+          },
+          "radius": {
+            "$token": "radius.lg"
+          },
+          "position": {
+            "type": "absolute",
+            "x": 24,
+            "y": 12,
+            "constraints": {
+              "horizontal": "right",
+              "vertical": "top"
+            }
+          }
+        },
+        "mobile": {
+          "size": {
+            "height": {
+              "mode": "fixed",
+              "value": 240,
+              "unit": "px"
+            }
+          },
+          "radius": null
+        }
+      },
+      "props": {
+        "fit": "cover",
+        "image": {
+          "assetId": "ast_cake000001",
+          "alt": "Kue cokelat di meja kayu",
+          "focalPoint": {
+            "x": 0.5,
+            "y": 0.4
+          }
+        }
+      }
+    },
+    "pg_about00001": {
+      "id": "pg_about00001",
+      "type": "page",
+      "name": "Tentang",
+      "parentId": null,
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column"
+          }
+        }
+      },
+      "props": {
+        "path": "/tentang",
+        "title": "Tentang Kami"
+      }
+    }
+  }
+}

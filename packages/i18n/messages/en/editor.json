@@ -368,7 +368,8 @@
     "image": "Image",
     "shape": "Shape",
     "icon": "Icon",
-    "group": "Group"
+    "group": "Group",
+    "instance": "Instance"
   },
   "bottomBar": {
     "label": "Bottom bar",

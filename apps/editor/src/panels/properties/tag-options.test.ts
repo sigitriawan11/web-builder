@@ -19,7 +19,8 @@ describe("TAG_OPTIONS valid untuk setTag (ED-218)", () => {
       for (const tag of tags ?? []) {
         const result = runCommand({ doc, origin: ORIGIN }, setTag, { id, tag });
         expect(result.ok, `tag ${tag}`).toBe(true);
-        expect((yDocToJson(doc) as SiteDocument).nodes[id]?.tag).toBe(tag);
+        const node = (yDocToJson(doc) as SiteDocument).nodes[id];
+        expect(node && "tag" in node ? node.tag : undefined).toBe(tag);
       }
     });
   }

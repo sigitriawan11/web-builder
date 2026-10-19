@@ -18,6 +18,8 @@ const DEFAULT_TAG: Record<Node["type"], string> = {
   shape: "div",
   icon: "span",
   group: "div",
+  // Placeholder; tag efektif instance = root component setelah resolusi (T3.2.1).
+  instance: "div",
 };
 
 export interface RenderEnv {
@@ -165,6 +167,10 @@ export function renderNodeElement(
       );
       return iconLink ? <Link attributes={{ ...attributes, ...iconLink }}>{span}</Link> : span;
     }
+    case "instance":
+      // TODO(T3.2.1): resolve ComponentDefinition@version → render subtree hasil (variant+props+overrides+slots).
+      // Sampai resolver renderer ada, instance dirender sebagai placeholder kosong (data-node-id tetap dibawa editor).
+      return <Box tag={DEFAULT_TAG.instance} attributes={attributes} />;
   }
 }
 

@@ -368,7 +368,8 @@
     "image": "Gambar",
     "shape": "Bentuk",
     "icon": "Ikon",
-    "group": "Grup"
+    "group": "Grup",
+    "instance": "Instance"
   },
   "bottomBar": {
     "label": "Bar bawah",

@@ -57,7 +57,11 @@ const DEFAULT_TAG: Record<Node["type"], string> = {
   shape: "div",
   icon: "span",
   group: "div",
+  instance: "div",
 };
+
+// Tag efektif node (instance tak punya field `tag` — placeholder; tag asli dari root component saat resolusi).
+const tagOf = (node: Node): string => ("tag" in node ? (node.tag ?? DEFAULT_TAG[node.type]) : DEFAULT_TAG[node.type]);
 
 function DesignTab({
   pageId,
@@ -162,14 +166,9 @@ function SettingsTab({
       </InspectorRow>
       <InspectorRow label={t("inspector.tag")}>
         {single && runtime ? (
-          <TagSelect
-            runtime={runtime}
-            node={single}
-            current={single.tag ?? DEFAULT_TAG[single.type]}
-            readOnly={readOnly}
-          />
+          <TagSelect runtime={runtime} node={single} current={tagOf(single)} readOnly={readOnly} />
         ) : (
-          <Value value={mixedValue(nodes.map((node) => node.tag ?? DEFAULT_TAG[node.type]))} />
+          <Value value={mixedValue(nodes.map(tagOf))} />
         )}
       </InspectorRow>
       {single && single.type !== "page" && runtime ? (

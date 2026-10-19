@@ -22,8 +22,11 @@ const DEFAULT_TAG: Record<Node["type"], string> = {
   shape: "div",
   icon: "span",
   group: "div",
+  // Instance = placeholder; tag efektif sebenarnya dari root component (ditentukan saat resolusi, bukan lint).
+  instance: "div",
 };
-const effectiveTag = (node: Node): string => node.tag ?? DEFAULT_TAG[node.type];
+const effectiveTag = (node: Node): string =>
+  "tag" in node ? (node.tag ?? DEFAULT_TAG[node.type]) : DEFAULT_TAG[node.type];
 
 /** Node page dalam urutan DOM (depth-first mengikuti `children`). */
 function* inDomOrder(doc: SiteDocument, pageId: string): Generator<Node> {

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { AssetRefSchema } from "./asset-ref";
+import { NodePatchSchema, NodePathSchema, PropValueSchema, SLOT_ALLOWED_TYPES } from "./component";
 import { LinkValueSchema } from "./link";
 import { RichTextDocSchema } from "./rich-text";
 import { ResponsiveStyleSchema } from "./style";
@@ -199,6 +200,49 @@ export const GroupNodeSchema = z.strictObject({
   props: z.strictObject({}),
 });
 
+// DM-018: instance component. Tidak punya `children`; `style` hanya berlaku pada root component (ukuran/posisi di
+// parent). Nilai & override divalidasi struktural di sini; kesesuaian dengan `propsSchema`/definisi dicek saat resolusi.
+export const InstancePropsSchema = z.strictObject({
+  componentId: ComponentIdSchema,
+  version: z.number().int().positive(),
+  variant: z.record(z.string(), z.string()).optional(),
+  propValues: z.record(z.string(), PropValueSchema).optional(),
+  overrides: z.record(NodePathSchema, NodePatchSchema).optional(),
+  // Isi slot: node-node ini punya parentId = id instance.
+  slots: z.record(z.string(), z.array(ChildIdSchema)).optional(),
+});
+
+export const InstanceNodeSchema = z.strictObject({
+  ...baseShape,
+  id: ChildIdSchema,
+  type: z.literal("instance"),
+  parentId: NodeIdSchema,
+  props: InstancePropsSchema,
+});
+
+// DM-019: slot — HANYA di dalam ComponentDefinition (bukan di dokumen site; karena itu tidak masuk `NodeSchema` site).
+// Container ber-style; `children` di definisi = isi default slot.
+export const SlotPropsSchema = z.strictObject({
+  slotName: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-z][a-zA-Z0-9]*$/, "slotName camelCase"),
+  allowedTypes: z.array(z.enum(SLOT_ALLOWED_TYPES)).optional(),
+  allowedComponents: z.array(ComponentIdSchema).optional(),
+  maxChildren: z.number().int().positive().optional(),
+});
+
+export const SlotNodeSchema = z.strictObject({
+  ...baseShape,
+  ...childrenShape,
+  id: ChildIdSchema,
+  type: z.literal("slot"),
+  parentId: NodeIdSchema,
+  tag: z.enum(["div"]).optional(),
+  props: SlotPropsSchema,
+});
+
 export const NodeSchema = z.discriminatedUnion("type", [
   PageNodeSchema,
   FrameNodeSchema,
@@ -207,6 +251,7 @@ export const NodeSchema = z.discriminatedUnion("type", [
   ShapeNodeSchema,
   IconNodeSchema,
   GroupNodeSchema,
+  InstanceNodeSchema,
 ]);
 
 export type PageNode = z.infer<typeof PageNodeSchema>;
@@ -216,6 +261,8 @@ export type IconNode = z.infer<typeof IconNodeSchema>;
 export type GroupNode = z.infer<typeof GroupNodeSchema>;
 export type TextNode = z.infer<typeof TextNodeSchema>;
 export type ImageNode = z.infer<typeof ImageNodeSchema>;
+export type InstanceNode = z.infer<typeof InstanceNodeSchema>;
+export type SlotNode = z.infer<typeof SlotNodeSchema>;
 export type Node = z.infer<typeof NodeSchema>;
 export type NodeMetadata = z.infer<typeof NodeMetadataSchema>;
 export type A11y = z.infer<typeof A11ySchema>;

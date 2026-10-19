@@ -11,6 +11,7 @@ import { cn } from "@platform/ui";
 import {
   ChevronDownIcon,
   ChevronRightIcon,
+  ComponentIcon,
   EyeIcon,
   EyeOffIcon,
   FrameIcon,
@@ -43,6 +44,7 @@ const TYPE_ICON: Record<Node["type"], LucideIcon> = {
   shape: SquareIcon,
   icon: SmileIcon,
   group: GroupIcon,
+  instance: ComponentIcon,
 };
 
 interface LayerActions {

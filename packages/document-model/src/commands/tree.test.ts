@@ -268,7 +268,8 @@ describe("command field node", () => {
   it("setTag mengikuti daftar tag per tipe (DM-009)", () => {
     const { ctx, read } = setupDoc(heroDocument());
     expect(runCommand(ctx, setTag, { id: "n_herottl001", tag: "h2" }).ok).toBe(true);
-    expect(read().nodes.n_herottl001?.tag).toBe("h2");
+    const titled = read().nodes.n_herottl001;
+    expect(titled && "tag" in titled ? titled.tag : undefined).toBe("h2");
     expect(runCommand(ctx, setTag, { id: "n_hero000001", tag: "h2" })).toMatchObject({
       error: { code: "INVALID_RESULT" },
     });
