@@ -1,6 +1,11 @@
 import {
   type AutoRuleId,
   type BreakpointDef,
+  type ComponentDefinition,
+  type Node,
+  type ResolveCtx,
+  type ResolvedNode,
+  resolveInstance,
   resolveStateStyle,
   resolveStyle,
   type SiteDocument,
@@ -39,6 +44,10 @@ export interface PageStylesOptions {
   rootSelector?: string;
   // Metrik font untuk estimasi `stackRows` (default sampai katalog font M2).
   fonts?: AutoResponsiveOptions["fonts"];
+  // DM-051 (M3): registry definisi component untuk me-resolve node `instance` → CSS subtree ter-resolve. Tanpa ini,
+  // instance = placeholder (tidak ada CSS). Harus registry YANG SAMA dengan `RenderContext.component` agar id scope
+  // (`<instId>:<defNodeId>`) di CSS cocok dengan class yang dipasang renderer.
+  component?: (componentId: string, version: number) => ComponentDefinition | undefined;
 }
 
 export interface PageStyles {
@@ -171,6 +180,58 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
   };
 
   type ParentBox = { width?: number | undefined; height?: number | undefined };
+
+  // Registry component untuk resolve instance (sama seperti RenderContext.component) → `siteNode` = node dokumen.
+  const resolveCtx: ResolveCtx = {
+    getComponent: options.component ?? (() => undefined),
+    siteNode: (id: string) => doc.nodes[id],
+  };
+
+  // CSS untuk subtree instance ter-resolve (DM-051). Node sudah konkret (slot/nested/repeater di-expand resolveInstance)
+  // → tanpa auto-responsive (komponen mendefinisikan style responsif eksplisit; auto-responsive subtree = follow-up).
+  const visitResolved = (
+    resolved: ResolvedNode,
+    parents: Record<Breakpoint, ParentLayout>,
+    parentBoxes: Record<Breakpoint, ParentBox>,
+  ) => {
+    if (!resolved.visible) return;
+    const asNode = resolved as unknown as Node;
+    const declarations = {} as Record<Breakpoint, Declaration[]>;
+    const childParents = {} as Record<Breakpoint, ParentLayout>;
+    const childBoxes = {} as Record<Breakpoint, ParentBox>;
+    for (const bp of BREAKPOINTS) {
+      const style = resolveStyle(resolved.style, bp, { theme: doc.theme });
+      const ctx = {
+        parent: parents[bp],
+        theme: doc.theme,
+        assetUrl: options.assetUrl,
+        parentWidth: parentBoxes[bp].width,
+        parentHeight: parentBoxes[bp].height,
+      };
+      declarations[bp] = [...nodeDeclarations(asNode, style), ...styleDeclarations(style, ctx)];
+      childParents[bp] = childLayoutOf(style);
+      childBoxes[bp] = { width: fixedPx(style.size?.width), height: fixedPx(style.size?.height) };
+    }
+    let states: StateDecls | null = null;
+    if (target === "publish" && resolved.style.states) {
+      states = Object.fromEntries(
+        (Object.keys(STATE_PSEUDO) as StateName[]).map((name) => [name, {} as Record<Breakpoint, Declaration[]>]),
+      ) as StateDecls;
+      for (const name of Object.keys(STATE_PSEUDO) as StateName[]) {
+        for (const bp of BREAKPOINTS) {
+          const override = resolveStateStyle(resolved.style, bp, name, { theme: doc.theme });
+          states[name][bp] = styleDeclarations(override, {
+            parent: parents[bp],
+            theme: doc.theme,
+            assetUrl: options.assetUrl,
+          });
+        }
+      }
+    }
+    assign(resolved.id, declarations, states);
+    for (const child of resolved.children ?? []) visitResolved(child, childParents, childBoxes);
+  };
+
   // Arti `fill` bergantung arah parent DI BREAKPOINT YANG SAMA (mis. row di desktop, stack di mobile).
   const visit = (
     nodeId: string,
@@ -179,6 +240,15 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
   ) => {
     const node = doc.nodes[nodeId];
     if (!node?.visible) return;
+    // DM-051: instance dirender sebagai subtree ter-resolve (bukan node sendiri). Tanpa registry → placeholder tanpa
+    // CSS. Dengan registry → emit CSS untuk node ter-resolve (id scope cocok dengan class yang dipasang renderer).
+    if (node.type === "instance") {
+      if (!options.component) return;
+      const resolved = resolveInstance(node, resolveCtx);
+      if (resolved.missingComponent) return;
+      visitResolved(resolved, parents, parentBoxes);
+      return;
+    }
     const declarations = {} as Record<Breakpoint, Declaration[]>;
     const childParents = {} as Record<Breakpoint, ParentLayout>;
     const childBoxes = {} as Record<Breakpoint, ParentBox>;

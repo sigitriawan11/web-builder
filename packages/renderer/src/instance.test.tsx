@@ -2,7 +2,9 @@ import { type ComponentDefinition, createBlankSiteDocument, type SiteDocument } 
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { RenderContext } from "./context";
+import { buildPageStyles } from "./css/stylesheet";
 import { render } from "./render";
+import { renderToStaticHtml } from "./static";
 
 const label = { id: "L", en: "L" };
 const buttonDef = {
@@ -92,5 +94,50 @@ describe("render instance (DM-051, T3.2.1)", () => {
     expect(noReg).not.toContain("Beli");
     const missing = renderToStaticMarkup(render(doc, { ...ctx(homeId, "publish"), component: () => undefined }));
     expect(missing).toContain("data-missing-component");
+  });
+});
+
+// T3.2.1 (lanjutan): CSS untuk subtree instance ter-resolve — id scope (`<instId>:<defNodeId>`) di CSS cocok dengan
+// class yang dipasang renderer. Definisi ber-style (root lebar tetap) agar menghasilkan deklarasi.
+const rawNodes = (buttonDef as unknown as { nodes: Record<string, Record<string, unknown>> }).nodes;
+const styledDef = {
+  ...(buttonDef as unknown as Record<string, unknown>),
+  nodes: {
+    n_btnroot01: {
+      ...rawNodes.n_btnroot01,
+      style: { base: { size: { width: { mode: "fixed", value: 320, unit: "px" } } } },
+    },
+    n_btnlabel1: rawNodes.n_btnlabel1,
+  },
+} as unknown as ComponentDefinition;
+const styledReg = (id: string, v: number) => (id === "cmp_btn0001" && v === 1 ? styledDef : undefined);
+
+describe("instance CSS (T3.2.1)", () => {
+  it("buildPageStyles memberi class ke node subtree ter-resolve + aturannya masuk CSS", () => {
+    const { doc, homeId } = docWithInstance();
+    const styles = buildPageStyles(doc, { pageId: homeId, assetUrl: (id) => `/a/${id}`, component: styledReg });
+    const rootClass = styles.classOf("n_inst0001:n_btnroot01");
+    expect(rootClass).toMatch(/^s-[0-9a-z]{6}$/);
+    expect(styles.css).toContain(`.${rootClass}`);
+    expect(styles.css).toContain("320px");
+  });
+
+  it("tanpa registry → tidak ada class untuk subtree (instance = placeholder)", () => {
+    const { doc, homeId } = docWithInstance();
+    const styles = buildPageStyles(doc, { pageId: homeId, assetUrl: (id) => `/a/${id}` });
+    expect(styles.classOf("n_inst0001:n_btnroot01")).toBeUndefined();
+  });
+
+  it("renderToStaticHtml: elemen ter-resolve membawa class yang ada aturannya di CSS (end-to-end)", () => {
+    const { doc, homeId } = docWithInstance();
+    const { html, css } = renderToStaticHtml(doc, homeId, { assetUrl: (id) => `/a/${id}`, component: styledReg });
+    const rootClass = buildPageStyles(doc, {
+      pageId: homeId,
+      assetUrl: (id) => `/a/${id}`,
+      component: styledReg,
+    }).classOf("n_inst0001:n_btnroot01");
+    expect(rootClass).toBeTruthy();
+    expect(html).toContain(`class="${rootClass}"`);
+    expect(css).toContain(`.${rootClass}{`);
   });
 });

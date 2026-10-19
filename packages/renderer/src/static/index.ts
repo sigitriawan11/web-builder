@@ -1,4 +1,4 @@
-import type { SiteDocument } from "@platform/document-model";
+import type { ComponentDefinition, SiteDocument } from "@platform/document-model";
 import { renderToStaticMarkup } from "react-dom/server";
 import { BASE_CSS, buildPageStyles } from "../css/stylesheet";
 import { render } from "../render";
@@ -11,6 +11,8 @@ export interface StaticRenderOptions {
   assetUrl: (assetId: string) => string;
   // Origin situs (mis. `https://tokobudi.com`) untuk canonical & og:url; tanpa = tidak dibuat.
   baseUrl?: string;
+  // DM-051: registry definisi component (publish pipeline menyediakan dari DB). Tanpa ini, instance = placeholder.
+  component?: (componentId: string, version: number) => ComponentDefinition | undefined;
 }
 
 export interface StaticPage {
@@ -49,7 +51,11 @@ export function renderToStaticHtml(doc: SiteDocument, pageId: string, options: S
   const { settings } = doc;
   const seo = page.props.seo ?? {};
 
-  const styles = buildPageStyles(doc, { pageId, assetUrl: options.assetUrl });
+  const styles = buildPageStyles(doc, {
+    pageId,
+    assetUrl: options.assetUrl,
+    ...(options.component ? { component: options.component } : {}),
+  });
   const body = renderToStaticMarkup(
     render(doc, {
       pageId,
@@ -57,6 +63,7 @@ export function renderToStaticHtml(doc: SiteDocument, pageId: string, options: S
       mode: "publish",
       assetUrl: options.assetUrl,
       className: (node) => styles.classOf(node.id),
+      ...(options.component ? { component: options.component } : {}),
       // Target skip link; `htmlId` page (bila ada) tetap dipakai.
       nodeAttributes: (node) => (node.id === pageId && !node.htmlId ? { id: "main" } : undefined),
     }),

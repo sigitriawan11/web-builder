@@ -89,15 +89,13 @@ async function pages(siteId: string) {
 // CMP-051/CMP-156: seed component platform published agar instance (cmp_…@versionSeq) ter-resolve ke UUID + semver.
 async function seedComponent(publicId: string, versionSeq: number, semver: string) {
   const categoryId = uuidv7();
-  await testDb.db
-    .insert(schema.libraryCategories)
-    .values({
-      id: categoryId,
-      slug: `cat-${publicId}`,
-      scope: "component",
-      type: "functional",
-      name: { id: "K", en: "C" },
-    });
+  await testDb.db.insert(schema.libraryCategories).values({
+    id: categoryId,
+    slug: `cat-${publicId}`,
+    scope: "component",
+    type: "functional",
+    name: { id: "K", en: "C" },
+  });
   const componentId = uuidv7();
   await testDb.db.insert(schema.components).values({
     id: componentId,
