@@ -153,7 +153,7 @@ export function renderNodeElement(
     case "icon": {
       // DM-015: ikon Lucide sebagai inline SVG. Definisi path diambil dari peta ikon renderer (ctx.icon); bila tak
       // tersedia (mis. editor menyuntik SVG sendiri lewat `content`), render kosong.
-      const svg = options.content ?? ctx.icon?.(node.props.name, node.props.strokeWidth);
+      const svg = options.content ?? ctx.icon?.(node.props.name, node.props.strokeWidth, node.props.set);
       const iconLink = node.props.link ? linkOf(node.props.link, env) : null;
       const span = (
         <Box tag={node.tag ?? DEFAULT_TAG.icon} attributes={iconLink ? {} : attributes}>

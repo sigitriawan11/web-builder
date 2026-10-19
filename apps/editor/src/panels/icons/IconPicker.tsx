@@ -9,8 +9,8 @@ export function IconPicker({ runtime, onClose }: { runtime: CanvasRuntime; onClo
   return (
     <div className="w-64 p-2" data-testid="icon-picker">
       <IconBrowser
-        onPick={(name) => {
-          insertIconNode(runtime, name);
+        onPick={(name, set) => {
+          insertIconNode(runtime, name, set);
           toolStore.getState().dispatch({ type: "selectTool", tool: "select" });
           onClose();
         }}

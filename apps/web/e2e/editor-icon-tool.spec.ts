@@ -64,3 +64,21 @@ test("AC ED-163: tab Assets → Icons → cari 'phone' → sisip node icon", asy
   const iconId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
   expect((await doc(page)).nodes[iconId]).toMatchObject({ type: "icon", props: { set: "lucide", name: "phone" } });
 });
+
+test("AC ED-163: tab Brand logos → cari 'whatsapp' → sisip node icon set brand (Simple Icons)", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Brand Icon Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  await page.getByTestId("tool-icon").click();
+  await expect(page.getByTestId("icon-picker")).toBeVisible();
+  await page.getByTestId("icon-set-brand").click();
+  await page.getByTestId("brand-search").fill("whatsapp");
+  // Data brand dimuat lazy (dynamic import simple-icons); tunggu opsi muncul.
+  await page.getByTestId("brand-option-whatsapp").click();
+
+  const iconId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  expect((await doc(page)).nodes[iconId]).toMatchObject({ type: "icon", props: { set: "brand", name: "whatsapp" } });
+  // Ter-render sebagai SVG inline (BrandIcon, currentColor).
+  await expect(page.getByTestId("editor-canvas").locator(`[data-node-id="${iconId}"] svg`)).toBeVisible();
+});

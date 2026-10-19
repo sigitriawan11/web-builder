@@ -429,7 +429,11 @@
   "icons": {
     "search": "Search icons",
     "results": "Icon results",
-    "empty": "No matching icons."
+    "empty": "No matching icons.",
+    "lucide": "Icons",
+    "brand": "Brand logos",
+    "brandSearch": "Search brand logos",
+    "brandLoading": "Loading brand logos…"
   },
   "insert": {
     "basic": "Basic",

@@ -28,7 +28,12 @@ function freeformPosition(runtime: CanvasRuntime, parentId: string): { type: "ab
 }
 
 // ED-037: parent freeform → ikon absolute (bisa digeser); parent auto-layout → flow (pindah via reorder).
-export function insertIconNode(runtime: CanvasRuntime, name: string): string | null {
+// `set` = "lucide" (default) atau "brand" (logo Simple Icons, ED-163).
+export function insertIconNode(
+  runtime: CanvasRuntime,
+  name: string,
+  set: "lucide" | "brand" = "lucide",
+): string | null {
   const selected = selectionStore.getState().selectedIds[0];
   const selectedNode = selected ? runtime.nodeStore.getNode(selected) : null;
   // Parent = frame terpilih, atau page aktif.
@@ -45,7 +50,7 @@ export function insertIconNode(runtime: CanvasRuntime, name: string): string | n
   const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, createNode, {
     parentId,
     type: "icon",
-    props: { set: "lucide", name },
+    props: { set, name },
     style: { base },
   });
   if (result.ok) {

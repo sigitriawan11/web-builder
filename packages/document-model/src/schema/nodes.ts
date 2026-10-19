@@ -71,13 +71,16 @@ export const ShapePropsSchema = z.strictObject({
 });
 
 // DM-015: ikon Lucide. Warna = `style.color`, ukuran = `style.size` (square).
+// DM-015: set `lucide` (ikon umum) atau `brand` (logo merek, mis. Simple Icons — ED-163). `name` = slug kebab-case
+// (lucide: nama ikon; brand: slug merek, mis. "whatsapp"). `strokeWidth` hanya berlaku untuk lucide.
 export const IconPropsSchema = z.strictObject({
-  set: z.literal("lucide"),
+  set: z.enum(["lucide", "brand"]),
+  // Slug lucide selalu diawali huruf; slug brand (Simple Icons) boleh diawali digit (mis. "1password", "500px").
   name: z
     .string()
     .min(1)
     .max(64)
-    .regex(/^[a-z][a-z0-9-]*$/, "nama ikon kebab-case"),
+    .regex(/^[a-z0-9][a-z0-9-]*$/, "nama ikon kebab-case"),
   strokeWidth: z.number().positive().max(8).optional(),
   link: LinkValueSchema.optional(),
 });

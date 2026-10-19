@@ -5,7 +5,7 @@ import { defaultSiteSettings } from "../../src/defaults/top-level";
 // DM-004 AC: dokumen kosong minimal (1 page tanpa child) harus valid.
 export function minimalDocument(): SiteDocument {
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     meta: { title: "Situs Kosong", createdWith: "blank" },
     settings: defaultSiteSettings({ title: "Situs Kosong" }),
     theme: defaultTheme(),
@@ -31,7 +31,7 @@ export function minimalDocument(): SiteDocument {
 // Landing kecil berdasarkan contoh spec 01 (DM-010, DM-011, DM-013, DM-014, DM-036).
 export function heroDocument(): SiteDocument {
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     meta: { title: "Toko Kue Budi", createdWith: "template" },
     settings: defaultSiteSettings({ title: "Toko Kue Budi" }),
     theme: defaultTheme(),
@@ -186,7 +186,7 @@ export function nestedDocument(): SiteDocument {
   theme.tokens.color.brand = { 600: "#9A3412" };
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     meta: { title: "Kasus Tepi" },
     settings: defaultSiteSettings({ title: "Kasus Tepi" }),
     theme,
@@ -272,7 +272,7 @@ export function nestedDocument(): SiteDocument {
 export function freeformDocument(): SiteDocument {
   const fixed = (value: number) => ({ mode: "fixed" as const, value, unit: "px" as const });
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     meta: { title: "Papan Bebas" },
     settings: defaultSiteSettings({ title: "Papan Bebas" }),
     theme: defaultTheme(),
@@ -449,7 +449,7 @@ export function autolayoutDocument(): SiteDocument {
   ];
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     meta: { title: "Auto-layout" },
     settings: defaultSiteSettings({ title: "Auto-layout" }),
     theme: defaultTheme(),
@@ -536,7 +536,7 @@ export function wrapGridDocument(count = 100): SiteDocument {
   ];
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     meta: { title: `Grid wrap ${count}` },
     settings: defaultSiteSettings({ title: `Grid wrap ${count}` }),
     theme: defaultTheme(),

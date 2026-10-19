@@ -87,7 +87,7 @@ export function AssetsPanel({
 
       {view === "icons" ? (
         // ED-163: browser ikon Lucide di tab Assets — klik = sisip node icon ke frame/page terpilih.
-        <IconBrowser onPick={(name) => !readOnly && insertIconNode(runtime, name)} />
+        <IconBrowser onPick={(name, set) => !readOnly && insertIconNode(runtime, name, set)} />
       ) : (
         <MediaLibrary
           siteId={siteId}

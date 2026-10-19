@@ -1,5 +1,6 @@
 import { icons } from "lucide-react";
 import { createElement, type ReactNode } from "react";
+import { BrandIcon } from "./BrandIcon";
 
 // DM-015: nama ikon dokumen = kebab-case (`air-vent`); lucide-react memetakan PascalCase (`AirVent`).
 export function kebabToPascal(name: string): string {
@@ -39,4 +40,10 @@ export function renderLucideIcon(name: string, strokeWidth?: number): ReactNode 
   ];
   if (!Icon) return null;
   return createElement(Icon, { width: "100%", height: "100%", ...(strokeWidth ? { strokeWidth } : {}) });
+}
+
+/** Resolver ikon editor (`ctx.icon`): set `brand` → logo Simple Icons (lazy); selain itu Lucide (DM-015/ED-163). */
+export function renderIcon(name: string, strokeWidth?: number, set?: "lucide" | "brand"): ReactNode {
+  if (set === "brand") return createElement(BrandIcon, { slug: name });
+  return renderLucideIcon(name, strokeWidth);
 }

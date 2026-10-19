@@ -16,5 +16,5 @@ export interface RenderContext {
   // Hook mode editor (T1.10.9): atribut tambahan per elemen node (mis. `data-node-id`, ref) tanpa import API editor.
   nodeAttributes?: (node: Node) => Record<string, unknown> | undefined;
   // DM-015: SVG inline ikon Lucide by name (publish: dari peta ikon; editor menyuntik lewat `content`).
-  icon?: (name: string, strokeWidth?: number) => import("react").ReactNode;
+  icon?: (name: string, strokeWidth?: number, set?: "lucide" | "brand") => import("react").ReactNode;
 }
