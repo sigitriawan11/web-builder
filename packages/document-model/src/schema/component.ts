@@ -3,11 +3,11 @@ import { AssetRefSchema } from "./asset-ref";
 import { LinkValueSchema } from "./link";
 import { RichTextDocSchema } from "./rich-text";
 import { StatesSchema, StylePatchSchema } from "./style";
-import { ColorSchema, JsonValueSchema } from "./values";
+import { ColorSchema, ComponentIdSchema, JsonValueSchema, NodeIdSchema } from "./values";
 
-// Blok bangun sistem component (DM-045–DM-049, Epic 3.1). Modul ini menampung schema yang tidak bergantung pada
-// `ComponentDefinition` penuh: props (DM-046), variants (DM-048), patch node (DM-049), nilai prop instance.
-// `ComponentDefinition` (DM-045) + validasi `$prop` dalam node menyusul (butuh node schema varian `cv()`).
+// Sistem component (DM-045–DM-049, Epic 3.1): props (DM-046), variants (DM-048), patch node (DM-049), nilai prop
+// instance, dan envelope `ComponentDefinition` (DM-045). Validasi bentuk tiap node di dalam definisi (boleh `$prop`)
+// + integritas (`$prop` ⊆ propsSchema, tanpa self-instance, rootId) ada di `validate/component.ts`.
 
 // Label dwibahasa (ID default, EN) — dipakai label prop & option enum.
 const LabelSchema = z.strictObject({ id: z.string().min(1).max(120), en: z.string().min(1).max(120) });
@@ -173,3 +173,48 @@ export const PropValueSchema: z.ZodType = z.lazy(() =>
     z.array(z.record(z.string(), PropValueSchema)),
   ]),
 );
+
+// ── ComponentDefinition (DM-045) ─────────────────────────────────────────────
+
+export const ComponentCategorySchema = z.enum([
+  "navbar",
+  "hero",
+  "section",
+  "card",
+  "button",
+  "form",
+  "footer",
+  "pricing",
+  "testimonial",
+  "gallery",
+  "table",
+  "dashboard",
+  "sidebar",
+  "icon",
+  "other",
+]);
+export type ComponentCategory = z.infer<typeof ComponentCategorySchema>;
+
+// Envelope ComponentDefinition. `nodes` divalidasi STRUKTUR di sini (record<NodeId, JSON>), tetapi bentuk tiap node
+// (boleh `$prop`/slot) + integritas (`$prop` ⊆ propsSchema, tanpa self-instance, rootId, slotName unik) dicek oleh
+// `validateComponentDefinition()` — mirror SiteDocumentSchema (struktur) + validateDocument (invariant).
+export const ComponentDefinitionSchema = z.strictObject({
+  // Versi format ComponentDefinition sendiri (DM-071), terpisah dari schemaVersion dokumen site.
+  schemaVersion: z.number().int().positive(),
+  id: ComponentIdSchema,
+  version: z.number().int().positive(),
+  name: z.string().min(1).max(120),
+  category: ComponentCategorySchema,
+  description: z.string().max(1000).optional(),
+  tags: z.array(z.string().min(1).max(40)).max(20).optional(),
+  aiHints: z.strictObject({ whenToUse: z.string().min(1).max(500), doNot: z.string().max(500).optional() }).optional(),
+  propsSchema: z.array(PropDefSchema).max(50),
+  variantAxes: z.array(VariantAxisSchema).max(4).optional(),
+  variants: z.array(VariantRuleSchema).max(32).optional(),
+  rootId: NodeIdSchema,
+  nodes: z.record(NodeIdSchema, JsonValueSchema),
+  thumbnail: AssetRefSchema.optional(),
+  // Gating paket (DM-045): komponen yang butuh fitur dinamis/commerce (03 O-1).
+  requires: z.strictObject({ dynamic: z.boolean().optional(), commerce: z.boolean().optional() }).optional(),
+});
+export type ComponentDefinition = z.infer<typeof ComponentDefinitionSchema>;

@@ -38,7 +38,31 @@ export const LINT_ISSUE_CODES = [
   "MULTIPLE_MAIN",
 ] as const;
 
-export const ISSUE_CODES = [...STRUCTURE_ISSUE_CODES, ...REFERENCE_ISSUE_CODES, ...LINT_ISSUE_CODES] as const;
+// DM-045–DM-049: validasi ComponentDefinition (Mode Admin / library seed).
+export const COMPONENT_ISSUE_CODES = [
+  // Envelope definisi (Zod) / envelope node di dalam definisi.
+  "COMPONENT_SCHEMA",
+  "COMPONENT_NODE",
+  // rootId tidak ada / bukan root (parentId ≠ null).
+  "COMPONENT_ROOT",
+  // `$prop` merujuk key yang tidak ada di propsSchema.
+  "PROP_REF_UNKNOWN",
+  // Key prop duplikat di propsSchema.
+  "PROP_KEY_DUPLICATE",
+  // Instance di dalam definisi merujuk component dirinya sendiri (langsung).
+  "SELF_INSTANCE",
+  // slotName duplikat dalam satu component.
+  "SLOT_NAME_DUPLICATE",
+  // Variant `when` merujuk axis/option yang tidak ada.
+  "VARIANT_AXIS_UNKNOWN",
+] as const;
+
+export const ISSUE_CODES = [
+  ...STRUCTURE_ISSUE_CODES,
+  ...REFERENCE_ISSUE_CODES,
+  ...LINT_ISSUE_CODES,
+  ...COMPONENT_ISSUE_CODES,
+] as const;
 export type IssueCode = (typeof ISSUE_CODES)[number];
 
 export type IssueMessage = { id: string; en: string };

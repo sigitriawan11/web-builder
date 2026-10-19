@@ -28,6 +28,7 @@ export {
 } from "./migrations";
 export * from "./query";
 export * from "./schema";
+export { type ComponentValidationResult, validateComponentDefinition } from "./validate/component";
 export { MAX_TREE_DEPTH } from "./validate/invariants";
 export {
   ISSUE_CODES,
