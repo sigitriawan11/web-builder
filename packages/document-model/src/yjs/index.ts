@@ -31,6 +31,7 @@ export {
 } from "./state";
 export {
   compactState,
+  createComponentJsonSnapshot,
   createJsonSnapshot,
   documentFromJsonSnapshot,
   type JsonSnapshot,

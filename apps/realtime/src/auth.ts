@@ -14,6 +14,8 @@ export interface RealtimeContext {
   docId: string;
   siteId: string | null;
   role: RealtimeTokenClaims["role"];
+  // `site` (token tenant) atau `component` (Mode Admin) — projections site-only dilewati untuk component.
+  kind: RealtimeTokenClaims["kind"];
   // Diisi single-editor-lock saat autentikasi: nama user & pemegang lock bila dokumen sedang diedit user lain.
   userName?: string;
   lockedBy?: LockHolder | undefined;
@@ -45,5 +47,5 @@ export async function authenticateConnection(
   const claims = result.value;
   // Dokumen yang diminta harus sama dengan `docId` di token.
   if (claims.docId !== documentName) throw new RealtimeAuthError("DOCUMENT_MISMATCH");
-  return { userId: claims.sub, docId: claims.docId, siteId: claims.siteId, role: claims.role };
+  return { userId: claims.sub, docId: claims.docId, siteId: claims.siteId, role: claims.role, kind: claims.kind };
 }

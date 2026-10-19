@@ -6,6 +6,7 @@ import type { PageSummary } from "@platform/document-model";
 
 export interface StoredDocument {
   siteId: string | null;
+  kind: (typeof schema.documentKindEnum.enumValues)[number];
   schemaVersion: number;
   lastSeq: number;
   snapshot: { state: Uint8Array; uptoSeq: number; createdAt: Date } | null;
@@ -21,6 +22,7 @@ export async function loadStoredDocument(
   const [document] = await db
     .select({
       siteId: schema.documents.siteId,
+      kind: schema.documents.kind,
       schemaVersion: schema.documents.schemaVersion,
       lastSeq: schema.documents.lastSeq,
       lastSnapshotId: schema.documents.lastSnapshotId,
@@ -54,6 +56,7 @@ export async function loadStoredDocument(
 
   return {
     siteId: document.siteId,
+    kind: document.kind,
     schemaVersion: document.schemaVersion,
     lastSeq: document.lastSeq,
     snapshot: snapshot ?? null,

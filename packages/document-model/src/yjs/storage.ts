@@ -2,7 +2,10 @@ import * as Y from "yjs";
 import { checkByteLimit, type LimitCheck } from "../limits";
 import { jsonEqual } from "../query/normalize-overrides";
 import { type Node, type SiteDocument, SiteDocumentSchema } from "../schema";
+import type { ComponentDefinition } from "../schema/component";
+import { validateComponentDefinition } from "../validate/component";
 import { cloneJson } from "./clone-json";
+import { yDocToComponentDef } from "./component-mapping";
 import { createSiteYDoc, jsonToYDoc, nodeToYMap, YDOC_KEYS, yDocToJson } from "./mapping";
 import { richTextToYXmlFragment, yXmlFragmentToRichText } from "./rich-text";
 
@@ -48,7 +51,7 @@ export function stateSizeAfterUpdate(
 }
 
 export type JsonSnapshot =
-  | { json: SiteDocument; invalid: false }
+  | { json: SiteDocument | ComponentDefinition; invalid: false }
   | { json: unknown; invalid: true; issues: { path: (string | number)[]; message: string }[] };
 
 /**
@@ -66,6 +69,18 @@ export function createJsonSnapshot(doc: Y.Doc): JsonSnapshot {
       path: issue.path.filter((key): key is string | number => typeof key !== "symbol"),
       message: issue.message,
     })),
+  };
+}
+
+/** Snapshot JSON untuk dokumen `kind='component'` (Mode Admin): validasi ComponentDefinition, bukan SiteDocument. */
+export function createComponentJsonSnapshot(doc: Y.Doc): JsonSnapshot {
+  const json = yDocToComponentDef(doc);
+  const result = validateComponentDefinition(json);
+  if (result.ok && result.definition) return { json: result.definition, invalid: false };
+  return {
+    json,
+    invalid: true,
+    issues: result.issues.map((issue) => ({ path: issue.path, message: issue.message.en })),
   };
 }
 

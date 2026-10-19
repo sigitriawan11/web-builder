@@ -8,7 +8,9 @@ import type {
 } from "@hocuspocus/server";
 import { type Db, type DbExecutor, systemScope } from "@platform/db";
 import {
+  CURRENT_COMPONENT_SCHEMA_VERSION,
   CURRENT_SCHEMA_VERSION,
+  createComponentJsonSnapshot,
   createJsonSnapshot,
   DOCUMENT_LIMITS,
   loadDocument,
@@ -67,6 +69,8 @@ interface DocumentBuffer {
   // Update klien (sebelum digabung) yang sudah tersimpan sejak snapshot terakhir.
   updatesSinceSnapshot: number;
   lastSnapshotAt: number;
+  // Jenis dokumen (dari DB) → menentukan schemaVersion server & validasi snapshot (site vs ComponentDefinition).
+  documentKind: "site" | "component" | "template";
   // Flush per dokumen berurutan agar seq tidak bertukar urutan.
   flushing: Promise<void>;
 }
@@ -107,22 +111,27 @@ export class PersistenceExtension implements Extension {
     const loaded = loadDocument(stored.snapshot?.state ?? null, stored.updates);
     const buffer = this.buffer(documentName);
     buffer.updatesSinceSnapshot = stored.updates.length;
+    buffer.documentKind = stored.kind;
     // Belum pernah di-snapshot → interval dihitung sejak dimuat.
     buffer.lastSnapshotAt = stored.snapshot?.createdAt.getTime() ?? this.now();
+    // Dokumen component (Mode Admin) punya schemaVersion SENDIRI (DM-071) — jangan dibandingkan/dimigrasi dengan
+    // versi site, kalau tidak Y.Doc component akan dikorupsi oleh migrasi site.
+    const current = stored.kind === "component" ? CURRENT_COMPONENT_SCHEMA_VERSION : CURRENT_SCHEMA_VERSION;
     try {
       // Dokumen dari versi platform yang lebih baru (rollback deploy): jangan dimuat/ditulis — server ini tidak
       // mengerti formatnya. Kolom DB & `meta.schemaVersion` dicek (keduanya bisa lebih dulu naik).
       const metaVersion = loaded.getMap<unknown>(YDOC_KEYS.meta).get("schemaVersion");
       const version = Math.max(stored.schemaVersion, typeof metaVersion === "number" ? metaVersion : 0);
-      if (version > CURRENT_SCHEMA_VERSION) {
+      if (version > current) {
         const error = new SchemaUnsupportedError(documentName, version);
         this.options.logger.error(
-          { err: error, docId: documentName, schemaVersion: version, supported: CURRENT_SCHEMA_VERSION },
+          { err: error, docId: documentName, schemaVersion: version, supported: current },
           "dokumen ber-schemaVersion lebih baru dari server; koneksi ditolak",
         );
         throw error;
       }
-      if (stored.schemaVersion < CURRENT_SCHEMA_VERSION) {
+      // Migrasi hanya untuk dokumen situs (migrasi component belum ada; v1). Bila nanti ada, tambah jalur sendiri.
+      if (stored.kind === "site" && stored.schemaVersion < current) {
         await this.migrate(documentName, loaded, stored.lastSeq);
         buffer.updatesSinceSnapshot = 0;
         buffer.lastSnapshotAt = this.now();
@@ -285,6 +294,7 @@ export class PersistenceExtension implements Extension {
         warned: false,
         updatesSinceSnapshot: 0,
         lastSnapshotAt: this.now(),
+        documentKind: "site",
         flushing: Promise.resolve(),
       };
       this.buffers.set(documentName, buffer);
@@ -302,7 +312,8 @@ export class PersistenceExtension implements Extension {
     createdBy: string | null,
     db: DbExecutor = this.options.db,
   ): Promise<void> {
-    const json = createJsonSnapshot(doc);
+    const json =
+      this.buffer(documentId).documentKind === "component" ? createComponentJsonSnapshot(doc) : createJsonSnapshot(doc);
     if (json.invalid) {
       this.options.logger.error(
         { docId: documentId, kind, issues: json.issues.slice(0, 20) },

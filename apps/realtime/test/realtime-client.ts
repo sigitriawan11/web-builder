@@ -24,12 +24,19 @@ export interface ConnectOptions {
   docId: string;
   siteId: string | null;
   role?: "owner" | "editor" | "viewer";
+  kind?: "site" | "component";
 }
 
 export async function connectClient(options: ConnectOptions): Promise<TestClient> {
   const token = await signToken(
     options.secret,
-    { sub: options.userId, docId: options.docId, siteId: options.siteId, role: options.role ?? "owner" },
+    {
+      sub: options.userId,
+      docId: options.docId,
+      siteId: options.siteId,
+      role: options.role ?? "owner",
+      kind: options.kind ?? "site",
+    },
     { expiresInSeconds: 300, audience: REALTIME_TOKEN_AUDIENCE },
   );
   const doc = new Y.Doc();

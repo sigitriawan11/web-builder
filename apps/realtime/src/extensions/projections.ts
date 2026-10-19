@@ -24,6 +24,8 @@ export class ProjectionsExtension implements Extension {
   constructor(private readonly options: ProjectionsOptions) {}
 
   async onStoreDocument({ documentName, document }: onStoreDocumentPayload<RealtimeContext>): Promise<void> {
+    // Proyeksi ini (site_pages, site_component_usage) khusus dokumen situs. Dokumen `kind='component'` (Mode Admin)
+    // BUKAN SiteDocument → gagal parse di bawah → dilewati (kedua proyeksi) tanpa korupsi.
     const parsed = SiteDocumentSchema.safeParse(yDocToJson(document));
     if (!parsed.success) {
       this.options.logger.warn(
