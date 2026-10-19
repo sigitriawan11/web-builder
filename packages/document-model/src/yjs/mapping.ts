@@ -1,10 +1,17 @@
 import * as Y from "yjs";
-import type { Node, SiteDocument } from "../schema";
+import type { Node, RichTextDoc, SiteDocument } from "../schema";
 import { cloneJson } from "./clone-json";
 import { richTextToYXmlFragment, yXmlFragmentToRichText } from "./rich-text";
 
 // DM-058: key props yang disimpan sebagai Y.XmlFragment (rich text), bukan JSON atomik.
 const RICH_TEXT_PROP = "content";
+
+// `content` = rich text (`{type:"doc",…}`) → Y.XmlFragment; di ComponentDefinition `content` bisa pula ref `$prop`
+// (`{$prop:…}`) yang disimpan JSON apa adanya. Deteksi berdasarkan BENTUK (bukan tipe node) agar sama untuk site &
+// component: node teks site selalu rich text → perilaku identik; node teks component ber-$prop → JSON biasa.
+function isRichTextDoc(value: unknown): value is RichTextDoc {
+  return typeof value === "object" && value !== null && (value as { type?: unknown }).type === "doc";
+}
 
 // Nama root type di Y.Doc (DM-058). `localComponents` (P1) ditambah bersama fiturnya.
 export const YDOC_KEYS = {
@@ -23,18 +30,19 @@ export function createSiteYDoc(siteId: string): Y.Doc {
   return new Y.Doc({ guid: siteId });
 }
 
-export function nodeToYMap(node: Node): Y.Map<unknown> {
+/** Encode node generik (site ATAU ComponentDefinition) → Y.Map. Bentuk node sama (id/type/style/props/children). */
+export function nodeRecordToYMap(node: Record<string, unknown>): Y.Map<unknown> {
   const yNode = new Y.Map<unknown>();
   for (const [key, value] of Object.entries(node)) {
     if (value === undefined) continue;
 
     if (key === "children" && Array.isArray(value)) {
       yNode.set(key, Y.Array.from(value));
-    } else if (key === "style") {
+    } else if (key === "style" && value !== null && typeof value === "object") {
       // Y.Map per breakpoint → per style group, agar edit `fills` dan `layout` node yang sama tidak konflik.
       const yStyle = new Y.Map<Y.Map<unknown>>();
-      for (const [breakpoint, style] of Object.entries(node.style)) {
-        if (style === undefined) continue;
+      for (const [breakpoint, style] of Object.entries(value)) {
+        if (style === undefined || style === null || typeof style !== "object") continue;
         const yGroups = new Y.Map<unknown>();
         for (const [group, groupValue] of Object.entries(style)) {
           if (groupValue !== undefined) yGroups.set(group, cloneJson(groupValue));
@@ -42,12 +50,12 @@ export function nodeToYMap(node: Node): Y.Map<unknown> {
         yStyle.set(breakpoint, yGroups);
       }
       yNode.set(key, yStyle);
-    } else if (key === "props") {
+    } else if (key === "props" && value !== null && typeof value === "object") {
       const yProps = new Y.Map<unknown>();
-      for (const [propKey, propValue] of Object.entries(node.props)) {
+      for (const [propKey, propValue] of Object.entries(value)) {
         if (propValue === undefined) continue;
-        if (node.type === "text" && propKey === RICH_TEXT_PROP)
-          yProps.set(propKey, richTextToYXmlFragment(node.props.content));
+        if (propKey === RICH_TEXT_PROP && isRichTextDoc(propValue))
+          yProps.set(propKey, richTextToYXmlFragment(propValue));
         else yProps.set(propKey, cloneJson(propValue));
       }
       yNode.set(key, yProps);
@@ -56,6 +64,10 @@ export function nodeToYMap(node: Node): Y.Map<unknown> {
     }
   }
   return yNode;
+}
+
+export function nodeToYMap(node: Node): Y.Map<unknown> {
+  return nodeRecordToYMap(node as unknown as Record<string, unknown>);
 }
 
 // Menulis dokumen ke Y.Doc dalam satu transaksi. Input diasumsikan sudah lolos SiteDocumentSchema.

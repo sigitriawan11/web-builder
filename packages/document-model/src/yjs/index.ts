@@ -1,5 +1,11 @@
+export {
+  COMPONENT_YDOC_KEYS,
+  componentDefToYDoc,
+  createComponentYDoc,
+  yDocToComponentDef,
+} from "./component-mapping";
 export { applyDraft, type DocumentFork, draftUpdate, forkDocument } from "./draft";
-export { createSiteYDoc, jsonToYDoc, YDOC_KEYS, yDocToJson, yNodeToJson } from "./mapping";
+export { createSiteYDoc, jsonToYDoc, nodeRecordToYMap, YDOC_KEYS, yDocToJson, yNodeToJson } from "./mapping";
 export {
   aiOrigin,
   createDocumentUndoManager,

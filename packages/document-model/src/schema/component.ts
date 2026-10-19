@@ -176,6 +176,10 @@ export const PropValueSchema: z.ZodType = z.lazy(() =>
 
 // ── ComponentDefinition (DM-045) ─────────────────────────────────────────────
 
+// Versi format ComponentDefinition (DM-071), TERPISAH dari schemaVersion dokumen site (yang kini 8). Naikkan +
+// tulis migrasi component bila bentuk ComponentDefinition berubah.
+export const CURRENT_COMPONENT_SCHEMA_VERSION = 1;
+
 export const ComponentCategorySchema = z.enum([
   "navbar",
   "hero",
