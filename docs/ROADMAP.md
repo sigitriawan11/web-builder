@@ -1291,9 +1291,12 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.3 — Database & API library
 
-- [ ] **T3.3.1** Tabel `library_categories` + seed kategori (ID/EN) — CMP-150 · `packages/db/src/schema/library.ts` · Verifikasi: migration + seed
-- [ ] **T3.3.2** ⚑ Tabel `components` (key, scope, category, name jsonb, tags, status, latest_version, draft_document_id, is_premium/tier) — CMP-151 · `packages/db` · Verifikasi: migration; unique(scope, workspace_id, key)
-- [ ] **T3.3.3** ⚑ Tabel `component_versions` immutable (trigger menolak UPDATE) — CMP-152, CMP-044 · `packages/db` · Verifikasi: int test UPDATE → error
+- [~] **T3.3.1** Tabel `library_categories` + seed kategori (ID/EN) — CMP-150 · `packages/db/src/schema/library.ts` · Verifikasi: migration + seed
+  - Catatan (2026-10-19): tabel `library_categories` (slug unik, scope/type, parent self-FK 2 level, name/description jsonb id/en, icon, sort_order) di `schema/library.ts` + migrasi `0011`. **Seed kategori** (fungsional §9 + industri §10) menyusul bersama importer T3.3.9 (pakai `@platform/library-seed` `data/categories.json`).
+- [x] **T3.3.2** ⚑ Tabel `components` — CMP-151 · `packages/db` · Verifikasi: migration; unique per owner+slug
+  - Catatan (2026-10-19): tabel `components` — owner_type/owner_id (platform/user/vendor; user/vendor P2, kolom disiapkan CMP-004/P-7), kind, category FK, name/displayName/description, tags/industries/requiresFeatures (text[] GIN), keywords jsonb, **min_plan nullable** (O-1 gating disiapkan), status, pointer versi (latest/draft, non-FK), usage_site_count, dsb. Unik slug per owner via **dua partial unique index** (platform owner_id null vs user/vendor) — `nullsNotDistinct` belum ada di drizzle 0.45.
+- [x] **T3.3.3** ⚑ Tabel `component_versions` immutable (trigger menolak UPDATE) — CMP-152, CMP-044 · `packages/db` · Verifikasi: int test UPDATE → error
+  - Catatan (2026-10-19): tabel `component_versions` (component FK cascade, version/version_seq/bump nullable saat draft, status, yanked, definition jsonb, props_schema_hash, content_hash, changelog, qa_report). **Trigger `component_versions_immutable`** (di migrasi 0011) menolak UPDATE baris `status='published'` (P-1). **Diverifikasi di Postgres nyata**: insert kategori→component→versi published → UPDATE ditolak (`restrict_violation`). Schema-shape test `library.test.ts` (4). Integration test formal via api (T3.3.7).
 - [ ] **T3.3.4** Tabel `themes` / `theme_versions` — CMP-155 · `packages/db` · Verifikasi: migration
 - [ ] **T3.3.5** Tabel `site_component_usage` + pencatatan dari projections realtime — CMP-156, CMP-051 · `packages/db`, `apps/realtime` · Verifikasi: int test insert instance → usage tercatat
 - [ ] **T3.3.6** (P1) Tabel pendukung lain (review notes, QA results) — CMP-157 · `packages/db` · Verifikasi: migration
