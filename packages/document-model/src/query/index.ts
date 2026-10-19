@@ -41,3 +41,4 @@ export {
   type WalkEntry,
   walk,
 } from "./tree";
+export { type ComponentUsageEntry, collectComponentUsage } from "./usage";

@@ -3,6 +3,7 @@ import { asc, eq, schema, systemScope } from "@platform/db";
 import { createSite, createTestDb, createUser, createWorkspace, type TestDb } from "@platform/db/testing";
 import {
   createBlankSiteDocument,
+  createInstance,
   createPage,
   deletePage,
   jsonToYDoc,
@@ -10,6 +11,7 @@ import {
   updatePage,
   userOrigin,
 } from "@platform/document-model";
+import { uuidv7 } from "@platform/shared";
 import { createLogger } from "@platform/shared/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import * as Y from "yjs";
@@ -83,6 +85,83 @@ async function pages(siteId: string) {
     .where(eq(schema.sitePages.siteId, siteId))
     .orderBy(asc(schema.sitePages.sortOrder));
 }
+
+// CMP-051/CMP-156: seed component platform published agar instance (cmp_…@versionSeq) ter-resolve ke UUID + semver.
+async function seedComponent(publicId: string, versionSeq: number, semver: string) {
+  const categoryId = uuidv7();
+  await testDb.db
+    .insert(schema.libraryCategories)
+    .values({
+      id: categoryId,
+      slug: `cat-${publicId}`,
+      scope: "component",
+      type: "functional",
+      name: { id: "K", en: "C" },
+    });
+  const componentId = uuidv7();
+  await testDb.db.insert(schema.components).values({
+    id: componentId,
+    publicId,
+    slug: `slug-${publicId}`,
+    ownerType: "platform",
+    kind: "element",
+    categoryId,
+    name: publicId,
+    displayName: { id: publicId, en: publicId },
+    description: { id: "d", en: "d" },
+    status: "published",
+    latestVersion: semver,
+  });
+  await testDb.db.insert(schema.componentVersions).values({
+    componentId,
+    version: semver,
+    versionSeq,
+    status: "published",
+    definition: { rootId: "n_x", nodes: {} },
+  });
+  return componentId;
+}
+
+async function usage(siteId: string) {
+  return testDb.db
+    .select({
+      componentId: schema.siteComponentUsage.componentId,
+      version: schema.siteComponentUsage.version,
+      docState: schema.siteComponentUsage.docState,
+      instanceCount: schema.siteComponentUsage.instanceCount,
+      pageIds: schema.siteComponentUsage.pageIds,
+      hasOverrides: schema.siteComponentUsage.hasOverrides,
+    })
+    .from(schema.siteComponentUsage)
+    .where(eq(schema.siteComponentUsage.siteId, siteId));
+}
+
+describe("projections → site_component_usage (CMP-051)", () => {
+  it("sisip instance → usage tercatat (UUID + semver, docState draft, pageIds); referensi tak dikenal dilewati", async () => {
+    const componentId = await seedComponent("cmp_widget0001", 1, "1.0.0");
+    const { siteId, client, ctx } = await openSite();
+    const home = client.doc.getArray<string>("pageOrder").get(0);
+
+    runCommand(ctx, createInstance, { parentId: home, componentId: "cmp_widget0001", version: 1 });
+    await waitFor(async () => (await usage(siteId)).length === 1);
+    expect(await usage(siteId)).toEqual([
+      {
+        componentId,
+        version: "1.0.0",
+        docState: "draft",
+        instanceCount: 1,
+        pageIds: [home],
+        hasOverrides: false,
+      },
+    ]);
+
+    // Instance kedua component sama → count naik; instance component tak dikenal → dilewati (usage tetap 1 baris).
+    runCommand(ctx, createInstance, { parentId: home, componentId: "cmp_widget0001", version: 1 });
+    runCommand(ctx, createInstance, { parentId: home, componentId: "cmp_takkenal01", version: 1 });
+    await waitFor(async () => (await usage(siteId))[0]?.instanceCount === 2);
+    expect(await usage(siteId)).toHaveLength(1);
+  });
+});
 
 describe("projections → site_pages", () => {
   it("rename page (judul, path, SEO) → read model ter-update (AC T1.12.7)", async () => {
