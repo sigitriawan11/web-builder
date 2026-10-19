@@ -157,7 +157,7 @@ pnpm db:reset            # lokal saja
 | MinIO console | http://localhost:9001 |
 | Mailpit | http://localhost:8025 |
 
-User dev dari seed: `owner@platform.test`, `admin@platform.test`. Lingkungan owner: **WSL2**; buka URL di browser Windows.
+User dev dari seed: `owner@platform.test` (user biasa), `admin@platform.test` (staff `super_admin`). Password login keduanya: **`platform-dev-123`** (override via env `SEED_DEV_PASSWORD` saat `pnpm db:seed`; hanya dev, bukan produksi). Lingkungan owner: **WSL2**; buka URL di browser Windows.
 
 Detail lengkap: [ARCHITECTURE.md §15](docs/ARCHITECTURE.md#15-development-environment).
 

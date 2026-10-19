@@ -1,12 +1,48 @@
+import { randomBytes, scrypt } from "node:crypto";
 import { jsonToYDoc, type SiteDocument } from "@platform/document-model";
 import { heroDocument, landing200 } from "@platform/document-model/fixtures";
 import { eq, sql } from "drizzle-orm";
 import * as Y from "yjs";
 import type { Db } from "../src/client";
-import { documentSnapshots, documents, sitePages, sites, users, workspaceMembers, workspaces } from "../src/schema";
+import {
+  accounts,
+  documentSnapshots,
+  documents,
+  sitePages,
+  sites,
+  users,
+  workspaceMembers,
+  workspaces,
+} from "../src/schema";
+
+// Password dev untuk owner@ & admin@ (login lokal). Override lewat env `SEED_DEV_PASSWORD`. Hanya dev/seed —
+// JANGAN dipakai di produksi (seed dev tidak dijalankan di produksi).
+const DEV_PASSWORD = process.env.SEED_DEV_PASSWORD ?? "platform-dev-123";
+
+// Hash password format Better Auth (`@better-auth/utils` node: scrypt N=16384 r=16 p=1 dkLen=64; `salt:key` hex,
+// password dinormalkan NFKC). Direplikasi dengan node:crypto agar seed tak perlu dependency better-auth.
+const SCRYPT = { N: 16384, r: 16, p: 1, maxmem: 128 * 16384 * 16 * 2 } as const;
+function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16).toString("hex");
+  return new Promise((resolve, reject) => {
+    scrypt(password.normalize("NFKC"), salt, 64, SCRYPT, (err, key) => {
+      if (err) reject(err);
+      else resolve(`${salt}:${key.toString("hex")}`);
+    });
+  });
+}
+
+// Akun kredensial Better Auth (providerId "credential", accountId = userId). Idempoten lewat unique (providerId,
+// accountId). ID akun dibiarkan default ($defaultFn uuidv7).
+async function ensureCredential(db: Db, userId: string, passwordHash: string): Promise<void> {
+  await db
+    .insert(accounts)
+    .values({ userId, providerId: "credential", accountId: userId, password: passwordHash })
+    .onConflictDoNothing({ target: [accounts.providerId, accounts.accountId] });
+}
 
 // Data dev (ARCHITECTURE §6.1 Seed, CLAUDE.md "User dev dari seed"). Idempoten: ID tetap + upsert, user dicari
-// lewat email dulu. Password login ditambahkan setelah Better Auth terpasang (T1.5) — format hash milik Better Auth.
+// lewat email dulu. Login email+password di-seed lewat `ensureCredential` (akun kredensial Better Auth).
 
 // UUIDv7 tetap (format valid agar lolos validasi UuidV7Schema di aplikasi).
 const ID = {
@@ -165,8 +201,10 @@ export interface SeedSummary {
 
 export async function seedDevData(db: Db): Promise<SeedSummary> {
   const workspaceByEmail = new Map<string, string>();
+  const passwordHash = await hashPassword(DEV_PASSWORD);
   for (const user of DEV_USERS) {
     const userId = await ensureUser(db, user);
+    await ensureCredential(db, userId, passwordHash);
     workspaceByEmail.set(user.email, await ensurePersonalWorkspace(db, userId, user));
   }
   const ownerWorkspace = workspaceByEmail.get("owner@platform.test");

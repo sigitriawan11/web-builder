@@ -1,11 +1,35 @@
+import { scrypt } from "node:crypto";
 import { SiteDocumentSchema, yDocToJson } from "@platform/document-model";
 import { heroDocument } from "@platform/document-model/fixtures";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import * as Y from "yjs";
-import { documentSnapshots, documents, sitePages, sites, users, workspaceMembers, workspaces } from "../src/schema";
+import {
+  accounts,
+  documentSnapshots,
+  documents,
+  sitePages,
+  sites,
+  users,
+  workspaceMembers,
+  workspaces,
+} from "../src/schema";
 import { createTestDb, type TestDb } from "../test/test-db";
 import { seedDevData } from "./dev-data";
+
+// Verifikasi hash Better Auth (`salt:key` scrypt) — re-derive & bandingkan (tanpa import better-auth di test db).
+function verifyHash(hash: string, password: string): Promise<boolean> {
+  const [salt, key] = hash.split(":");
+  return new Promise((resolve, reject) => {
+    scrypt(
+      password.normalize("NFKC"),
+      salt ?? "",
+      64,
+      { N: 16384, r: 16, p: 1, maxmem: 128 * 16384 * 16 * 2 },
+      (err, out) => (err ? reject(err) : resolve(out.toString("hex") === key)),
+    );
+  });
+}
 
 let testDb: TestDb;
 beforeAll(async () => {
@@ -23,6 +47,7 @@ const counts = async () => ({
   documents: await testDb.db.$count(documents),
   snapshots: await testDb.db.$count(documentSnapshots),
   pages: await testDb.db.$count(sitePages),
+  accounts: await testDb.db.$count(accounts),
 });
 
 describe("seed dev (T1.3.9)", () => {
@@ -31,7 +56,28 @@ describe("seed dev (T1.3.9)", () => {
     const first = await counts();
     await seedDevData(testDb.db);
     expect(await counts()).toEqual(first);
-    expect(first).toEqual({ users: 2, workspaces: 2, members: 2, sites: 2, documents: 2, snapshots: 2, pages: 3 });
+    expect(first).toEqual({
+      users: 2,
+      workspaces: 2,
+      members: 2,
+      sites: 2,
+      documents: 2,
+      snapshots: 2,
+      pages: 3,
+      accounts: 2,
+    });
+  });
+
+  it("owner & admin punya akun kredensial dengan password dev yang terverifikasi", async () => {
+    const rows = await testDb.db
+      .select({ userId: accounts.userId, providerId: accounts.providerId, password: accounts.password })
+      .from(accounts)
+      .where(eq(accounts.providerId, "credential"));
+    expect(rows).toHaveLength(2);
+    for (const row of rows) {
+      expect(row.password).toBeTruthy();
+      expect(await verifyHash(row.password ?? "", "platform-dev-123")).toBe(true);
+    }
   });
 
   it("admin = super_admin; owner & admin masing-masing punya personal workspace", async () => {
