@@ -104,4 +104,18 @@ export const INVALID_DOCUMENTS = {
     const image = doc.nodes.n_heroimg001 as { props: Record<string, unknown> };
     image.props.link = { type: "page", pageId: "pg_dihapus001" };
   }),
+  // DM-069: instance tanpa entri componentDeps.
+  INSTANCE_DEP: hero((doc) => {
+    doc.nodes.n_instdep001 = {
+      id: "n_instdep001",
+      type: "instance",
+      name: "Instance",
+      parentId: "n_hero000001",
+      visible: true,
+      locked: false,
+      style: { base: {} },
+      props: { componentId: "cmp_btn0001", version: 1 },
+    };
+    children(doc, "n_hero000001").push("n_instdep001");
+  }),
 } as const;

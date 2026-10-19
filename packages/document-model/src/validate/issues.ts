@@ -22,7 +22,16 @@ export const STRUCTURE_ISSUE_CODES = [
 ] as const;
 
 // Rujukan ke data lain di dokumen: warning saat edit, error saat publish/ai (DM-068).
-export const REFERENCE_ISSUE_CODES = ["ASSET_REF", "ASSET_KIND", "TOKEN_REF", "FONT_REF", "BROKEN_LINK"] as const;
+// `INSTANCE_DEP` (DM-069): instance merujuk versi yang tercatat di `componentDeps`. Keberadaan versi di registry
+// library dicek async saat publish (worker), bukan di sini.
+export const REFERENCE_ISSUE_CODES = [
+  "ASSET_REF",
+  "ASSET_KIND",
+  "TOKEN_REF",
+  "FONT_REF",
+  "BROKEN_LINK",
+  "INSTANCE_DEP",
+] as const;
 
 // Lint kualitas/a11y (DM-009): selalu warning.
 // `LIMIT_WARNING`: mendekati batas DM-076 (melewati batas soft).

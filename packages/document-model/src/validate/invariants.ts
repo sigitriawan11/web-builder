@@ -14,7 +14,7 @@ import { checkDocumentLimits } from "./limits";
 /** Kedalaman tree maksimum (DM-069 `DEPTH`, DM-076): page = 0. */
 export const MAX_TREE_DEPTH = DOCUMENT_LIMITS.treeDepth.hard;
 
-type DocShape = Pick<SiteDocument, "nodes" | "pageOrder" | "assets" | "theme" | "settings">;
+type DocShape = Pick<SiteDocument, "nodes" | "pageOrder" | "assets" | "theme" | "settings" | "componentDeps">;
 
 const BREAKPOINTS = ["base", "tablet", "mobile"] as const;
 
@@ -312,6 +312,25 @@ export function checkReferences(doc: DocShape, report: IssueReporter): void {
   for (const node of Object.values(doc.nodes)) {
     visitTokenRefs(node.style, ["nodes", node.id, "style"], checkToken);
     visitTokenRefs(node.props, ["nodes", node.id, "props"], checkToken);
+  }
+
+  // DM-069 INSTANCE_DEP: setiap instance merujuk versi yang tercatat di `componentDeps`. Deps transitif dicatat
+  // saat pembuatan instance (OPEN-DM-11); keberadaan versi di registry dicek async saat publish.
+  for (const node of Object.values(doc.nodes)) {
+    if (node.type !== "instance") continue;
+    const { componentId, version } = node.props;
+    const dep = doc.componentDeps[componentId];
+    if (!dep) {
+      report("INSTANCE_DEP", ["nodes", node.id, "props", "componentId"], {
+        id: `Component "${componentId}" tidak tercatat di componentDeps`,
+        en: `Component "${componentId}" is not recorded in componentDeps`,
+      });
+    } else if (dep.version !== version) {
+      report("INSTANCE_DEP", ["nodes", node.id, "props", "version"], {
+        id: `Versi instance (${version}) ≠ componentDeps (${dep.version})`,
+        en: `Instance version (${version}) ≠ componentDeps (${dep.version})`,
+      });
+    }
   }
 
   // DM-056: link page/anchor menunjuk page & node yang ada.
