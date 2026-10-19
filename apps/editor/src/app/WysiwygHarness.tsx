@@ -3,13 +3,14 @@ import { BASE_CSS, buildPageStyles, render } from "@platform/renderer";
 import { renderToStaticMarkup } from "react-dom/server";
 import { fixtureFromSearch } from "../canvas/dev-fixture";
 import { DEFAULT_PREVIEW_WIDTHS } from "../canvas/frames/frame-layout";
+import { assetUrl } from "../canvas/render-root/asset-url";
 import { breakpointFromSearch } from "../store/breakpoint-store";
 
 // T2.19.2 / ED-240: harness uji paritas WYSIWYG (dev/e2e saja). Merender output PUBLISH (statis) satu fixture di
 // iframe, dengan `data-node-id` tiap elemen agar e2e bisa mencocokkan geometri & computed style dengan canvas editor.
 // Lebar iframe = lebar frame breakpoint (dari `?w=`) sehingga media query publish resolve ke breakpoint yang sama.
-
-const assetUrl = (assetId: string) => `/_assets/${assetId}`;
+// `assetUrl` SAMA dengan canvas editor (placeholder data-URI) → gambar "termuat" identik di kedua sisi, sehingga
+// dimensi intrinsik gambar tidak menimbulkan selisih palsu.
 
 function publishDocument(search: string): {
   html: string;

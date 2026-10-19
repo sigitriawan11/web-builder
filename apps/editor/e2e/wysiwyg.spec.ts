@@ -98,13 +98,6 @@ const TOL = 1; // px: toleransi sub-piksel antar root (shadow vs iframe). Parita
 for (const fixture of FIXTURES) {
   for (const breakpoint of BREAKPOINTS) {
     test(`WYSIWYG ${fixture} @ ${breakpoint}: canvas editor == publish statis`, async ({ page, context }) => {
-      // BUG DM/renderer (T2.19.2a): node `width:fill` (mobile) yang menimpa `width:fixed` (base) di parent yang
-      // berubah row→column menghitung lebar salah di publish (mem-bake px lebar containing block desktop, mis.
-      // "Kartu 1" landing200 jadi 1232px alih-alih stretch 326px seperti di canvas). test.fail = repro hidup; hapus
-      // saat bug diperbaiki (Playwright akan menandai bila mulai lulus). Lihat Lampiran D / ROADMAP T2.19.2a.
-      if (fixture === "landing200" && breakpoint === "mobile") {
-        test.fail(true, "renderer: fill(mobile) override fixed(base) salah hitung lebar — T2.19.2a");
-      }
       // Editor: frame tunggal breakpoint di origin (fokus), zoom 1.
       await page.goto(`?fixture=${fixture}&bp=${breakpoint}&zoom=1&x=0&y=0`);
       await page.waitForFunction(
