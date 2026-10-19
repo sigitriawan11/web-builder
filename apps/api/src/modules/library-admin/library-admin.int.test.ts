@@ -137,23 +137,38 @@ describe("admin library CRUD (CMP-159)", () => {
     expect(audits.map((a) => a.action).sort()).toEqual(["library_component.create", "library_component.publish"]);
   });
 
-  it("publish tanpa draft → 409; definisi tidak valid saat create → 422", async () => {
+  it("create → dokumen Yjs kind=component (workspace null) + draft_document_id; publish baca Yjs; definisi invalid → 422", async () => {
     const admin = await register("library_admin");
     const created = await request(target)
       .post("/v1/admin/library/components")
       .set("cookie", admin)
-      .send(createBody("tombol-409"));
+      .send(createBody("tombol-yjs"));
     const { id } = created.body.data as { id: string };
-    await request(target)
+
+    // Draft = dokumen Yjs kind=component, global (workspace null), dengan snapshot awal.
+    const [row] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    expect(row?.draftDocumentId).not.toBeNull();
+    const [doc] = await testDb.db
+      .select()
+      .from(schema.documents)
+      .where(eq(schema.documents.id, row?.draftDocumentId ?? ""));
+    expect(doc?.kind).toBe("component");
+    expect(doc?.workspaceId).toBeNull();
+    expect(doc?.lastSnapshotId).not.toBeNull();
+
+    // Publish membaca state Yjs draft → component_versions.
+    const published = await request(target)
       .post(`/v1/admin/library/components/${id}/draft/publish`)
       .set("cookie", admin)
       .send({ bump: "patch", changelog: label });
-    // Draft sudah habis (jadi published) → publish lagi 409.
+    expect(published.status).toBe(200);
+    expect(published.body.data).toEqual({ version: "0.0.1", versionSeq: 1 });
+    // Draft tetap → publish lagi = versi baru (bukan 409).
     const again = await request(target)
       .post(`/v1/admin/library/components/${id}/draft/publish`)
       .set("cookie", admin)
-      .send({ bump: "patch", changelog: label });
-    expect(again.status).toBe(409);
+      .send({ bump: "minor", changelog: label });
+    expect(again.body.data).toEqual({ version: "0.1.0", versionSeq: 2 });
 
     const bad = await request(target)
       .post("/v1/admin/library/components")

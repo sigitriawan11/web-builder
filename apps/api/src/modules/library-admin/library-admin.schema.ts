@@ -29,10 +29,10 @@ export const createComponentRequest = {
   }),
 };
 
+// Metadata draft saja — definisi (nodes/props/variants) diedit lewat Yjs/realtime (Approach A), bukan endpoint ini.
 export const saveDraftRequest = {
   params: IdParams,
   body: z.object({
-    definition: z.unknown().optional(),
     name: z.string().min(1).optional(),
     displayName: Localized.optional(),
     description: Localized.optional(),
