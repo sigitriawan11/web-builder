@@ -39,6 +39,9 @@ export const useSiteAssets = (siteId: string, search = "") => useQuery(useQuerie
 export const useProfile = () => useQuery(useQueries().profile());
 export const useConsents = () => useQuery(useQueries().consents());
 export const useSessions = () => useQuery(useQueries().sessions());
+/** Sesi editor Mode Admin (CMP-010); gagal 404 = bukan staf (editor memperlakukan sebagai tidak ditemukan). */
+export const useLibraryEditorSession = (componentId: string) =>
+  useQuery({ ...useQueries().libraryEditorSession(componentId), retry: false });
 
 export const useCreateSite = () => useMutation({ mutationFn: useMutations().createSite });
 export const useRenameSite = () => useMutation({ mutationFn: useMutations().renameSite });

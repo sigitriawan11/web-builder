@@ -5,6 +5,7 @@ import type {
   archiveRequest,
   createComponentRequest,
   deprecateRequest,
+  editorSessionRequest,
   publishRequest,
   saveDraftRequest,
   usageRequest,
@@ -46,5 +47,8 @@ export function createLibraryAdminController(service: LibraryAdminService) {
   const usage: ValidatedHandler<typeof usageRequest> = async (req, res) => {
     res.json({ data: await service.usage(req.valid.params.id), meta: meta(res) });
   };
-  return { create, saveDraft, publish, deprecate, archive, usage };
+  const editorSession: ValidatedHandler<typeof editorSessionRequest> = async (req, res) => {
+    res.json({ data: await service.getEditorSession(actor(req), req.valid.params.id), meta: meta(res) });
+  };
+  return { create, saveDraft, publish, deprecate, archive, usage, editorSession };
 }

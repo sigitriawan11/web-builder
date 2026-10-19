@@ -1,4 +1,10 @@
 {
+  "admin": {
+    "badge": "ADMIN · Library",
+    "componentLabel": "Component",
+    "canvasPending": "The component editor will appear here (coming soon).",
+    "readOnly": "Read-only — your role cannot modify this draft."
+  },
   "app": {
     "loading": "Loading editor…",
     "back": "Back to dashboard",

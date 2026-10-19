@@ -1,4 +1,10 @@
 {
+  "admin": {
+    "badge": "ADMIN · Library",
+    "componentLabel": "Component",
+    "canvasPending": "Editor component akan tampil di sini (menyusul).",
+    "readOnly": "Baca saja — role kamu tidak dapat mengubah draft ini."
+  },
   "app": {
     "loading": "Memuat editor…",
     "back": "Kembali ke dashboard",

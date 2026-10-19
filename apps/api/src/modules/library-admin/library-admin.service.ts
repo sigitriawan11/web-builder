@@ -2,9 +2,11 @@ import { createHash } from "node:crypto";
 import type { Db } from "@platform/db";
 import { createId, validateComponentDefinition } from "@platform/document-model";
 import { AppError, uuidv7 } from "@platform/shared";
+import type { LibraryEditorSession } from "@platform/shared/contracts";
 import type { Logger } from "@platform/shared/node";
 import type { z } from "zod";
 import { recordAudit } from "../../audit/audit.repository";
+import { findStaffRole, type StaffRole } from "../../middleware/staff.repository";
 import { withTransaction } from "../../queues/with-transaction";
 import * as repo from "./library-admin.repository";
 import type {
@@ -195,7 +197,38 @@ export function createLibraryAdminService(deps: { db: Db; logger: Logger }) {
       if (!component) throw new AppError("NOT_FOUND");
       return repo.usageByComponent(db, componentId);
     },
+
+    /** Bootstrap sesi editor Mode Admin (CMP-010): metadata + kapabilitas user dari `users.staff_role`. */
+    async getEditorSession(actor: StaffActor, componentId: string): Promise<LibraryEditorSession> {
+      const component = await repo.findComponent(db, componentId);
+      if (!component) throw new AppError("NOT_FOUND");
+      const role = await findStaffRole(db, actor.userId);
+      // requireStaffRole sudah menolak non-staf; `role` di sini pasti terisi.
+      if (!role) throw new AppError("NOT_FOUND");
+      return {
+        component: {
+          id: component.id,
+          publicId: component.publicId,
+          kind: component.kind,
+          name: component.name,
+          displayName: component.displayName,
+          description: component.description,
+          status: component.status,
+          latestVersion: component.latestVersion,
+          hasDraft: component.draftVersionId !== null,
+        },
+        capabilities: capabilitiesFor(role),
+      };
+    },
   };
+}
+
+// CMP-010 §tabel role: designer/library_admin/super_admin boleh edit draft; publish hanya library_admin/super_admin;
+// `staff` = read-only.
+function capabilitiesFor(role: StaffRole): LibraryEditorSession["capabilities"] {
+  const canEditDraft = role === "designer" || role === "library_admin" || role === "super_admin";
+  const canPublish = role === "library_admin" || role === "super_admin";
+  return { role, canEditDraft, canPublish };
 }
 
 export type LibraryAdminService = ReturnType<typeof createLibraryAdminService>;

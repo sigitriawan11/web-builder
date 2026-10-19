@@ -43,6 +43,7 @@ const NON_TENANT_ROUTES: Record<string, string> = {
   "POST /v1/admin/library/components/:id/deprecate": "admin library platform global; role staf (CMP-159)",
   "POST /v1/admin/library/components/:id/archive": "admin library platform global; role staf (CMP-159)",
   "GET /v1/admin/library/components/:id/usage": "admin library platform global; role staf (CMP-159)",
+  "GET /v1/admin/library/components/:id": "admin library platform global; role staf (sesi editor Mode Admin, CMP-010)",
   "GET /internal/v1/ping": "service token",
   "GET /internal/v1/documents/:id/state": "service token (worker/realtime), lintas tenant via systemScope",
 };

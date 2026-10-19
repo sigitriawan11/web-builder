@@ -11,17 +11,22 @@ import {
   archiveRequest,
   createComponentRequest,
   deprecateRequest,
+  editorSessionRequest,
   publishRequest,
   saveDraftRequest,
   usageRequest,
 } from "./library-admin.schema";
 import { createLibraryAdminService } from "./library-admin.service";
 
-// `/v1/admin/library` — CRUD admin library platform (CMP-159). Wajib login + role staf (`super_admin`/`library_admin`);
-// non-staf → 404 (permukaan admin tidak bocor). Setiap mutasi menulis `audit_logs`.
-// Catatan scope (2026-10-19): endpoint QA/submit/review (butuh tabel review/QA T3.3.6 P1 + worker QA), yank/rollback
-// (trigger immutable menolak UPDATE baris published → butuh pengecualian toggle `yanked`; diajukan ke owner), templates
-// (belum dimodelkan) & CRUD themes menyusul. Enqueue thumbnail/notify saat publish menanti job-nya (M4).
+// `/v1/admin/library` — CRUD admin library platform (CMP-159/CMP-010). Wajib login + role staf; non-staf → 404
+// (permukaan admin tidak bocor). Matriks role (CMP-010 §tabel): BACA = semua staf (`staff` read-only); EDIT DRAFT =
+// designer/library_admin/super_admin; PUBLISH/deprecate/archive = library_admin/super_admin. Tiap mutasi tulis audit.
+// Catatan scope: endpoint QA/submit/review (tabel P1 T3.3.6 + worker QA), yank/rollback (trigger immutable → keputusan
+// owner), templates & CRUD themes, enqueue thumbnail/notify (M4) menyusul.
+const READ_ROLES = ["super_admin", "staff", "library_admin", "designer"] as const;
+const DRAFT_ROLES = ["super_admin", "library_admin", "designer"] as const;
+const PUBLISH_ROLES = ["super_admin", "library_admin"] as const;
+
 export function createLibraryAdminRouter(deps: {
   db: Db;
   logger: Logger;
@@ -30,7 +35,6 @@ export function createLibraryAdminRouter(deps: {
 }): Router {
   const controller = createLibraryAdminController(createLibraryAdminService({ db: deps.db, logger: deps.logger }));
   const router = express.Router();
-  const gate = [requireAuth(), requireStaffRole(deps.db, ["super_admin", "library_admin"])];
   const limiter = deps.redis
     ? [
         rateLimit(
@@ -40,13 +44,26 @@ export function createLibraryAdminRouter(deps: {
         ),
       ]
     : [];
-  const guard = [...gate, ...limiter];
+  const guard = (roles: readonly ("super_admin" | "staff" | "library_admin" | "designer")[]) => [
+    requireAuth(),
+    requireStaffRole(deps.db, roles),
+    ...limiter,
+  ];
 
-  router.post("/components", ...guard, ...validated(createComponentRequest, controller.create));
-  router.put("/components/:id/draft", ...guard, ...validated(saveDraftRequest, controller.saveDraft));
-  router.post("/components/:id/draft/publish", ...guard, ...validated(publishRequest, controller.publish));
-  router.post("/components/:id/deprecate", ...guard, ...validated(deprecateRequest, controller.deprecate));
-  router.post("/components/:id/archive", ...guard, ...validated(archiveRequest, controller.archive));
-  router.get("/components/:id/usage", ...guard, ...validated(usageRequest, controller.usage));
+  router.post("/components", ...guard(DRAFT_ROLES), ...validated(createComponentRequest, controller.create));
+  router.put("/components/:id/draft", ...guard(DRAFT_ROLES), ...validated(saveDraftRequest, controller.saveDraft));
+  router.post(
+    "/components/:id/draft/publish",
+    ...guard(PUBLISH_ROLES),
+    ...validated(publishRequest, controller.publish),
+  );
+  router.post(
+    "/components/:id/deprecate",
+    ...guard(PUBLISH_ROLES),
+    ...validated(deprecateRequest, controller.deprecate),
+  );
+  router.post("/components/:id/archive", ...guard(PUBLISH_ROLES), ...validated(archiveRequest, controller.archive));
+  router.get("/components/:id/usage", ...guard(READ_ROLES), ...validated(usageRequest, controller.usage));
+  router.get("/components/:id", ...guard(READ_ROLES), ...validated(editorSessionRequest, controller.editorSession));
   return router;
 }

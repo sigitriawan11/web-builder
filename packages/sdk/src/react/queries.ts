@@ -23,6 +23,10 @@ export const queryKeys = {
     consents: ["account", "consents"] as const,
     sessions: ["account", "sessions"] as const,
   },
+  library: {
+    all: ["library"] as const,
+    editorSession: (componentId: string) => ["library", "editor-session", componentId] as const,
+  },
 };
 
 export function createQueries(api: PlatformApi) {
@@ -45,6 +49,11 @@ export function createQueries(api: PlatformApi) {
     profile: () => queryOptions({ queryKey: queryKeys.account.profile, queryFn: () => api.account.profile() }),
     consents: () => queryOptions({ queryKey: queryKeys.account.consents, queryFn: () => api.account.consents() }),
     sessions: () => queryOptions({ queryKey: queryKeys.account.sessions, queryFn: () => api.account.sessions() }),
+    libraryEditorSession: (componentId: string) =>
+      queryOptions({
+        queryKey: queryKeys.library.editorSession(componentId),
+        queryFn: () => api.library.editorSession(componentId),
+      }),
   };
 }
 

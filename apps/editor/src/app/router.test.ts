@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { editorUrl, parseEditorRoute } from "./router";
+import { editorUrl, libraryDraftUrl, parseEditorRoute } from "./router";
 
 const SITE = "0199f0aa-1234-7abc-8def-0123456789ab";
+const CMP = "cmp_button01";
 
 describe("parseEditorRoute", () => {
   it.each([
@@ -15,6 +16,11 @@ describe("parseEditorRoute", () => {
     ["/editor/bukan-uuid", "", { kind: "not-found" }],
     [`/editor/${SITE}/lain`, "", { kind: "not-found" }],
     ["/lain", "", { kind: "not-found" }],
+    // Mode Admin library (CMP-010).
+    [`/editor/library/components/${CMP}/draft`, "", { kind: "library", componentId: CMP }],
+    [`/editor/library/components/${CMP}/draft/`, "", { kind: "library", componentId: CMP }],
+    ["/editor/library/components/bukan-id/draft", "", { kind: "not-found" }],
+    [`/editor/library/components/${CMP}`, "", { kind: "not-found" }],
   ] as const)("%s%s", (pathname, search, expected) => {
     expect(parseEditorRoute(pathname, search)).toEqual(expected);
   });
@@ -22,5 +28,10 @@ describe("parseEditorRoute", () => {
   it("editorUrl", () => {
     expect(editorUrl(SITE)).toBe(`/editor/${SITE}`);
     expect(editorUrl(SITE, "pg_home000001")).toBe(`/editor/${SITE}?page=pg_home000001`);
+  });
+
+  it("libraryDraftUrl", () => {
+    expect(libraryDraftUrl(CMP)).toBe(`/editor/library/components/${CMP}/draft`);
+    expect(() => libraryDraftUrl("bukan-id")).toThrow();
   });
 });

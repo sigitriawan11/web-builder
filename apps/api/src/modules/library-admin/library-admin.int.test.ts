@@ -188,15 +188,54 @@ describe("admin library CRUD (CMP-159)", () => {
     expect(archived?.status).toBe("archived");
   });
 
-  it("designer (staf non-library) → 404 (permukaan library hanya untuk super_admin/library_admin)", async () => {
+  it("matriks role CMP-010: designer boleh draft tapi publish → 403; staf read-only → draft 403", async () => {
+    const admin = await register("library_admin");
     const designer = await register("designer");
+    const staff = await register("staff");
+
+    // designer: boleh create draft (201) & simpan draft, tapi publish → 403 (bukan non-staf, jadi 403 bukan 404).
+    const made = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", designer)
+      .send(createBody("tombol-designer"));
+    expect(made.status).toBe(201);
+    const { id } = made.body.data as { id: string };
     expect(
       (
         await request(target)
-          .post("/v1/admin/library/components")
+          .post(`/v1/admin/library/components/${id}/draft/publish`)
           .set("cookie", designer)
-          .send(createBody("tombol-designer"))
+          .send({ bump: "patch", changelog: label })
       ).status,
-    ).toBe(404);
+    ).toBe(403);
+
+    // staf (read-only): create draft → 403; tapi baca sesi editor → 200.
+    expect(
+      (await request(target).post("/v1/admin/library/components").set("cookie", staff).send(createBody("tombol-staff")))
+        .status,
+    ).toBe(403);
+    const session = await request(target).get(`/v1/admin/library/components/${id}`).set("cookie", staff);
+    expect(session.status).toBe(200);
+    expect(session.body.data.capabilities).toEqual({ role: "staff", canEditDraft: false, canPublish: false });
+
+    // library_admin: sesi editor → kapabilitas penuh; komponen punya draft (belum dipublish).
+    const adminSession = await request(target).get(`/v1/admin/library/components/${id}`).set("cookie", admin);
+    expect(adminSession.body.data.capabilities).toEqual({
+      role: "library_admin",
+      canEditDraft: true,
+      canPublish: true,
+    });
+    expect(adminSession.body.data.component).toMatchObject({ id, kind: "element", status: "draft", hasDraft: true });
+  });
+
+  it("sesi editor untuk user biasa (bukan staf) → 404", async () => {
+    const admin = await register("library_admin");
+    const plain = await register();
+    const made = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-sesi"));
+    const { id } = made.body.data as { id: string };
+    expect((await request(target).get(`/v1/admin/library/components/${id}`).set("cookie", plain)).status).toBe(404);
   });
 });

@@ -4,6 +4,7 @@ export * from "./auth";
 export * from "./documents";
 export * from "./envelope";
 export * from "./jobs";
+export * from "./library";
 export * from "./pagination";
 export * from "./realtime-bus";
 export * from "./realtime-messages";

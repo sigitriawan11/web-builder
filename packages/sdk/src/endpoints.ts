@@ -4,6 +4,7 @@ import {
   ConsentStatusSchema,
   type CreateSiteBody,
   dataEnvelope,
+  LibraryEditorSessionSchema,
   type ListSitesQuery,
   listEnvelope,
   type PresignUploadRequest,
@@ -105,6 +106,15 @@ export function createPlatformApi(client: ApiClient) {
       token: (docId: string) =>
         client
           .request("POST", "/v1/realtime/token", { body: { docId }, schema: dataEnvelope(RealtimeTokenResponseSchema) })
+          .then(unwrap),
+    },
+    library: {
+      /** Sesi editor Mode Admin (CMP-010): metadata component + kapabilitas user. Non-staf → 404. */
+      editorSession: (componentId: string) =>
+        client
+          .request("GET", `/v1/admin/library/components/${componentId}`, {
+            schema: dataEnvelope(LibraryEditorSessionSchema),
+          })
           .then(unwrap),
     },
   };
