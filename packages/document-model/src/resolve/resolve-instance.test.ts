@@ -111,10 +111,54 @@ const gridDef = {
   },
 } as unknown as ComponentDefinition;
 
+// Nav: prop `list` menuItems + repeater (frame repeatProp) dengan template teks ber-$prop item.
+const navDef = {
+  schemaVersion: 1,
+  id: "cmp_nav0001",
+  version: 1,
+  name: "Nav",
+  category: "navbar",
+  propsSchema: [
+    {
+      key: "menuItems",
+      label,
+      type: "list",
+      itemSchema: [{ key: "label", label, type: "text", default: "" }],
+      default: [],
+    },
+  ],
+  rootId: "n_navroot01",
+  nodes: {
+    n_navroot01: {
+      id: "n_navroot01",
+      type: "frame",
+      name: "Nav",
+      parentId: null,
+      visible: true,
+      locked: false,
+      children: ["n_navitem01"],
+      style: { base: {} },
+      props: { role: "generic", repeatProp: "menuItems" },
+    },
+    n_navitem01: {
+      id: "n_navitem01",
+      type: "text",
+      name: "Item",
+      parentId: "n_navroot01",
+      visible: true,
+      locked: false,
+      tag: "span",
+      style: { base: {} },
+      props: { content: { $prop: "menuItems[].label" } },
+    },
+  },
+} as unknown as ComponentDefinition;
+
 const registry = new Map<string, ComponentDefinition>([
   ["cmp_btn@1", buttonDef],
   ["cmp_card@1", cardDef],
   ["cmp_grid@1", gridDef],
+  ["cmp_nav0001@1", navDef],
 ]);
 const ctx = {
   getComponent: (id: string, version: number) => registry.get(`${id}@${version}`),
@@ -195,6 +239,22 @@ describe("resolveInstance (DM-051)", () => {
     // Root button (2 level ke dalam) jadi visible:false lewat override path bertingkat.
     const btnRoot = find(root, (n) => n.id.endsWith(":n_btnroot"));
     expect(btnRoot?.visible).toBe(false);
+  });
+
+  it("repeater list (CMP-022): template diulang per item, scope `menuItems[].label`", () => {
+    const root = resolveInstance(
+      instance({
+        componentId: "cmp_nav0001",
+        version: 1,
+        propValues: { menuItems: [{ label: "Fitur" }, { label: "Harga" }, { label: "Kontak" }] },
+      }),
+      ctx,
+    );
+    const items = root.children ?? [];
+    expect(items).toHaveLength(3);
+    expect(items.map((n) => textOf(n))).toEqual(["Fitur", "Harga", "Kontak"]);
+    // ID unik per item.
+    expect(new Set(items.map((n) => n.id)).size).toBe(3);
   });
 
   it("component hilang → placeholder (tidak crash)", () => {

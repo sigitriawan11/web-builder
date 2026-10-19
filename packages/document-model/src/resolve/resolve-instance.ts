@@ -8,6 +8,7 @@ import {
   defaultsOfProps,
   defaultsOfVariant,
   extractNested,
+  type ItemScope,
   pickKnownProps,
   sanitizeVariant,
   substitute,
@@ -80,22 +81,15 @@ export function resolveInstance(inst: Node & { type: "instance" }, ctx: ResolveC
   const props = { ...defaultsOfProps(propsSchema), ...pickKnownProps(inst.props.propValues, propsSchema) };
   const patches = collectPatches(def, variant, inst.props.overrides as Record<string, NodePatch> | undefined);
 
-  const walk = (defNodeId: string): ResolvedNode => {
+  const walk = (defNodeId: string, itemScope?: ItemScope, idSuffix = ""): ResolvedNode => {
     const src = def.nodes[defNodeId];
+    const scopedId = `${inst.id}:${defNodeId}${idSuffix}`;
     if (!src || typeof src !== "object") {
-      return {
-        id: `${inst.id}:${defNodeId}`,
-        type: "frame",
-        name: defNodeId,
-        visible: true,
-        locked: false,
-        style: { base: {} },
-      };
+      return { id: scopedId, type: "frame", name: defNodeId, visible: true, locked: false, style: { base: {} } };
     }
-    const scopedId = `${inst.id}:${defNodeId}`;
     const patched = applyPatch(cloneJson(src) as Record<string, unknown>, patches.get(defNodeId));
     // Node ComponentDefinition boleh bertipe `slot` (di luar union `Node` site), jadi `type` dilonggarkan ke string.
-    const node = substitute(patched, props) as Record<string, unknown> & {
+    const node = substitute(patched, props, itemScope) as Record<string, unknown> & {
       type: string;
       children?: string[];
       props?: Record<string, unknown>;
@@ -109,7 +103,7 @@ export function resolveInstance(inst: Node & { type: "instance" }, ctx: ResolveC
             const sn = ctx.siteNode(id);
             return sn ? [resolveSiteNode(sn, ctx, depth + 1)] : [];
           })
-        : (node.children ?? []).map(walk);
+        : (node.children ?? []).map((child) => walk(child, itemScope, idSuffix));
       return finalize(scopedId, { ...node, type: "frame" }, children);
     }
     if (node.type === "instance") {
@@ -122,7 +116,22 @@ export function resolveInstance(inst: Node & { type: "instance" }, ctx: ResolveC
       } as unknown as Node & { type: "instance" };
       return resolveInstance(nestedInst, ctx, depth + 1);
     }
-    const children = "children" in node && Array.isArray(node.children) ? node.children.map(walk) : undefined;
+    // CMP-022/DM-047: repeater list — node `props.repeatProp` mengulang child template per item (scope item).
+    const repeatProp = (node.props as { repeatProp?: string } | undefined)?.repeatProp;
+    if (typeof repeatProp === "string") {
+      const items = Array.isArray(props[repeatProp]) ? (props[repeatProp] as Record<string, unknown>[]) : [];
+      const templateId = node.children?.[0];
+      const children = templateId
+        ? items.map((item, index) => walk(templateId, { key: repeatProp, item }, `${idSuffix}:i${index}`))
+        : [];
+      const outProps = { ...node.props };
+      delete outProps.repeatProp;
+      return finalize(scopedId, { ...node, props: outProps }, children);
+    }
+    const children =
+      "children" in node && Array.isArray(node.children)
+        ? node.children.map((child) => walk(child, itemScope, idSuffix))
+        : undefined;
     return finalize(scopedId, node, children);
   };
 

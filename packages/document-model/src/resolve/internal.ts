@@ -72,19 +72,31 @@ export function applyPatch(
   return { ...node, style, ...(props ? { props } : {}), visible };
 }
 
-// Ganti `{$prop}` dengan nilai props (deep). `eq` → boolean; `fallback` bila prop kosong. Scope item list (M7)
-// belum didukung: ref `menuItems[].x` memakai key dasar.
-export function substitute(value: unknown, props: Props): unknown {
-  if (Array.isArray(value)) return value.map((item) => substitute(item, props));
+// Scope item untuk repeater list (CMP-022/DM-047): ref `listKey[].field` → nilai item saat ini.
+export interface ItemScope {
+  key: string;
+  item: Record<string, unknown>;
+}
+
+// Ganti `{$prop}` dengan nilai props (deep). `eq` → boolean; `fallback` bila prop kosong. Di dalam repeater,
+// `listKey[].field` memakai `itemScope.item[field]` (DM-047).
+export function substitute(value: unknown, props: Props, itemScope?: ItemScope): unknown {
+  if (Array.isArray(value)) return value.map((item) => substitute(item, props, itemScope));
   if (value && typeof value === "object") {
     if (isPropRef(value)) {
       const ref = value as { $prop: string; eq?: unknown; fallback?: unknown };
-      const raw = props[ref.$prop.split(/[.[]/)[0] ?? ref.$prop];
+      let raw: unknown;
+      if (itemScope && ref.$prop.startsWith(`${itemScope.key}[]`)) {
+        const field = ref.$prop.slice(itemScope.key.length + 2).replace(/^\./, "");
+        raw = field ? itemScope.item[field] : itemScope.item;
+      } else {
+        raw = props[ref.$prop.split(/[.[]/)[0] ?? ref.$prop];
+      }
       if (ref.eq !== undefined) return raw === ref.eq;
       return raw ?? ref.fallback ?? null;
     }
     const out: Record<string, unknown> = {};
-    for (const [key, item] of Object.entries(value)) out[key] = substitute(item, props);
+    for (const [key, item] of Object.entries(value)) out[key] = substitute(item, props, itemScope);
     return out;
   }
   return value;
