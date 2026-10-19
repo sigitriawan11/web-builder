@@ -1,0 +1,202 @@
+import { eq, schema } from "@platform/db";
+import { createTestDb, type TestDb } from "@platform/db/testing";
+import { uuidv7 } from "@platform/shared";
+import type { Express } from "express";
+import { Redis } from "ioredis";
+import request from "supertest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { authTestApp, sessionCookie, signUpBody, TEST_ORIGIN, uniqueEmail } from "../../auth/auth.test-harness";
+import type { StaffRole } from "../../middleware/staff";
+
+// T3.3.7 (CMP-159): CRUD admin library. Fokus AC: role non-staf → 404 (permukaan tak bocor); publish transaksional
+// (draft → versi published + pointer latest_*); setiap mutasi menulis audit_logs.
+let testDb: TestDb;
+let redis: Redis;
+let target: Express;
+let ipCounter = 0;
+let categoryId: string;
+
+const label = { id: "L", en: "L" };
+const definition = () => ({
+  schemaVersion: 1,
+  id: "cmp_admintest01",
+  version: 1,
+  name: "Admin Test",
+  category: "button" as const,
+  propsSchema: [{ key: "label", label, type: "text", default: "Klik" }],
+  rootId: "n_root0001",
+  nodes: {
+    n_root0001: {
+      id: "n_root0001",
+      type: "text",
+      name: "Label",
+      parentId: null,
+      visible: true,
+      locked: false,
+      tag: "span",
+      style: { base: {} },
+      props: { content: { $prop: "label" } },
+    },
+  },
+});
+
+beforeAll(async () => {
+  testDb = await createTestDb();
+  redis = new Redis(process.env.REDIS_URL ?? "redis://localhost:6379");
+  target = authTestApp(testDb, redis);
+  categoryId = uuidv7();
+  await testDb.db.insert(schema.libraryCategories).values({
+    id: categoryId,
+    slug: "admin-test-cat",
+    scope: "component",
+    type: "functional",
+    name: { id: "Uji", en: "Test" },
+  });
+});
+afterAll(async () => {
+  redis.disconnect();
+  await testDb.drop();
+});
+
+async function register(staffRole?: StaffRole) {
+  const email = uniqueEmail();
+  const response = await request(target)
+    .post("/auth/sign-up/email")
+    .set("origin", TEST_ORIGIN)
+    .set("x-forwarded-for", `198.18.11.${(ipCounter++ % 250) + 1}`)
+    .send(signUpBody(email));
+  if (staffRole) {
+    await testDb.db.update(schema.users).set({ staffRole }).where(eq(schema.users.email, email));
+  }
+  return sessionCookie(response.headers["set-cookie"]) ?? "";
+}
+
+const createBody = (slug: string) => ({
+  slug,
+  categoryId,
+  kind: "element" as const,
+  name: "Admin Test",
+  displayName: { id: "Uji Admin", en: "Admin Test" },
+  description: { id: "Dipakai test", en: "Used in test" },
+  definition: definition(),
+});
+
+describe("admin library CRUD (CMP-159)", () => {
+  it("user biasa (bukan staf) → 404 di semua endpoint; tanpa sesi → 401", async () => {
+    const plain = await register();
+    const id = uuidv7();
+    expect(
+      (await request(target).post("/v1/admin/library/components").set("cookie", plain).send(createBody("x1"))).status,
+    ).toBe(404);
+    expect(
+      (await request(target).put(`/v1/admin/library/components/${id}/draft`).set("cookie", plain).send({})).status,
+    ).toBe(404);
+    expect(
+      (
+        await request(target)
+          .post(`/v1/admin/library/components/${id}/draft/publish`)
+          .set("cookie", plain)
+          .send({ bump: "minor", changelog: label })
+      ).status,
+    ).toBe(404);
+    expect((await request(target).get(`/v1/admin/library/components/${id}/usage`).set("cookie", plain)).status).toBe(
+      404,
+    );
+    // Tanpa sesi → 401 (requireAuth sebelum requireStaffRole).
+    expect((await request(target).post("/v1/admin/library/components").send(createBody("x2"))).status).toBe(401);
+  });
+
+  it("staf library_admin: create → publish → baca via editor API; audit tercatat", async () => {
+    const admin = await register("library_admin");
+    const created = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-admin"));
+    expect(created.status).toBe(201);
+    const { id, publicId } = created.body.data as { id: string; publicId: string };
+    expect(publicId).toMatch(/^cmp_[0-9a-z]{6,24}$/);
+
+    const published = await request(target)
+      .post(`/v1/admin/library/components/${id}/draft/publish`)
+      .set("cookie", admin)
+      .send({ bump: "minor", changelog: { id: "Rilis awal", en: "Initial" } });
+    expect(published.status).toBe(200);
+    expect(published.body.data).toEqual({ version: "0.1.0", versionSeq: 1 });
+
+    // Editor read API (T3.3.8) kini menemukan versi published.
+    const read = await request(target).get(`/v1/library/components/${publicId}/versions/1`).set("cookie", admin);
+    expect(read.status).toBe(200);
+    expect(read.body.data.definition).toMatchObject({ rootId: "n_root0001" });
+
+    // Komponen jadi published; audit create + publish tertulis.
+    const [row] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    expect(row?.status).toBe("published");
+    expect(row?.latestVersion).toBe("0.1.0");
+    expect(row?.draftVersionId).toBeNull();
+    const audits = await testDb.db.select().from(schema.auditLogs).where(eq(schema.auditLogs.targetId, id));
+    expect(audits.map((a) => a.action).sort()).toEqual(["library_component.create", "library_component.publish"]);
+  });
+
+  it("publish tanpa draft → 409; definisi tidak valid saat create → 422", async () => {
+    const admin = await register("library_admin");
+    const created = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-409"));
+    const { id } = created.body.data as { id: string };
+    await request(target)
+      .post(`/v1/admin/library/components/${id}/draft/publish`)
+      .set("cookie", admin)
+      .send({ bump: "patch", changelog: label });
+    // Draft sudah habis (jadi published) → publish lagi 409.
+    const again = await request(target)
+      .post(`/v1/admin/library/components/${id}/draft/publish`)
+      .set("cookie", admin)
+      .send({ bump: "patch", changelog: label });
+    expect(again.status).toBe(409);
+
+    const bad = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send({ ...createBody("tombol-bad"), definition: { rootId: "n_tidakada", nodes: {} } });
+    expect(bad.status).toBe(422);
+  });
+
+  it("deprecate & archive mengubah status; usage kosong → []", async () => {
+    const admin = await register("library_admin");
+    const created = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-lifecycle"));
+    const { id } = created.body.data as { id: string };
+
+    expect(
+      (await request(target).get(`/v1/admin/library/components/${id}/usage`).set("cookie", admin)).body.data,
+    ).toEqual([]);
+
+    expect(
+      (await request(target).post(`/v1/admin/library/components/${id}/deprecate`).set("cookie", admin).send({})).status,
+    ).toBe(204);
+    const [deprecated] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    expect(deprecated?.status).toBe("deprecated");
+    expect(deprecated?.deprecatedAt).not.toBeNull();
+
+    expect(
+      (await request(target).post(`/v1/admin/library/components/${id}/archive`).set("cookie", admin).send({})).status,
+    ).toBe(204);
+    const [archived] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    expect(archived?.status).toBe("archived");
+  });
+
+  it("designer (staf non-library) → 404 (permukaan library hanya untuk super_admin/library_admin)", async () => {
+    const designer = await register("designer");
+    expect(
+      (
+        await request(target)
+          .post("/v1/admin/library/components")
+          .set("cookie", designer)
+          .send(createBody("tombol-designer"))
+      ).status,
+    ).toBe(404);
+  });
+});

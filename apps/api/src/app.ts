@@ -19,6 +19,7 @@ import { securityHeaders } from "./middleware/security";
 import { createAccountRouter } from "./modules/account/account.routes";
 import { createAccountService } from "./modules/account/account.service";
 import { createLibraryRouter } from "./modules/library/library.routes";
+import { createLibraryAdminRouter } from "./modules/library-admin/library-admin.routes";
 import { createRealtimeTokenRouter } from "./modules/realtime-token/realtime-token.routes";
 import { createRealtimeTokenService } from "./modules/realtime-token/realtime-token.service";
 import { createSiteScopeRouter } from "./modules/sites/site-scope.routes";
@@ -139,6 +140,17 @@ export function createApp(deps: AppDeps): Express {
       "/v1/library",
       createLibraryRouter({
         db: deps.db,
+        ...(deps.redis ? { redis: deps.redis } : {}),
+        ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
+      }),
+    );
+    // CRUD admin library (CMP-159) — role staf; non-staf → 404.
+    mountAt(
+      app,
+      "/v1/admin/library",
+      createLibraryAdminRouter({
+        db: deps.db,
+        logger: deps.logger,
         ...(deps.redis ? { redis: deps.redis } : {}),
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
       }),

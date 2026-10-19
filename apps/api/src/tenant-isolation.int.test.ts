@@ -36,6 +36,13 @@ const NON_TENANT_ROUTES: Record<string, string> = {
   "POST /v1/realtime/token": "ID dokumen di body; akses dicek service — diuji isolasi di bawah",
   "GET /v1/library/components/:componentId/versions/:version":
     "library platform global (bukan tenant); hanya versi published; auth saja (CMP-158)",
+  "POST /v1/admin/library/components":
+    "admin library platform global (bukan tenant); role staf → non-staf 404 (CMP-159)",
+  "PUT /v1/admin/library/components/:id/draft": "admin library platform global; role staf (CMP-159)",
+  "POST /v1/admin/library/components/:id/draft/publish": "admin library platform global; role staf (CMP-159)",
+  "POST /v1/admin/library/components/:id/deprecate": "admin library platform global; role staf (CMP-159)",
+  "POST /v1/admin/library/components/:id/archive": "admin library platform global; role staf (CMP-159)",
+  "GET /v1/admin/library/components/:id/usage": "admin library platform global; role staf (CMP-159)",
   "GET /internal/v1/ping": "service token",
   "GET /internal/v1/documents/:id/state": "service token (worker/realtime), lintas tenant via systemScope",
 };
