@@ -32,8 +32,10 @@ describe("schema library (CMP-150/151/152)", () => {
     expect(cols.sortOrder.hasDefault).toBe(true);
   });
 
-  it("components: owner/kind/category wajib; min_plan nullable (O-1 gating disiapkan); pointer versi non-FK", () => {
+  it("components: public_id (cmp_… yang dirujuk dokumen) wajib & unik; owner/kind/category wajib; min_plan nullable", () => {
     const cols = getTableColumns(components);
+    expect(cols.publicId.notNull).toBe(true);
+    expect(cols.publicId.isUnique).toBe(true);
     expect(cols.ownerType.notNull).toBe(true);
     expect(cols.kind.notNull).toBe(true);
     expect(cols.categoryId.notNull).toBe(true);

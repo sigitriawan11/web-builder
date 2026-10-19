@@ -57,6 +57,9 @@ export const components = pgTable(
   {
     // UUID v5 (dari slug) untuk seed, v7 untuk yang dibuat di editor — keduanya disuplai service, bukan default DB.
     id: uuid().primaryKey(),
+    // ID yang DIRUJUK dokumen (instance.props.componentId, componentDeps — DM-007/DM-018, `cmp_…`). Terpisah dari
+    // UUID PK internal (CMP-151) agar dua spec konsisten: dokumen pakai `cmp_…`, DB PK tetap UUID. Lampiran D 2026-10-19.
+    publicId: text().notNull().unique(),
     slug: text().notNull(),
     ownerType: libraryOwnerTypeEnum().notNull(),
     ownerId: uuid(),

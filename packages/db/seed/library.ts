@@ -69,6 +69,7 @@ export async function importLibraryToDb(db: Db): Promise<LibraryImportCounts> {
     await db.transaction(async (tx) => {
       const componentValue = {
         id: componentId,
+        publicId: seed.id,
         slug: seed.slug,
         ownerType: "platform" as const,
         kind: seed.kind,

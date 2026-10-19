@@ -92,6 +92,13 @@
       "when": 1792405942464,
       "tag": "0012_abandoned_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792422834376,
+      "tag": "0013_steady_spiral",
+      "breakpoints": true
     }
   ]
 }
