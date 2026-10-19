@@ -2,6 +2,7 @@ import { registerAsset, replaceText, setImage, setLink, setNodeProps, setTextCon
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
 import { groupNodes, ungroup } from "./group";
+import { createInstance, resetOverride, setInstanceOverride, setProp, setSlotContent, setVariant } from "./instance";
 import { moveNode } from "./move-node";
 import { renameNode, reorderNode, setHtmlId, setLocked, setTag, setVisible } from "./node-fields";
 import { createPage, deletePage, reorderPages, updatePage } from "./pages";
@@ -28,6 +29,7 @@ export { type Subtree, SubtreeSchema } from "./subtree";
 export {
   addFont,
   clearBreakpointOverrides,
+  createInstance,
   createNode,
   createPage,
   deleteNodes,
@@ -41,16 +43,21 @@ export {
   reorderNode,
   reorderPages,
   replaceText,
+  resetOverride,
   setBreakpointOverride,
   setHtmlId,
   setImage,
+  setInstanceOverride,
   setLayoutMode,
   setLink,
   setLocked,
   setNodeProps,
+  setProp,
   setSettings,
+  setSlotContent,
   setTag,
   setTextContent,
+  setVariant,
   setVisible,
   ungroup,
   updatePage,
@@ -90,4 +97,10 @@ export const COMMANDS = {
   renameToken,
   deleteToken,
   addFont,
+  createInstance,
+  setProp,
+  setVariant,
+  setInstanceOverride,
+  resetOverride,
+  setSlotContent,
 } as const;

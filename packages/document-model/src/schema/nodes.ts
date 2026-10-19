@@ -262,6 +262,7 @@ export type GroupNode = z.infer<typeof GroupNodeSchema>;
 export type TextNode = z.infer<typeof TextNodeSchema>;
 export type ImageNode = z.infer<typeof ImageNodeSchema>;
 export type InstanceNode = z.infer<typeof InstanceNodeSchema>;
+export type InstanceProps = z.infer<typeof InstancePropsSchema>;
 export type SlotNode = z.infer<typeof SlotNodeSchema>;
 export type Node = z.infer<typeof NodeSchema>;
 export type NodeMetadata = z.infer<typeof NodeMetadataSchema>;
