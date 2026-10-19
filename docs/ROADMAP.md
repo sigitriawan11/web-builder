@@ -1291,8 +1291,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.3 — Database & API library
 
-- [~] **T3.3.1** Tabel `library_categories` + seed kategori (ID/EN) — CMP-150 · `packages/db/src/schema/library.ts` · Verifikasi: migration + seed
-  - Catatan (2026-10-19): tabel `library_categories` (slug unik, scope/type, parent self-FK 2 level, name/description jsonb id/en, icon, sort_order) di `schema/library.ts` + migrasi `0011`. **Seed kategori** (fungsional §9 + industri §10) menyusul bersama importer T3.3.9 (pakai `@platform/library-seed` `data/categories.json`).
+- [x] **T3.3.1** Tabel `library_categories` + seed kategori (ID/EN) — CMP-150 · `packages/db/src/schema/library.ts` · Verifikasi: migration + seed
+  - Catatan (2026-10-19): tabel `library_categories` (slug unik, scope/type, parent self-FK 2 level, name/description jsonb id/en, icon, sort_order) di `schema/library.ts` + migrasi `0011`. **Seed kategori selesai** lewat importer T3.3.9: `pnpm db:seed --library` → **36 kategori** (16 fungsional + 20 industri) ter-tulis ke DB.
 - [x] **T3.3.2** ⚑ Tabel `components` — CMP-151 · `packages/db` · Verifikasi: migration; unique per owner+slug
   - Catatan (2026-10-19): tabel `components` — owner_type/owner_id (platform/user/vendor; user/vendor P2, kolom disiapkan CMP-004/P-7), kind, category FK, name/displayName/description, tags/industries/requiresFeatures (text[] GIN), keywords jsonb, **min_plan nullable** (O-1 gating disiapkan), status, pointer versi (latest/draft, non-FK), usage_site_count, dsb. Unik slug per owner via **dua partial unique index** (platform owner_id null vs user/vendor) — `nullsNotDistinct` belum ada di drizzle 0.45.
 - [x] **T3.3.3** ⚑ Tabel `component_versions` immutable (trigger menolak UPDATE) — CMP-152, CMP-044 · `packages/db` · Verifikasi: int test UPDATE → error
@@ -1302,7 +1302,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [ ] **T3.3.6** (P1) Tabel pendukung lain (review notes, QA results) — CMP-157 · `packages/db` · Verifikasi: migration
 - [ ] **T3.3.7** Endpoint admin library: CRUD component draft, publish versi, deprecate, archive, metadata — CMP-159 · `apps/api/src/modules/library` · Verifikasi: int test role non-admin → 404
 - [ ] **T3.3.8** Endpoint baca untuk editor (GET definisi `componentId@version`, cache immutable) — CMP-158 (subset), CMP-050 · `apps/api/src/modules/library` · Verifikasi: int test header cache immutable
-- [ ] **T3.3.9** Importer seed lengkap: `pnpm db:seed --library` upsert component/theme dari `@platform/library-seed` sebagai versi — CMP-142 · `packages/db/seed` · Verifikasi: seed 2× idempotent; versi baru hanya bila hash berubah
+- [x] **T3.3.9** Importer seed lengkap: `pnpm db:seed --library` upsert component/theme dari `@platform/library-seed` sebagai versi — CMP-142 · `packages/db/seed` · Verifikasi: seed 2× idempotent; versi baru hanya bila hash berubah
+  - Catatan (2026-10-19): `importLibraryToDb(db)` di `packages/db/seed/library.ts` — upsert kategori & component by id (UUIDv5 dari slug), versi **INSERT-ONLY** (skip bila ada; versi published dengan content hash beda → error, CMP-141), satu transaksi per entitas. `pnpm db:seed --library` (tanpa `--dry-run`) tulis ke DB lokal. **Diverifikasi di Postgres nyata & idempoten**: run ke-1 = 36 kategori + 1 component + 1 versi; run ke-2 = 0 versi baru. Theme preset belum ada di `data/` seed (component dulu) → importer theme menyusul saat preset tersedia.
 - [ ] **T3.3.10** Konten library dwibahasa (name/description/default content ID+EN) — ACC-292 · `packages/library-seed`, `packages/db` · Verifikasi: unit test semua item punya ID & EN
 
 #### Epic 3.4 — Mode Admin di editor
