@@ -8,7 +8,7 @@ import { renameNode, reorderNode, setHtmlId, setLocked, setTag, setVisible } fro
 import { createPage, deletePage, reorderPages, updatePage } from "./pages";
 import { clearBreakpointOverrides, setBreakpointOverride, setLayoutMode, setSettings } from "./style-commands";
 import { duplicateNodes, insertSubtree } from "./subtree";
-import { addFont, deleteToken, renameToken, setToken } from "./theme";
+import { addFont, applyThemePreset, deleteToken, renameToken, setToken } from "./theme";
 import { updateStyle } from "./update-style";
 import { wrapInFrame } from "./wrap-in-frame";
 
@@ -28,6 +28,7 @@ export { plainToRichText } from "./content";
 export { type Subtree, SubtreeSchema } from "./subtree";
 export {
   addFont,
+  applyThemePreset,
   clearBreakpointOverrides,
   createInstance,
   createNode,
@@ -97,6 +98,7 @@ export const COMMANDS = {
   renameToken,
   deleteToken,
   addFont,
+  applyThemePreset,
   createInstance,
   setProp,
   setVariant,

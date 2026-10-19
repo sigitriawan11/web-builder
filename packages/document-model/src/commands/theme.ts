@@ -10,10 +10,13 @@ import {
   tokenGroupOf,
 } from "../query/tokens";
 import {
+  type FontDef,
   FontDefSchema,
   NodeSchema,
   type Theme,
   ThemeSchema,
+  type ThemeTokens,
+  TOKEN_GROUPS,
   TOKEN_PATH_PATTERN,
   TOKEN_VALUE_SCHEMAS,
   TokenRefSchema,
@@ -403,6 +406,62 @@ export const addFont = defineCommand({
       }
     }
     yFonts.push([cloneJson(input)]);
+    return { ok: true, value: undefined, affected: [] };
+  },
+});
+
+// DM-044: nilai token dianggap "daun" (bukan subgrup) bila string/array/objek token (punya salah satu kunci ini).
+const TOKEN_LEAF_KEYS = ["$token", "value", "unit", "fontFamily", "fontSize"] as const;
+const isTokenLeaf = (value: unknown): boolean =>
+  typeof value !== "object" ||
+  value === null ||
+  Array.isArray(value) ||
+  TOKEN_LEAF_KEYS.some((key) => key in (value as object));
+
+// Gabung preset di atas lama: preset menang di daun, token lama mengisi yang hilang (tidak boleh ada rujukan patah).
+function fillMerge(old: unknown, preset: unknown): unknown {
+  if (preset === undefined) return old;
+  if (old === undefined || isTokenLeaf(old) || isTokenLeaf(preset)) return preset;
+  const out: Record<string, unknown> = { ...(old as Record<string, unknown>) };
+  for (const [key, value] of Object.entries(preset as Record<string, unknown>)) {
+    out[key] = fillMerge((old as Record<string, unknown>)[key], value);
+  }
+  return out;
+}
+
+const mergeFonts = (current: FontDef[], preset: FontDef[]): FontDef[] => {
+  const families = new Set(current.map((font) => font.family));
+  return [...current, ...preset.filter((font) => !families.has(font.family))];
+};
+
+// DM-044: ganti tema = merge token preset di atas tema sekarang. `keep` = grup token yang dipertahankan dari tema
+// lama. Node tidak disentuh; token yang hilang di preset diisi dari lama (AC: tanpa TokenNotFound). Satu transaksi.
+export const applyThemePreset = defineCommand({
+  name: "applyThemePreset",
+  description: {
+    id: "Ganti tema dengan preset (merge token; grup `keep` dipertahankan dari tema lama).",
+    en: "Switch theme to a preset (merge tokens; `keep` groups preserved from the old theme).",
+  },
+  aiExposed: true,
+  input: z.strictObject({ preset: ThemeSchema, keep: z.array(z.enum(TOKEN_GROUPS)).optional() }),
+  run(ctx, input) {
+    const current = readTheme(ctx.doc);
+    const keep = new Set(input.keep ?? []);
+    const tokens = {} as Record<string, unknown>;
+    for (const group of TOKEN_GROUPS) {
+      const cur = (current.tokens as Record<string, unknown>)[group];
+      const pre = (input.preset.tokens as Record<string, unknown>)[group];
+      const merged = keep.has(group) ? cur : fillMerge(cur, pre);
+      if (merged !== undefined) tokens[group] = merged;
+    }
+    const fonts = mergeFonts(current.fonts, input.preset.fonts);
+    const next: Theme = { ...current, tokens: tokens as ThemeTokens, fonts };
+    const error = checkNextTheme(current, next);
+    if (error) return error;
+    writeTheme(ctx.doc, current, next);
+    if (!jsonEqual(current.fonts, next.fonts)) {
+      ctx.doc.getMap<unknown>(YDOC_KEYS.theme).set("fonts", cloneJson(next.fonts));
+    }
     return { ok: true, value: undefined, affected: [] };
   },
 });
