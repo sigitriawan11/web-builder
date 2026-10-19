@@ -85,6 +85,13 @@
       "when": 1792405713626,
       "tag": "0011_productive_squadron_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792405942464,
+      "tag": "0012_abandoned_jackpot",
+      "breakpoints": true
     }
   ]
 }

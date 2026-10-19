@@ -7,6 +7,10 @@ import {
   libraryCategories,
   libraryOwnerTypeEnum,
   libraryStatusEnum,
+  siteComponentUsage,
+  themeModeEnum,
+  themes,
+  usageDocStateEnum,
   versionBumpEnum,
 } from "./library";
 
@@ -48,5 +52,23 @@ describe("schema library (CMP-150/151/152)", () => {
     expect(cols.versionSeq.notNull).toBe(false);
     expect(cols.yanked.hasDefault).toBe(true);
     expect(cols.status.hasDefault).toBe(true);
+  });
+
+  it("themes (CMP-155): tokens/displayName wajib, mode light|dark, version default 1", () => {
+    expect(themeModeEnum.enumValues).toEqual(["light", "dark"]);
+    const cols = getTableColumns(themes);
+    expect(cols.tokens.notNull).toBe(true);
+    expect(cols.displayName.notNull).toBe(true);
+    expect(cols.version.hasDefault).toBe(true);
+  });
+
+  it("site_component_usage (CMP-156): doc_state draft|published, version/docState wajib", () => {
+    expect(usageDocStateEnum.enumValues).toEqual(["draft", "published"]);
+    const cols = getTableColumns(siteComponentUsage);
+    expect(cols.siteId.notNull).toBe(true);
+    expect(cols.componentId.notNull).toBe(true);
+    expect(cols.version.notNull).toBe(true);
+    expect(cols.docState.notNull).toBe(true);
+    expect(cols.instanceCount.hasDefault).toBe(true);
   });
 });

@@ -7,6 +7,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -14,6 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { id, timestamps } from "../columns";
 import { users } from "./identity";
+import { sites } from "./sites";
 
 // Library component/theme berversi (CMP-150–CMP-156). Schema & migration HANYA di sini (CLAUDE.md § Database).
 // `search_vector` (tsvector, CMP-160) & `embedding` (pgvector, P1) ditambah bersama fiturnya.
@@ -125,5 +127,62 @@ export const componentVersions = pgTable(
   (table) => [
     uniqueIndex("component_versions_component_version_idx").on(table.componentId, table.version),
     index("component_versions_component_seq_idx").on(table.componentId, table.versionSeq),
+  ],
+);
+
+export const themeModeEnum = pgEnum("theme_mode", ["light", "dark"]);
+export const usageDocStateEnum = pgEnum("usage_doc_state", ["draft", "published"]);
+
+// CMP-155: theme preset library. Theme situs sendiri disimpan di dokumen (`site.theme`); `sites.theme_source_id`
+// mencatat asal preset. `version` int naik tiap edit preset (situs menyimpan salinan, DM-044).
+export const themes = pgTable(
+  "themes",
+  {
+    id: id(),
+    slug: text().notNull(),
+    ownerType: libraryOwnerTypeEnum().notNull(),
+    ownerId: uuid(),
+    displayName: jsonb().$type<Localized>().notNull(),
+    tokens: jsonb().$type<Record<string, unknown>>().notNull(),
+    mode: themeModeEnum().notNull().default("light"),
+    tags: text().array().notNull().default(sql`'{}'`),
+    industries: text().array().notNull().default(sql`'{}'`),
+    version: integer().notNull().default(1),
+    status: libraryStatusEnum().notNull().default("draft"),
+    previewUrl: text(),
+    sortOrder: integer().notNull().default(0),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("themes_platform_slug_idx").on(table.ownerType, table.slug).where(sql`${table.ownerId} is null`),
+    uniqueIndex("themes_owner_slug_idx")
+      .on(table.ownerType, table.ownerId, table.slug)
+      .where(sql`${table.ownerId} is not null`),
+  ],
+);
+
+// CMP-156/CMP-051: pemakaian component per situs (dicatat dari projection realtime). PK komposit; hapus situs →
+// cascade. Dipakai untuk notifikasi update (M4) & estimasi risiko. `site_update_notices` (M4) menyusul.
+export const siteComponentUsage = pgTable(
+  "site_component_usage",
+  {
+    siteId: uuid()
+      .notNull()
+      .references(() => sites.id, { onDelete: "cascade" }),
+    componentId: uuid()
+      .notNull()
+      .references(() => components.id, { onDelete: "cascade" }),
+    componentVersionId: uuid().references(() => componentVersions.id, { onDelete: "set null" }),
+    version: text().notNull(),
+    docState: usageDocStateEnum().notNull(),
+    instanceCount: integer().notNull().default(0),
+    pageIds: text().array().notNull().default(sql`'{}'`),
+    hasOverrides: boolean().notNull().default(false),
+    lastIndexedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.siteId, table.componentId, table.version, table.docState] }),
+    index("site_component_usage_component_version_idx").on(table.componentId, table.version),
+    index("site_component_usage_site_idx").on(table.siteId),
   ],
 );
