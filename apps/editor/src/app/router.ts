@@ -4,13 +4,13 @@
 
 export const EDITOR_BASE = "/editor/";
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_BODY = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+const UUID = new RegExp(`^${UUID_BODY}$`, "i");
 // ID node page (`pg_…`, spec 01 DM-007).
 const PAGE_ID = /^pg_[A-Za-z0-9_-]{1,64}$/;
-// ID publik component (`cmp_…`, spec 01 DM-007) yang dirujuk dokumen & URL Mode Admin (CMP-010).
-const COMPONENT_PUBLIC_ID = /^cmp_[0-9a-z]{6,24}$/;
-// Mode Admin: `/editor/library/components/<cmp_…>/draft` (CMP-010). Dokumen = ComponentDefinition draft, bukan situs.
-const LIBRARY_DRAFT = /^library\/components\/(cmp_[0-9a-z]{6,24})\/draft$/;
+// Mode Admin: `/editor/library/components/<uuid>/draft` (CMP-010). Permukaan editing admin memakai UUID component
+// (konsisten dengan API `/v1/admin/library/*`); `cmp_…` public_id dipakai untuk rujukan dokumen & read API published.
+const LIBRARY_DRAFT = new RegExp(`^library/components/(${UUID_BODY})/draft$`, "i");
 
 export type EditorRoute =
   | { kind: "site"; siteId: string; pageId: string | null }
@@ -27,7 +27,7 @@ export function parseEditorRoute(pathname: string, search: string): EditorRoute 
   if (rest === "") return { kind: "playground" };
   // Mode Admin library (CMP-010/ED-003) sebelum rute situs (keduanya di bawah /editor/).
   const library = LIBRARY_DRAFT.exec(rest);
-  if (library?.[1]) return { kind: "library", componentId: library[1] };
+  if (library?.[1]) return { kind: "library", componentId: library[1].toLowerCase() };
   if (rest.includes("/") || !UUID.test(rest)) return { kind: "not-found" };
   const page = new URLSearchParams(search).get("page");
   return { kind: "site", siteId: rest.toLowerCase(), pageId: page && PAGE_ID.test(page) ? page : null };
@@ -38,8 +38,8 @@ export function editorUrl(siteId: string, pageId?: string | null): string {
   return `${EDITOR_BASE}${siteId}${pageId ? `?page=${encodeURIComponent(pageId)}` : ""}`;
 }
 
-/** URL editor Mode Admin untuk draft component (CMP-010). */
+/** URL editor Mode Admin untuk draft component (CMP-010); `componentId` = UUID component (bukan `cmp_…`). */
 export function libraryDraftUrl(componentId: string): string {
-  if (!COMPONENT_PUBLIC_ID.test(componentId)) throw new Error(`componentId tidak valid: ${componentId}`);
-  return `${EDITOR_BASE}library/components/${componentId}/draft`;
+  if (!UUID.test(componentId)) throw new Error(`componentId (UUID) tidak valid: ${componentId}`);
+  return `${EDITOR_BASE}library/components/${componentId.toLowerCase()}/draft`;
 }

@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { editorUrl, libraryDraftUrl, parseEditorRoute } from "./router";
 
 const SITE = "0199f0aa-1234-7abc-8def-0123456789ab";
-const CMP = "cmp_button01";
+// Mode Admin memakai UUID component (konsisten dengan API admin).
+const CMP = "0199f0bb-5678-7abc-8def-0123456789cd";
 
 describe("parseEditorRoute", () => {
   it.each([
@@ -16,9 +17,11 @@ describe("parseEditorRoute", () => {
     ["/editor/bukan-uuid", "", { kind: "not-found" }],
     [`/editor/${SITE}/lain`, "", { kind: "not-found" }],
     ["/lain", "", { kind: "not-found" }],
-    // Mode Admin library (CMP-010).
+    // Mode Admin library (CMP-010) — UUID component.
     [`/editor/library/components/${CMP}/draft`, "", { kind: "library", componentId: CMP }],
     [`/editor/library/components/${CMP}/draft/`, "", { kind: "library", componentId: CMP }],
+    [`/editor/library/components/${CMP.toUpperCase()}/draft`, "", { kind: "library", componentId: CMP }],
+    ["/editor/library/components/cmp_button01/draft", "", { kind: "not-found" }],
     ["/editor/library/components/bukan-id/draft", "", { kind: "not-found" }],
     [`/editor/library/components/${CMP}`, "", { kind: "not-found" }],
   ] as const)("%s%s", (pathname, search, expected) => {
