@@ -1,6 +1,7 @@
 import type * as Y from "yjs";
 import type { z } from "zod";
 import type { IdPrefix } from "../ids";
+import type { ComponentDefinition } from "../schema";
 import type { Issue, IssueDetails, IssueMessage } from "../validate/issues";
 import { applyDraftUpdate, draftUpdate, forkDocument } from "../yjs/draft";
 import type { TxOrigin } from "../yjs/origin";
@@ -18,6 +19,9 @@ export interface CommandContext {
   now?: () => string;
   // DM-075: lewati penjagaan node terkunci (UI mengirim ini saat user mengonfirmasi mengubah node locked).
   force?: boolean;
+  // M3: registry definisi component (library/lokal) — dibutuhkan command yang me-resolve instance (detach,
+  // updateInstanceVersion). Disuntik editor/worker; command pure yang tak butuh registry mengabaikannya.
+  getComponent?: (componentId: string, version: number) => ComponentDefinition | undefined;
 }
 
 // DM-075: command yang boleh menyentuh node terkunci tanpa `force` (lock/visibility & operasi page).

@@ -2,7 +2,15 @@ import { registerAsset, replaceText, setImage, setLink, setNodeProps, setTextCon
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
 import { groupNodes, ungroup } from "./group";
-import { createInstance, resetOverride, setInstanceOverride, setProp, setSlotContent, setVariant } from "./instance";
+import {
+  createInstance,
+  detachInstance,
+  resetOverride,
+  setInstanceOverride,
+  setProp,
+  setSlotContent,
+  setVariant,
+} from "./instance";
 import { moveNode } from "./move-node";
 import { renameNode, reorderNode, setHtmlId, setLocked, setTag, setVisible } from "./node-fields";
 import { createPage, deletePage, reorderPages, updatePage } from "./pages";
@@ -35,6 +43,7 @@ export {
   createPage,
   deleteNodes,
   deletePage,
+  detachInstance,
   duplicateNodes,
   groupNodes,
   insertSubtree,
@@ -100,6 +109,7 @@ export const COMMANDS = {
   addFont,
   applyThemePreset,
   createInstance,
+  detachInstance,
   setProp,
   setVariant,
   setInstanceOverride,

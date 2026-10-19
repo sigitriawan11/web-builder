@@ -1,10 +1,12 @@
 import * as Y from "yjs";
 import { z } from "zod";
 import { createId } from "../ids";
+import { detachToSubtree } from "../resolve/detach";
 import {
   ComponentIdSchema,
   type InstanceProps,
   InstancePropsSchema,
+  type Node,
   NodeIdSchema,
   NodePatchSchema,
   NodePathSchema,
@@ -14,7 +16,7 @@ import {
   StyleSchema,
 } from "../schema";
 import { cloneJson } from "../yjs/clone-json";
-import { nodeToYMap, YDOC_KEYS } from "../yjs/mapping";
+import { nodeToYMap, YDOC_KEYS, yNodeToJson } from "../yjs/mapping";
 import { type CommandContext, type CommandFailure, defineCommand, fail } from "./command";
 import { exceeds, locate, pageNodeCount } from "./limits";
 import { childrenOf, nodesMap, nodeType, type YNode } from "./y-access";
@@ -259,5 +261,82 @@ export const setSlotContent = defineCommand({
       return { ...props, slots };
     });
     return error ?? { ok: true, value: undefined, affected: [input.id] };
+  },
+});
+
+// DM-050: detach instance → subtree node biasa (ID baru, $prop→literal, variant+override diterapkan). Butuh
+// `ctx.getComponent` (registry). Satu transaksi, satu undo. Instance bersarang tetap instance (satu level).
+export const detachInstance = defineCommand({
+  name: "detachInstance",
+  description: { id: "Detach instance menjadi node biasa.", en: "Detach an instance into plain nodes." },
+  aiExposed: true,
+  input: z.strictObject({ id: NodeIdSchema }),
+  run(ctx, input) {
+    if (!ctx.getComponent)
+      return fail("INVALID_TARGET", { id: "registry component tidak tersedia", en: "component registry unavailable" }, [
+        "id",
+      ]);
+    const nodes = nodesMap(ctx.doc);
+    const yInst = nodes.get(input.id);
+    if (!yInst) return notFound(input.id);
+    if (nodeType(yInst) !== "instance")
+      return fail(
+        "INVALID_TARGET",
+        { id: `Node "${input.id}" bukan instance`, en: `Node "${input.id}" is not an instance` },
+        ["id"],
+      );
+    const inst = yNodeToJson(yInst) as Node & { type: "instance" };
+    const parent = inst.parentId ? nodes.get(inst.parentId) : undefined;
+    const siblings = parent ? childrenOf(parent) : undefined;
+    if (!parent || !siblings)
+      return fail(
+        "INVALID_TARGET",
+        { id: "instance tanpa parent container", en: "instance without a container parent" },
+        ["id"],
+      );
+
+    const def = ctx.getComponent(inst.props.componentId, inst.props.version);
+    if (!def)
+      return fail(
+        "NOT_FOUND",
+        {
+          id: `Component "${inst.props.componentId}@${inst.props.version}" tidak ada di registry`,
+          en: `Component "${inst.props.componentId}@${inst.props.version}" not in registry`,
+        },
+        ["id"],
+      );
+
+    const detached = detachToSubtree(inst, def, ctx.idGen);
+    // Validasi tiap node hasil detach (bentuk node site).
+    for (const [id, node] of Object.entries(detached.nodes)) {
+      const parsed = NodeSchema.safeParse(node);
+      if (!parsed.success)
+        return fail(
+          "INVALID_RESULT",
+          {
+            id: `Node detach "${id}" tidak valid: ${parsed.error.issues[0]?.message}`,
+            en: `Detached node "${id}" invalid: ${parsed.error.issues[0]?.message}`,
+          },
+          ["id"],
+        );
+    }
+    const limit = exceeds("nodesPerSite", nodes.size - 1 + Object.keys(detached.nodes).length);
+    if (limit) return limit;
+
+    const index = siblings.toArray().indexOf(input.id);
+    // Tulis: hapus instance, sisipkan root detach di posisinya, tambah node baru, pindahkan konten slot.
+    siblings.delete(index, 1);
+    nodes.delete(input.id);
+    for (const [id, node] of Object.entries(detached.nodes)) nodes.set(id, nodeToYMap(node));
+    siblings.insert(index < 0 ? siblings.length : index, [detached.rootId]);
+    for (const move of detached.moved) nodes.get(move.nodeId)?.set("parentId", move.parentId);
+    const deps = ctx.doc.getMap<unknown>(YDOC_KEYS.componentDeps);
+    for (const [componentId, version] of Object.entries(detached.deps))
+      deps.set(componentId, { version, source: "library" });
+
+    const affected = [inst.parentId, detached.rootId, ...Object.keys(detached.nodes)].filter(
+      (id): id is string => !!id,
+    );
+    return { ok: true, value: detached.rootId, affected };
   },
 });
