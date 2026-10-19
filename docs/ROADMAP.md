@@ -1304,7 +1304,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [ ] **T3.3.8** Endpoint baca untuk editor (GET definisi `componentId@version`, cache immutable) — CMP-158 (subset), CMP-050 · `apps/api/src/modules/library` · Verifikasi: int test header cache immutable
 - [x] **T3.3.9** Importer seed lengkap: `pnpm db:seed --library` upsert component/theme dari `@platform/library-seed` sebagai versi — CMP-142 · `packages/db/seed` · Verifikasi: seed 2× idempotent; versi baru hanya bila hash berubah
   - Catatan (2026-10-19): `importLibraryToDb(db)` di `packages/db/seed/library.ts` — upsert kategori & component by id (UUIDv5 dari slug), versi **INSERT-ONLY** (skip bila ada; versi published dengan content hash beda → error, CMP-141), satu transaksi per entitas. `pnpm db:seed --library` (tanpa `--dry-run`) tulis ke DB lokal. **Diverifikasi di Postgres nyata & idempoten**: run ke-1 = 36 kategori + 1 component + 1 versi; run ke-2 = 0 versi baru. Theme preset belum ada di `data/` seed (component dulu) → importer theme menyusul saat preset tersedia.
-- [ ] **T3.3.10** Konten library dwibahasa (name/description/default content ID+EN) — ACC-292 · `packages/library-seed`, `packages/db` · Verifikasi: unit test semua item punya ID & EN
+- [x] **T3.3.10** Konten library dwibahasa (name/description/default content ID+EN) — ACC-292 · `packages/library-seed`, `packages/db` · Verifikasi: unit test semua item punya ID & EN
+  - Catatan (2026-10-19): dwibahasa ditegakkan `LocalizedSchema` (id+en min-length) pada name kategori, displayName/description/keywords/changelog component. Test `bilingual.test.ts` mengunci seluruh data repo seed punya ID & EN non-kosong. DB `name`/`display_name`/`description` jsonb `{id,en}` (CMP-150/151).
 
 #### Epic 3.4 — Mode Admin di editor
 
