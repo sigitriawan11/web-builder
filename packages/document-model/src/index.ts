@@ -27,6 +27,13 @@ export {
   migrateYDoc,
 } from "./migrations";
 export * from "./query";
+export {
+  MAX_INSTANCE_DEPTH,
+  type ResolveCtx,
+  type ResolvedNode,
+  resolveInstance,
+  resolveSiteNode,
+} from "./resolve/resolve-instance";
 export * from "./schema";
 export { type ComponentValidationResult, validateComponentDefinition } from "./validate/component";
 export { MAX_TREE_DEPTH } from "./validate/invariants";

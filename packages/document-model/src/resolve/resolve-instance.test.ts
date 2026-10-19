@@ -1,0 +1,209 @@
+import { describe, expect, it } from "vitest";
+import type { ComponentDefinition, Node } from "../schema";
+import { type ResolvedNode, resolveInstance } from "./resolve-instance";
+
+const label = { id: "L", en: "L" };
+
+// Button: prop `label` → teks; variant `tone` (ghost = tanpa fill).
+const buttonDef = {
+  schemaVersion: 1,
+  id: "cmp_btn",
+  version: 1,
+  name: "Button",
+  category: "button",
+  propsSchema: [{ key: "label", label, type: "text", default: "Klik" }],
+  variantAxes: [{ name: "tone", options: ["primary", "ghost"], default: "primary" }],
+  variants: [{ when: { tone: "ghost" }, overrides: { n_btnroot: { style: { base: { fills: [] } } } } }],
+  rootId: "n_btnroot",
+  nodes: {
+    n_btnroot: {
+      id: "n_btnroot",
+      type: "frame",
+      name: "Button",
+      parentId: null,
+      visible: true,
+      locked: false,
+      tag: "div",
+      children: ["n_btnlabel"],
+      style: { base: { fills: [{ type: "solid", color: "#2563EB" }] } },
+      props: { role: "button" },
+    },
+    n_btnlabel: {
+      id: "n_btnlabel",
+      type: "text",
+      name: "Label",
+      parentId: "n_btnroot",
+      visible: true,
+      locked: false,
+      tag: "span",
+      style: { base: {} },
+      props: { content: { $prop: "label" } },
+    },
+  },
+} as unknown as ComponentDefinition;
+
+// Card: meneruskan `ctaLabel` ke instance Button bersarang.
+const cardDef = {
+  schemaVersion: 1,
+  id: "cmp_card",
+  version: 1,
+  name: "Card",
+  category: "card",
+  propsSchema: [{ key: "ctaLabel", label, type: "text", default: "Beli" }],
+  rootId: "n_cardroot",
+  nodes: {
+    n_cardroot: {
+      id: "n_cardroot",
+      type: "frame",
+      name: "Card",
+      parentId: null,
+      visible: true,
+      locked: false,
+      children: ["n_cardbtn"],
+      style: { base: {} },
+      props: {},
+    },
+    n_cardbtn: {
+      id: "n_cardbtn",
+      type: "instance",
+      name: "CTA",
+      parentId: "n_cardroot",
+      visible: true,
+      locked: false,
+      style: { base: {} },
+      props: { componentId: "cmp_btn", version: 1, propValues: { label: { $prop: "ctaLabel" } } },
+    },
+  },
+} as unknown as ComponentDefinition;
+
+// Grid: meneruskan `ctaLabel` ke instance Card bersarang (3 level: grid → card → button).
+const gridDef = {
+  schemaVersion: 1,
+  id: "cmp_grid",
+  version: 1,
+  name: "Grid",
+  category: "section",
+  propsSchema: [{ key: "ctaLabel", label, type: "text", default: "Pesan" }],
+  rootId: "n_gridroot",
+  nodes: {
+    n_gridroot: {
+      id: "n_gridroot",
+      type: "frame",
+      name: "Grid",
+      parentId: null,
+      visible: true,
+      locked: false,
+      tag: "section",
+      children: ["n_gridcard"],
+      style: { base: {} },
+      props: { role: "section" },
+    },
+    n_gridcard: {
+      id: "n_gridcard",
+      type: "instance",
+      name: "Card",
+      parentId: "n_gridroot",
+      visible: true,
+      locked: false,
+      style: { base: {} },
+      props: { componentId: "cmp_card", version: 1, propValues: { ctaLabel: { $prop: "ctaLabel" } } },
+    },
+  },
+} as unknown as ComponentDefinition;
+
+const registry = new Map<string, ComponentDefinition>([
+  ["cmp_btn@1", buttonDef],
+  ["cmp_card@1", cardDef],
+  ["cmp_grid@1", gridDef],
+]);
+const ctx = {
+  getComponent: (id: string, version: number) => registry.get(`${id}@${version}`),
+  siteNode: () => undefined,
+};
+
+const instance = (props: Record<string, unknown>, extra: Record<string, unknown> = {}): Node & { type: "instance" } =>
+  ({
+    id: "n_inst0001",
+    type: "instance",
+    name: "Inst",
+    parentId: "pg_home000001",
+    visible: true,
+    locked: false,
+    style: { base: {} },
+    props,
+    ...extra,
+  }) as unknown as Node & { type: "instance" };
+
+const find = (node: ResolvedNode, pred: (n: ResolvedNode) => boolean): ResolvedNode | undefined => {
+  if (pred(node)) return node;
+  for (const child of node.children ?? []) {
+    const hit = find(child, pred);
+    if (hit) return hit;
+  }
+  return undefined;
+};
+const textOf = (node: ResolvedNode): string | undefined => {
+  const content = node.props?.content as { content?: { content?: { text?: string }[] }[] } | undefined;
+  return content?.content?.[0]?.content?.[0]?.text;
+};
+
+describe("resolveInstance (DM-051)", () => {
+  it("substitusi prop + default + id ter-scope", () => {
+    const root = resolveInstance(
+      instance({ componentId: "cmp_btn", version: 1, propValues: { label: "Pesan via WA" } }),
+      ctx,
+    );
+    expect(root.id).toBe("n_inst0001:n_btnroot");
+    expect(root.sourceInstanceId).toBe("n_inst0001");
+    const labelNode = find(root, (n) => n.type === "text");
+    expect(textOf(labelNode as ResolvedNode)).toBe("Pesan via WA");
+    // Prop kosong → default.
+    const d = resolveInstance(instance({ componentId: "cmp_btn", version: 1 }), ctx);
+    expect(textOf(find(d, (n) => n.type === "text") as ResolvedNode)).toBe("Klik");
+  });
+
+  it("variant: tone=ghost menghapus fills root; default primary mempertahankan", () => {
+    const ghost = resolveInstance(instance({ componentId: "cmp_btn", version: 1, variant: { tone: "ghost" } }), ctx);
+    expect((ghost.style.base as { fills?: unknown[] }).fills).toEqual([]);
+    const primary = resolveInstance(instance({ componentId: "cmp_btn", version: 1 }), ctx);
+    expect((primary.style.base as { fills?: unknown[] }).fills).toHaveLength(1);
+  });
+
+  it("override instance + merge style root dari instance", () => {
+    const root = resolveInstance(
+      instance(
+        { componentId: "cmp_btn", version: 1, overrides: { n_btnlabel: { visible: false } } },
+        { style: { base: { size: { width: { mode: "fill" } } } } },
+      ),
+      ctx,
+    );
+    expect(find(root, (n) => n.type === "text")?.visible).toBe(false);
+    expect((root.style.base as { size?: { width?: { mode?: string } } }).size?.width?.mode).toBe("fill");
+  });
+
+  it("AC: instance bersarang 3 level; prop menembus & override menembus 2 level", () => {
+    const root = resolveInstance(
+      instance({
+        componentId: "cmp_grid",
+        version: 1,
+        overrides: { "n_gridcard/n_cardbtn/n_btnroot": { visible: false } },
+      }),
+      ctx,
+    );
+    // ctaLabel default "Pesan" menembus grid → card → button → teks.
+    expect(textOf(find(root, (n) => n.type === "text") as ResolvedNode)).toBe("Pesan");
+    // Root button (2 level ke dalam) jadi visible:false lewat override path bertingkat.
+    const btnRoot = find(root, (n) => n.id.endsWith(":n_btnroot"));
+    expect(btnRoot?.visible).toBe(false);
+  });
+
+  it("component hilang → placeholder (tidak crash)", () => {
+    const warnings: string[] = [];
+    const root = resolveInstance(instance({ componentId: "cmp_tidakada", version: 9 }), {
+      ...ctx,
+      onWarning: (code) => warnings.push(code),
+    });
+    expect(root.missingComponent).toEqual({ componentId: "cmp_tidakada", version: 9 });
+    expect(warnings).toContain("MISSING_COMPONENT");
+  });
+});
