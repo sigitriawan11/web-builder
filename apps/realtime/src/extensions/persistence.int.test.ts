@@ -3,6 +3,7 @@ import type { Server } from "@hocuspocus/server";
 import { asc, eq, schema, systemScope } from "@platform/db";
 import { createSite, createTestDb, createUser, createWorkspace, type TestDb } from "@platform/db/testing";
 import {
+  CURRENT_SCHEMA_VERSION,
   createBlankSiteDocument,
   createNode,
   jsonToYDoc,
@@ -45,7 +46,7 @@ afterAll(async () => {
   await testDb.drop();
 });
 
-async function siteDocument(schemaVersion = 2) {
+async function siteDocument(schemaVersion = CURRENT_SCHEMA_VERSION) {
   const { user: owner } = await createUser(testDb.db);
   const workspace = await createWorkspace(testDb.db, { owner });
   const { site, document } = await createSite(testDb.db, { workspace, schemaVersion });
@@ -138,7 +139,7 @@ describe("onLoadDocument", () => {
     ]);
 
     const received = SiteDocumentSchema.parse(await syncedJson(owner.id, document.id, site.id));
-    expect(received.schemaVersion).toBe(2);
+    expect(received.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(received.settings.language).toBe("id");
     expect(received.nodes).toEqual(v0.nodes);
 
@@ -151,7 +152,7 @@ describe("onLoadDocument", () => {
       { seq: 2, origin: "migration" },
     ]);
     const [after] = await testDb.db.select().from(schema.documents).where(eq(schema.documents.id, document.id));
-    expect(after).toMatchObject({ schemaVersion: 2, lastSeq: 2 });
+    expect(after).toMatchObject({ schemaVersion: CURRENT_SCHEMA_VERSION, lastSeq: 2 });
 
     // Snapshot `migration` sebelum (JSON v0, tidak valid untuk schema terkini) & sesudah (valid, titik awal load).
     const snapshots = await testDb.db
@@ -178,8 +179,8 @@ describe("onLoadDocument", () => {
   });
 
   it.each([
-    ["kolom schema_version", 3, 1],
-    ["meta.schemaVersion di Y.Doc", 1, 3],
+    ["kolom schema_version", CURRENT_SCHEMA_VERSION + 1, 1],
+    ["meta.schemaVersion di Y.Doc", 1, CURRENT_SCHEMA_VERSION + 1],
   ])(
     "dokumen lebih baru dari server (%s) → koneksi ditolak `schema-unsupported`, tidak ada yang ditulis",
     async (_, column, meta) => {
