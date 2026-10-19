@@ -18,6 +18,7 @@ import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
 import { createAccountRouter } from "./modules/account/account.routes";
 import { createAccountService } from "./modules/account/account.service";
+import { createLibraryRouter } from "./modules/library/library.routes";
 import { createRealtimeTokenRouter } from "./modules/realtime-token/realtime-token.routes";
 import { createRealtimeTokenService } from "./modules/realtime-token/realtime-token.service";
 import { createSiteScopeRouter } from "./modules/sites/site-scope.routes";
@@ -125,6 +126,19 @@ export function createApp(deps: AppDeps): Express {
             await (await auth.$context).internalAdapter.updateUser(userId, fields);
           },
         }),
+        ...(deps.redis ? { redis: deps.redis } : {}),
+        ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
+      }),
+    );
+  }
+
+  if (deps.auth && deps.db) {
+    // `/v1/library` — baca library platform (global, bukan tenant); wajib login.
+    mountAt(
+      app,
+      "/v1/library",
+      createLibraryRouter({
+        db: deps.db,
         ...(deps.redis ? { redis: deps.redis } : {}),
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
       }),
