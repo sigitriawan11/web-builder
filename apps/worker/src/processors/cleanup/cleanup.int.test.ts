@@ -46,6 +46,10 @@ async function bootWorker(prefix: string, cron: string) {
     SMTP_URL: "smtp://localhost:1025",
     EMAIL_FROM: "Platform <no-reply@platformmu.com>",
     PUBLIC_APP_URL: "http://app.localhost:3000",
+    // S3 wajib di schema env worker (processor image-processing); tak dipakai test ini.
+    S3_ENDPOINT: "http://localhost:9000",
+    S3_ACCESS_KEY_ID: "minioadmin",
+    S3_SECRET_ACCESS_KEY: "minioadmin",
     CLEANUP_COMPACTION_CRON: cron,
   });
   const logger = createWorkerLogger({ APP_ENV: "local", LOG_LEVEL: "fatal" }, { write: () => {} });
