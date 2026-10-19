@@ -1,4 +1,12 @@
-import type { AssetEntry, LinkValue, Node, SiteDocument } from "@platform/document-model";
+import {
+  type AssetEntry,
+  type LinkValue,
+  type Node,
+  type ResolveCtx,
+  type ResolvedNode,
+  resolveInstance,
+  type SiteDocument,
+} from "@platform/document-model";
 import { Fragment, type ReactElement, type ReactNode } from "react";
 import type { RenderContext } from "./context";
 import { anchorId, anchorTargets, linkAttributes } from "./links";
@@ -80,6 +88,8 @@ export interface RenderNodeOptions {
   // Override tag elemen node teks (editor-only): saat edit inline, ProseMirror membungkus isi dalam `<div>`;
   // membungkusnya di `<p>`/`<hN>` = nesting HTML tak valid (warning React). Editor pakai `div` saat editing.
   tag?: string;
+  // DM-051: root hasil resolve instance membawa `data-instance-id` (editor: klik → pilih instance).
+  instanceId?: string;
 }
 
 /**
@@ -95,6 +105,8 @@ export function renderNodeElement(
   const { ctx } = env;
   if (!node.visible && ctx.mode === "publish") return null;
   const attributes = baseAttributes(node, env);
+  // DM-051: penanda instance di mode editor (seleksi). Publish tidak membawanya.
+  if (options.instanceId && ctx.mode === "editor") attributes["data-instance-id"] = options.instanceId;
 
   switch (node.type) {
     case "page":
@@ -167,11 +179,36 @@ export function renderNodeElement(
       );
       return iconLink ? <Link attributes={{ ...attributes, ...iconLink }}>{span}</Link> : span;
     }
-    case "instance":
-      // TODO(T3.2.1): resolve ComponentDefinition@version → render subtree hasil (variant+props+overrides+slots).
-      // Sampai resolver renderer ada, instance dirender sebagai placeholder kosong (data-node-id tetap dibawa editor).
-      return <Box tag={DEFAULT_TAG.instance} attributes={attributes} />;
+    case "instance": {
+      // DM-051: resolve ComponentDefinition@version → render subtree hasil. Tanpa registry (`ctx.component`) atau
+      // component/versi hilang → placeholder (halaman tidak crash).
+      if (!ctx.component) return <Box tag={DEFAULT_TAG.instance} attributes={attributes} />;
+      const resolveCtx: ResolveCtx = { getComponent: ctx.component, siteNode: env.node };
+      const resolved = resolveInstance(node, resolveCtx);
+      if (resolved.missingComponent) {
+        const label = `${resolved.missingComponent.componentId}@${resolved.missingComponent.version}`;
+        return <Box tag={DEFAULT_TAG.instance} attributes={{ ...attributes, "data-missing-component": label }} />;
+      }
+      return renderResolvedTree(resolved, env, true);
+    }
   }
+}
+
+/** Render subtree hasil resolve instance (ResolvedNode = Node-like dengan anak inline). Root membawa data-instance-id. */
+function renderResolvedTree(resolved: ResolvedNode, env: RenderEnv, isRoot: boolean): ReactElement | null {
+  if (!resolved.visible && env.ctx.mode === "publish") return null;
+  const opensLink =
+    resolved.type === "frame" && !env.insideLink && (resolved.props as { link?: unknown })?.link != null;
+  const childEnv = opensLink ? { ...env, insideLink: true } : env;
+  const children = resolved.children?.length
+    ? resolved.children.map((child) => <Fragment key={child.id}>{renderResolvedTree(child, childEnv, false)}</Fragment>)
+    : null;
+  return renderNodeElement(
+    resolved as unknown as Node,
+    env,
+    children,
+    isRoot && resolved.sourceInstanceId ? { instanceId: resolved.sourceInstanceId } : {},
+  );
 }
 
 function renderTree(id: string, env: RenderEnv): ReactNode {

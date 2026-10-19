@@ -1,4 +1,4 @@
-import type { Breakpoint, Node } from "@platform/document-model";
+import type { Breakpoint, ComponentDefinition, Node } from "@platform/document-model";
 
 // ED-017 / DM-001: satu renderer untuk editor & publish; perbedaan mode lewat context, bukan kode render terpisah.
 export type RenderMode = "editor" | "publish";
@@ -17,4 +17,6 @@ export interface RenderContext {
   nodeAttributes?: (node: Node) => Record<string, unknown> | undefined;
   // DM-015: SVG inline ikon Lucide by name (publish: dari peta ikon; editor menyuntik lewat `content`).
   icon?: (name: string, strokeWidth?: number, set?: "lucide" | "brand") => import("react").ReactNode;
+  // DM-051 (M3): registry definisi component untuk me-resolve node `instance`. Tanpa ini, instance = placeholder.
+  component?: (componentId: string, version: number) => ComponentDefinition | undefined;
 }
