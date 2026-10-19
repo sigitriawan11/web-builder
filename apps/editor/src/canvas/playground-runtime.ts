@@ -7,6 +7,7 @@ import {
   setLink,
   updateStyle,
 } from "@platform/document-model";
+import { breakpointFromSearch, breakpointStore } from "../store/breakpoint-store";
 import { interactionStore } from "../store/interaction-store";
 import { selectionStore } from "../store/selection-store";
 import { marqueeSelection } from "../tools/select/marquee-selection";
@@ -22,6 +23,8 @@ export const LOCAL_ORIGIN = { kind: "user", sessionId: "local" } as const;
  * Editor situs memakai runtime yang sama untuk dokumen dari realtime (SiteEditor).
  */
 export function createPlaygroundRuntime(search: string): CanvasRuntime {
+  // Fokus satu breakpoint (`?bp=`) untuk uji paritas WYSIWYG (T2.19.2): frame tunggal di origin, tanpa culling.
+  breakpointStore.getState().setActive(breakpointFromSearch(search));
   const fixture = fixtureFromSearch(search);
   const runtime = createCanvasRuntime({
     doc: jsonToYDoc(fixture),

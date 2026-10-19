@@ -10,6 +10,12 @@ interface BreakpointState {
 
 export const BREAKPOINT_OPTIONS: readonly Breakpoint[] = ["base", "tablet", "mobile"];
 
+/** Breakpoint fokus awal dari `?bp=` (playground/e2e: ukur satu frame breakpoint di origin, zoom 1). */
+export function breakpointFromSearch(search: string): Breakpoint {
+  const value = new URLSearchParams(search).get("bp");
+  return BREAKPOINT_OPTIONS.find((option) => option === value) ?? "base";
+}
+
 export const breakpointStore = createStore<BreakpointState>()((set, get) => ({
   active: "base",
   setActive: (breakpoint) => {

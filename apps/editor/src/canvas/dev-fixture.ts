@@ -8,6 +8,8 @@ import {
   minimalDocument,
   nestedDocument,
   responsiveSectionsDocument,
+  richTextDocument,
+  styledDocument,
   wrapGridDocument,
 } from "@platform/document-model/fixtures";
 import { benchPagesDocument } from "./bench-fixture";
@@ -21,6 +23,9 @@ const FIXTURES: Record<string, () => SiteDocument> = {
   wrap100: () => wrapGridDocument(100),
   nested: nestedDocument,
   minimal: minimalDocument,
+  // T2.19.2: fixture tambahan untuk uji paritas WYSIWYG (styled = token/tipografi; richText = Tiptap + link).
+  styled: styledDocument,
+  richText: richTextDocument,
   landing200,
   landing2000,
   // T0.8.4: 10 section untuk uji deteksi overflow `stackRows`.

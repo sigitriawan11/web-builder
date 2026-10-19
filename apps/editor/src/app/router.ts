@@ -11,11 +11,14 @@ const PAGE_ID = /^pg_[A-Za-z0-9_-]{1,64}$/;
 export type EditorRoute =
   | { kind: "site"; siteId: string; pageId: string | null }
   | { kind: "playground" }
+  | { kind: "wysiwyg" }
   | { kind: "not-found" };
 
 export function parseEditorRoute(pathname: string, search: string): EditorRoute {
   if (!pathname.startsWith(EDITOR_BASE.slice(0, -1))) return { kind: "not-found" };
   const rest = pathname.slice(EDITOR_BASE.length - 1).replace(/^\/+|\/+$/g, "");
+  // Harness uji paritas WYSIWYG (T2.19.2, dev/e2e saja): render publish satu fixture di iframe.
+  if (rest === "" && new URLSearchParams(search).get("harness") === "wysiwyg") return { kind: "wysiwyg" };
   if (rest === "") return { kind: "playground" };
   if (rest.includes("/") || !UUID.test(rest)) return { kind: "not-found" };
   const page = new URLSearchParams(search).get("page");

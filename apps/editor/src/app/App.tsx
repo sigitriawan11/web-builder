@@ -9,6 +9,7 @@ import { parseEditorRoute } from "./router";
 const SiteEditor = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteEditor })));
 const SiteNotFound = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteNotFound })));
 const Playground = lazy(() => import("./Playground").then((module) => ({ default: module.Playground })));
+const WysiwygHarness = lazy(() => import("./WysiwygHarness").then((module) => ({ default: module.WysiwygHarness })));
 
 // Bootstrap editor (ARCHITECTURE §5.2): providers → error boundary → rute.
 export function App() {
@@ -21,6 +22,8 @@ export function App() {
             <SiteEditor siteId={route.siteId} pageId={route.pageId} />
           ) : route.kind === "playground" ? (
             <Playground />
+          ) : route.kind === "wysiwyg" ? (
+            <WysiwygHarness />
           ) : (
             <SiteNotFound />
           )}
