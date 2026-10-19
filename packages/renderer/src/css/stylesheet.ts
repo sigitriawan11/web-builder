@@ -108,14 +108,20 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
   const classByNode = new Map<string, string>();
   const classBySignature = new Map<string, string>();
   const rules: Record<Breakpoint, string[]> = { base: [], tablet: [], mobile: [] };
-  // DM-040: aturan interaction state. hover dibungkus `@media (hover:hover)` (jangan aktif di sentuh); pressed = `:active`.
-  const hoverRules: Record<Breakpoint, string[]> = { base: [], tablet: [], mobile: [] };
-  const pressedRules: Record<Breakpoint, string[]> = { base: [], tablet: [], mobile: [] };
+  // DM-040: interaction state. hover dibungkus `@media (hover:hover)` (jangan aktif di sentuh); pressed = `:active`,
+  // focus = `:focus-visible`, disabled = `[aria-disabled="true"]`.
+  const emptyBuckets = (): Record<Breakpoint, string[]> => ({ base: [], tablet: [], mobile: [] });
+  const hoverRules = emptyBuckets();
+  const pressedRules = emptyBuckets();
+  const focusRules = emptyBuckets();
+  const disabledRules = emptyBuckets();
 
   type StateDecls = Record<StateName, Record<Breakpoint, Declaration[]>>;
   const STATE_PSEUDO: Record<StateName, { pseudo: string; bucket: Record<Breakpoint, string[]> }> = {
     hover: { pseudo: ":hover", bucket: hoverRules },
     pressed: { pseudo: ":active", bucket: pressedRules },
+    focus: { pseudo: ":focus-visible", bucket: focusRules },
+    disabled: { pseudo: '[aria-disabled="true"]', bucket: disabledRules },
   };
 
   const assign = (nodeId: string, perBreakpoint: Record<Breakpoint, Declaration[]>, states: StateDecls | null) => {
@@ -197,7 +203,9 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
     // DM-040: state hanya dirender untuk publish (editor memakai force-preview — task editor terpisah).
     let states: StateDecls | null = null;
     if (target === "publish" && node.style.states) {
-      states = { hover: {} as Record<Breakpoint, Declaration[]>, pressed: {} as Record<Breakpoint, Declaration[]> };
+      states = Object.fromEntries(
+        (Object.keys(STATE_PSEUDO) as StateName[]).map((name) => [name, {} as Record<Breakpoint, Declaration[]>]),
+      ) as StateDecls;
       for (const name of Object.keys(STATE_PSEUDO) as StateName[]) {
         for (const bp of BREAKPOINTS) {
           const override = resolveStateStyle(node.style, bp, name, { theme: doc.theme });
@@ -231,7 +239,11 @@ export function buildPageStyles(doc: SiteDocument, options: PageStylesOptions): 
   // (konvensi LVHA; :active menang saat hover+press bersamaan).
   const hoverWrap = (body: string) => (body ? `@media (hover:hover){${body}}` : "");
   const blockFor = (bp: Breakpoint) =>
-    rules[bp].join("") + hoverWrap(hoverRules[bp].join("")) + pressedRules[bp].join("");
+    rules[bp].join("") +
+    hoverWrap(hoverRules[bp].join("")) +
+    pressedRules[bp].join("") +
+    focusRules[bp].join("") +
+    disabledRules[bp].join("");
 
   // Urutan: base → tablet → mobile (cascade desktop-first); satu blok per breakpoint (PUB-042).
   let css = tokenRule("base") + blockFor("base");

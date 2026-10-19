@@ -367,6 +367,20 @@ describe("interaction states (DM-040)", () => {
     expect(css).not.toContain(":active");
   });
 
+  it("publish: focus → :focus-visible; disabled → [aria-disabled] (DM-040 P1, T3.2.2)", () => {
+    const doc = heroDocument();
+    const hero = doc.nodes.n_hero000001;
+    if (hero?.type !== "frame") throw new Error("fixture berubah");
+    hero.style.states = {
+      focus: { base: { opacity: 0.9 } },
+      disabled: { base: { opacity: 0.4 } },
+    };
+    const page = styles(doc);
+    const cls = page.classOf("n_hero000001");
+    expect(page.css).toContain(`.${cls}:focus-visible{opacity:0.9}`);
+    expect(page.css).toContain(`.${cls}[aria-disabled="true"]{opacity:0.4}`);
+  });
+
   it("tanpa states: nama class & CSS tidak berubah (signature stabil)", () => {
     const before = styles(heroDocument());
     const after = styles(heroDocument());

@@ -304,15 +304,25 @@ export const StateStylePatchSchema = z.strictObject({
 });
 
 // Satu state, cascade breakpoint desktop-first (base → tablet → mobile) seperti style biasa.
-const StateVariantSchema = z.strictObject({
+// Tipe eksplisit (alias bernama) agar inferensi `NodeSchema`/`SiteDocumentSchema` tidak meledak (TS7056) saat
+// `states` memuat beberapa state (hover/pressed/focus/disabled). `StateStylePatch` diekspor di bawah.
+type StateVariant = {
+  base?: z.infer<typeof StateStylePatchSchema> | undefined;
+  tablet?: z.infer<typeof StateStylePatchSchema> | undefined;
+  mobile?: z.infer<typeof StateStylePatchSchema> | undefined;
+};
+const StateVariantSchema: z.ZodType<StateVariant> = z.strictObject({
   base: StateStylePatchSchema.optional(),
   tablet: StateStylePatchSchema.optional(),
   mobile: StateStylePatchSchema.optional(),
 });
 
+// DM-040: hover/pressed (M2) + focus/disabled (P1 · M3, ED-183/CMP-032). `active` (kelas .is-active nav) terpisah.
 export const StatesSchema = z.strictObject({
   hover: StateVariantSchema.optional(),
   pressed: StateVariantSchema.optional(),
+  focus: StateVariantSchema.optional(),
+  disabled: StateVariantSchema.optional(),
 });
 
 // ── Style & responsive (DM-036) ────────────────────────────────────────────

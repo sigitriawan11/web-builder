@@ -39,7 +39,7 @@ export const AssetEntrySchema = z.strictObject({
 });
 
 // Versi schema dokumen yang dihasilkan kode ini (spec 01 §19). Naik bersama fungsi migrasi + fixture test.
-export const CURRENT_SCHEMA_VERSION = 7;
+export const CURRENT_SCHEMA_VERSION = 8;
 
 // DM-004 top-level. `localComponents` (P1) ditambah bersama fiturnya. Strict: key tak dikenal ditolak.
 const SiteDocumentShapeSchema = z.strictObject({
