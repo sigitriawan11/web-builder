@@ -1,0 +1,2 @@
+ALTER TABLE "components" ADD COLUMN "draft_document_id" uuid;--> statement-breakpoint
+ALTER TABLE "components" ADD CONSTRAINT "components_draft_document_id_documents_id_fk" FOREIGN KEY ("draft_document_id") REFERENCES "public"."documents"("id") ON DELETE set null ON UPDATE no action;

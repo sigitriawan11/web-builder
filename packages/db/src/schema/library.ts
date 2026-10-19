@@ -14,6 +14,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { id, timestamps } from "../columns";
+import { documents } from "./documents";
 import { users } from "./identity";
 import { sites } from "./sites";
 
@@ -82,6 +83,9 @@ export const components = pgTable(
     latestVersionId: uuid(),
     latestVersion: text(),
     draftVersionId: uuid(),
+    // Mode Admin (Approach A, T3.4.2): draft component = dokumen Yjs `kind='component'`. Satu draft aktif per
+    // component; hapus dokumen → set null (component tetap ada).
+    draftDocumentId: uuid().references(() => documents.id, { onDelete: "set null" }),
     replacedByComponentId: uuid().references((): AnyPgColumn => components.id, { onDelete: "set null" }),
     thumbnailUrl: text(),
     usageSiteCount: integer().notNull().default(0),

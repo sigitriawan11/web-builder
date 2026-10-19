@@ -44,6 +44,8 @@ describe("schema library (CMP-150/151/152)", () => {
     expect(cols.ownerId.notNull).toBe(false);
     expect(cols.status.hasDefault).toBe(true);
     expect(cols.usageSiteCount.hasDefault).toBe(true);
+    // Mode Admin (T3.4.2): draft component = dokumen Yjs; nullable (null = belum ada draft aktif).
+    expect(cols.draftDocumentId.notNull).toBe(false);
   });
 
   it("component_versions: definition wajib; version/version_seq nullable (draft); yanked default false", () => {
