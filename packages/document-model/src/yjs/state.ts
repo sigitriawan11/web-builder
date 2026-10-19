@@ -1,5 +1,7 @@
 import * as Y from "yjs";
 import { type SiteDocument, SiteDocumentSchema } from "../schema";
+import type { ComponentDefinition } from "../schema/component";
+import { componentDefToYDoc, yDocToComponentDef } from "./component-mapping";
 import { jsonToYDoc, yDocToJson } from "./mapping";
 
 // State Yjs biner dokumen (update penuh) untuk snapshot awal & muat ulang tanpa konsumen memegang Y.Doc sendiri
@@ -14,6 +16,18 @@ export function siteDocumentFromState(state: Uint8Array): SiteDocument {
   const ydoc = new Y.Doc();
   Y.applyUpdate(ydoc, state);
   return SiteDocumentSchema.parse(yDocToJson(ydoc));
+}
+
+/** State Yjs awal draft component (Mode Admin, Approach A). Dipakai api saat membuat dokumen `kind='component'`. */
+export function componentDefToState(def: ComponentDefinition): Uint8Array {
+  return Y.encodeStateAsUpdate(componentDefToYDoc(def));
+}
+
+/** State → JSON ComponentDefinition MENTAH (tidak divalidasi). Pemanggil wajib `validateComponentDefinition`. */
+export function componentDefFromState(state: Uint8Array): unknown {
+  const ydoc = new Y.Doc();
+  Y.applyUpdate(ydoc, state);
+  return yDocToComponentDef(ydoc);
 }
 
 /**

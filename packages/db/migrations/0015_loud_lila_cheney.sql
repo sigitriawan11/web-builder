@@ -1,0 +1,2 @@
+ALTER TABLE "documents" ALTER COLUMN "workspace_id" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "documents" ADD CONSTRAINT "documents_site_requires_workspace" CHECK ("documents"."kind" <> 'site' OR "documents"."workspace_id" IS NOT NULL);

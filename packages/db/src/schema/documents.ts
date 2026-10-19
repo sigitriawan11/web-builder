@@ -1,7 +1,9 @@
+import { sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   bigint,
   boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -37,9 +39,9 @@ export const documents = pgTable(
   "documents",
   {
     id: id(),
-    workspaceId: uuid()
-      .notNull()
-      .references(() => workspaces.id, { onDelete: "restrict" }),
+    // null untuk dokumen library platform (component/template draft) yang GLOBAL (akses via role staf, bukan tenant).
+    // Dokumen situs WAJIB punya workspace (CHECK di bawah). Mode Admin, keputusan owner 2026-10-20.
+    workspaceId: uuid().references(() => workspaces.id, { onDelete: "restrict" }),
     // null untuk dokumen library (component/template draft).
     siteId: uuid().references((): AnyPgColumn => sites.id, { onDelete: "cascade" }),
     kind: documentKindEnum().notNull(),
@@ -50,7 +52,12 @@ export const documents = pgTable(
     sizeBytes: bigint({ mode: "number" }).notNull().default(0),
     ...timestamps,
   },
-  (table) => [index("documents_site_id_idx").on(table.siteId), index("documents_kind_idx").on(table.kind)],
+  (table) => [
+    index("documents_site_id_idx").on(table.siteId),
+    index("documents_kind_idx").on(table.kind),
+    // Dokumen situs wajib bertenant; dokumen library (component/template) boleh global (workspace null).
+    check("documents_site_requires_workspace", sql`${table.kind} <> 'site' OR ${table.workspaceId} IS NOT NULL`),
+  ],
 );
 
 /** Append-only bervolume tinggi → PK bigint identity (ARCHITECTURE §6.1). Tidak pernah di-UPDATE. */

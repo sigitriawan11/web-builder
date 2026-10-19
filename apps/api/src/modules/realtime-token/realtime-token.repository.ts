@@ -19,7 +19,8 @@ export async function findSiteDocumentAccess(
     .select({
       documentId: schema.documents.id,
       siteId: schema.sites.id,
-      workspaceId: schema.documents.workspaceId,
+      // Dari tabel workspaces (inner join) → non-null; `documents.workspace_id` kini nullable (doc library global).
+      workspaceId: schema.workspaces.id,
       role: schema.workspaceMembers.role,
     })
     .from(schema.documents)
