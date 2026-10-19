@@ -75,6 +75,9 @@ export function childRenderEnv(node: Node, env: RenderEnv): RenderEnv {
 export interface RenderNodeOptions {
   // Pengganti isi node teks (editor teks inline ED-115 menggantikan hasil render rich text).
   content?: ReactNode;
+  // Override tag elemen node teks (editor-only): saat edit inline, ProseMirror membungkus isi dalam `<div>`;
+  // membungkusnya di `<p>`/`<hN>` = nesting HTML tak valid (warning React). Editor pakai `div` saat editing.
+  tag?: string;
 }
 
 /**
@@ -120,7 +123,7 @@ export function renderNodeElement(
     case "text": {
       const { content, style } = renderRichText(node.props.content, (value) => linkOf(value, env));
       return (
-        <Text tag={node.tag ?? DEFAULT_TAG.text} attributes={attributes} style={style}>
+        <Text tag={options.tag ?? node.tag ?? DEFAULT_TAG.text} attributes={attributes} style={style}>
           {options.content ?? content}
         </Text>
       );

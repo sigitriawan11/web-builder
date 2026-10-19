@@ -101,3 +101,25 @@ for (const isolation of ["shadow", "prefix"]) {
     });
   });
 }
+
+// Regresi (bug M2.d): editor ProseMirror membungkus isi dalam `<div>`; node teks saat edit harus `<div>`, bukan
+// `<p>`/`<hN>`, agar nesting HTML valid (tanpa warning React "div cannot be a descendant of p").
+test("saat edit, elemen node teks = div (nesting valid, tanpa warning React)", async ({ page }) => {
+  const warnings: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error" || msg.type() === "warning") warnings.push(msg.text());
+  });
+  page.on("pageerror", (err) => warnings.push(err.message));
+
+  await startEditing(page, "shadow");
+  const tag = await page.locator(TITLE).evaluate((el) => el.tagName);
+  expect(tag).toBe("DIV");
+
+  await page.keyboard.press("Escape");
+  await expect(page.locator(EDITOR)).toHaveCount(0);
+  // Setelah edit selesai, kembali ke tag semantik heading.
+  expect(await page.locator(TITLE).evaluate((el) => el.tagName)).not.toBe("DIV");
+
+  const nesting = warnings.filter((w) => /cannot (be a|contain a) descendant|cannot appear as a descendant/i.test(w));
+  expect(nesting, nesting.join("\n")).toEqual([]);
+});

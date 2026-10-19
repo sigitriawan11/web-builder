@@ -88,7 +88,14 @@ function NodeViewRender({ id, parent, env: parentEnv }: NodeViewProps) {
   };
   const nodeEnv: RenderEnv = { ...env, ctx: { ...env.ctx, nodeAttributes: () => attributes } };
   if (node.type === "text") {
-    return renderNodeElement(node, nodeEnv, null, editing ? { content: <InlineTextEditor nodeId={id} /> } : {});
+    // Saat edit: bungkus di `div` (bukan `<p>`/`<hN>`) agar `<div>` ProseMirror tidak nesting tak valid; tampilan
+    // identik karena gaya dari style inline, bukan tag.
+    return renderNodeElement(
+      node,
+      nodeEnv,
+      null,
+      editing ? { content: <InlineTextEditor nodeId={id} />, tag: "div" } : {},
+    );
   }
   const childLayout = childLayoutOf(style);
   const children =
