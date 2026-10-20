@@ -1,4 +1,4 @@
-import { userOrigin } from "@platform/document-model";
+import { ComponentNodeSchema, userOrigin } from "@platform/document-model";
 import { isApiError } from "@platform/sdk";
 import { useLibraryEditorSession } from "@platform/sdk/react";
 import type { LibraryEditorSession } from "@platform/shared/contracts";
@@ -107,7 +107,13 @@ function useComponentRuntime(session: DocumentSession | null, rootId: string | n
   const [runtime, setRuntime] = useState<CanvasRuntime | null>(null);
   useEffect(() => {
     if (!session || !rootId) return;
-    const next = createCanvasRuntime({ doc: session.doc, pageId: rootId, origin: TAB_ORIGIN });
+    // Node ComponentDefinition (root parentId null, slot, $prop) → validator component, bukan schema node situs.
+    const next = createCanvasRuntime({
+      doc: session.doc,
+      pageId: rootId,
+      origin: TAB_ORIGIN,
+      nodeSchema: ComponentNodeSchema,
+    });
     setRuntime(next);
     return () => {
       setRuntime(null);

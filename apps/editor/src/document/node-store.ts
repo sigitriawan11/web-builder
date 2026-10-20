@@ -3,6 +3,14 @@ import * as Y from "yjs";
 
 type Listener = () => void;
 
+// Validator node di boundary Y.Doc. Default = `NodeSchema` (dokumen situs); Mode Admin menyuntik `ComponentNodeSchema`
+// (node ComponentDefinition: root ber-parentId null, tipe `slot`, nilai `$prop`).
+export type NodeValidator = {
+  safeParse(
+    value: unknown,
+  ): { success: true; data: unknown } | { success: false; error: { issues: readonly unknown[] } };
+};
+
 /**
  * Snapshot node per ID dari Y.Doc untuk rendering inkremental (ED-018, DM-077).
  *
@@ -18,8 +26,11 @@ export class NodeStore {
   private readonly invalid = new Set<string>();
   private readonly listeners = new Map<string, Set<Listener>>();
 
-  constructor(doc: Y.Doc) {
+  private readonly nodeSchema: NodeValidator;
+
+  constructor(doc: Y.Doc, nodeSchema: NodeValidator = NodeSchema) {
     this.nodes = doc.getMap<Y.Map<unknown>>(YDOC_KEYS.nodes);
+    this.nodeSchema = nodeSchema;
     this.nodes.observeDeep(this.handleChanges);
   }
 
@@ -67,13 +78,13 @@ export class NodeStore {
     const yNode = this.nodes.get(id);
     if (!yNode) return null;
     // Y.Doc bisa berisi update remote, jadi divalidasi di boundary ini (CLAUDE.md: Zod di setiap boundary).
-    const parsed = NodeSchema.safeParse(yNodeToJson(yNode));
+    const parsed = this.nodeSchema.safeParse(yNodeToJson(yNode));
     if (!parsed.success) {
       this.invalid.add(id);
       console.error(`Node "${id}" di Y.Doc tidak valid; tidak dirender.`, parsed.error.issues);
       return null;
     }
-    return parsed.data;
+    return parsed.data as Node;
   }
 
   private readonly handleChanges = (events: Y.YEvent<Y.AbstractType<unknown>>[]): void => {

@@ -36,7 +36,7 @@ const envelope = (type: (typeof COMPONENT_NODE_TYPES)[number]) =>
     ...(CONTAINER_TYPES.has(type) ? { children: z.array(ChildId) } : {}),
   });
 
-const ComponentNodeEnvelope = z.discriminatedUnion(
+export const ComponentNodeSchema = z.discriminatedUnion(
   "type",
   COMPONENT_NODE_TYPES.map(envelope) as [ReturnType<typeof envelope>, ...ReturnType<typeof envelope>[]],
 );
@@ -94,7 +94,7 @@ export function validateComponentDefinition(input: unknown): ComponentValidation
 
   const slotNames = new Set<string>();
   for (const [nodeId, raw] of Object.entries(def.nodes)) {
-    const env = ComponentNodeEnvelope.safeParse(raw);
+    const env = ComponentNodeSchema.safeParse(raw);
     if (!env.success) {
       for (const issue of env.error.issues) {
         report("COMPONENT_NODE", ["nodes", nodeId, ...toPath(issue.path)], msg(issue.message, issue.message), nodeId);

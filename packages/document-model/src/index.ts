@@ -35,7 +35,7 @@ export {
   resolveSiteNode,
 } from "./resolve/resolve-instance";
 export * from "./schema";
-export { type ComponentValidationResult, validateComponentDefinition } from "./validate/component";
+export { ComponentNodeSchema, type ComponentValidationResult, validateComponentDefinition } from "./validate/component";
 export { MAX_TREE_DEPTH } from "./validate/invariants";
 export {
   ISSUE_CODES,

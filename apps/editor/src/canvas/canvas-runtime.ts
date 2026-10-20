@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 import type * as Y from "yjs";
 import { useStore } from "zustand";
 import { createStore, type StoreApi } from "zustand/vanilla";
-import { NodeStore } from "../document/node-store";
+import { NodeStore, type NodeValidator } from "../document/node-store";
 import { createUndoController, type UndoController } from "../document/undo-controller";
 import { selectionStore } from "../store/selection-store";
 import { syncUiWithDocument } from "../store/selection-sync";
@@ -57,9 +57,11 @@ export function createCanvasRuntime(options: {
   doc: Y.Doc;
   pageId: string;
   origin: Extract<TxOrigin, { kind: "user" }>;
+  // Mode Admin menyuntik `ComponentNodeSchema` (default = schema node situs).
+  nodeSchema?: NodeValidator;
 }): CanvasRuntime {
   const { doc, pageId, origin } = options;
-  const nodeStore = new NodeStore(doc);
+  const nodeStore = new NodeStore(doc, options.nodeSchema);
   const page = createStore<{ pageId: string }>()(() => ({ pageId }));
   const cameras = new Map<string, CameraState>();
   const geometry = createDomGeometry();

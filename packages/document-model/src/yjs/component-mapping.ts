@@ -1,4 +1,5 @@
 import * as Y from "yjs";
+import { defaultTheme } from "../defaults/theme";
 import type { ComponentDefinition } from "../schema/component";
 import { cloneJson } from "./clone-json";
 import { nodeRecordToYMap, yNodeToJson } from "./mapping";
@@ -58,6 +59,15 @@ export function componentDefToYDoc(def: ComponentDefinition, target: Y.Doc = new
     for (const [nodeId, node] of Object.entries(def.nodes)) {
       yNodes.set(nodeId, nodeRecordToYMap(node as Record<string, unknown>));
     }
+
+    // Theme PRATINJAU untuk canvas editor Mode Admin (token component di-resolve ke nilai nyata). BUKAN bagian
+    // ComponentDefinition (`yDocToComponentDef` mengabaikan key `theme`) → publish tetap bersih. Statis (tak diedit
+    // kolaboratif) → disimpan sebagai nilai biasa.
+    const theme = defaultTheme();
+    const yTheme = target.getMap<unknown>("theme");
+    yTheme.set("tokens", cloneJson(theme.tokens));
+    yTheme.set("fonts", cloneJson(theme.fonts));
+    if (theme.modes) yTheme.set("modes", cloneJson(theme.modes));
   }, origin);
   return target;
 }
