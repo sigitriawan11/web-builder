@@ -138,8 +138,9 @@ describe("extractToInstance (CMP-011)", () => {
     expect(after.nodes[h.homeId]?.children).toContain(instId);
     const inst = after.nodes[instId];
     expect(inst?.type).toBe("instance");
-    expect((inst?.props as InstanceProps).componentId).toBe("cmp_newcard01");
-    expect((inst?.props as InstanceProps).version).toBe(0);
+    const props = inst?.props as InstanceProps | undefined;
+    expect(props?.componentId).toBe("cmp_newcard01");
+    expect(props?.version).toBe(0);
 
     // Satu langkah undo → kembali persis seperti sebelum extract.
     h.undoManager.undo();
