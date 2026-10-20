@@ -44,7 +44,16 @@ export const LibraryDraftDefinitionSchema = z.object({
   definition: z.unknown(),
 });
 
+// Definisi versi PUBLISHED (CMP-158/CMP-050) — editor/publish me-resolve instance versi published.
+export const LibraryPublishedDefinitionSchema = z.object({
+  componentId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
+  version: z.number().int().positive(),
+  semver: z.string().nullable(),
+  definition: z.unknown(),
+});
+
 export type LibraryDraftDefinition = z.infer<typeof LibraryDraftDefinitionSchema>;
+export type LibraryPublishedDefinition = z.infer<typeof LibraryPublishedDefinitionSchema>;
 export type ComponentKind = z.infer<typeof ComponentKindSchema>;
 export type LibraryStatus = z.infer<typeof LibraryStatusSchema>;
 export type StaffRole = z.infer<typeof StaffRoleSchema>;

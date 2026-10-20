@@ -42,6 +42,9 @@ export const useSessions = () => useQuery(useQueries().sessions());
 /** Sesi editor Mode Admin (CMP-010); gagal 404 = bukan staf (editor memperlakukan sebagai tidak ditemukan). */
 export const useLibraryEditorSession = (componentId: string) =>
   useQuery({ ...useQueries().libraryEditorSession(componentId), retry: false });
+/** Definisi component (draft version 0 / published) untuk resolusi instance di canvas (CMP-011). */
+export const useLibraryComponentDefinition = (componentId: string, version: number) =>
+  useQuery({ ...useQueries().libraryComponentDefinition(componentId, version), retry: false });
 
 export const useCreateSite = () => useMutation({ mutationFn: useMutations().createSite });
 export const useRenameSite = () => useMutation({ mutationFn: useMutations().renameSite });

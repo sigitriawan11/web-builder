@@ -16,6 +16,7 @@ import { InlineTextEditor } from "../text-editing/InlineTextEditor";
 import { assetUrl } from "./asset-url";
 import { FrameContext } from "./breakpoint-context";
 import { editorNodeStyle } from "./editor-style";
+import { InstanceNodeView } from "./InstanceNodeView";
 import { NodeErrorBoundary, NodePlaceholder } from "./NodeErrorBoundary";
 import { RenderEnvContext } from "./render-env";
 import { renderProbe } from "./render-probe";
@@ -77,6 +78,22 @@ function NodeViewRender({ id, parent, env: parentEnv }: NodeViewProps) {
   // ED-228: node ada tetapi datanya tidak valid → placeholder, bukan hilang diam-diam.
   if (!node) return store?.isInvalid(id) ? <NodePlaceholder id={id} /> : null;
   if (!style || !env || !theme || !childEnv) return null;
+
+  // DM-051/CMP-011: instance dirender sebagai subtree ter-resolve (definisi di-fetch). Node instance tetap bisa dipilih.
+  if (node.type === "instance") {
+    return (
+      <InstanceNodeView
+        node={node}
+        env={env}
+        theme={theme}
+        breakpoint={frame.breakpoint}
+        parent={parent}
+        frameWidth={frame.width}
+        store={store}
+        geometryRef={geometry ? ref : undefined}
+      />
+    );
+  }
 
   const css = editorNodeStyle(node, style, { parent, theme, assetUrl, frameWidth: frame.width });
   const attributes = {

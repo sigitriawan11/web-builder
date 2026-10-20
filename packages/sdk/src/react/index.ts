@@ -3,6 +3,7 @@ export {
   PlatformApiProvider,
   useConsents,
   useCreateSite,
+  useLibraryComponentDefinition,
   useLibraryEditorSession,
   usePlatformApi,
   useProfile,

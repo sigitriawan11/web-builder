@@ -6,6 +6,7 @@ import {
   dataEnvelope,
   LibraryDraftDefinitionSchema,
   LibraryEditorSessionSchema,
+  LibraryPublishedDefinitionSchema,
   type ListSitesQuery,
   listEnvelope,
   type PresignUploadRequest,
@@ -129,6 +130,13 @@ export function createPlatformApi(client: ApiClient) {
         client
           .request("GET", `/v1/admin/library/component-drafts/${componentId}`, {
             schema: dataEnvelope(LibraryDraftDefinitionSchema),
+          })
+          .then(unwrap),
+      /** Definisi versi published (CMP-158) — editor me-resolve instance versi published (immutable, cacheable). */
+      publishedDefinition: (componentId: string, version: number) =>
+        client
+          .request("GET", `/v1/library/components/${componentId}/versions/${version}`, {
+            schema: dataEnvelope(LibraryPublishedDefinitionSchema),
           })
           .then(unwrap),
     },

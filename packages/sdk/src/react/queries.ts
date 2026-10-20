@@ -26,6 +26,7 @@ export const queryKeys = {
   library: {
     all: ["library"] as const,
     editorSession: (componentId: string) => ["library", "editor-session", componentId] as const,
+    definition: (componentId: string, version: number) => ["library", "definition", componentId, version] as const,
   },
 };
 
@@ -53,6 +54,15 @@ export function createQueries(api: PlatformApi) {
       queryOptions({
         queryKey: queryKeys.library.editorSession(componentId),
         queryFn: () => api.library.editorSession(componentId),
+      }),
+    // CMP-011/Option A: definisi component untuk resolusi instance — version 0 = draft (admin), >0 = published.
+    libraryComponentDefinition: (componentId: string, version: number) =>
+      queryOptions({
+        queryKey: queryKeys.library.definition(componentId, version),
+        queryFn: async () =>
+          version === 0
+            ? (await api.library.draftDefinition(componentId)).definition
+            : (await api.library.publishedDefinition(componentId, version)).definition,
       }),
   };
 }
