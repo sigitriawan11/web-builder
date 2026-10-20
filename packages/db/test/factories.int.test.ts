@@ -49,7 +49,7 @@ describe("factories (ARCHITECTURE §14)", () => {
     const { site, document } = await createSite(testDb.db, { workspace });
     expect(site).toMatchObject({ workspaceId: workspace.id, status: "draft", documentId: document.id });
     // schemaVersion = default factory (CURRENT_SCHEMA_VERSION, disalin karena db hanya type-only ke document-model).
-    expect(document).toMatchObject({ siteId: site.id, kind: "site", schemaVersion: 8 });
+    expect(document).toMatchObject({ siteId: site.id, kind: "site", schemaVersion: 9 });
     const [stored] = await testDb.db.select().from(documents).where(eq(documents.id, document.id));
     expect(stored?.siteId).toBe(site.id);
   });

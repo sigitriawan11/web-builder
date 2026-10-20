@@ -353,7 +353,7 @@ export function generateLandingDocument({ nodeCount, seed = 1 }: LandingOptions)
   while (builder.remaining > 0) builder.text(fillerParent, "Catatan", "p", builder.sentence(4, 12));
 
   return {
-    schemaVersion: 8,
+    schemaVersion: 9,
     meta: { title: `Benchmark Landing ${nodeCount}`, createdWith: "template" },
     settings: defaultSiteSettings({ title: `Benchmark Landing ${nodeCount}` }),
     theme: defaultTheme(),

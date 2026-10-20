@@ -29,9 +29,13 @@ describe("InstanceNode (DM-018)", () => {
     expect(InstanceNodeSchema.safeParse(bad).success).toBe(false);
   });
 
-  it("menolak children (instance tidak punya children) & version non-positif", () => {
+  it("menolak children (instance tidak punya children) & version negatif; version 0 = rujukan draft (CMP-011)", () => {
     expect(InstanceNodeSchema.safeParse({ ...instance, children: [] }).success).toBe(false);
-    expect(InstanceNodeSchema.safeParse({ ...instance, props: { ...instance.props, version: 0 } }).success).toBe(false);
+    // version 0 = rujukan draft terbaru (Mode Admin, Option A) → VALID; negatif tetap ditolak.
+    expect(InstanceNodeSchema.safeParse({ ...instance, props: { ...instance.props, version: 0 } }).success).toBe(true);
+    expect(InstanceNodeSchema.safeParse({ ...instance, props: { ...instance.props, version: -1 } }).success).toBe(
+      false,
+    );
   });
 });
 

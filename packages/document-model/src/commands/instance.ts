@@ -69,7 +69,7 @@ export const createInstance = defineCommand({
     parentId: NodeIdSchema,
     index: z.number().int().nonnegative().optional(),
     componentId: ComponentIdSchema,
-    version: z.number().int().positive(),
+    version: z.number().int().nonnegative(),
     source: z.enum(["library", "site", "marketplace"]).default("library"),
     variant: z.record(z.string(), z.string()).optional(),
     propValues: z.record(z.string(), PropValueSchema).optional(),

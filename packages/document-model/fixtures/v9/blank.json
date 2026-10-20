@@ -1,0 +1,421 @@
+{
+  "schemaVersion": 9,
+  "meta": {
+    "title": "Situs Kosong",
+    "createdWith": "blank"
+  },
+  "settings": {
+    "language": "id",
+    "seo": {
+      "titleTemplate": "%s · Situs Kosong",
+      "defaultTitle": "Situs Kosong"
+    },
+    "breakpoints": [
+      {
+        "id": "base",
+        "label": {
+          "id": "Desktop",
+          "en": "Desktop"
+        },
+        "maxWidth": null,
+        "previewWidth": 1440
+      },
+      {
+        "id": "tablet",
+        "label": {
+          "id": "Tablet",
+          "en": "Tablet"
+        },
+        "maxWidth": 991,
+        "previewWidth": 768
+      },
+      {
+        "id": "mobile",
+        "label": {
+          "id": "Mobile",
+          "en": "Mobile"
+        },
+        "maxWidth": 479,
+        "previewWidth": 390
+      }
+    ],
+    "manualResponsive": false,
+    "autoResponsive": {
+      "enabled": true,
+      "rules": {}
+    }
+  },
+  "theme": {
+    "tokens": {
+      "color": {
+        "primary": "#2563EB",
+        "primaryHover": "#1D4ED8",
+        "onPrimary": "#FFFFFF",
+        "background": "#FFFFFF",
+        "surface": "#F8FAFC",
+        "onSurface": "#0F172A",
+        "muted": "#64748B",
+        "border": "#E2E8F0",
+        "accent": "#F59E0B",
+        "success": "#16A34A",
+        "warning": "#D97706",
+        "danger": "#DC2626"
+      },
+      "typography": {
+        "display": {
+          "value": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 64,
+              "unit": "px"
+            },
+            "fontWeight": 800,
+            "lineHeight": 1.1
+          },
+          "tablet": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 52,
+              "unit": "px"
+            },
+            "fontWeight": 800,
+            "lineHeight": 1.1
+          },
+          "mobile": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 40,
+              "unit": "px"
+            },
+            "fontWeight": 800,
+            "lineHeight": 1.15
+          }
+        },
+        "h1": {
+          "value": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 48,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.15
+          },
+          "mobile": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 34,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.2
+          }
+        },
+        "h2": {
+          "value": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 36,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.2
+          },
+          "mobile": {
+            "fontFamily": {
+              "$token": "fontFamily.heading"
+            },
+            "fontSize": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "lineHeight": 1.25
+          }
+        },
+        "h3": {
+          "fontFamily": {
+            "$token": "fontFamily.heading"
+          },
+          "fontSize": {
+            "value": 28,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.3
+        },
+        "h4": {
+          "fontFamily": {
+            "$token": "fontFamily.heading"
+          },
+          "fontSize": {
+            "value": 22,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.35
+        },
+        "body": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 16,
+            "unit": "px"
+          },
+          "fontWeight": 400,
+          "lineHeight": 1.6
+        },
+        "bodySm": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 14,
+            "unit": "px"
+          },
+          "fontWeight": 400,
+          "lineHeight": 1.55
+        },
+        "caption": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 12,
+            "unit": "px"
+          },
+          "fontWeight": 400,
+          "lineHeight": 1.5
+        },
+        "button": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 16,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.25
+        },
+        "overline": {
+          "fontFamily": {
+            "$token": "fontFamily.body"
+          },
+          "fontSize": {
+            "value": 12,
+            "unit": "px"
+          },
+          "fontWeight": 600,
+          "lineHeight": 1.5,
+          "letterSpacing": {
+            "value": 0.08,
+            "unit": "em"
+          },
+          "textTransform": "uppercase"
+        }
+      },
+      "fontFamily": {
+        "heading": "Plus Jakarta Sans",
+        "body": "Inter",
+        "mono": "JetBrains Mono"
+      },
+      "space": {
+        "0": {
+          "value": 0,
+          "unit": "px"
+        },
+        "1": {
+          "value": 4,
+          "unit": "px"
+        },
+        "2": {
+          "value": 8,
+          "unit": "px"
+        },
+        "3": {
+          "value": 12,
+          "unit": "px"
+        },
+        "4": {
+          "value": 16,
+          "unit": "px"
+        },
+        "5": {
+          "value": 20,
+          "unit": "px"
+        },
+        "6": {
+          "value": 24,
+          "unit": "px"
+        },
+        "8": {
+          "value": 32,
+          "unit": "px"
+        },
+        "10": {
+          "value": 40,
+          "unit": "px"
+        },
+        "12": {
+          "value": 48,
+          "unit": "px"
+        },
+        "16": {
+          "value": 64,
+          "unit": "px"
+        },
+        "20": {
+          "value": 80,
+          "unit": "px"
+        },
+        "24": {
+          "value": 96,
+          "unit": "px"
+        }
+      },
+      "radius": {
+        "none": {
+          "value": 0,
+          "unit": "px"
+        },
+        "sm": {
+          "value": 4,
+          "unit": "px"
+        },
+        "md": {
+          "value": 8,
+          "unit": "px"
+        },
+        "lg": {
+          "value": 12,
+          "unit": "px"
+        },
+        "xl": {
+          "value": 16,
+          "unit": "px"
+        },
+        "full": {
+          "value": 9999,
+          "unit": "px"
+        }
+      },
+      "shadow": {
+        "sm": [
+          {
+            "type": "dropShadow",
+            "x": 0,
+            "y": 1,
+            "blur": 2,
+            "color": "#0F172A14"
+          }
+        ],
+        "md": [
+          {
+            "type": "dropShadow",
+            "x": 0,
+            "y": 4,
+            "blur": 16,
+            "color": "#0F172A1A"
+          }
+        ],
+        "lg": [
+          {
+            "type": "dropShadow",
+            "x": 0,
+            "y": 12,
+            "blur": 32,
+            "spread": -4,
+            "color": "#0F172A26"
+          }
+        ]
+      },
+      "size": {
+        "container": {
+          "value": 1200,
+          "unit": "px"
+        },
+        "contentNarrow": {
+          "value": 720,
+          "unit": "px"
+        }
+      }
+    },
+    "fonts": [
+      {
+        "family": "Plus Jakarta Sans",
+        "source": "google",
+        "weights": [
+          600,
+          700,
+          800
+        ],
+        "fallback": "sans-serif"
+      },
+      {
+        "family": "Inter",
+        "source": "google",
+        "weights": [
+          400,
+          600
+        ],
+        "fallback": "sans-serif"
+      },
+      {
+        "family": "JetBrains Mono",
+        "source": "google",
+        "weights": [
+          400
+        ],
+        "fallback": "monospace"
+      }
+    ]
+  },
+  "componentDeps": {},
+  "assets": {},
+  "pageOrder": [
+    "pg_home000001"
+  ],
+  "nodes": {
+    "pg_home000001": {
+      "id": "pg_home000001",
+      "type": "page",
+      "name": "Home",
+      "parentId": null,
+      "children": [],
+      "visible": true,
+      "locked": false,
+      "style": {
+        "base": {
+          "layout": {
+            "mode": "flex",
+            "direction": "column"
+          },
+          "size": {
+            "width": {
+              "mode": "fill"
+            }
+          }
+        }
+      },
+      "props": {
+        "path": "/",
+        "title": "Home",
+        "isHome": true
+      }
+    }
+  }
+}

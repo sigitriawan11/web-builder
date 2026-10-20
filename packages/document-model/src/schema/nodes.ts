@@ -204,7 +204,9 @@ export const GroupNodeSchema = z.strictObject({
 // parent). Nilai & override divalidasi struktural di sini; kesesuaian dengan `propsSchema`/definisi dicek saat resolusi.
 export const InstancePropsSchema = z.strictObject({
   componentId: ComponentIdSchema,
-  version: z.number().int().positive(),
+  // ≥0: `0` = rujukan draft terbaru (Mode Admin create-from-selection, CMP-011/Option A); >0 = version_seq published.
+  // Instance situs WAJIB published (dijaga invariant INSTANCE_DEP); draft hanya di dokumen ComponentDefinition.
+  version: z.number().int().nonnegative(),
   variant: z.record(z.string(), z.string()).optional(),
   propValues: z.record(z.string(), PropValueSchema).optional(),
   overrides: z.record(NodePathSchema, NodePatchSchema).optional(),

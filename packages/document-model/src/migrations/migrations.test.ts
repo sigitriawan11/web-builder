@@ -109,7 +109,7 @@ describe("migrateYDoc (alur load server)", () => {
     expect(migrateYDoc(doc)).toEqual({
       fromVersion: 0,
       toVersion: CURRENT_SCHEMA_VERSION,
-      applied: [0, 1, 2, 3, 4, 5, 6, 7],
+      applied: [0, 1, 2, 3, 4, 5, 6, 7, 8],
     });
     expect(origins).toEqual([systemOrigin("migration")]);
     expect(undo.canUndo()).toBe(false);
