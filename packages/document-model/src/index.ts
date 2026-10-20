@@ -35,6 +35,7 @@ export {
   resolveSiteNode,
 } from "./resolve/resolve-instance";
 export * from "./schema";
+export { type ComponentMeta, componentFromSubtree } from "./authoring/from-subtree";
 export { ComponentNodeSchema, type ComponentValidationResult, validateComponentDefinition } from "./validate/component";
 export { MAX_TREE_DEPTH } from "./validate/invariants";
 export {
