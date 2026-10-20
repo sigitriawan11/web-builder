@@ -3,11 +3,15 @@ import { isApiError } from "@platform/sdk";
 import { useLibraryEditorSession } from "@platform/sdk/react";
 import type { LibraryEditorSession } from "@platform/shared/contracts";
 import { type ReactNode, useEffect, useState, useSyncExternalStore } from "react";
+import { useStore } from "zustand";
 import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
 import { useLibraryDocumentSession } from "../collaboration/use-library-document-session";
-import { useT } from "./i18n";
+import { isEditableEvent } from "../commands/is-editable-target";
+import { CreateComponentDialog } from "../panels/components/CreateComponentDialog";
+import { selectionStore } from "../store/selection-store";
+import { useLocale, useT } from "./i18n";
 import { SiteNotFound } from "./SiteEditor";
 
 // T3.4.1/T3.4.2 (CMP-010/ED-003, Approach A): editor Mode Admin. Akses diverifikasi SERVER (bukan staf → 404).
@@ -71,17 +75,46 @@ function LibraryCanvas({
   canEdit: boolean;
 }) {
   const t = useT();
+  const locale = useLocale();
   const { session } = useLibraryDocumentSession(draftDocumentId, componentId);
   const rootId = useRootId(session);
   const runtime = useComponentRuntime(session, rootId);
+  const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
+  const [createOpen, setCreateOpen] = useState(false);
 
   // Binding aset library = T3.4.13; draft awal tanpa aset. `configureAssetUrl` (situs) tidak dipanggil di sini.
   useEffect(() => runtime?.setReadOnly(!canEdit), [runtime, canEdit]);
 
+  // CMP-011: Cmd/Ctrl+Alt+K → dialog "Buat component dari seleksi" (hanya saat bisa edit & ada seleksi).
+  useEffect(() => {
+    if (!canEdit) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (isEditableEvent(event)) return;
+      if ((event.metaKey || event.ctrlKey) && event.altKey && event.code === "KeyK") {
+        if (selectionStore.getState().selectedIds.length === 0) return;
+        event.preventDefault();
+        setCreateOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [canEdit]);
+
   if (!runtime) {
     return <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>;
   }
-  return <CanvasViewport runtime={runtime} />;
+  return (
+    <>
+      <CanvasViewport runtime={runtime} />
+      <CreateComponentDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        runtime={runtime}
+        selectedIds={selectedIds}
+        locale={locale}
+      />
+    </>
+  );
 }
 
 // `rootId` dari meta Y.Doc component (muncul setelah sinkron). Null selama belum ada.

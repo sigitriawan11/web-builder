@@ -3,7 +3,20 @@
     "badge": "ADMIN · Library",
     "componentLabel": "Component",
     "canvasPending": "Editor component akan tampil di sini (menyusul).",
-    "readOnly": "Baca saja — role kamu tidak dapat mengubah draft ini."
+    "readOnly": "Baca saja — role kamu tidak dapat mengubah draft ini.",
+    "create": {
+      "action": "Jadikan component",
+      "title": "Buat component dari seleksi",
+      "name": "Nama (PascalCase, EN)",
+      "displayNameId": "Nama tampilan (ID)",
+      "displayNameEn": "Nama tampilan (EN)",
+      "kind": "Jenis",
+      "category": "Kategori",
+      "cancel": "Batal",
+      "submit": "Buat component",
+      "selectOne": "Pilih tepat satu node untuk dijadikan component.",
+      "failed": "Gagal membuat component: {error}"
+    }
   },
   "app": {
     "loading": "Memuat editor…",

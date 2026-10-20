@@ -2,8 +2,11 @@ import {
   type AcceptConsentsBody,
   AssetSummarySchema,
   ConsentStatusSchema,
+  type CreateLibraryComponentBody,
+  CreateLibraryComponentResponseSchema,
   type CreateSiteBody,
   dataEnvelope,
+  LibraryCategorySchema,
   LibraryDraftDefinitionSchema,
   LibraryEditorSessionSchema,
   LibraryPublishedDefinitionSchema,
@@ -111,6 +114,19 @@ export function createPlatformApi(client: ApiClient) {
           .then(unwrap),
     },
     library: {
+      /** Kategori library (CMP-150) untuk picker create-from-selection. */
+      categories: () =>
+        client
+          .request("GET", "/v1/admin/library/categories", { schema: dataEnvelope(z.array(LibraryCategorySchema)) })
+          .then(unwrap),
+      /** Buat component (create-from-selection, CMP-011) → { id (UUID), publicId (cmp_) }. */
+      createComponent: (body: CreateLibraryComponentBody) =>
+        client
+          .request("POST", "/v1/admin/library/components", {
+            body,
+            schema: dataEnvelope(CreateLibraryComponentResponseSchema),
+          })
+          .then(unwrap),
       /** Sesi editor Mode Admin (CMP-010): metadata component + kapabilitas user. Non-staf → 404. */
       editorSession: (componentId: string) =>
         client

@@ -68,3 +68,6 @@ export const realtimeTokenRequest = { params: IdParams };
 export const draftDefinitionRequest = {
   params: z.object({ componentId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/, "componentId cmp_… (DM-007)") }),
 };
+
+// Daftar kategori (CMP-150) — tanpa params.
+export const categoriesRequest = {};

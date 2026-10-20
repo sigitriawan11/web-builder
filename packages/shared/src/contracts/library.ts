@@ -6,6 +6,14 @@ import { UuidV7Schema } from "../ids";
 
 export const LocalizedTextSchema = z.object({ id: z.string(), en: z.string() });
 
+export const LibraryCategorySchema = z.object({
+  id: UuidV7Schema,
+  slug: z.string(),
+  type: z.enum(["functional", "industry"]),
+  name: LocalizedTextSchema,
+});
+export type LibraryCategory = z.infer<typeof LibraryCategorySchema>;
+
 export const ComponentKindSchema = z.enum(["element", "block", "section", "page", "layout"]);
 export const LibraryStatusSchema = z.enum(["draft", "in_review", "published", "deprecated", "archived"]);
 export const StaffRoleSchema = z.enum(["super_admin", "staff", "library_admin", "designer"]);
@@ -52,8 +60,26 @@ export const LibraryPublishedDefinitionSchema = z.object({
   definition: z.unknown(),
 });
 
+// Buat component (Mode Admin create-from-selection, CMP-011) — `definition` divalidasi `validateComponentDefinition`
+// di server. `slug` kebab-case unik per owner.
+export const CreateLibraryComponentBodySchema = z.object({
+  slug: z.string().regex(/^[a-z0-9][a-z0-9-]{1,62}$/),
+  categoryId: UuidV7Schema,
+  kind: ComponentKindSchema,
+  name: z.string().min(1),
+  displayName: LocalizedTextSchema,
+  description: LocalizedTextSchema,
+  tags: z.array(z.string()).optional(),
+  definition: z.unknown(),
+});
+export const CreateLibraryComponentResponseSchema = z.object({
+  id: UuidV7Schema,
+  publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
+});
+
 export type LibraryDraftDefinition = z.infer<typeof LibraryDraftDefinitionSchema>;
 export type LibraryPublishedDefinition = z.infer<typeof LibraryPublishedDefinitionSchema>;
+export type CreateLibraryComponentBody = z.infer<typeof CreateLibraryComponentBodySchema>;
 export type ComponentKind = z.infer<typeof ComponentKindSchema>;
 export type LibraryStatus = z.infer<typeof LibraryStatusSchema>;
 export type StaffRole = z.infer<typeof StaffRoleSchema>;

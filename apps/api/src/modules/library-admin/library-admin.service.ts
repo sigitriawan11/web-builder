@@ -87,9 +87,10 @@ export function createLibraryAdminService(deps: {
   return {
     /** Buat component platform + draft sebagai dokumen Yjs `kind='component'` (CMP-010/CMP-011, Approach A). */
     async createComponent(actor: StaffActor, input: CreateInput): Promise<{ id: string; publicId: string }> {
-      const definition = validateDefinition(input.definition);
       const id = uuidv7();
       const publicId = createId("cmp");
+      // Samakan `definition.id` dengan public_id yang di-generate (DM-018): id yang dirujuk dokumen/instance = public_id.
+      const definition: ComponentDefinition = { ...validateDefinition(input.definition), id: publicId };
       await withTransaction(db, logger, async (tx) => {
         await repo.insertComponent(tx, {
           id,
@@ -199,6 +200,11 @@ export function createLibraryAdminService(deps: {
       if (!component) throw new AppError("NOT_FOUND");
       await repo.updateComponent(db, componentId, { status: "archived", archivedAt: new Date() });
       await audit(actor, "library_component.archive", componentId, {});
+    },
+
+    /** Daftar kategori library (CMP-150) untuk picker create-from-selection. */
+    async listCategories(): Promise<repo.CategoryRow[]> {
+      return repo.listComponentCategories(db);
     },
 
     /** Pemakaian per versi/docState (CMP-159 GET usage). */

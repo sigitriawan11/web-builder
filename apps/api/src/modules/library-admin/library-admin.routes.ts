@@ -9,6 +9,7 @@ import { validated } from "../../middleware/validate";
 import { createLibraryAdminController } from "./library-admin.controller";
 import {
   archiveRequest,
+  categoriesRequest,
   createComponentRequest,
   deprecateRequest,
   draftDefinitionRequest,
@@ -59,6 +60,7 @@ export function createLibraryAdminRouter(deps: {
     ...limiter,
   ];
 
+  router.get("/categories", ...guard(READ_ROLES), ...validated(categoriesRequest, controller.categories));
   router.post("/components", ...guard(DRAFT_ROLES), ...validated(createComponentRequest, controller.create));
   router.put("/components/:id/draft", ...guard(DRAFT_ROLES), ...validated(saveDraftRequest, controller.saveDraft));
   router.post(

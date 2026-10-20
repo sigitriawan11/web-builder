@@ -3,7 +3,20 @@
     "badge": "ADMIN · Library",
     "componentLabel": "Component",
     "canvasPending": "The component editor will appear here (coming soon).",
-    "readOnly": "Read-only — your role cannot modify this draft."
+    "readOnly": "Read-only — your role cannot modify this draft.",
+    "create": {
+      "action": "Create component",
+      "title": "Create component from selection",
+      "name": "Name (PascalCase, EN)",
+      "displayNameId": "Display name (ID)",
+      "displayNameEn": "Display name (EN)",
+      "kind": "Kind",
+      "category": "Category",
+      "cancel": "Cancel",
+      "submit": "Create component",
+      "selectOne": "Select exactly one node to turn into a component.",
+      "failed": "Failed to create component: {error}"
+    }
   },
   "app": {
     "loading": "Loading editor…",

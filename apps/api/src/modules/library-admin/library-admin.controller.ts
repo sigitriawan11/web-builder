@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import type { ValidatedHandler } from "../../middleware/validate";
 import type {
   archiveRequest,
+  categoriesRequest,
   createComponentRequest,
   deprecateRequest,
   draftDefinitionRequest,
@@ -52,6 +53,9 @@ export function createLibraryAdminController(service: LibraryAdminService) {
   const editorSession: ValidatedHandler<typeof editorSessionRequest> = async (req, res) => {
     res.json({ data: await service.getEditorSession(actor(req), req.valid.params.id), meta: meta(res) });
   };
+  const categories: ValidatedHandler<typeof categoriesRequest> = async (_req, res) => {
+    res.json({ data: await service.listCategories(), meta: meta(res) });
+  };
   const realtimeToken: ValidatedHandler<typeof realtimeTokenRequest> = async (req, res) => {
     const data = await service.issueRealtimeToken(actor(req), req.valid.params.id);
     res.set("Cache-Control", "no-store"); // token berumur pendek; jangan di-cache.
@@ -62,5 +66,16 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     res.set("Cache-Control", "no-store"); // draft berubah terus; jangan di-cache.
     res.json({ data, meta: meta(res) });
   };
-  return { create, saveDraft, publish, deprecate, archive, usage, editorSession, realtimeToken, draftDefinition };
+  return {
+    create,
+    saveDraft,
+    publish,
+    deprecate,
+    archive,
+    usage,
+    editorSession,
+    realtimeToken,
+    draftDefinition,
+    categories,
+  };
 }

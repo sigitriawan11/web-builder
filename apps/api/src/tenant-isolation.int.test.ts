@@ -48,6 +48,7 @@ const NON_TENANT_ROUTES: Record<string, string> = {
     "admin library platform global; role staf (token realtime draft component, CMP-010/D3)",
   "GET /v1/admin/library/component-drafts/:componentId":
     "admin library platform global; role staf (definisi draft by public_id, CMP-011)",
+  "GET /v1/admin/library/categories": "admin library platform global; role staf (daftar kategori, CMP-150)",
   "GET /internal/v1/ping": "service token",
   "GET /internal/v1/documents/:id/state": "service token (worker/realtime), lintas tenant via systemScope",
 };
