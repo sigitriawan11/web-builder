@@ -17,6 +17,7 @@ import {
   PresignUploadResponseSchema,
   ProfileSchema,
   RealtimeTokenResponseSchema,
+  type SaveLibraryDraftBody,
   SessionInfoSchema,
   SiteSchema,
   type UpdateProfileBody,
@@ -135,6 +136,9 @@ export function createPlatformApi(client: ApiClient) {
             schema: dataEnvelope(z.array(LibraryComponentUsageSchema)),
           })
           .then(unwrap),
+      /** Simpan metadata draft (CMP-013) — PUT draft, 204. Definisi node diedit lewat realtime, bukan di sini. */
+      saveDraft: (componentId: string, body: SaveLibraryDraftBody) =>
+        client.request("PUT", `/v1/admin/library/components/${componentId}/draft`, { body }),
       /** Sesi editor Mode Admin (CMP-010): metadata component + kapabilitas user. Non-staf → 404. */
       editorSession: (componentId: string) =>
         client

@@ -18,6 +18,11 @@ export const ComponentKindSchema = z.enum(["element", "block", "section", "page"
 export const LibraryStatusSchema = z.enum(["draft", "in_review", "published", "deprecated", "archived"]);
 export const StaffRoleSchema = z.enum(["super_admin", "staff", "library_admin", "designer"]);
 
+// Keyword sinonim pencarian per bahasa (CMP-013).
+export const LibraryKeywordsSchema = z.object({ id: z.array(z.string()), en: z.array(z.string()) });
+// Fitur paket yang dibutuhkan component (CMP-013; lihat spec 05/06).
+export const LibraryFeatureSchema = z.enum(["dynamic", "auth", "commerce"]);
+
 export const LibraryComponentSummarySchema = z.object({
   id: UuidV7Schema,
   // ID yang dirujuk dokumen (DM-018).
@@ -31,7 +36,35 @@ export const LibraryComponentSummarySchema = z.object({
   hasDraft: z.boolean(),
   // Dokumen Yjs draft (kind=component) yang dibuka editor Mode Admin; null bila belum ada draft.
   draftDocumentId: UuidV7Schema.nullable(),
+  // Metadata (CMP-013) untuk tab Metadata panel Mode Admin.
+  categoryId: UuidV7Schema,
+  tags: z.array(z.string()),
+  keywords: LibraryKeywordsSchema.nullable(),
+  industries: z.array(z.string()),
+  aiHints: z.string().nullable(),
+  requiresFeatures: z.array(LibraryFeatureSchema),
 });
+
+// Tag lowercase-kebab (CMP-013): `hero`, `split-layout`.
+const TagSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+
+// Simpan metadata draft (CMP-013) lewat PUT `/components/:id/draft`. Semua field opsional (simpan parsial); kelengkapan
+// field wajib digerbang saat Submit review (CMP-017), bukan tiap simpan. Format divalidasi (tag kebab, aiHints ≤ 500).
+export const SaveLibraryDraftBodySchema = z
+  .object({
+    displayName: LocalizedTextSchema,
+    description: LocalizedTextSchema,
+    categoryId: UuidV7Schema,
+    tags: z.array(TagSchema).max(30),
+    keywords: LibraryKeywordsSchema,
+    industries: z.array(TagSchema).max(30),
+    aiHints: z.string().max(500),
+    requiresFeatures: z.array(LibraryFeatureSchema),
+  })
+  .partial();
+export type SaveLibraryDraftBody = z.infer<typeof SaveLibraryDraftBodySchema>;
+export type LibraryKeywords = z.infer<typeof LibraryKeywordsSchema>;
+export type LibraryFeature = z.infer<typeof LibraryFeatureSchema>;
 
 // Kapabilitas user (dari `users.staff_role`) terhadap library (CMP-010 §tabel role).
 export const LibraryCapabilitiesSchema = z.object({

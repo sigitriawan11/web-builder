@@ -120,6 +120,16 @@ test("staf: buka Mode Admin → badge ADMIN + canvas me-render component", async
   await expect(panel).toBeVisible();
   await expect(panel.getByRole("tab", { name: "Metadata" })).toBeVisible();
   await expect(panel.getByRole("tab", { name: "Props" })).toBeVisible();
+
+  // CMP-013: super_admin bisa edit metadata → simpan → "Saved"; nilai bertahan setelah reload.
+  await panel.getByLabel("Display name (EN)").fill("Edited CTA");
+  await panel.getByLabel("Tags (comma-separated)").fill("cta, with-icon");
+  await panel.getByRole("button", { name: "Save metadata" }).click();
+  await expect(panel.getByText("Saved")).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId("admin-badge")).toBeVisible();
+  await expect(page.getByTestId("component-panel").getByLabel("Display name (EN)")).toHaveValue("Edited CTA");
+
   await panel.getByRole("tab", { name: "Versions" }).click();
   await expect(panel.getByText("Draft", { exact: true })).toBeVisible();
   await panel.getByRole("tab", { name: "Usage" }).click();

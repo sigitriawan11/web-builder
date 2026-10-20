@@ -12,6 +12,7 @@ export {
   useRemoveSite,
   useRenameSite,
   useRevokeSession,
+  useSaveLibraryDraft,
   useSessions,
   useSite,
   useSiteAssets,

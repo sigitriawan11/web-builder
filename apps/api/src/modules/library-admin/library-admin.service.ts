@@ -10,6 +10,7 @@ import {
 } from "@platform/document-model";
 import { AppError, uuidv7 } from "@platform/shared";
 import {
+  type LibraryComponentSummary,
   type LibraryEditorSession,
   REALTIME_TOKEN_AUDIENCE,
   REALTIME_TOKEN_TTL_SECONDS,
@@ -62,6 +63,28 @@ function validateDefinition(input: unknown): ComponentDefinition {
 
 // ComponentDefinition → kolom jsonb (`component_versions.definition`, `$type<Record<string,unknown>>`).
 const asJsonb = (def: ComponentDefinition): Record<string, unknown> => def as unknown as Record<string, unknown>;
+
+// Baris `components` → DTO summary panel Mode Admin (CMP-010/CMP-013).
+function componentSummary(component: repo.ComponentRow): LibraryComponentSummary {
+  return {
+    id: component.id,
+    publicId: component.publicId,
+    kind: component.kind,
+    name: component.name,
+    displayName: component.displayName,
+    description: component.description,
+    status: component.status,
+    latestVersion: component.latestVersion,
+    hasDraft: component.draftDocumentId !== null,
+    draftDocumentId: component.draftDocumentId,
+    categoryId: component.categoryId,
+    tags: component.tags,
+    keywords: component.keywords,
+    industries: component.industries,
+    aiHints: component.aiHints,
+    requiresFeatures: component.requiresFeatures as LibraryComponentSummary["requiresFeatures"],
+  };
+}
 
 export function createLibraryAdminService(deps: {
   db: Db;
@@ -130,10 +153,12 @@ export function createLibraryAdminService(deps: {
       if (input.name !== undefined) meta.name = input.name;
       if (input.displayName !== undefined) meta.displayName = input.displayName;
       if (input.description !== undefined) meta.description = input.description;
+      if (input.categoryId !== undefined) meta.categoryId = input.categoryId;
       if (input.tags !== undefined) meta.tags = input.tags;
       if (input.keywords !== undefined) meta.keywords = input.keywords;
       if (input.industries !== undefined) meta.industries = input.industries;
       if (input.aiHints !== undefined) meta.aiHints = input.aiHints;
+      if (input.requiresFeatures !== undefined) meta.requiresFeatures = input.requiresFeatures;
       if (input.minPlan !== undefined) meta.minPlan = input.minPlan;
       if (Object.keys(meta).length > 0) await repo.updateComponent(db, componentId, meta);
       await audit(actor, "library_component.draft_save", componentId, { fields: Object.keys(meta) });
@@ -222,18 +247,7 @@ export function createLibraryAdminService(deps: {
       // requireStaffRole sudah menolak non-staf; `role` di sini pasti terisi.
       if (!role) throw new AppError("NOT_FOUND");
       return {
-        component: {
-          id: component.id,
-          publicId: component.publicId,
-          kind: component.kind,
-          name: component.name,
-          displayName: component.displayName,
-          description: component.description,
-          status: component.status,
-          latestVersion: component.latestVersion,
-          hasDraft: component.draftDocumentId !== null,
-          draftDocumentId: component.draftDocumentId,
-        },
+        component: componentSummary(component),
         capabilities: capabilitiesFor(role),
       };
     },

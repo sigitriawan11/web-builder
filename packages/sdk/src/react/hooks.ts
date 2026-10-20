@@ -48,6 +48,8 @@ export const useLibraryComponentDefinition = (componentId: string, version: numb
 /** Pemakaian per versi/docState (CMP-012 tab Usage). */
 export const useLibraryComponentUsage = (componentId: string) =>
   useQuery({ ...useQueries().libraryComponentUsage(componentId), retry: false });
+/** Simpan metadata draft (CMP-013); menyegarkan sesi editor. */
+export const useSaveLibraryDraft = () => useMutation({ mutationFn: useMutations().saveLibraryDraft });
 
 export const useCreateSite = () => useMutation({ mutationFn: useMutations().createSite });
 export const useRenameSite = () => useMutation({ mutationFn: useMutations().renameSite });

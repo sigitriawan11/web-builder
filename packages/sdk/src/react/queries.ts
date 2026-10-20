@@ -110,6 +110,14 @@ export function createMutations(api: PlatformApi, queryClient: QueryClient) {
       await api.assets.remove(input.siteId, input.assetId);
       await queryClient.invalidateQueries({ queryKey: queryKeys.assets.all });
     },
+    // CMP-013: simpan metadata draft → refetch sesi editor agar panel menampilkan nilai tersimpan.
+    saveLibraryDraft: async (input: {
+      componentId: string;
+      body: Parameters<PlatformApi["library"]["saveDraft"]>[1];
+    }) => {
+      await api.library.saveDraft(input.componentId, input.body);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.library.editorSession(input.componentId) });
+    },
   };
 }
 

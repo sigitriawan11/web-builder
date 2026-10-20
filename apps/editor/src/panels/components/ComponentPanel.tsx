@@ -3,6 +3,7 @@ import type { LibraryComponentSummary, LibraryStatus } from "@platform/shared/co
 import { Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@platform/ui";
 import type { ReactNode } from "react";
 import { useT } from "../../app/i18n";
+import { MetadataTab } from "./MetadataTab";
 
 // CMP-012: panel kanan Mode Admin. Tab yang punya data sekarang terisi (Metadata baca, Versions, Usage); tab editing
 // (Props/Variants/Access/QA) placeholder — masing-masing dibangun di task tersendiri (T3.4.4/5/7/9, QA).
@@ -23,11 +24,13 @@ export function ComponentPanel({
   componentId,
   component,
   locale,
+  canEdit,
 }: {
   // UUID internal (sama dengan sesi editor & endpoint usage), bukan public_id.
   componentId: string;
   component: LibraryComponentSummary;
   locale: "id" | "en";
+  canEdit: boolean;
 }) {
   const t = useT();
   return (
@@ -46,18 +49,7 @@ export function ComponentPanel({
         </TabsList>
 
         <TabsContent value="metadata">
-          <dl className="flex flex-col gap-3 text-sm">
-            <Field label={t("admin.panel.metadata.name")}>{component.name}</Field>
-            <Field label={t("admin.panel.metadata.displayName")}>{component.displayName[locale]}</Field>
-            <Field label={t("admin.panel.metadata.kind")}>{component.kind}</Field>
-            <Field label={t("admin.panel.metadata.publicId")}>
-              <code className="text-xs">{component.publicId}</code>
-            </Field>
-            <Field label={t("admin.panel.metadata.status")}>
-              <Badge variant={STATUS_VARIANT[component.status]}>{t(`admin.panel.status.${component.status}`)}</Badge>
-            </Field>
-            <Field label={t("admin.panel.metadata.description")}>{component.description[locale]}</Field>
-          </dl>
+          <MetadataTab componentId={componentId} component={component} locale={locale} canEdit={canEdit} />
         </TabsContent>
 
         <TabsContent value="versions">

@@ -57,6 +57,23 @@
         "empty": "Not used on any site yet.",
         "loading": "Loading usage…",
         "failed": "Failed to load usage."
+      },
+      "edit": {
+        "displayNameId": "Display name (ID)",
+        "displayNameEn": "Display name (EN)",
+        "descriptionId": "Description (ID)",
+        "descriptionEn": "Description (EN)",
+        "category": "Category",
+        "tags": "Tags (comma-separated)",
+        "keywordsId": "Keywords (ID, comma-separated)",
+        "keywordsEn": "Keywords (EN, comma-separated)",
+        "industries": "Industries (comma-separated)",
+        "aiHints": "AI hints",
+        "requiresFeatures": "Requires features",
+        "save": "Save metadata",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "failed": "Failed to save: {error}"
       }
     }
   },

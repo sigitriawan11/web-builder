@@ -200,8 +200,13 @@ function AdminShell({
       </header>
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 flex-1 bg-muted/40">{children}</div>
-        {/* CMP-012: panel kanan component (Metadata/Versions/Usage + placeholder tab editing). */}
-        <ComponentPanel componentId={componentId} component={component} locale={locale} />
+        {/* CMP-012/CMP-013: panel kanan component (Metadata edit/baca, Versions, Usage + placeholder tab lain). */}
+        <ComponentPanel
+          componentId={componentId}
+          component={component}
+          locale={locale}
+          canEdit={capabilities.canEditDraft}
+        />
       </div>
     </div>
   );

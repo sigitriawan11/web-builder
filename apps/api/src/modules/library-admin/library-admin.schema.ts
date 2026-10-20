@@ -5,6 +5,9 @@ import { z } from "zod";
 const Localized = z.object({ id: z.string().min(1), en: z.string().min(1) });
 const LocalizedList = z.object({ id: z.array(z.string()), en: z.array(z.string()) });
 const ComponentKind = z.enum(["element", "block", "section", "page", "layout"]);
+const Feature = z.enum(["dynamic", "auth", "commerce"]);
+// Tag lowercase-kebab (CMP-013).
+const Tag = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "tag lowercase-kebab");
 const IdParams = z.object({ id: z.uuid() });
 
 const metadataFields = {
@@ -30,16 +33,19 @@ export const createComponentRequest = {
 };
 
 // Metadata draft saja — definisi (nodes/props/variants) diedit lewat Yjs/realtime (Approach A), bukan endpoint ini.
+// Simpan parsial (CMP-013); kelengkapan field wajib digerbang saat Submit review (CMP-017).
 export const saveDraftRequest = {
   params: IdParams,
   body: z.object({
     name: z.string().min(1).optional(),
     displayName: Localized.optional(),
     description: Localized.optional(),
-    tags: z.array(z.string()).optional(),
+    categoryId: z.uuid().optional(),
+    tags: z.array(Tag).max(30).optional(),
     keywords: LocalizedList.optional(),
-    industries: z.array(z.string()).optional(),
-    aiHints: z.string().optional(),
+    industries: z.array(Tag).max(30).optional(),
+    aiHints: z.string().max(500).optional(),
+    requiresFeatures: z.array(Feature).optional(),
     minPlan: z.string().nullable().optional(),
   }),
 };

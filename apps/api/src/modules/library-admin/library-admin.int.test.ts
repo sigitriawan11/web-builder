@@ -252,6 +252,59 @@ describe("admin library CRUD (CMP-159)", () => {
     expect(adminSession.body.data.component).toMatchObject({ id, kind: "element", status: "draft", hasDraft: true });
   });
 
+  it("simpan metadata draft (CMP-013): field tersimpan & muncul di sesi editor; tag non-kebab → 422", async () => {
+    const admin = await register("library_admin");
+    const made = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-metadata"));
+    const { id } = made.body.data as { id: string };
+
+    // Kategori kedua untuk menguji perubahan categoryId.
+    const otherCategoryId = uuidv7();
+    await testDb.db.insert(schema.libraryCategories).values({
+      id: otherCategoryId,
+      slug: "admin-test-cat-2",
+      scope: "component",
+      type: "industry",
+      name: { id: "Lain", en: "Other" },
+    });
+
+    const saved = await request(target)
+      .put(`/v1/admin/library/components/${id}/draft`)
+      .set("cookie", admin)
+      .send({
+        displayName: { id: "Tombol Ajakan", en: "Call To Action" },
+        description: { id: "Tombol CTA utama", en: "Primary CTA button" },
+        categoryId: otherCategoryId,
+        tags: ["cta", "with-icon"],
+        keywords: { id: ["ajakan"], en: ["call to action"] },
+        industries: ["kuliner"],
+        aiHints: "Pakai di hero; prop label & href penting.",
+        requiresFeatures: ["commerce"],
+      });
+    expect(saved.status).toBe(204);
+
+    // GET sesi editor → summary memuat metadata tersimpan.
+    const session = await request(target).get(`/v1/admin/library/components/${id}`).set("cookie", admin);
+    expect(session.body.data.component).toMatchObject({
+      categoryId: otherCategoryId,
+      tags: ["cta", "with-icon"],
+      keywords: { id: ["ajakan"], en: ["call to action"] },
+      industries: ["kuliner"],
+      aiHints: "Pakai di hero; prop label & href penting.",
+      requiresFeatures: ["commerce"],
+      displayName: { id: "Tombol Ajakan", en: "Call To Action" },
+    });
+
+    // Tag non-kebab ditolak (CMP-013 format).
+    const bad = await request(target)
+      .put(`/v1/admin/library/components/${id}/draft`)
+      .set("cookie", admin)
+      .send({ tags: ["Not Kebab"] });
+    expect(bad.status).toBe(422);
+  });
+
   it("token realtime draft component (D3): staf → kind=component + role sesuai kapabilitas; non-staf → 404", async () => {
     const admin = await register("library_admin");
     const staff = await register("staff");

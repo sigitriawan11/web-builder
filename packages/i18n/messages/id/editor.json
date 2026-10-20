@@ -57,6 +57,23 @@
         "empty": "Belum dipakai di situs mana pun.",
         "loading": "Memuat pemakaian…",
         "failed": "Gagal memuat pemakaian."
+      },
+      "edit": {
+        "displayNameId": "Nama tampilan (ID)",
+        "displayNameEn": "Nama tampilan (EN)",
+        "descriptionId": "Deskripsi (ID)",
+        "descriptionEn": "Deskripsi (EN)",
+        "category": "Kategori",
+        "tags": "Tag (pisah koma)",
+        "keywordsId": "Keyword (ID, pisah koma)",
+        "keywordsEn": "Keyword (EN, pisah koma)",
+        "industries": "Industri (pisah koma)",
+        "aiHints": "Petunjuk AI",
+        "requiresFeatures": "Butuh fitur",
+        "save": "Simpan metadata",
+        "saving": "Menyimpan…",
+        "saved": "Tersimpan",
+        "failed": "Gagal menyimpan: {error}"
       }
     }
   },
