@@ -50,6 +50,7 @@ export { Label } from "./components/Label";
 export { NativeSelect } from "./components/NativeSelect";
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "./components/Popover";
 export { Separator } from "./components/Separator";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/Tabs";
 export { ThemeSwitcher, type ThemeSwitcherProps } from "./components/ThemeSwitcher";
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./components/Tooltip";
 export { cn } from "./lib/cn";

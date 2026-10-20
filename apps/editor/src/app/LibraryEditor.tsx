@@ -9,6 +9,7 @@ import type { DocumentSession } from "../collaboration/document-session";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { useLibraryDocumentSession } from "../collaboration/use-library-document-session";
 import { isEditableEvent } from "../commands/is-editable-target";
+import { ComponentPanel } from "../panels/components/ComponentPanel";
 import { CreateComponentDialog } from "../panels/components/CreateComponentDialog";
 import { selectionStore } from "../store/selection-store";
 import { useLocale, useT } from "./i18n";
@@ -53,13 +54,13 @@ function LibraryWorkspace({ componentId, data }: { componentId: string; data: Li
   if (!draftDocumentId) {
     // Component tanpa draft aktif (mis. hanya versi published) — editing versi baru = T3.4.x.
     return (
-      <AdminShell component={component} capabilities={capabilities}>
+      <AdminShell componentId={componentId} component={component} capabilities={capabilities}>
         <p className="m-auto text-sm text-muted-foreground">{t("admin.canvasPending")}</p>
       </AdminShell>
     );
   }
   return (
-    <AdminShell component={component} capabilities={capabilities}>
+    <AdminShell componentId={componentId} component={component} capabilities={capabilities}>
       <LibraryCanvas componentId={componentId} draftDocumentId={draftDocumentId} canEdit={capabilities.canEditDraft} />
     </AdminShell>
   );
@@ -168,15 +169,18 @@ function useComponentRuntime(session: DocumentSession | null, rootId: string | n
 }
 
 function AdminShell({
+  componentId,
   component,
   capabilities,
   children,
 }: {
+  componentId: string;
   component: LibraryEditorSession["component"];
   capabilities: LibraryEditorSession["capabilities"];
   children: ReactNode;
 }) {
   const t = useT();
+  const locale = useLocale();
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-admin-mode="library">
       <header className="flex items-center gap-3 border-b px-4 py-2">
@@ -194,7 +198,11 @@ function AdminShell({
           </span>
         ) : null}
       </header>
-      <div className="flex min-h-0 flex-1 bg-muted/40">{children}</div>
+      <div className="flex min-h-0 flex-1">
+        <div className="flex min-h-0 flex-1 bg-muted/40">{children}</div>
+        {/* CMP-012: panel kanan component (Metadata/Versions/Usage + placeholder tab editing). */}
+        <ComponentPanel componentId={componentId} component={component} locale={locale} />
+      </div>
     </div>
   );
 }

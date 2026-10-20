@@ -7,6 +7,7 @@ import {
   type CreateSiteBody,
   dataEnvelope,
   LibraryCategorySchema,
+  LibraryComponentUsageSchema,
   LibraryDraftDefinitionSchema,
   LibraryEditorSessionSchema,
   LibraryPublishedDefinitionSchema,
@@ -125,6 +126,13 @@ export function createPlatformApi(client: ApiClient) {
           .request("POST", "/v1/admin/library/components", {
             body,
             schema: dataEnvelope(CreateLibraryComponentResponseSchema),
+          })
+          .then(unwrap),
+      /** Pemakaian per versi/docState (CMP-012/CMP-159) untuk tab Usage panel Mode Admin. */
+      usage: (componentId: string) =>
+        client
+          .request("GET", `/v1/admin/library/components/${componentId}/usage`, {
+            schema: dataEnvelope(z.array(LibraryComponentUsageSchema)),
           })
           .then(unwrap),
       /** Sesi editor Mode Admin (CMP-010): metadata component + kapabilitas user. Non-staf → 404. */

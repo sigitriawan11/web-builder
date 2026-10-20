@@ -60,6 +60,15 @@ export const LibraryPublishedDefinitionSchema = z.object({
   definition: z.unknown(),
 });
 
+// Pemakaian per (versi, docState) untuk tab Usage panel Mode Admin (CMP-012/CMP-159): berapa situs & instance.
+export const LibraryComponentUsageSchema = z.object({
+  version: z.string(),
+  docState: z.enum(["draft", "published"]),
+  siteCount: z.number().int().nonnegative(),
+  instanceCount: z.number().int().nonnegative(),
+});
+export type LibraryComponentUsage = z.infer<typeof LibraryComponentUsageSchema>;
+
 // Buat component (Mode Admin create-from-selection, CMP-011) — `definition` divalidasi `validateComponentDefinition`
 // di server. `slug` kebab-case unik per owner.
 export const CreateLibraryComponentBodySchema = z.object({

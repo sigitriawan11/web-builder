@@ -16,6 +16,48 @@
       "submit": "Create component",
       "selectOne": "Select exactly one node to turn into a component.",
       "failed": "Failed to create component: {error}"
+    },
+    "panel": {
+      "title": "Component",
+      "comingSoon": "Coming in a later step.",
+      "tabs": {
+        "metadata": "Metadata",
+        "props": "Props",
+        "variants": "Variants",
+        "access": "Access",
+        "qa": "QA",
+        "versions": "Versions",
+        "usage": "Usage"
+      },
+      "metadata": {
+        "name": "Name (EN)",
+        "displayName": "Display name",
+        "kind": "Kind",
+        "publicId": "Public ID",
+        "description": "Description",
+        "status": "Status"
+      },
+      "status": {
+        "draft": "Draft",
+        "in_review": "In review",
+        "published": "Published",
+        "deprecated": "Deprecated",
+        "archived": "Archived"
+      },
+      "versions": {
+        "latest": "Latest version",
+        "none": "No published version yet",
+        "hasDraft": "Has an unpublished draft"
+      },
+      "usage": {
+        "version": "Version",
+        "docState": "Doc state",
+        "sites": "Sites",
+        "instances": "Instances",
+        "empty": "Not used on any site yet.",
+        "loading": "Loading usage…",
+        "failed": "Failed to load usage."
+      }
     }
   },
   "app": {

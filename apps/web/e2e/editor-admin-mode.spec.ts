@@ -114,6 +114,16 @@ test("staf: buka Mode Admin → badge ADMIN + canvas me-render component", async
   await expect(page.getByTestId("admin-badge")).toBeVisible();
   // Canvas memuat draft Yjs & me-render dari rootId: teks component terlihat.
   await expect(page.getByText(marker)).toBeVisible();
+
+  // CMP-012: panel component kanan — tab Metadata/Versions/Usage/Props; Versions (status Draft), Usage (kosong).
+  const panel = page.getByTestId("component-panel");
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole("tab", { name: "Metadata" })).toBeVisible();
+  await expect(panel.getByRole("tab", { name: "Props" })).toBeVisible();
+  await panel.getByRole("tab", { name: "Versions" }).click();
+  await expect(panel.getByText("Draft", { exact: true })).toBeVisible();
+  await panel.getByRole("tab", { name: "Usage" }).click();
+  await expect(panel.getByText("Not used on any site yet.")).toBeVisible();
 });
 
 test("create component dari seleksi (CMP-011): seleksi → component baru + instance; konten tetap terlihat", async ({

@@ -16,6 +16,48 @@
       "submit": "Buat component",
       "selectOne": "Pilih tepat satu node untuk dijadikan component.",
       "failed": "Gagal membuat component: {error}"
+    },
+    "panel": {
+      "title": "Component",
+      "comingSoon": "Akan hadir di tahap berikutnya.",
+      "tabs": {
+        "metadata": "Metadata",
+        "props": "Props",
+        "variants": "Variants",
+        "access": "Access",
+        "qa": "QA",
+        "versions": "Versions",
+        "usage": "Usage"
+      },
+      "metadata": {
+        "name": "Nama (EN)",
+        "displayName": "Nama tampilan",
+        "kind": "Jenis",
+        "publicId": "ID publik",
+        "description": "Deskripsi",
+        "status": "Status"
+      },
+      "status": {
+        "draft": "Draft",
+        "in_review": "Dalam review",
+        "published": "Published",
+        "deprecated": "Usang",
+        "archived": "Diarsip"
+      },
+      "versions": {
+        "latest": "Versi terbaru",
+        "none": "Belum ada versi published",
+        "hasDraft": "Ada draft yang belum dipublish"
+      },
+      "usage": {
+        "version": "Versi",
+        "docState": "Status dok",
+        "sites": "Situs",
+        "instances": "Instance",
+        "empty": "Belum dipakai di situs mana pun.",
+        "loading": "Memuat pemakaian…",
+        "failed": "Gagal memuat pemakaian."
+      }
     }
   },
   "app": {

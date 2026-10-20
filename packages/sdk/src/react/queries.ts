@@ -27,6 +27,7 @@ export const queryKeys = {
     all: ["library"] as const,
     editorSession: (componentId: string) => ["library", "editor-session", componentId] as const,
     definition: (componentId: string, version: number) => ["library", "definition", componentId, version] as const,
+    usage: (componentId: string) => ["library", "usage", componentId] as const,
   },
 };
 
@@ -63,6 +64,11 @@ export function createQueries(api: PlatformApi) {
           version === 0
             ? (await api.library.draftDefinition(componentId)).definition
             : (await api.library.publishedDefinition(componentId, version)).definition,
+      }),
+    libraryComponentUsage: (componentId: string) =>
+      queryOptions({
+        queryKey: queryKeys.library.usage(componentId),
+        queryFn: () => api.library.usage(componentId),
       }),
   };
 }
