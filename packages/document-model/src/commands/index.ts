@@ -5,6 +5,7 @@ import { groupNodes, ungroup } from "./group";
 import {
   createInstance,
   detachInstance,
+  extractToInstance,
   resetOverride,
   setInstanceOverride,
   setProp,
@@ -45,6 +46,7 @@ export {
   deletePage,
   detachInstance,
   duplicateNodes,
+  extractToInstance,
   groupNodes,
   insertSubtree,
   moveNode,
@@ -109,6 +111,7 @@ export const COMMANDS = {
   addFont,
   applyThemePreset,
   createInstance,
+  extractToInstance,
   detachInstance,
   setProp,
   setVariant,

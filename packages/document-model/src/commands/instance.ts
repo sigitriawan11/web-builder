@@ -19,7 +19,7 @@ import { cloneJson } from "../yjs/clone-json";
 import { nodeToYMap, YDOC_KEYS, yNodeToJson } from "../yjs/mapping";
 import { type CommandContext, type CommandFailure, defineCommand, fail } from "./command";
 import { exceeds, locate, pageNodeCount } from "./limits";
-import { childrenOf, nodesMap, nodeType, type YNode } from "./y-access";
+import { childrenOf, collectSubtree, nodesMap, nodeType, parentIdOf, type YNode } from "./y-access";
 
 const MAX_ID_ATTEMPTS = 8;
 const isFailure = (value: unknown): value is CommandFailure =>
@@ -151,6 +151,82 @@ export const createInstance = defineCommand({
       .getMap<unknown>(YDOC_KEYS.componentDeps)
       .set(input.componentId, { version: input.version, source: input.source });
     return { ok: true, value: id, affected: [id, input.parentId] };
+  },
+});
+
+// CMP-011: ganti subtree `rootId` dengan instance dari component baru, dalam SATU transaksi (satu langkah undo).
+// Dipakai editor create-from-selection setelah `componentFromSubtree` + API create. `version: 0` = rujukan draft.
+export const extractToInstance = defineCommand({
+  name: "extractToInstance",
+  description: {
+    id: "Ganti seleksi dengan instance component.",
+    en: "Replace the selection with a component instance.",
+  },
+  aiExposed: false,
+  input: z.strictObject({
+    rootId: NodeIdSchema,
+    componentId: ComponentIdSchema,
+    version: z.number().int().nonnegative(),
+    name: z.string().min(1).max(80).optional(),
+  }),
+  run(ctx, input) {
+    const nodes = nodesMap(ctx.doc);
+    const root = nodes.get(input.rootId);
+    if (!root)
+      return fail("NOT_FOUND", { id: `Node "${input.rootId}" tidak ada`, en: `Node "${input.rootId}" not found` }, [
+        "rootId",
+      ]);
+    const parentId = parentIdOf(root);
+    if (!parentId)
+      return fail(
+        "INVALID_TARGET",
+        { id: "Root dokumen tidak bisa diekstrak", en: "The document root cannot be extracted" },
+        ["rootId"],
+      );
+    const parent = nodes.get(parentId);
+    const siblings = parent ? childrenOf(parent) : undefined;
+    const index = siblings ? siblings.toArray().indexOf(input.rootId) : -1;
+    if (!siblings || index < 0)
+      return fail(
+        "INVALID_TARGET",
+        { id: "Posisi node tidak ditemukan di parent", en: "Node position not found in parent" },
+        ["rootId"],
+      );
+
+    const idGen = ctx.idGen ?? createId;
+    let id = idGen("n");
+    for (let attempt = 1; nodes.has(id) && attempt < MAX_ID_ATTEMPTS; attempt++) id = idGen("n");
+    if (nodes.has(id))
+      return fail("INVALID_RESULT", { id: "Gagal membuat ID unik", en: "Failed to create a unique ID" });
+
+    const parsed = NodeSchema.safeParse({
+      id,
+      type: "instance",
+      name: input.name ?? "Instance",
+      parentId,
+      visible: true,
+      locked: false,
+      style: { base: {} },
+      props: { componentId: input.componentId, version: input.version },
+    });
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      return fail(
+        "INVALID_RESULT",
+        { id: `Instance tidak valid: ${issue?.message}`, en: `Invalid instance: ${issue?.message}` },
+        issue?.path.map(String),
+      );
+    }
+
+    // Satu transaksi: lepas & hapus subtree lama, sisipkan instance di posisi yang sama → satu langkah undo (AC CMP-011).
+    // Dipakai di dokumen ComponentDefinition (Mode Admin); referensi ter-pin di props instance. `componentDeps` TIDAK
+    // ditulis (itu konsep dokumen situs; draft version 0 bukan dep published).
+    const removed = collectSubtree(nodes, input.rootId);
+    siblings.delete(index, 1);
+    for (const rid of removed) nodes.delete(rid);
+    nodes.set(id, nodeToYMap(parsed.data));
+    siblings.insert(index, [id]);
+    return { ok: true, value: { instanceId: id, removedIds: [...removed] }, affected: [...removed, id, parentId] };
   },
 });
 
