@@ -1,4 +1,5 @@
 import {
+  ComponentNodeSchema,
   componentFromSubtree,
   createId,
   extractToInstance,
@@ -59,12 +60,12 @@ export async function createComponentFromSelection(deps: {
     definition,
   });
 
-  const result = runCommand({ doc: deps.runtime.doc, origin: deps.runtime.origin }, extractToInstance, {
-    rootId,
-    componentId: publicId,
-    version: 0,
-    name: deps.form.name,
-  });
+  // Dokumen ComponentDefinition → pasca-cek command pakai `ComponentNodeSchema` (root `parentId: null` sah di sini).
+  const result = runCommand(
+    { doc: deps.runtime.doc, origin: deps.runtime.origin, nodeSchema: ComponentNodeSchema },
+    extractToInstance,
+    { rootId, componentId: publicId, version: 0, name: deps.form.name },
+  );
   if (!result.ok) throw new Error(`extractToInstance: ${result.error.code}`);
   return { publicId, instanceId: result.value.instanceId };
 }

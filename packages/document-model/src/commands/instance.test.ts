@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { setupDoc } from "../../test/command-harness";
 import { minimalDocument } from "../../test/fixtures/basic-documents";
-import type { InstanceProps, SiteDocument } from "../schema";
+import type { ComponentDefinition, InstanceProps, SiteDocument } from "../schema";
+import { ComponentNodeSchema } from "../validate/component";
+import { componentDefToYDoc } from "../yjs/component-mapping";
 import { yDocToJson } from "../yjs/mapping";
-import { runCommand } from "./command";
+import { userOrigin } from "../yjs/origin";
+import { type CommandContext, runCommand } from "./command";
 import { createNode } from "./create-node";
 import {
   createInstance,
@@ -151,5 +154,77 @@ describe("extractToInstance (CMP-011)", () => {
     const h = docWithFrame();
     const result = runCommand(h.ctx, extractToInstance, { rootId: h.homeId, componentId: "cmp_x0000001", version: 0 });
     expect(result.ok).toBe(false);
+  });
+
+  // Mode Admin: extract di dokumen ComponentDefinition — parent node yang diekstrak = ROOT component (`parentId: null`).
+  // Pasca-cek command harus pakai `ComponentNodeSchema`; schema node situs menolak frame root tanpa parent.
+  describe("di dokumen ComponentDefinition (root parentId null)", () => {
+    const DEF: ComponentDefinition = {
+      schemaVersion: 1,
+      id: "cmp_srccard1",
+      version: 1,
+      name: "SrcCard",
+      category: "card",
+      propsSchema: [],
+      rootId: "n_root0001",
+      nodes: {
+        n_root0001: {
+          id: "n_root0001",
+          type: "frame",
+          name: "Root",
+          parentId: null,
+          visible: true,
+          locked: false,
+          tag: "div",
+          children: ["n_text0001"],
+          style: { base: {} },
+          props: {},
+        },
+        n_text0001: {
+          id: "n_text0001",
+          type: "text",
+          name: "Title",
+          parentId: "n_root0001",
+          visible: true,
+          locked: false,
+          tag: "p",
+          style: { base: {} },
+          props: { content: { type: "doc", content: [] } },
+        },
+      },
+    };
+
+    function componentCtx(): { ctx: CommandContext; json: () => DocJson } {
+      const doc = componentDefToYDoc(DEF);
+      const ctx: CommandContext = { doc, origin: userOrigin("test"), nodeSchema: ComponentNodeSchema };
+      return { ctx, json: () => yDocToJson(doc) as DocJson };
+    }
+
+    it("ganti anak-root dengan instance; root (parentId null) tidak dianggap tidak valid", () => {
+      const { ctx, json } = componentCtx();
+      const result = runCommand(ctx, extractToInstance, {
+        rootId: "n_text0001",
+        componentId: "cmp_newtext1",
+        version: 0,
+      });
+      if (!result.ok) throw new Error(result.error.code);
+      const after = json();
+      expect(after.nodes.n_text0001).toBeUndefined();
+      const instId = result.value.instanceId;
+      expect(after.nodes.n_root0001?.children).toContain(instId);
+      expect(after.nodes[instId]?.type).toBe("instance");
+    });
+
+    it("tanpa ComponentNodeSchema (default schema situs) → root parentId null ditolak (INVARIANT_VIOLATION)", () => {
+      const doc = componentDefToYDoc(DEF);
+      const ctx: CommandContext = { doc, origin: userOrigin("test") }; // default = NodeSchema situs
+      const result = runCommand(ctx, extractToInstance, {
+        rootId: "n_text0001",
+        componentId: "cmp_newtext1",
+        version: 0,
+      });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.code).toBe("INVARIANT_VIOLATION");
+    });
   });
 });

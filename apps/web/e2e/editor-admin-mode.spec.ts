@@ -116,6 +116,34 @@ test("staf: buka Mode Admin → badge ADMIN + canvas me-render component", async
   await expect(page.getByText(marker)).toBeVisible();
 });
 
+test("create component dari seleksi (CMP-011): seleksi → component baru + instance; konten tetap terlihat", async ({
+  page,
+}) => {
+  const { componentId, marker } = await createComponentAsStaff(page);
+  await page.goto(`${APP_URL}/editor/library/components/${componentId}/draft`);
+  await expect(page.getByTestId("admin-badge")).toBeVisible();
+  await expect(page.getByText(marker)).toBeVisible();
+
+  // Pilih node teks (n_text0001 dari definisi) lewat hook test editor, lalu Ctrl+Alt+K → dialog.
+  await page.waitForFunction(() => Boolean((window as unknown as { __editorTestApi?: unknown }).__editorTestApi));
+  const selected = await page.evaluate(() => {
+    const api = (window as unknown as { __editorTestApi?: { select(ids: string[]): void; getSelection(): string[] } })
+      .__editorTestApi;
+    api?.select(["n_text0001"]);
+    return api?.getSelection();
+  });
+  expect(selected).toEqual(["n_text0001"]);
+  await page.keyboard.press("Control+Alt+KeyK");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByLabel("Name (PascalCase, EN)").fill("ExtractedText");
+  await page.getByRole("button", { name: "Create component" }).click();
+
+  // Dialog tertutup; posisi asal kini instance dari component baru (draft) → konten tetap ter-render (AC pixel-diff).
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.locator("[data-instance-id]")).toBeVisible();
+  await expect(page.getByText(marker)).toBeVisible();
+});
+
 test("user biasa (bukan staf): Mode Admin → tidak ditemukan (permukaan admin tak bocor)", async ({ page, context }) => {
   const { componentId, marker } = await createComponentAsStaff(page);
   await context.clearCookies();

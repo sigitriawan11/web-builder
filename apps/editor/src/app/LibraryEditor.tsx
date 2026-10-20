@@ -3,10 +3,10 @@ import { isApiError } from "@platform/sdk";
 import { useLibraryEditorSession } from "@platform/sdk/react";
 import type { LibraryEditorSession } from "@platform/shared/contracts";
 import { type ReactNode, useEffect, useState, useSyncExternalStore } from "react";
-import { useStore } from "zustand";
 import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
+import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { useLibraryDocumentSession } from "../collaboration/use-library-document-session";
 import { isEditableEvent } from "../commands/is-editable-target";
 import { CreateComponentDialog } from "../panels/components/CreateComponentDialog";
@@ -79,7 +79,9 @@ function LibraryCanvas({
   const { session } = useLibraryDocumentSession(draftDocumentId, componentId);
   const rootId = useRootId(session);
   const runtime = useComponentRuntime(session, rootId);
-  const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
+  // Seleksi di-SNAPSHOT saat dialog dibuka: membuka dialog modal memindah fokus → canvas membersihkan seleksi; dialog
+  // tetap memakai seleksi saat gesture dipicu.
+  const [pendingSelection, setPendingSelection] = useState<readonly string[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
 
   // Binding aset library = T3.4.13; draft awal tanpa aset. `configureAssetUrl` (situs) tidak dipanggil di sini.
@@ -91,8 +93,10 @@ function LibraryCanvas({
     const onKeyDown = (event: KeyboardEvent) => {
       if (isEditableEvent(event)) return;
       if ((event.metaKey || event.ctrlKey) && event.altKey && event.code === "KeyK") {
-        if (selectionStore.getState().selectedIds.length === 0) return;
+        const ids = selectionStore.getState().selectedIds;
+        if (ids.length === 0) return;
         event.preventDefault();
+        setPendingSelection(ids);
         setCreateOpen(true);
       }
     };
@@ -105,16 +109,23 @@ function LibraryCanvas({
   }
   return (
     <>
+      {import.meta.env.DEV && session ? <LibraryTestHook session={session} runtime={runtime} /> : null}
       <CanvasViewport runtime={runtime} />
       <CreateComponentDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
         runtime={runtime}
-        selectedIds={selectedIds}
+        selectedIds={pendingSelection}
         locale={locale}
       />
     </>
   );
+}
+
+// ED-242: hook test editor (window.__editorTestApi) juga di Mode Admin — e2e memilih node & menjalankan command.
+function LibraryTestHook({ session, runtime }: { session: DocumentSession; runtime: CanvasRuntime }) {
+  useEditorTestHook(session, runtime, () => {});
+  return null;
 }
 
 // `rootId` dari meta Y.Doc component (muncul setelah sinkron). Null selama belum ada.

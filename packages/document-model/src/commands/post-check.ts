@@ -1,10 +1,11 @@
 import * as Y from "yjs";
+import type { z } from "zod";
 import { jsonEqual, normalizeOverrides } from "../query/normalize-overrides";
 import { NodeSchema, type ResponsiveStyle } from "../schema";
 import type { Issue } from "../validate/issues";
 import { cloneJson } from "../yjs/clone-json";
 import { yNodeToJson } from "../yjs/mapping";
-import { childrenOf, nodesMap, nodeType, parentIdOf, styleOf, type YNode } from "./y-access";
+import { childrenOf, nodesMap, parentIdOf, styleOf, type YNode } from "./y-access";
 
 const BREAKPOINTS = ["base", "tablet", "mobile"] as const;
 
@@ -51,23 +52,32 @@ export function normalizeAffectedStyles(doc: Y.Doc, affected: readonly string[])
 /**
  * Pasca-cek ringan (DM-073) pada node terdampak — bentuk node valid & relasi parent/children konsisten. Validasi
  * penuh dokumen terlalu mahal untuk setiap command; cek penuh tetap di `validateDocument`.
+ *
+ * `nodeSchema` dapat disuntik (default: schema node situs). Dokumen ComponentDefinition memakai `ComponentNodeSchema`
+ * — di sana root ber-`parentId: null` adalah bentuk yang valid, yang ditolak schema situs.
  */
-export function checkAffectedNodes(doc: Y.Doc, affected: readonly string[]): Issue[] {
+export function checkAffectedNodes(
+  doc: Y.Doc,
+  affected: readonly string[],
+  nodeSchema: z.ZodTypeAny = NodeSchema,
+): Issue[] {
   const nodes = nodesMap(doc);
   const issues: Issue[] = [];
   for (const id of new Set(affected)) {
     const yNode = nodes.get(id);
     if (!yNode) continue; // node terhapus
     const path = ["nodes", id];
-    const parsed = NodeSchema.safeParse(yNodeToJson(yNode));
+    const parsed = nodeSchema.safeParse(yNodeToJson(yNode));
     if (!parsed.success) {
       const message = parsed.error.issues[0]?.message ?? "node tidak valid";
       issues.push({ code: "SCHEMA", path, nodeId: id, message: { id: message, en: message } });
       continue;
     }
-    if (nodeType(yNode) !== "page") {
-      const parentId = parentIdOf(yNode);
-      const parent = parentId ? nodes.get(parentId) : undefined;
+    // Node ber-parent wajib dicantumkan parent-nya. Node root (`parentId: null` — page situs atau root component) sah
+    // tanpa parent; kelayakan root sebagai tipe node diurus schema (`nodeSchema`), bukan cek relasi ini.
+    const parentId = parentIdOf(yNode);
+    if (parentId) {
+      const parent = nodes.get(parentId);
       if (!parent || !childrenOf(parent)?.toArray().includes(id)) {
         issues.push({
           code: "CHILD_MISMATCH",

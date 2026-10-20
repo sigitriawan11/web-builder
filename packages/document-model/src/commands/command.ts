@@ -22,6 +22,9 @@ export interface CommandContext {
   // M3: registry definisi component (library/lokal) — dibutuhkan command yang me-resolve instance (detach,
   // updateInstanceVersion). Disuntik editor/worker; command pure yang tak butuh registry mengabaikannya.
   getComponent?: (componentId: string, version: number) => ComponentDefinition | undefined;
+  // Schema validasi node untuk pasca-cek command (default: schema node situs). Dokumen ComponentDefinition menyuntik
+  // `ComponentNodeSchema` — root ber-`parentId: null` sah di sana, ditolak schema situs.
+  nodeSchema?: z.ZodTypeAny;
 }
 
 // DM-075: command yang boleh menyentuh node terkunci tanpa `force` (lock/visibility & operasi page).
@@ -138,7 +141,7 @@ export function runCommand<I extends z.ZodType, O>(
   }, ctx.origin);
 
   if (!result.ok) return result;
-  const issues = checkAffectedNodes(ctx.doc, result.affected);
+  const issues = checkAffectedNodes(ctx.doc, result.affected, ctx.nodeSchema);
   if (issues.length > 0) {
     const [first] = issues;
     return fail(
