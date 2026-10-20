@@ -63,3 +63,8 @@ export const editorSessionRequest = { params: IdParams };
 
 // Token realtime draft component (D3) — endpoint admin terpisah dari token situs.
 export const realtimeTokenRequest = { params: IdParams };
+
+// Definisi draft by public_id (`cmp_…`) — registry editor me-resolve instance draft (CMP-011/Option A).
+export const draftDefinitionRequest = {
+  params: z.object({ componentId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/, "componentId cmp_… (DM-007)") }),
+};

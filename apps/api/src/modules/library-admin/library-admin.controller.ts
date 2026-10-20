@@ -5,6 +5,7 @@ import type {
   archiveRequest,
   createComponentRequest,
   deprecateRequest,
+  draftDefinitionRequest,
   editorSessionRequest,
   publishRequest,
   realtimeTokenRequest,
@@ -56,5 +57,10 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     res.set("Cache-Control", "no-store"); // token berumur pendek; jangan di-cache.
     res.json({ data, meta: meta(res) });
   };
-  return { create, saveDraft, publish, deprecate, archive, usage, editorSession, realtimeToken };
+  const draftDefinition: ValidatedHandler<typeof draftDefinitionRequest> = async (req, res) => {
+    const data = await service.getDraftDefinition(req.valid.params.componentId);
+    res.set("Cache-Control", "no-store"); // draft berubah terus; jangan di-cache.
+    res.json({ data, meta: meta(res) });
+  };
+  return { create, saveDraft, publish, deprecate, archive, usage, editorSession, realtimeToken, draftDefinition };
 }

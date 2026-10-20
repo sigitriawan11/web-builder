@@ -38,6 +38,13 @@ export const LibraryEditorSessionSchema = z.object({
   capabilities: LibraryCapabilitiesSchema,
 });
 
+// Definisi DRAFT component (CMP-011/Option A): registry editor me-resolve instance draft (version 0) via public_id.
+export const LibraryDraftDefinitionSchema = z.object({
+  componentId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
+  definition: z.unknown(),
+});
+
+export type LibraryDraftDefinition = z.infer<typeof LibraryDraftDefinitionSchema>;
 export type ComponentKind = z.infer<typeof ComponentKindSchema>;
 export type LibraryStatus = z.infer<typeof LibraryStatusSchema>;
 export type StaffRole = z.infer<typeof StaffRoleSchema>;

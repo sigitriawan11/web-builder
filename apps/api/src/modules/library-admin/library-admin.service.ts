@@ -259,6 +259,18 @@ export function createLibraryAdminService(deps: {
       const expiresAt = new Date((Math.floor(nowMs / 1000) + REALTIME_TOKEN_TTL_SECONDS) * 1000).toISOString();
       return { token, url: realtime.url, expiresAt };
     },
+
+    /**
+     * Definisi DRAFT terkini (CMP-011/Option A) by public_id — registry editor me-resolve instance draft (version 0).
+     * Dibaca dari Y.Doc draft (sama seperti publish, tanpa membuat versi). Tak ada draft / tak valid → 404/422.
+     */
+    async getDraftDefinition(publicId: string): Promise<{ componentId: string; definition: ComponentDefinition }> {
+      const component = await repo.findComponentByPublicId(db, publicId);
+      if (!component?.draftDocumentId) throw new AppError("NOT_FOUND");
+      const draftState = await repo.loadDraftDocumentState(db, component.draftDocumentId);
+      if (!draftState) throw new AppError("NOT_FOUND");
+      return { componentId: publicId, definition: validateDefinition(componentDefFromState(draftState.state)) };
+    },
   };
 }
 

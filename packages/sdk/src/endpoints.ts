@@ -4,6 +4,7 @@ import {
   ConsentStatusSchema,
   type CreateSiteBody,
   dataEnvelope,
+  LibraryDraftDefinitionSchema,
   LibraryEditorSessionSchema,
   type ListSitesQuery,
   listEnvelope,
@@ -121,6 +122,13 @@ export function createPlatformApi(client: ApiClient) {
         client
           .request("POST", `/v1/admin/library/components/${componentId}/realtime-token`, {
             schema: dataEnvelope(RealtimeTokenResponseSchema),
+          })
+          .then(unwrap),
+      /** Definisi draft component by public_id (CMP-011) — registry editor me-resolve instance draft (version 0). */
+      draftDefinition: (componentId: string) =>
+        client
+          .request("GET", `/v1/admin/library/component-drafts/${componentId}`, {
+            schema: dataEnvelope(LibraryDraftDefinitionSchema),
           })
           .then(unwrap),
     },

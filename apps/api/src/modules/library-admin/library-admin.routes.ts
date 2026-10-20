@@ -11,6 +11,7 @@ import {
   archiveRequest,
   createComponentRequest,
   deprecateRequest,
+  draftDefinitionRequest,
   editorSessionRequest,
   publishRequest,
   realtimeTokenRequest,
@@ -73,6 +74,12 @@ export function createLibraryAdminRouter(deps: {
   router.post("/components/:id/archive", ...guard(PUBLISH_ROLES), ...validated(archiveRequest, controller.archive));
   router.get("/components/:id/usage", ...guard(READ_ROLES), ...validated(usageRequest, controller.usage));
   router.get("/components/:id", ...guard(READ_ROLES), ...validated(editorSessionRequest, controller.editorSession));
+  // Definisi draft by public_id (registry editor me-resolve instance draft, CMP-011) — path terpisah dari `:id` UUID.
+  router.get(
+    "/component-drafts/:componentId",
+    ...guard(READ_ROLES),
+    ...validated(draftDefinitionRequest, controller.draftDefinition),
+  );
   // Token realtime draft component (D3) — semua staf (viewer = read-only).
   router.post(
     "/components/:id/realtime-token",

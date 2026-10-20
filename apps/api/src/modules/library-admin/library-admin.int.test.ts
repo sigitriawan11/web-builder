@@ -300,6 +300,34 @@ describe("admin library CRUD (CMP-159)", () => {
     ).toBe(404);
   });
 
+  it("definisi draft by public_id (CMP-011): staf → definisi; non-staf → 404", async () => {
+    const admin = await register("library_admin");
+    const plain = await register();
+    const made = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-draftdef"));
+    const { publicId } = made.body.data as { publicId: string };
+
+    const got = await request(target).get(`/v1/admin/library/component-drafts/${publicId}`).set("cookie", admin);
+    expect(got.status).toBe(200);
+    expect(got.headers["cache-control"]).toBe("no-store");
+    expect(got.body.data.componentId).toBe(publicId);
+    // Definisi dibaca dari Y.Doc draft (round-trip codec) → rootId sesuai yang dibuat.
+    expect(got.body.data.definition).toMatchObject({ rootId: "n_root0001" });
+
+    expect(
+      (await request(target).get(`/v1/admin/library/component-drafts/${publicId}`).set("cookie", plain)).status,
+    ).toBe(404);
+    // public_id tidak ada → 404; format bukan cmp_ → 422.
+    expect(
+      (await request(target).get("/v1/admin/library/component-drafts/cmp_tidakada").set("cookie", admin)).status,
+    ).toBe(404);
+    expect((await request(target).get("/v1/admin/library/component-drafts/bukan-id").set("cookie", admin)).status).toBe(
+      422,
+    );
+  });
+
   it("sesi editor untuk user biasa (bukan staf) → 404", async () => {
     const admin = await register("library_admin");
     const plain = await register();
