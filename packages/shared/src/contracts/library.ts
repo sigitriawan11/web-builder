@@ -85,6 +85,18 @@ export const LibraryDraftDefinitionSchema = z.object({
   definition: z.unknown(),
 });
 
+// Item daftar component published utk panel Insert editor (CMP-158/T3.6.1). `version` = version_seq terbaru (pin).
+export const LibraryComponentListItemSchema = z.object({
+  publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
+  name: z.string(),
+  displayName: LocalizedTextSchema,
+  categorySlug: z.string(),
+  kind: ComponentKindSchema,
+  version: z.number().int().positive(),
+  thumbnailUrl: z.string().nullable(),
+});
+export type LibraryComponentListItem = z.infer<typeof LibraryComponentListItemSchema>;
+
 // Definisi versi PUBLISHED (CMP-158/CMP-050) — editor/publish me-resolve instance versi published.
 export const LibraryPublishedDefinitionSchema = z.object({
   componentId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),

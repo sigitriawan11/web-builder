@@ -7,3 +7,8 @@ const ComponentPublicId = z.string().regex(/^cmp_[0-9a-z]{6,24}$/, "componentId 
 export const getDefinitionRequest = {
   params: z.object({ componentId: ComponentPublicId, version: z.coerce.number().int().positive() }),
 };
+
+// Daftar component published utk panel Insert (T3.6.1): filter kategori (slug) & pencarian nama, opsional.
+export const listComponentsRequest = {
+  query: z.object({ category: z.string().max(64).optional(), search: z.string().max(100).optional() }),
+};

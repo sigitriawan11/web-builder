@@ -34,6 +34,7 @@ const NON_TENANT_ROUTES: Record<string, string> = {
   "GET /v1/workspaces":
     "daftar keanggotaan user login (scope userId sesi) — isolasi diuji di workspaces-list.int.test.ts",
   "POST /v1/realtime/token": "ID dokumen di body; akses dicek service — diuji isolasi di bawah",
+  "GET /v1/library/components": "library platform global (bukan tenant); daftar published utk panel Insert (T3.6.1)",
   "GET /v1/library/components/:componentId/versions/:version":
     "library platform global (bukan tenant); hanya versi published; auth saja (CMP-158)",
   "POST /v1/admin/library/components":

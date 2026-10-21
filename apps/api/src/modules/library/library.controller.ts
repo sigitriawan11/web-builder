@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import type { ValidatedHandler } from "../../middleware/validate";
-import type { getDefinitionRequest } from "./library.schema";
+import type { getDefinitionRequest, listComponentsRequest } from "./library.schema";
 import type { LibraryService } from "./library.service";
 
 const meta = (res: Response) => ({ requestId: String(res.getHeader("x-request-id") ?? "") });
@@ -12,5 +12,13 @@ export function createLibraryController(service: LibraryService) {
     res.set("Cache-Control", "public, max-age=31536000, immutable");
     res.json({ data, meta: meta(res) });
   };
-  return { getDefinition };
+  const listComponents: ValidatedHandler<typeof listComponentsRequest> = async (req, res) => {
+    const { category, search } = req.valid.query;
+    const data = await service.listComponents({
+      ...(category ? { category } : {}),
+      ...(search ? { search } : {}),
+    });
+    res.json({ data, meta: meta(res) });
+  };
+  return { getDefinition, listComponents };
 }

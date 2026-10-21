@@ -1,4 +1,4 @@
-import { schema } from "@platform/db";
+import { eq, schema } from "@platform/db";
 import { createTestDb, type TestDb } from "@platform/db/testing";
 import { uuidv7 } from "@platform/shared";
 import { stableHash } from "@platform/shared/node";
@@ -122,6 +122,56 @@ describe("GET /v1/library/components/:componentId/versions/:version", () => {
     expect((await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/3`)).status).toBe(404);
     expect((await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/99`)).status).toBe(404);
     expect((await get(cookie, "/v1/library/components/cmp_tidakada/versions/1")).status).toBe(404);
+  });
+
+  it("T3.6.1: GET /components → daftar published per kategori + pencarian", async () => {
+    const cookie = await register();
+    const catId = uuidv7();
+    await testDb.db.insert(schema.libraryCategories).values({
+      id: catId,
+      slug: "list-cat",
+      scope: "component",
+      type: "functional",
+      name: { id: "L", en: "L" },
+    });
+    const compId = uuidv7();
+    await testDb.db.insert(schema.components).values({
+      id: compId,
+      publicId: "cmp_listtest1",
+      slug: "list-test",
+      ownerType: "platform",
+      kind: "section",
+      categoryId: catId,
+      name: "ListHero",
+      displayName: { id: "Hero", en: "Hero" },
+      description: { id: "d", en: "d" },
+      status: "published",
+      latestVersion: "1.0.0",
+    });
+    const [ver] = await testDb.db
+      .insert(schema.componentVersions)
+      .values({ componentId: compId, version: "1.0.0", versionSeq: 1, status: "published", definition: {} })
+      .returning();
+    await testDb.db.update(schema.components).set({ latestVersionId: ver?.id }).where(eq(schema.components.id, compId));
+
+    const byCat = await get(cookie, "/v1/library/components?category=list-cat");
+    expect(byCat.status).toBe(200);
+    expect(byCat.body.data).toEqual([
+      {
+        publicId: "cmp_listtest1",
+        name: "ListHero",
+        displayName: { id: "Hero", en: "Hero" },
+        categorySlug: "list-cat",
+        kind: "section",
+        version: 1,
+        thumbnailUrl: null,
+      },
+    ]);
+    // Pencarian nama (ilike) cocok; seed cmp_testbtn01 tanpa latestVersionId → tak muncul di daftar.
+    const bySearch = await get(cookie, "/v1/library/components?search=hero");
+    expect(bySearch.body.data.map((c: { publicId: string }) => c.publicId)).toContain("cmp_listtest1");
+    const none = await get(cookie, "/v1/library/components?category=list-cat&search=zzz");
+    expect(none.body.data).toEqual([]);
   });
 
   it("tanpa sesi → 401; componentId/versi tidak valid → 422", async () => {

@@ -5,7 +5,7 @@ import { requireAuth } from "../../middleware/auth-session";
 import { byUserOrIp, RATE_LIMITS, rateLimit } from "../../middleware/rate-limit";
 import { validated } from "../../middleware/validate";
 import { createLibraryController } from "./library.controller";
-import { getDefinitionRequest } from "./library.schema";
+import { getDefinitionRequest, listComponentsRequest } from "./library.schema";
 import { createLibraryService } from "./library.service";
 
 // `/v1/library` — baca library platform (CMP-158 subset). Global (bukan tenant); wajib login. Hanya baca versi
@@ -22,6 +22,7 @@ export function createLibraryRouter(deps: { db: Db; redis?: Redis; rateLimitPref
         ),
       ]
     : [];
+  router.get("/components", requireAuth(), ...limiter, ...validated(listComponentsRequest, controller.listComponents));
   router.get(
     "/components/:componentId/versions/:version",
     requireAuth(),

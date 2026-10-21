@@ -7,6 +7,7 @@ import {
   type CreateSiteBody,
   dataEnvelope,
   LibraryCategorySchema,
+  LibraryComponentListItemSchema,
   LibraryComponentUsageSchema,
   LibraryDraftDefinitionSchema,
   LibraryEditorSessionSchema,
@@ -158,6 +159,14 @@ export function createPlatformApi(client: ApiClient) {
         client
           .request("GET", `/v1/admin/library/component-drafts/${componentId}`, {
             schema: dataEnvelope(LibraryDraftDefinitionSchema),
+          })
+          .then(unwrap),
+      /** Daftar component published utk panel Insert (T3.6.1) — filter kategori (slug) & pencarian nama. */
+      listComponents: (query: { category?: string; search?: string } = {}) =>
+        client
+          .request("GET", "/v1/library/components", {
+            query,
+            schema: dataEnvelope(z.array(LibraryComponentListItemSchema)),
           })
           .then(unwrap),
       /** Definisi versi published (CMP-158) — editor me-resolve instance versi published (immutable, cacheable). */
