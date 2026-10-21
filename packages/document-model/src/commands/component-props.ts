@@ -233,3 +233,40 @@ export const unbindProp = defineCommand({
     return { ok: true, value: undefined, affected: [input.nodeId] };
   },
 });
+
+/** Tipe PropDef dengan `key` tertentu, atau undefined. */
+function propType(doc: Y.Doc, key: string): string | undefined {
+  const index = propIndex(doc, key);
+  if (index < 0) return undefined;
+  const prop = propsArray(doc).get(index) as { type?: unknown } | undefined;
+  return typeof prop?.type === "string" ? prop.type : undefined;
+}
+
+// CMP-022/DM-047: tandai node (frame template) sebagai repeater list — `props.repeatProp = listKey`. `listKey` harus
+// prop bertipe `list`. `listKey: null` melepas penandaan. Resolusi mengulang child template per item (resolve-instance).
+export const setRepeatProp = defineCommand({
+  name: "setRepeatProp",
+  description: { id: "Set/hapus repeater list pada node.", en: "Set/clear a node's list repeater." },
+  aiExposed: false,
+  input: z.strictObject({ nodeId: NodeIdSchema, listKey: z.union([CamelKeySchema, z.null()]) }),
+  run(ctx, input) {
+    const node = nodesMap(ctx.doc).get(input.nodeId);
+    if (!node)
+      return fail("NOT_FOUND", { id: `Node "${input.nodeId}" tidak ada`, en: `Node "${input.nodeId}" not found` }, [
+        "nodeId",
+      ]);
+    if (input.listKey === null) {
+      const props = node.get("props");
+      if (props instanceof Y.Map) props.delete("repeatProp");
+      return { ok: true, value: undefined, affected: [input.nodeId] };
+    }
+    if (propType(ctx.doc, input.listKey) !== "list")
+      return fail(
+        "INVALID_TARGET",
+        { id: `Prop "${input.listKey}" bukan tipe list`, en: `Prop "${input.listKey}" is not a list` },
+        ["listKey"],
+      );
+    propsMapOf(node).set("repeatProp", input.listKey);
+    return { ok: true, value: undefined, affected: [input.nodeId] };
+  },
+});

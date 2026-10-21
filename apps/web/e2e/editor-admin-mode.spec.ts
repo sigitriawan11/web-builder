@@ -194,6 +194,22 @@ test("props & binding (CMP-020/021): tambah prop → bind visible node terpilih"
   await expect(visibleRow.getByText("showText")).toBeVisible();
   await expect(visibleRow.getByRole("button", { name: "Unbind" })).toBeVisible();
   await expect(page.getByText(marker)).toBeVisible();
+
+  // CMP-022: tambah prop list + tandai frame root sebagai repeater.
+  await panel.getByLabel("Key (camelCase)").fill("items");
+  await panel.getByRole("combobox").first().selectOption("list");
+  await panel.getByRole("button", { name: "Add prop" }).click();
+  await expect(panel.getByTestId("prop-list").getByText("items").first()).toBeVisible();
+
+  await page.evaluate(() =>
+    (window as unknown as { __editorTestApi?: { select(ids: string[]): void } }).__editorTestApi?.select([
+      "n_root0001",
+    ]),
+  );
+  const repeat = panel.getByTestId("repeat-control");
+  await repeat.getByRole("combobox").selectOption("items");
+  await repeat.getByRole("button", { name: "Set" }).click();
+  await expect(repeat.getByText("items")).toBeVisible();
 });
 
 test("user biasa (bukan staf): Mode Admin → tidak ditemukan (permukaan admin tak bocor)", async ({ page, context }) => {

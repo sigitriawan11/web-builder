@@ -1,4 +1,11 @@
-import { addComponentProp, bindProp, removeComponentProp, unbindProp, updateComponentProp } from "./component-props";
+import {
+  addComponentProp,
+  bindProp,
+  removeComponentProp,
+  setRepeatProp,
+  unbindProp,
+  updateComponentProp,
+} from "./component-props";
 import { registerAsset, replaceText, setImage, setLink, setNodeProps, setTextContent } from "./content";
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
@@ -69,6 +76,7 @@ export {
   setLocked,
   setNodeProps,
   setProp,
+  setRepeatProp,
   setSettings,
   setSlotContent,
   setTag,
@@ -129,4 +137,5 @@ export const COMMANDS = {
   removeComponentProp,
   bindProp,
   unbindProp,
+  setRepeatProp,
 } as const;

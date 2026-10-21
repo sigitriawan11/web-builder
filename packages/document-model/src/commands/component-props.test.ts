@@ -4,7 +4,14 @@ import { ComponentNodeSchema, validateComponentDefinition } from "../validate/co
 import { componentDefToYDoc, yDocToComponentDef } from "../yjs/component-mapping";
 import { userOrigin } from "../yjs/origin";
 import { type CommandContext, runCommand } from "./command";
-import { addComponentProp, bindProp, removeComponentProp, unbindProp, updateComponentProp } from "./component-props";
+import {
+  addComponentProp,
+  bindProp,
+  removeComponentProp,
+  setRepeatProp,
+  unbindProp,
+  updateComponentProp,
+} from "./component-props";
 
 const TEXT_PROP: PropDef = { key: "title", label: { id: "Judul", en: "Title" }, type: "text", default: "Halo" };
 const BOOL_PROP: PropDef = {
@@ -53,7 +60,7 @@ function baseDef(): ComponentDefinition {
 
 // Node ComponentDefinition bertipe longgar (style/props/visible permisif) → cast ke bentuk yang kita periksa.
 type LooseNode = {
-  props?: { content?: unknown };
+  props?: { content?: unknown; repeatProp?: unknown };
   visible?: unknown;
   style?: { base?: { fills?: { color?: unknown } } };
 };
@@ -183,5 +190,32 @@ describe("command binding prop → node (CMP-021)", () => {
     const removed = runCommand(h.ctx, removeComponentProp, { key: "title" });
     expect(removed.ok).toBe(true);
     expect(h.read().propsSchema).toEqual([]);
+  });
+});
+
+describe("repeater list (CMP-022)", () => {
+  const LIST_PROP: PropDef = {
+    key: "items",
+    label: { id: "Item", en: "Items" },
+    type: "list",
+    itemSchema: [{ key: "label", label: { id: "L", en: "L" }, type: "text", default: "" }],
+    default: [],
+  };
+
+  it("setRepeatProp menandai frame; prop non-list ditolak; null melepas", () => {
+    const h = setup();
+    runCommand(h.ctx, addComponentProp, { prop: LIST_PROP });
+    const set = runCommand(h.ctx, setRepeatProp, { nodeId: "n_root0001", listKey: "items" });
+    expect(set.ok).toBe(true);
+    expect(h.node("n_root0001").props?.repeatProp).toBe("items");
+
+    runCommand(h.ctx, addComponentProp, { prop: TEXT_PROP });
+    const bad = runCommand(h.ctx, setRepeatProp, { nodeId: "n_root0001", listKey: "title" });
+    expect(bad.ok).toBe(false);
+    if (!bad.ok) expect(bad.error.code).toBe("INVALID_TARGET");
+
+    const cleared = runCommand(h.ctx, setRepeatProp, { nodeId: "n_root0001", listKey: null });
+    expect(cleared.ok).toBe(true);
+    expect(h.node("n_root0001").props?.repeatProp).toBeUndefined();
   });
 });

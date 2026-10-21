@@ -7,6 +7,7 @@ import {
   type PropDef,
   removeComponentProp,
   runCommand,
+  setRepeatProp,
   unbindProp,
 } from "@platform/document-model";
 import { Button, Input, Label, NativeSelect } from "@platform/ui";
@@ -21,9 +22,11 @@ import { selectionStore } from "../../store/selection-store";
 // sama dengan canvas. Tipe prop di form sengaja subset skalar (text/number/boolean/color); richText/enum/image/link/
 // icon/slot/list menyusul (editor tipe-khusus). Binding: hanya target yang bentuknya pasti (content teks, visible).
 
-// Tipe prop yang form add-nya dukung sekarang (default skalar sederhana).
-const ADDABLE_TYPES = ["text", "number", "boolean", "color"] as const;
+// Tipe prop yang form add-nya dukung sekarang (default skalar + list dgn itemSchema starter).
+const ADDABLE_TYPES = ["text", "number", "boolean", "color", "list"] as const;
 type AddableType = (typeof ADDABLE_TYPES)[number];
+// Tipe yang tidak butuh input "default" di form.
+const NO_DEFAULT_INPUT = new Set<AddableType>(["color", "list"]);
 
 const ctxOf = (runtime: CanvasRuntime) => ({
   doc: runtime.doc,
@@ -41,6 +44,15 @@ function buildProp(type: AddableType, key: string, label: { id: string; en: stri
       return { key, label, type: "boolean", default: defaultText.trim().toLowerCase() === "true" };
     case "color":
       return { key, label, type: "color", default: { $token: "color.primary" } };
+    case "list":
+      // itemSchema starter (satu sub-field teks); editor itemSchema penuh = follow-up.
+      return {
+        key,
+        label,
+        type: "list",
+        itemSchema: [{ key: "label", label: { id: "Label", en: "Label" }, type: "text", default: "" }],
+        default: [],
+      };
   }
 }
 
@@ -75,6 +87,8 @@ function useSelectedNode(runtime: CanvasRuntime): Node | null {
   const getSnapshot = useCallback(() => (id ? runtime.nodeStore.getNode(id) : null), [id, runtime]);
   return useSyncExternalStore(subscribe, getSnapshot);
 }
+
+const propString = (value: unknown): string | null => (typeof value === "string" ? value : null);
 
 const propRefKey = (value: unknown): string | null =>
   typeof value === "object" &&
@@ -184,7 +198,7 @@ function PropsEditor({ runtime, canEdit, locale }: { runtime: CanvasRuntime; can
                 </option>
               ))}
             </NativeSelect>
-            {type !== "color" ? (
+            {!NO_DEFAULT_INPUT.has(type) ? (
               <Input
                 placeholder={t("admin.panel.props.defaultValue")}
                 value={defaultText}
@@ -265,9 +279,77 @@ function BindingSection({
               onResult(runCommand(ctxOf(runtime), unbindProp, { nodeId: node.id, path: { field: "visible" } }))
             }
           />
+          {node.type === "frame" || node.type === "group" ? (
+            <RepeatControl
+              current={propString((node.props as { repeatProp?: unknown } | undefined)?.repeatProp)}
+              lists={props.filter((p) => p.type === "list")}
+              disabled={!canEdit}
+              onSet={(listKey) => onResult(runCommand(ctxOf(runtime), setRepeatProp, { nodeId: node.id, listKey }))}
+              onClear={() => onResult(runCommand(ctxOf(runtime), setRepeatProp, { nodeId: node.id, listKey: null }))}
+            />
+          ) : null}
         </>
       )}
     </section>
+  );
+}
+
+// CMP-022: tandai frame terpilih sebagai repeater (props.repeatProp → prop list). Isi item = Simple mode (M4).
+function RepeatControl({
+  current,
+  lists,
+  disabled,
+  onSet,
+  onClear,
+}: {
+  current: string | null;
+  lists: PropDef[];
+  disabled: boolean;
+  onSet: (listKey: string) => void;
+  onClear: () => void;
+}) {
+  const t = useT();
+  const [pick, setPick] = useState("");
+  return (
+    <div className="flex items-center gap-2 text-sm" data-testid="repeat-control">
+      <span className="w-20 shrink-0 text-muted-foreground">{t("admin.panel.props.repeat")}</span>
+      {current ? (
+        <>
+          <code className="text-xs">{current}</code>
+          {!disabled ? (
+            <button type="button" className="ml-auto text-xs text-destructive hover:underline" onClick={onClear}>
+              {t("admin.panel.props.repeatClear")}
+            </button>
+          ) : null}
+        </>
+      ) : (
+        <>
+          <NativeSelect
+            value={pick}
+            onChange={(e) => setPick(e.target.value)}
+            disabled={disabled || lists.length === 0}
+          >
+            <option value="">{t("admin.panel.props.bindSelect")}</option>
+            {lists.map((p) => (
+              <option key={p.key} value={p.key}>
+                {p.key}
+              </option>
+            ))}
+          </NativeSelect>
+          <button
+            type="button"
+            className="text-xs text-primary hover:underline disabled:opacity-50"
+            disabled={disabled || pick === ""}
+            onClick={() => {
+              onSet(pick);
+              setPick("");
+            }}
+          >
+            {t("admin.panel.props.repeatSet")}
+          </button>
+        </>
+      )}
+    </div>
   );
 }
 

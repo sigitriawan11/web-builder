@@ -92,7 +92,10 @@
         "bindVisible": "Visible",
         "bindSelect": "— pick a prop —",
         "bind": "Bind",
-        "unbind": "Unbind"
+        "unbind": "Unbind",
+        "repeat": "Repeat (list)",
+        "repeatSet": "Set",
+        "repeatClear": "Clear"
       }
     }
   },

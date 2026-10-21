@@ -92,7 +92,10 @@
         "bindVisible": "Terlihat",
         "bindSelect": "— pilih prop —",
         "bind": "Bind",
-        "unbind": "Lepas"
+        "unbind": "Lepas",
+        "repeat": "Ulang (list)",
+        "repeatSet": "Set",
+        "repeatClear": "Hapus"
       }
     }
   },
