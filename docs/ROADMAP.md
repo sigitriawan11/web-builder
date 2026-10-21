@@ -1350,7 +1350,9 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [~] **T3.4.14** Aturan desain wajib (design rules linter: token-only warna, auto-layout, alt text, kontras) — CMP-015 · `apps/editor`, `packages/document-model` · Verifikasi: unit test linter
   - **Core selesai (2026-10-21):** `library-lint` fungsi murni browser-safe `@platform/library-seed/lint` (`lintComponent(def) → LintViolation[]{rule,nodeId?,message}`), export subpath siap dipakai editor. Aturan statis: **R-NAMING** (nama generik), **R-SIZE** (node >300 / JSON >200KB), **R-AUTOLAYOUT** (container ber-anak tanpa flex/grid; dekoratif dikecualikan), **R-TOKEN** (warna literal hex). 5 unit test; library-seed 24. **SISA (follow-up):** aturan berbasis render Playwright (**R-RESPONSIVE**, **R-A11Y** kontras/alt/ariaLabel, **R-SEMANTIC** penuh); integrasi panel QA editor + klik pelanggaran → pilih node + blok transisi `in_review` = **T3.5.2**.
 - [ ] **T3.4.15** Edit main component (admin only) dari instance → buka draft — CMP-073 · `apps/editor` · Verifikasi: e2e
+  - **Ditunda (2026-10-21):** butuh instance ter-insert di editor situs (Epic 3.6) sebagai titik masuk menu "Edit komponen utama". Kerjakan setelah T3.6.x.
 - [ ] **T3.4.16** Theme di Mode Admin (edit preset theme) — CMP-124, CMP-120 · `apps/editor/src/panels/theme` · Verifikasi: e2e simpan preset
+  - **Ditunda/realign (2026-10-21):** spec CMP-124 menaruh **editing preset di Admin Panel** (`apps/web /admin`, form token + preview grid), bukan editor Mode Admin; "Theme matrix" = worker Playwright. Prasyarat belum ada: route admin (T3.8.1), preset ter-seed (T3.11.1), renderer-service Playwright (T3.7). Doc component hanya pakai theme PRATINJAU (bukan bagian ComponentDefinition). Kerjakan bareng Epic 3.8/3.11.
 
 #### Epic 3.5 — Lifecycle & versioning
 
