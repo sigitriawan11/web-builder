@@ -490,6 +490,11 @@
       "disabled": "Disabled",
       "opacity": "Opacity",
       "clear": "Clear"
+    },
+    "instance": {
+      "title": "Instance props",
+      "loading": "Loading props…",
+      "none": "This component has no editable props."
     }
   },
   "nodeType": {

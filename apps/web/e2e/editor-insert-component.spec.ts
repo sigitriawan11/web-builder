@@ -16,7 +16,7 @@ const DEFINITION = {
   version: 1,
   name: "InsertDemo",
   category: "card",
-  propsSchema: [],
+  propsSchema: [{ key: "title", label: { id: "Judul", en: "Title" }, type: "text", default: "Hello" }],
   rootId: "n_root0001",
   nodes: {
     n_root0001: {
@@ -36,7 +36,7 @@ const DEFINITION = {
 
 interface DNode {
   type: string;
-  props?: { componentId?: string; version?: number };
+  props?: { componentId?: string; version?: number; propValues?: Record<string, unknown> };
 }
 const doc = (page: Page) => page.evaluate(() => window.__editorTestApi?.getDoc() as { nodes: Record<string, DNode> });
 
@@ -77,7 +77,7 @@ test.beforeAll(async () => {
   }
 });
 
-test("T3.6.1: panel Components menampilkan component published; klik menyisipkan instance", async ({ page }) => {
+test("T3.6.1/T3.6.4: insert instance dari panel Components + edit prop lewat Inspector", async ({ page }) => {
   await page.goto(`${APP_URL}/sites`);
   await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Insert Component Test")}`);
   await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
@@ -94,4 +94,11 @@ test("T3.6.1: panel Components menampilkan component published; klik menyisipkan
   const node = (await doc(page)).nodes[selected];
   expect(node).toMatchObject({ type: "instance", props: { componentId: PUBLIC_ID, version: 1 } });
   void pageId;
+
+  // T3.6.4/ED-153: instance terpilih → Inspector menampilkan form props (dari propsSchema); ubah → setProp ke doc.
+  const titleInput = page.getByTestId("inspector").getByTestId("instance-prop-title");
+  await expect(titleInput).toBeVisible();
+  await titleInput.fill("Changed");
+  await titleInput.blur();
+  await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.propValues?.title).toBe("Changed");
 });

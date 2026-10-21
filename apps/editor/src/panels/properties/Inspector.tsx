@@ -22,6 +22,7 @@ import { EffectsSection } from "./EffectsSection";
 import { FillSection } from "./FillSection";
 import { ImageSection } from "./ImageSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
+import { InstancePropsSection } from "./InstancePropsSection";
 import { LinkSection } from "./LinkSection";
 import { isMixed, mixedValue } from "./mixed";
 import { NameField } from "./NameField";
@@ -110,6 +111,9 @@ function DesignTab({
           <Value value={mixedValue(nodes.map((node) => node.name))} />
         </InspectorRow>
       </InspectorSection>
+      {runtime && nodes.length === 1 && nodes[0]?.type === "instance" ? (
+        <InstancePropsSection runtime={runtime} node={nodes[0]} readOnly={readOnly} />
+      ) : null}
       {runtime ? <AutoLayoutHint runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <PositionSizeSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <AutoLayoutSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}

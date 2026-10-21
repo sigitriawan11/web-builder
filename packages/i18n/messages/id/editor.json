@@ -490,6 +490,11 @@
       "disabled": "Nonaktif",
       "opacity": "Opasitas",
       "clear": "Hapus"
+    },
+    "instance": {
+      "title": "Props instance",
+      "loading": "Memuat props…",
+      "none": "Component ini tanpa props yang bisa diubah."
     }
   },
   "nodeType": {
