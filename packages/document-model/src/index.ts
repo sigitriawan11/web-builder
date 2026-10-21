@@ -57,4 +57,11 @@ export {
   type SchemaChange,
   type SchemaDiff,
 } from "./versioning/diff-schemas";
+export {
+  type ComponentMigration,
+  ComponentMigrationSchema,
+  type MigrateResult,
+  type MigrationWarning,
+  migrateInstance,
+} from "./versioning/migrate-instance";
 export * from "./yjs";
