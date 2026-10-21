@@ -1,4 +1,4 @@
-import { createNode, runCommand, runCommands, setTag, step } from "@platform/document-model";
+import { createInstance, createNode, runCommand, runCommands, setTag, step } from "@platform/document-model";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { selectionStore } from "../../store/selection-store";
 import { toolStore } from "../../tools/tool-store";
@@ -86,6 +86,25 @@ export function insertDivider(runtime: CanvasRuntime): string | null {
         fills: [{ type: "solid", color: { $token: "color.border" } }],
       },
     },
+  });
+  const id = result.ok ? result.value : null;
+  afterInsert(id);
+  return id;
+}
+
+// T3.6.1 (ED-151): sisip instance component library published ke parent terpilih/page aktif. `version` = version_seq
+// (pin, CMP-050). Resolusi definisi untuk render terjadi di `InstanceNodeView` (publishedDefinition).
+export function insertComponentInstance(
+  runtime: CanvasRuntime,
+  component: { publicId: string; version: number },
+): string | null {
+  runtime.undo.stopCapturing();
+  const parentId = insertParent(runtime);
+  const result = runCommand(ctxOf(runtime), createInstance, {
+    parentId,
+    componentId: component.publicId,
+    version: component.version,
+    source: "library",
   });
   const id = result.ok ? result.value : null;
   afterInsert(id);

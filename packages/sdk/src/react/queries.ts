@@ -28,6 +28,7 @@ export const queryKeys = {
     editorSession: (componentId: string) => ["library", "editor-session", componentId] as const,
     definition: (componentId: string, version: number) => ["library", "definition", componentId, version] as const,
     usage: (componentId: string) => ["library", "usage", componentId] as const,
+    components: (query: { category?: string; search?: string }) => ["library", "components", query] as const,
   },
 };
 
@@ -69,6 +70,12 @@ export function createQueries(api: PlatformApi) {
       queryOptions({
         queryKey: queryKeys.library.usage(componentId),
         queryFn: () => api.library.usage(componentId),
+      }),
+    // T3.6.1: daftar component published utk panel Insert (filter kategori/pencarian).
+    libraryComponents: (query: { category?: string; search?: string } = {}) =>
+      queryOptions({
+        queryKey: queryKeys.library.components(query),
+        queryFn: () => api.library.listComponents(query),
       }),
   };
 }

@@ -48,6 +48,9 @@ export const useLibraryComponentDefinition = (componentId: string, version: numb
 /** Pemakaian per versi/docState (CMP-012 tab Usage). */
 export const useLibraryComponentUsage = (componentId: string) =>
   useQuery({ ...useQueries().libraryComponentUsage(componentId), retry: false });
+/** Daftar component published utk panel Insert editor (T3.6.1). */
+export const useLibraryComponents = (query: { category?: string; search?: string } = {}) =>
+  useQuery(useQueries().libraryComponents(query));
 /** Simpan metadata draft (CMP-013); menyegarkan sesi editor. */
 export const useSaveLibraryDraft = () => useMutation({ mutationFn: useMutations().saveLibraryDraft });
 

@@ -4,6 +4,7 @@ export {
   useConsents,
   useCreateSite,
   useLibraryComponentDefinition,
+  useLibraryComponents,
   useLibraryComponentUsage,
   useLibraryEditorSession,
   usePlatformApi,

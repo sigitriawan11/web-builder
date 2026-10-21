@@ -1,6 +1,7 @@
 import { MinusIcon, SquareIcon } from "lucide-react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
+import { ComponentsPanel } from "./ComponentsPanel";
 import { insertButton, insertDivider } from "./insert-elements";
 
 // ED-050 / §20 (minimal): bagian "Basic" Insert panel — Button & Divider. Section templates & component library
@@ -33,6 +34,9 @@ export function InsertPanel({ runtime, readOnly }: { runtime: CanvasRuntime; rea
             {item.label}
           </button>
         ))}
+      </div>
+      <div className="mt-3 border-t pt-1">
+        <ComponentsPanel runtime={runtime} readOnly={readOnly} />
       </div>
     </div>
   );

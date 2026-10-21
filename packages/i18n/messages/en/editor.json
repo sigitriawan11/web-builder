@@ -571,7 +571,11 @@
     "basic": "Basic",
     "button": "Button",
     "divider": "Divider",
-    "buttonLabel": "Button"
+    "buttonLabel": "Button",
+    "components": "Components",
+    "componentsEmpty": "No published components yet.",
+    "componentsLoading": "Loading components…",
+    "componentsError": "Failed to load components."
   },
   "command": {
     "undo": "Undo",

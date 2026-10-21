@@ -571,7 +571,11 @@
     "basic": "Dasar",
     "button": "Tombol",
     "divider": "Pembatas",
-    "buttonLabel": "Tombol"
+    "buttonLabel": "Tombol",
+    "components": "Components",
+    "componentsEmpty": "Belum ada component published.",
+    "componentsLoading": "Memuat component…",
+    "componentsError": "Gagal memuat component."
   },
   "command": {
     "undo": "Urungkan",
