@@ -1248,6 +1248,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 ### M3.c Epic & task
 
+> **Enabler (2026-10-21): Inspector Mode Admin SELESAI.** Editor library kini 3 kolom (ComponentPanel kiri · canvas · **Inspector node kanan**, reuse dari SiteEditor, dibungkus `NodeStoreContext`). Prasyarat: (A1) `runtime.commandCtx` membawa `nodeSchema` ke semua `runCommand` (39 file); (fix) command pre-cek node pakai `ctx.nodeSchema ?? NodeSchema` (node-fields/content/style-plan/subtree/create-node/theme) → edit node component (termasuk root `parentId:null` & node ber-`$prop`) berjalan. e2e: toggle visible root via Inspector. **Membuka UI** T3.4.11 (state switcher), T3.4.13 (default content di Inspector/Props), T3.4.16 (theme panel), penempatan node slot T3.4.12 — tinggal wire ke Inspector/canvas.
+
 #### Epic 3.1 — Document model: component & instance
 
 > Progres (2026-10-19):
