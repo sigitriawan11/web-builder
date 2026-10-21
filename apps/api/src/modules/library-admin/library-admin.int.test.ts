@@ -1,4 +1,4 @@
-import { eq, schema } from "@platform/db";
+import { and, eq, schema } from "@platform/db";
 import { createTestDb, type TestDb } from "@platform/db/testing";
 import { uuidv7 } from "@platform/shared";
 import { REALTIME_TOKEN_AUDIENCE, RealtimeTokenClaimsSchema } from "@platform/shared/contracts";
@@ -259,6 +259,46 @@ describe("admin library CRUD (CMP-159)", () => {
       canPublish: true,
     });
     expect(adminSession.body.data.component).toMatchObject({ id, kind: "element", status: "draft", hasDraft: true });
+  });
+
+  it("T3.5.4/T3.5.6: changelog wajib saat publish; versi published tetap terbaca setelah deprecate & archive", async () => {
+    const admin = await register("library_admin");
+    const created = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("tombol-lifecycle2"));
+    const { id, publicId } = created.body.data as { id: string; publicId: string };
+
+    // CMP-043: changelog wajib → publish tanpa changelog ditolak (422), dengan changelog sukses.
+    expect(
+      (
+        await request(target)
+          .post(`/v1/admin/library/components/${id}/draft/publish`)
+          .set("cookie", admin)
+          .send({ bump: "minor" })
+      ).status,
+    ).toBe(422);
+    expect(
+      (
+        await request(target)
+          .post(`/v1/admin/library/components/${id}/draft/publish`)
+          .set("cookie", admin)
+          .send({ bump: "minor", changelog: label })
+      ).status,
+    ).toBe(200);
+    const [version] = await testDb.db
+      .select()
+      .from(schema.componentVersions)
+      .where(and(eq(schema.componentVersions.componentId, id), eq(schema.componentVersions.versionSeq, 1)));
+    expect(version?.changelog).toEqual(label);
+
+    // CMP-045: versi published tetap resolve setelah deprecate & archive (instance lama tetap render).
+    const readV1 = () => request(target).get(`/v1/library/components/${publicId}/versions/1`).set("cookie", admin);
+    expect((await readV1()).status).toBe(200);
+    await request(target).post(`/v1/admin/library/components/${id}/deprecate`).set("cookie", admin).send({});
+    expect((await readV1()).status).toBe(200);
+    await request(target).post(`/v1/admin/library/components/${id}/archive`).set("cookie", admin).send({});
+    expect((await readV1()).status).toBe(200);
   });
 
   it("simpan metadata draft (CMP-013): field tersimpan & muncul di sesi editor; tag non-kebab → 422", async () => {
