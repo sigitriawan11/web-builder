@@ -494,7 +494,8 @@
     "instance": {
       "title": "Props instance",
       "loading": "Memuat props…",
-      "none": "Component ini tanpa props yang bisa diubah."
+      "none": "Component ini tanpa props yang bisa diubah.",
+      "detach": "Lepas (detach)"
     }
   },
   "nodeType": {

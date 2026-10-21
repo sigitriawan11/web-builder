@@ -1,6 +1,15 @@
-import { type Node, type PropDef, runCommand, setProp, setVariant, type VariantAxis } from "@platform/document-model";
+import {
+  type ComponentDefinition,
+  detachInstance,
+  type Node,
+  type PropDef,
+  runCommand,
+  setProp,
+  setVariant,
+  type VariantAxis,
+} from "@platform/document-model";
 import { useLibraryComponentDefinition } from "@platform/sdk/react";
-import { Checkbox, Input, NativeSelect } from "@platform/ui";
+import { Button, Checkbox, Input, NativeSelect } from "@platform/ui";
 import { useLocale, useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
@@ -66,6 +75,20 @@ function Form({
     runCommand(runtime.commandCtx, setVariant, { id: nodeId, axis, option });
     runtime.undo.stopCapturing();
   };
+  // T3.6.8/CMP-057: detach butuh registry (`getComponent`) — pakai definisi yang sudah di-fetch panel ini.
+  const detach = (componentDef: ComponentDefinition) => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runCommand(
+      {
+        ...runtime.commandCtx,
+        getComponent: (cid, v) => (cid === componentId && v === version ? componentDef : undefined),
+      },
+      detachInstance,
+      { id: nodeId },
+    );
+    runtime.undo.stopCapturing();
+  };
 
   if (def.isPending)
     return (
@@ -74,7 +97,7 @@ function Form({
       </InspectorSection>
     );
 
-  const data = def.data as { propsSchema?: PropDef[]; variantAxes?: VariantAxis[] } | undefined;
+  const data = def.data as ({ propsSchema?: PropDef[]; variantAxes?: VariantAxis[] } & ComponentDefinition) | undefined;
   const editable = (data?.propsSchema ?? []).filter((prop) => EDITABLE.has(prop.type));
   // CMP-031/CMP-032: axis `state` jadi pseudo-class (bukan picker manual) → tak ditampilkan di sini.
   const axes = (data?.variantAxes ?? []).filter((axis) => axis.name !== "state");
@@ -110,6 +133,13 @@ function Form({
           />
         </InspectorRow>
       ))}
+      {!readOnly && data ? (
+        <div className="px-3 pt-2">
+          <Button variant="outline" size="sm" data-testid="instance-detach" onClick={() => detach(data)}>
+            {t("inspector.instance.detach")}
+          </Button>
+        </div>
+      ) : null}
     </InspectorSection>
   );
 }

@@ -494,7 +494,8 @@
     "instance": {
       "title": "Instance props",
       "loading": "Loading props…",
-      "none": "This component has no editable props."
+      "none": "This component has no editable props.",
+      "detach": "Detach"
     }
   },
   "nodeType": {

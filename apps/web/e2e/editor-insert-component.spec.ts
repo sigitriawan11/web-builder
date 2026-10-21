@@ -83,7 +83,7 @@ test.beforeAll(async () => {
   }
 });
 
-test("T3.6.1/T3.6.4: insert instance dari panel Components + edit prop lewat Inspector", async ({ page }) => {
+test("T3.6.1/4/5/8: insert instance → edit prop/variant lewat Inspector → detach", async ({ page }) => {
   await page.goto(`${APP_URL}/sites`);
   await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Insert Component Test")}`);
   await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
@@ -113,4 +113,9 @@ test("T3.6.1/T3.6.4: insert instance dari panel Components + edit prop lewat Ins
   await expect(toneSelect).toBeVisible();
   await toneSelect.selectOption("outline");
   await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.variant?.tone).toBe("outline");
+
+  // T3.6.8/CMP-057: detach — instance jadi node biasa; node instance hilang dari doc.
+  await page.getByTestId("inspector").getByTestId("instance-detach").click();
+  await expect(page.getByTestId("inspector").getByTestId("instance-detach")).toBeHidden();
+  await expect.poll(async () => Object.values((await doc(page)).nodes).some((n) => n.type === "instance")).toBe(false);
 });
