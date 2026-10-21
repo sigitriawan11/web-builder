@@ -198,6 +198,15 @@ describe("admin library CRUD (CMP-159)", () => {
       (await request(target).get(`/v1/admin/library/components/${id}/usage`).set("cookie", admin)).body.data,
     ).toEqual([]);
 
+    // CMP-040: deprecate hanya dari published → publish dulu. Deprecate draft → 409.
+    expect(
+      (await request(target).post(`/v1/admin/library/components/${id}/deprecate`).set("cookie", admin).send({})).status,
+    ).toBe(409);
+    await request(target)
+      .post(`/v1/admin/library/components/${id}/draft/publish`)
+      .set("cookie", admin)
+      .send({ bump: "minor", changelog: label });
+
     expect(
       (await request(target).post(`/v1/admin/library/components/${id}/deprecate`).set("cookie", admin).send({})).status,
     ).toBe(204);

@@ -29,6 +29,7 @@ import type {
   publishRequest,
   saveDraftRequest,
 } from "./library-admin.schema";
+import { assertComponentTransition } from "./library-admin.status";
 
 // Aktor + jejak untuk audit_logs (CMP-159 AC-1: setiap aksi admin tercatat).
 export interface StaffActor {
@@ -209,6 +210,7 @@ export function createLibraryAdminService(deps: {
     async deprecate(actor: StaffActor, componentId: string, input: DeprecateInput): Promise<void> {
       const component = await repo.findComponent(db, componentId);
       if (!component) throw new AppError("NOT_FOUND");
+      assertComponentTransition(component.status, "deprecated"); // CMP-040: hanya dari published.
       await repo.updateComponent(db, componentId, {
         status: "deprecated",
         deprecatedAt: new Date(),
@@ -223,6 +225,7 @@ export function createLibraryAdminService(deps: {
     async archive(actor: StaffActor, componentId: string, _input: ArchiveInput): Promise<void> {
       const component = await repo.findComponent(db, componentId);
       if (!component) throw new AppError("NOT_FOUND");
+      assertComponentTransition(component.status, "archived"); // CMP-040: hanya dari deprecated.
       await repo.updateComponent(db, componentId, { status: "archived", archivedAt: new Date() });
       await audit(actor, "library_component.archive", componentId, {});
     },
