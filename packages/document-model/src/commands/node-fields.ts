@@ -19,7 +19,7 @@ function updateFields(ctx: CommandContext, ids: readonly string[], fields: Field
     const yNode = nodes.get(id);
     if (!yNode)
       return fail("NOT_FOUND", { id: `Node "${id}" tidak ditemukan`, en: `Node "${id}" not found` }, ["ids", i]);
-    const parsed = NodeSchema.safeParse({ ...yNodeToJson(yNode), ...fields });
+    const parsed = (ctx.nodeSchema ?? NodeSchema).safeParse({ ...yNodeToJson(yNode), ...fields });
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
       return fail(

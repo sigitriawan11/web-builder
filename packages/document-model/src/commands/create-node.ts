@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createId } from "../ids";
 import { plainText } from "../query/rich-text";
-import { NodeIdSchema, NodeSchema, type Style, StylePatchSchema, StyleSchema } from "../schema";
+import { type Node, NodeIdSchema, NodeSchema, type Style, StylePatchSchema, StyleSchema } from "../schema";
 import { nodeToYMap } from "../yjs/mapping";
 import { defineCommand, fail } from "./command";
 import { exceeds, locate, pageNodeCount } from "./limits";
@@ -96,7 +96,7 @@ export const createNode = defineCommand({
       });
 
     const { style, type } = input;
-    const parsed = NodeSchema.safeParse({
+    const parsed = (ctx.nodeSchema ?? NodeSchema).safeParse({
       id,
       type,
       name: input.name ?? DEFAULT_NAME[type],
@@ -119,6 +119,8 @@ export const createNode = defineCommand({
         issue?.path.map(String),
       );
     }
+    // `ctx.nodeSchema` injeksi (Mode Admin) → `data` unknown; bentuk node baru sama (selalu ber-parentId).
+    const node = parsed.data as Node;
 
     // DM-076: batas dicek sebelum menulis (tidak ada penulisan parsial).
     const { pageId, depth } = locate(nodes, input.parentId);
@@ -127,13 +129,13 @@ export const createNode = defineCommand({
       exceeds("nodesPerSite", nodes.size + 1) ??
       exceeds("treeDepth", depth + 1, ["parentId"]) ??
       (pageId ? exceeds("nodesPerPage", pageNodeCount(nodes, pageId) + 1, ["parentId"]) : null) ??
-      (parsed.data.type === "text"
-        ? exceeds("textCharsPerNode", plainText(parsed.data.props.content).length, ["props", "content"])
+      (node.type === "text"
+        ? exceeds("textCharsPerNode", plainText(node.props.content).length, ["props", "content"])
         : null);
     if (limitError) return limitError;
 
     const index = Math.min(input.index ?? siblings.length, siblings.length);
-    nodes.set(id, nodeToYMap(parsed.data));
+    nodes.set(id, nodeToYMap(node));
     siblings.insert(index, [id]);
     return { ok: true, value: id, affected: [id, input.parentId] };
   },

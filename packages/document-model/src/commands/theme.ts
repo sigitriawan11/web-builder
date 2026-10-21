@@ -175,7 +175,7 @@ function planNodeRewrites(
     const style = rewriteJson(json.style, rewrite);
     const props = rewriteJson(json.props, rewrite);
     if (style.count + props.count === 0) continue;
-    const parsed = NodeSchema.safeParse({ ...json, style: style.value, props: props.value });
+    const parsed = (ctx.nodeSchema ?? NodeSchema).safeParse({ ...json, style: style.value, props: props.value });
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
       return fail(

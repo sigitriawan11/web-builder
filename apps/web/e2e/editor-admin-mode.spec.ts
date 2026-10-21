@@ -121,16 +121,23 @@ test("staf: buka Mode Admin → badge ADMIN + canvas me-render component", async
   await expect(panel.getByRole("tab", { name: "Metadata" })).toBeVisible();
   await expect(panel.getByRole("tab", { name: "Props" })).toBeVisible();
 
-  // A2 (ED-008): Inspector node termount di Mode Admin — pilih node → Inspector tampil + menampilkan nama node.
+  // A2 (ED-008): Inspector node termount di Mode Admin; edit node component (termasuk ROOT parentId null) berjalan via
+  // commandCtx (butuh ComponentNodeSchema di pasca-cek, kalau tidak → INVARIANT_VIOLATION & checkbox tak berubah).
   await page.waitForFunction(() => Boolean((window as unknown as { __editorTestApi?: unknown }).__editorTestApi));
   await page.evaluate(() =>
     (window as unknown as { __editorTestApi?: { select(ids: string[]): void } }).__editorTestApi?.select([
-      "n_text0001",
+      "n_root0001",
     ]),
   );
   const inspector = page.getByTestId("inspector");
   await expect(inspector).toBeVisible();
-  await expect(inspector.getByText("Teks")).toBeVisible();
+  await inspector.getByTestId("inspector-tab-settings").click();
+  const visibleToggle = inspector.getByTestId("node-visible");
+  await expect(visibleToggle).toBeChecked();
+  await visibleToggle.click(); // setVisible pada ROOT (parentId null) → butuh ComponentNodeSchema di pasca-cek & pre-cek
+  await expect(visibleToggle).not.toBeChecked();
+  await visibleToggle.click();
+  await expect(visibleToggle).toBeChecked();
 
   // CMP-013: super_admin bisa edit metadata → simpan → "Saved"; nilai bertahan setelah reload.
   await panel.getByLabel("Display name (EN)").fill("Edited CTA");

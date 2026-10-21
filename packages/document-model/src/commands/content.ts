@@ -293,7 +293,7 @@ export const setNodeProps = defineCommand({
       if (value === null) delete props[key];
       else props[key] = value;
     }
-    const parsed = NodeSchema.safeParse({ ...json, props });
+    const parsed = (ctx.nodeSchema ?? NodeSchema).safeParse({ ...json, props });
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
       return fail(

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { normalizeOverrides } from "../query/normalize-overrides";
-import { NodeSchema, type ResponsiveStyle, StylePatchSchema, StyleSchema } from "../schema";
+import { type Node, NodeSchema, type ResponsiveStyle, StylePatchSchema, StyleSchema } from "../schema";
 import { checkNodeStyle } from "../validate/invariants";
 import type { Issue } from "../validate/issues";
 import { cloneJson } from "../yjs/clone-json";
@@ -23,7 +23,7 @@ type StyleTransform = (style: ResponsiveStyle, yNode: YNode) => ResponsiveStyle;
  * satu node gagal.
  */
 export function planStyles(
-  ctx: { doc: import("yjs").Doc },
+  ctx: { doc: import("yjs").Doc; nodeSchema?: import("zod").ZodTypeAny },
   ids: readonly string[],
   transform: StyleTransform,
 ): { yNode: YNode; style: ResponsiveStyle }[] | CommandFailure {
@@ -51,7 +51,7 @@ export function planStyles(
         );
       }
     }
-    const node = NodeSchema.safeParse({ ...yNodeToJson(yNode), style: next });
+    const node = (ctx.nodeSchema ?? NodeSchema).safeParse({ ...yNodeToJson(yNode), style: next });
     if (!node.success) {
       const issue = node.error.issues[0];
       return fail(
@@ -61,7 +61,8 @@ export function planStyles(
       );
     }
     const issues: Issue[] = [];
-    checkNodeStyle(node.data, (code, path, message) => issues.push({ code, path, message }));
+    // `nodeSchema` injeksi (ComponentNodeSchema di Mode Admin) menghasilkan `unknown`; bentuk node tetap sama.
+    checkNodeStyle(node.data as Node, (code, path, message) => issues.push({ code, path, message }));
     const [first] = issues;
     if (first) return fail("INVALID_RESULT", first.message, first.path, { invariant: first.code });
     planned.push({ yNode, style: normalizeOverrides(next) });

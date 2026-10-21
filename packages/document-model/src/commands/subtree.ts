@@ -133,7 +133,7 @@ export function planSubtree(
     json.parentId = idMap[originalParent] ?? parentId;
     if (Array.isArray(json.children)) json.children = (json.children as string[]).map((child) => idMap[child] ?? child);
     remapRefs(json.props, idMap);
-    const parsed = NodeSchema.safeParse(json);
+    const parsed = (ctx.nodeSchema ?? NodeSchema).safeParse(json);
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
       return subtreeError(`Node "${id}" tidak valid: ${issue?.message}`, `Node "${id}" is invalid: ${issue?.message}`, [
@@ -142,7 +142,7 @@ export function planSubtree(
         ...(issue?.path.filter((key): key is string | number => typeof key !== "symbol") ?? []),
       ]);
     }
-    planned.push(parsed.data);
+    planned.push(parsed.data as Node);
   }
 
   return {
