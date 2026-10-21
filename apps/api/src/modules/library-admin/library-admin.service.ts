@@ -6,6 +6,7 @@ import {
   componentDefFromState,
   componentDefToState,
   createId,
+  diffComponentSchemas,
   validateComponentDefinition,
 } from "@platform/document-model";
 import { AppError, uuidv7 } from "@platform/shared";
@@ -45,6 +46,9 @@ type DeprecateInput = z.infer<typeof deprecateRequest.body>;
 type ArchiveInput = z.infer<NonNullable<typeof archiveRequest.body>>;
 
 const contentHash = (value: unknown): string => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+
+// Urutan keparahan bump (CMP-042) — bump yang diminta tak boleh < yang terdeteksi.
+const BUMP_ORDER: Record<"patch" | "minor" | "major", number> = { patch: 0, minor: 1, major: 2 };
 
 /** Semver berikut dari versi published terakhir + bump. Null (belum pernah publish) → basis 0.0.0. */
 function bumpSemver(current: string | null, bump: PublishInput["bump"]): string {
@@ -181,6 +185,16 @@ export function createLibraryAdminService(deps: {
       if (!draftState) throw new AppError("CONFLICT", undefined, { reason: "no_draft" });
       // Draft dari Yjs bisa belum selesai/tidak valid → 422 dengan issues (bukan 500).
       const definition = validateDefinition(componentDefFromState(draftState.state));
+
+      // CMP-042: admin tak boleh menurunkan bump yang terdeteksi (breaking tak bisa dipublish sbg minor/patch).
+      if (component.latestVersionId) {
+        const prev = await repo.findVersion(db, component.latestVersionId);
+        if (prev) {
+          const detected = diffComponentSchemas(prev.definition as unknown as ComponentDefinition, definition).bump;
+          if (BUMP_ORDER[input.bump] < BUMP_ORDER[detected])
+            throw new AppError("CONFLICT", undefined, { reason: "bump_too_low", detected, requested: input.bump });
+        }
+      }
 
       const version = bumpSemver(component.latestVersion, input.bump);
       const versionSeq = (await repo.maxVersionSeq(db, componentId)) + 1;

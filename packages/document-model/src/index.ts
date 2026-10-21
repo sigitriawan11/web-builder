@@ -51,4 +51,10 @@ export {
 export { limitMessage } from "./validate/limits";
 export { type LintWarning, lintDocument } from "./validate/lint";
 export { type ValidationMode, type ValidationResult, validateDocument } from "./validate/validate-document";
+export {
+  type Bump,
+  diffComponentSchemas,
+  type SchemaChange,
+  type SchemaDiff,
+} from "./versioning/diff-schemas";
 export * from "./yjs";
