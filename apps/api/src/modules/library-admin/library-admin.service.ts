@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import type { Db } from "@platform/db";
 import {
   type ComponentDefinition,
@@ -17,7 +16,7 @@ import {
   REALTIME_TOKEN_TTL_SECONDS,
   type RealtimeTokenResponse,
 } from "@platform/shared/contracts";
-import { type Logger, signToken } from "@platform/shared/node";
+import { type Logger, signToken, stableHash } from "@platform/shared/node";
 import type { z } from "zod";
 import { recordAudit } from "../../audit/audit.repository";
 import { findStaffRole, type StaffRole } from "../../middleware/staff.repository";
@@ -45,7 +44,8 @@ type PublishInput = z.infer<typeof publishRequest.body>;
 type DeprecateInput = z.infer<typeof deprecateRequest.body>;
 type ArchiveInput = z.infer<NonNullable<typeof archiveRequest.body>>;
 
-const contentHash = (value: unknown): string => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+// CMP-044: hash kanonik (key terurut) → stabil lintas round-trip jsonb saat verifikasi integritas load.
+const contentHash = (value: unknown): string => stableHash(value);
 
 // Urutan keparahan bump (CMP-042) — bump yang diminta tak boleh < yang terdeteksi.
 const BUMP_ORDER: Record<"patch" | "minor" | "major", number> = { patch: 0, minor: 1, major: 2 };

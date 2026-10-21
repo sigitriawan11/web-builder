@@ -9,6 +9,8 @@ export interface LibraryDefinition {
   version: number;
   semver: string | null;
   definition: unknown;
+  // Hash kanonik tersimpan saat publish (CMP-044) — diverifikasi service saat load.
+  contentHash: string | null;
 }
 
 /** Definisi versi published (immutable) by `public_id` (`cmp_…`) + `version_seq`. `undefined` bila tidak ada. */
@@ -18,7 +20,11 @@ export async function findPublishedDefinition(
   versionSeq: number,
 ): Promise<LibraryDefinition | undefined> {
   const rows = await db
-    .select({ definition: componentVersions.definition, semver: componentVersions.version })
+    .select({
+      definition: componentVersions.definition,
+      semver: componentVersions.version,
+      contentHash: componentVersions.contentHash,
+    })
     .from(componentVersions)
     .innerJoin(components, eq(componentVersions.componentId, components.id))
     .where(
@@ -33,6 +39,12 @@ export async function findPublishedDefinition(
     .limit(1);
   const row = rows[0];
   return row
-    ? { componentId: publicId, version: versionSeq, semver: row.semver, definition: row.definition }
+    ? {
+        componentId: publicId,
+        version: versionSeq,
+        semver: row.semver,
+        definition: row.definition,
+        contentHash: row.contentHash,
+      }
     : undefined;
 }

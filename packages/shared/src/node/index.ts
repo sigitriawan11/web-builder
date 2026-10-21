@@ -17,6 +17,7 @@ export {
   runWithContext,
   updateContext,
 } from "./request-context";
+export { stableHash } from "./stable-hash";
 export {
   initServerTelemetry,
   redactPath,

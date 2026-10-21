@@ -1,6 +1,7 @@
 import { schema } from "@platform/db";
 import { createTestDb, type TestDb } from "@platform/db/testing";
 import { uuidv7 } from "@platform/shared";
+import { stableHash } from "@platform/shared/node";
 import type { Express } from "express";
 import { Redis } from "ioredis";
 import request from "supertest";
@@ -49,6 +50,23 @@ beforeAll(async () => {
     { componentId, version: "1.0.0", versionSeq: 1, status: "published", definition: DEFINITION },
     { componentId, version: "2.0.0", versionSeq: 2, status: "draft", definition: DEFINITION },
     { componentId, version: "3.0.0", versionSeq: 3, status: "published", yanked: true, definition: DEFINITION },
+    // CMP-044: seq 4 hash kanonik benar → 200; seq 5 hash salah → 500 (integritas).
+    {
+      componentId,
+      version: "4.0.0",
+      versionSeq: 4,
+      status: "published",
+      definition: DEFINITION,
+      contentHash: stableHash(DEFINITION),
+    },
+    {
+      componentId,
+      version: "5.0.0",
+      versionSeq: 5,
+      status: "published",
+      definition: DEFINITION,
+      contentHash: "deadbeef",
+    },
   ]);
 });
 afterAll(async () => {
@@ -79,6 +97,12 @@ describe("GET /v1/library/components/:componentId/versions/:version", () => {
     expect(response.headers["cache-control"]).toBe("public, max-age=31536000, immutable");
     expect(response.body.data).toMatchObject({ componentId: PUBLIC_ID, version: 1, semver: "1.0.0" });
     expect(response.body.data.definition).toEqual(DEFINITION);
+  });
+
+  it("CMP-044: hash kanonik cocok → 200; hash tak cocok (korupsi) → 500", async () => {
+    const cookie = await register();
+    expect((await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/4`)).status).toBe(200);
+    expect((await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/5`)).status).toBe(500);
   });
 
   it("versi draft / yanked / tidak ada → 404", async () => {
