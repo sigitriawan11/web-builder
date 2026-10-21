@@ -96,6 +96,12 @@
         "repeat": "Ulang (list)",
         "repeatSet": "Set",
         "repeatClear": "Hapus"
+      },
+      "access": {
+        "noDraft": "Buka draft untuk mengatur akses.",
+        "selectNode": "Pilih satu node untuk atur izin Simple mode.",
+        "simpleAccess": "Izin Simple mode",
+        "hardLocked": "Hard locked (tak bisa di-override)"
       }
     }
   },

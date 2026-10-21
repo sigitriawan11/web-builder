@@ -1,7 +1,7 @@
 import * as Y from "yjs";
 import { z } from "zod";
 import { walkJsonObjects } from "../query/walk-json";
-import { CAMEL_KEY, type PropDef, PropDefSchema } from "../schema/component";
+import { CAMEL_KEY, NodeAccessSchema, type PropDef, PropDefSchema } from "../schema/component";
 import { isPropRef, JsonValueSchema, NodeIdSchema } from "../schema/values";
 import { cloneJson } from "../yjs/clone-json";
 import { COMPONENT_YDOC_KEYS } from "../yjs/component-mapping";
@@ -268,5 +268,24 @@ export const setRepeatProp = defineCommand({
       );
     propsMapOf(node).set("repeatProp", input.listKey);
     return { ok: true, value: undefined, affected: [input.nodeId] };
+  },
+});
+
+// DM-079/CMP-024: set izin Simple mode per node (`nodeAccess[nodeId]`). `access: null` atau objek kosong → hapus entri
+// (kembali ke default "locked" kecuali ber-`$prop`). Tidak mengubah node → `affected: []`.
+export const setNodeAccess = defineCommand({
+  name: "setNodeAccess",
+  description: { id: "Set izin Simple mode node.", en: "Set a node's Simple-mode access." },
+  aiExposed: false,
+  input: z.strictObject({ nodeId: NodeIdSchema, access: z.union([NodeAccessSchema, z.null()]) }),
+  run(ctx, input) {
+    if (!nodesMap(ctx.doc).has(input.nodeId))
+      return fail("NOT_FOUND", { id: `Node "${input.nodeId}" tidak ada`, en: `Node "${input.nodeId}" not found` }, [
+        "nodeId",
+      ]);
+    const yAccess = ctx.doc.getMap<unknown>(COMPONENT_YDOC_KEYS.nodeAccess);
+    if (input.access === null || Object.keys(input.access).length === 0) yAccess.delete(input.nodeId);
+    else yAccess.set(input.nodeId, cloneJson(input.access));
+    return { ok: true, value: undefined, affected: [] };
   },
 });

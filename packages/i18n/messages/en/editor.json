@@ -96,6 +96,12 @@
         "repeat": "Repeat (list)",
         "repeatSet": "Set",
         "repeatClear": "Clear"
+      },
+      "access": {
+        "noDraft": "Open a draft to manage access.",
+        "selectNode": "Select one node to set its Simple-mode access.",
+        "simpleAccess": "Simple-mode access",
+        "hardLocked": "Hard locked (cannot be overridden)"
       }
     }
   },

@@ -8,6 +8,7 @@ import {
   addComponentProp,
   bindProp,
   removeComponentProp,
+  setNodeAccess,
   setRepeatProp,
   unbindProp,
   updateComponentProp,
@@ -217,5 +218,22 @@ describe("repeater list (CMP-022)", () => {
     const cleared = runCommand(h.ctx, setRepeatProp, { nodeId: "n_root0001", listKey: null });
     expect(cleared.ok).toBe(true);
     expect(h.node("n_root0001").props?.repeatProp).toBeUndefined();
+  });
+});
+
+describe("nodeAccess (CMP-024)", () => {
+  it("setNodeAccess set/round-trip; node tak ada → NOT_FOUND; null melepas", () => {
+    const h = setup();
+    const set = runCommand(h.ctx, setNodeAccess, { nodeId: "n_text0001", access: { simpleAccess: "content" } });
+    expect(set.ok).toBe(true);
+    expect(h.read().nodeAccess?.n_text0001).toEqual({ simpleAccess: "content" });
+
+    const missing = runCommand(h.ctx, setNodeAccess, { nodeId: "n_ghost0001", access: { hardLocked: true } });
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) expect(missing.error.code).toBe("NOT_FOUND");
+
+    const cleared = runCommand(h.ctx, setNodeAccess, { nodeId: "n_text0001", access: null });
+    expect(cleared.ok).toBe(true);
+    expect(h.read().nodeAccess).toBeUndefined();
   });
 });

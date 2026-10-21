@@ -4,6 +4,7 @@ import { Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@platform/ui";
 import type { ReactNode } from "react";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
+import { AccessTab } from "./AccessTab";
 import { MetadataTab } from "./MetadataTab";
 import { PropsTab } from "./PropsTab";
 
@@ -12,7 +13,7 @@ import { PropsTab } from "./PropsTab";
 const TABS = ["metadata", "props", "variants", "access", "qa", "versions", "usage"] as const;
 type TabKey = (typeof TABS)[number];
 // Tab yang belum punya editor sendiri → placeholder "coming soon".
-const PLACEHOLDER_TABS = new Set<TabKey>(["variants", "access", "qa"]);
+const PLACEHOLDER_TABS = new Set<TabKey>(["variants", "qa"]);
 
 const STATUS_VARIANT: Record<LibraryStatus, "default" | "secondary" | "outline"> = {
   draft: "secondary",
@@ -59,6 +60,10 @@ export function ComponentPanel({
 
         <TabsContent value="props">
           <PropsTab runtime={runtime} canEdit={canEdit} locale={locale} />
+        </TabsContent>
+
+        <TabsContent value="access">
+          <AccessTab runtime={runtime} canEdit={canEdit} />
         </TabsContent>
 
         <TabsContent value="versions">

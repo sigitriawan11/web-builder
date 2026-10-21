@@ -167,6 +167,18 @@ export function validateComponentDefinition(input: unknown): ComponentValidation
     }
   }
 
+  // DM-079: key nodeAccess harus node yang ada.
+  for (const nodeId of Object.keys(def.nodeAccess ?? {})) {
+    if (!def.nodes[nodeId]) {
+      report(
+        "COMPONENT_NODE",
+        ["nodeAccess", nodeId],
+        msg(`nodeAccess "${nodeId}" bukan node`, `nodeAccess "${nodeId}" is not a node`),
+        nodeId,
+      );
+    }
+  }
+
   // Variant `when` merujuk axis & option yang ada (DM-048).
   const axes = new Map((def.variantAxes ?? []).map((axis) => [axis.name, new Set(axis.options)]));
   for (const [index, rule] of (def.variants ?? []).entries()) {

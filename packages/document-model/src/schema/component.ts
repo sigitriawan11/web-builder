@@ -199,6 +199,13 @@ export const ComponentCategorySchema = z.enum([
 ]);
 export type ComponentCategory = z.infer<typeof ComponentCategorySchema>;
 
+// DM-079/CMP-024: izin node di Simple mode. `hardLocked` = tak bisa di-override bahkan di Design mode.
+export const NodeAccessSchema = z.strictObject({
+  simpleAccess: z.enum(["locked", "content", "visibility", "style-basic"]).optional(),
+  hardLocked: z.boolean().optional(),
+});
+export type NodeAccess = z.infer<typeof NodeAccessSchema>;
+
 // Envelope ComponentDefinition. `nodes` divalidasi STRUKTUR di sini (record<NodeId, JSON>), tetapi bentuk tiap node
 // (boleh `$prop`/slot) + integritas (`$prop` ⊆ propsSchema, tanpa self-instance, rootId, slotName unik) dicek oleh
 // `validateComponentDefinition()` — mirror SiteDocumentSchema (struktur) + validateDocument (invariant).
@@ -217,6 +224,8 @@ export const ComponentDefinitionSchema = z.strictObject({
   variants: z.array(VariantRuleSchema).max(32).optional(),
   rootId: NodeIdSchema,
   nodes: z.record(NodeIdSchema, JsonValueSchema),
+  // DM-079/CMP-024: izin Simple mode per node. Default (node tak terdaftar) = "locked" kecuali node ber-`$prop`.
+  nodeAccess: z.record(NodeIdSchema, NodeAccessSchema).optional(),
   thumbnail: AssetRefSchema.optional(),
   // Gating paket (DM-045): komponen yang butuh fitur dinamis/commerce (03 O-1).
   requires: z.strictObject({ dynamic: z.boolean().optional(), commerce: z.boolean().optional() }).optional(),

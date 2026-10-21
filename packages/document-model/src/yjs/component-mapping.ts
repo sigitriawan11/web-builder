@@ -16,6 +16,8 @@ export const COMPONENT_YDOC_KEYS = {
   variantAxes: "variantAxes",
   variants: "variants",
   nodes: "nodes",
+  // DM-079: izin Simple mode per node (Y.Map<nodeId, NodeAccess>).
+  nodeAccess: "nodeAccess",
 } as const;
 
 // Field ComponentDefinition yang disimpan di `meta` (skalar/objek kecil). propsSchema/variantAxes/variants/nodes
@@ -59,6 +61,10 @@ export function componentDefToYDoc(def: ComponentDefinition, target: Y.Doc = new
     for (const [nodeId, node] of Object.entries(def.nodes)) {
       yNodes.set(nodeId, nodeRecordToYMap(node as Record<string, unknown>));
     }
+    if (def.nodeAccess) {
+      const yAccess = target.getMap<unknown>(COMPONENT_YDOC_KEYS.nodeAccess);
+      for (const [nodeId, access] of Object.entries(def.nodeAccess)) yAccess.set(nodeId, cloneJson(access));
+    }
 
     // Theme PRATINJAU untuk canvas editor Mode Admin (token component di-resolve ke nilai nyata). BUKAN bagian
     // ComponentDefinition (`yDocToComponentDef` mengabaikan key `theme`) → publish tetap bersih. Statis (tak diedit
@@ -80,12 +86,14 @@ export function yDocToComponentDef(ydoc: Y.Doc): unknown {
   });
   const variantAxes = ydoc.getArray<unknown>(COMPONENT_YDOC_KEYS.variantAxes);
   const variants = ydoc.getArray<unknown>(COMPONENT_YDOC_KEYS.variants);
+  const nodeAccess = ydoc.getMap<unknown>(COMPONENT_YDOC_KEYS.nodeAccess).toJSON();
   // `nodes` sudah salinan (yNodeToJson, termasuk konversi rich text); sisanya disalin di sini.
   const rest = cloneJson({
     ...ydoc.getMap<unknown>(COMPONENT_YDOC_KEYS.meta).toJSON(),
     propsSchema: ydoc.getArray<unknown>(COMPONENT_YDOC_KEYS.propsSchema).toJSON(),
     ...(variantAxes.length > 0 ? { variantAxes: variantAxes.toJSON() } : {}),
     ...(variants.length > 0 ? { variants: variants.toJSON() } : {}),
+    ...(Object.keys(nodeAccess).length > 0 ? { nodeAccess } : {}),
   }) as Record<string, unknown>;
   return { ...rest, nodes };
 }

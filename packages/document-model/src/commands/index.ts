@@ -2,6 +2,7 @@ import {
   addComponentProp,
   bindProp,
   removeComponentProp,
+  setNodeAccess,
   setRepeatProp,
   unbindProp,
   updateComponentProp,
@@ -74,6 +75,7 @@ export {
   setLayoutMode,
   setLink,
   setLocked,
+  setNodeAccess,
   setNodeProps,
   setProp,
   setRepeatProp,
@@ -138,4 +140,5 @@ export const COMMANDS = {
   bindProp,
   unbindProp,
   setRepeatProp,
+  setNodeAccess,
 } as const;

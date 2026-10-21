@@ -210,6 +210,17 @@ test("props & binding (CMP-020/021): tambah prop → bind visible node terpilih"
   await repeat.getByRole("combobox").selectOption("items");
   await repeat.getByRole("button", { name: "Set" }).click();
   await expect(repeat.getByText("items")).toBeVisible();
+
+  // CMP-024: tab Access — atur izin Simple mode node (round-trip lewat command → doc).
+  await panel.getByRole("tab", { name: "Access" }).click();
+  await page.evaluate(() =>
+    (window as unknown as { __editorTestApi?: { select(ids: string[]): void } }).__editorTestApi?.select([
+      "n_text0001",
+    ]),
+  );
+  const accessSelect = panel.getByTestId("access-editor").getByRole("combobox");
+  await accessSelect.selectOption("content");
+  await expect(accessSelect).toHaveValue("content");
 });
 
 test("user biasa (bukan staf): Mode Admin → tidak ditemukan (permukaan admin tak bocor)", async ({ page, context }) => {
