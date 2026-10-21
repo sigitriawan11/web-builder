@@ -1376,7 +1376,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.6 — Instance di editor (Design mode)
 
-- [ ] **T3.6.1** Insert instance dari panel Components dasar (daftar per kategori, drag) — ED-151, ED-167 · `apps/editor/src/panels/insert` · Verifikasi: e2e
+- [x] **T3.6.1** Insert instance dari panel Components dasar (daftar per kategori, drag) — ED-151, ED-167 · `apps/editor/src/panels/insert` · Verifikasi: e2e
+  - Catatan (2026-10-21): **backend** `GET /v1/library/components?category&search` (daftar published + version_seq pin) + SDK `listComponents`/`useLibraryComponents`. **UI** section Components di InsertPanel (kelompok per categorySlug, klik → `insertComponentInstance` = createInstance ke parent terpilih/page aktif, pin versi terbaru). Render via InstanceNodeView→publishedDefinition. Int test (list) + e2e (seed component published → panel tampil → klik → instance ter-pin di doc). **SISA:** drag-ke-canvas & smart drop antar-section = T3.6.2; kategori dari endpoint kategori publik (kini derive dari item).
 - [ ] **T3.6.2** Drag ke canvas & smart insert (sisip antar section, auto-layout aware) — ED-170 · `apps/editor` · Verifikasi: e2e drop di antara 2 section
 - [ ] **T3.6.3** Seleksi di dalam instance (klik → instance; dblclick → node editable; locked tidak) — ED-058 · `apps/editor` · Verifikasi: e2e
 - [ ] **T3.6.4** Props panel instance (form dari propsSchema) — ED-153, ED-008 · `apps/editor/src/panels/properties/instance` · Verifikasi: e2e ubah prop → canvas update
