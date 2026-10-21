@@ -23,6 +23,7 @@
     "@hocuspocus/provider": "4.7.0",
     "@platform/document-model": "workspace:*",
     "@platform/i18n": "workspace:*",
+    "@platform/library-seed": "workspace:*",
     "@platform/renderer": "workspace:*",
     "@platform/sdk": "workspace:*",
     "@platform/shared": "workspace:*",

@@ -111,6 +111,12 @@
         "options": "Options (comma-separated)",
         "remove": "Remove",
         "failed": "Failed: {error}"
+      },
+      "qa": {
+        "noDraft": "Open a draft to run QA.",
+        "clean": "Passes the static design rules.",
+        "schemaInvalid": "Definition is not valid yet ({count} issues) — fix those first.",
+        "title": "Design rules (linter)"
       }
     }
   },

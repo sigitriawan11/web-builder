@@ -111,6 +111,12 @@
         "options": "Opsi (pisah koma)",
         "remove": "Hapus",
         "failed": "Gagal: {error}"
+      },
+      "qa": {
+        "noDraft": "Buka draft untuk menjalankan QA.",
+        "clean": "Lolos aturan desain statis.",
+        "schemaInvalid": "Definisi belum valid ({count} masalah) — perbaiki dulu.",
+        "title": "Aturan desain (linter)"
       }
     }
   },

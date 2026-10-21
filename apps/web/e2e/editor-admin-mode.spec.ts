@@ -230,6 +230,17 @@ test("panel authoring: props/binding/repeat/access/variants (CMP-020/021/022/024
   const variantList = panel.getByTestId("variant-list");
   await expect(variantList.getByText("layout")).toBeVisible();
   await expect(variantList.getByText("row · stack · grid")).toBeVisible();
+
+  // CMP-015/T3.5.2: tab QA menampilkan pelanggaran linter (frame root ber-anak tanpa auto-layout → R-AUTOLAYOUT);
+  // klik pelanggaran memilih node terkait.
+  await panel.getByRole("tab", { name: "QA" }).click();
+  const qa = panel.getByTestId("qa-list");
+  await expect(qa.getByText("R-AUTOLAYOUT")).toBeVisible();
+  await qa.getByRole("button").filter({ hasText: "R-AUTOLAYOUT" }).first().click();
+  const qaSel = await page.evaluate(() =>
+    (window as unknown as { __editorTestApi?: { getSelection(): string[] } }).__editorTestApi?.getSelection(),
+  );
+  expect(qaSel).toEqual(["n_root0001"]);
 });
 
 test("user biasa (bukan staf): Mode Admin → tidak ditemukan (permukaan admin tak bocor)", async ({ page, context }) => {

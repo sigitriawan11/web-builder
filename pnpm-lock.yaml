@@ -135,6 +135,9 @@ importers:
       '@platform/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@platform/library-seed':
+        specifier: workspace:*
+        version: link:../../packages/library-seed
       '@platform/renderer':
         specifier: workspace:*
         version: link:../../packages/renderer

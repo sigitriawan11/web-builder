@@ -7,14 +7,12 @@ import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { AccessTab } from "./AccessTab";
 import { MetadataTab } from "./MetadataTab";
 import { PropsTab } from "./PropsTab";
+import { QaTab } from "./QaTab";
 import { VariantsTab } from "./VariantsTab";
 
-// CMP-012: panel kanan Mode Admin. Tab yang punya data sekarang terisi (Metadata baca, Versions, Usage); tab editing
-// (Props/Variants/Access/QA) placeholder — masing-masing dibangun di task tersendiri (T3.4.4/5/7/9, QA).
+// CMP-012: panel kanan Mode Admin. Semua tab kini punya editor sendiri (Metadata/Props/Variants/Access/QA) + baca
+// (Versions/Usage).
 const TABS = ["metadata", "props", "variants", "access", "qa", "versions", "usage"] as const;
-type TabKey = (typeof TABS)[number];
-// Tab yang belum punya editor sendiri → placeholder "coming soon".
-const PLACEHOLDER_TABS = new Set<TabKey>(["qa"]);
 
 const STATUS_VARIANT: Record<LibraryStatus, "default" | "secondary" | "outline"> = {
   draft: "secondary",
@@ -71,6 +69,10 @@ export function ComponentPanel({
           <AccessTab runtime={runtime} canEdit={canEdit} />
         </TabsContent>
 
+        <TabsContent value="qa">
+          <QaTab runtime={runtime} />
+        </TabsContent>
+
         <TabsContent value="versions">
           <dl className="flex flex-col gap-3 text-sm">
             <Field label={t("admin.panel.metadata.status")}>
@@ -90,12 +92,6 @@ export function ComponentPanel({
         <TabsContent value="usage">
           <UsageTable componentId={componentId} />
         </TabsContent>
-
-        {[...PLACEHOLDER_TABS].map((tab) => (
-          <TabsContent key={tab} value={tab}>
-            <p className="text-sm text-muted-foreground">{t("admin.panel.comingSoon")}</p>
-          </TabsContent>
-        ))}
       </Tabs>
     </aside>
   );
