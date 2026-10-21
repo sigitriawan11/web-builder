@@ -22,11 +22,11 @@ import { selectionStore } from "../../store/selection-store";
 // sama dengan canvas. Tipe prop di form sengaja subset skalar (text/number/boolean/color); richText/enum/image/link/
 // icon/slot/list menyusul (editor tipe-khusus). Binding: hanya target yang bentuknya pasti (content teks, visible).
 
-// Tipe prop yang form add-nya dukung sekarang (default skalar + list dgn itemSchema starter).
-const ADDABLE_TYPES = ["text", "number", "boolean", "color", "list"] as const;
+// Tipe prop yang form add-nya dukung sekarang (default skalar + list dgn itemSchema starter + slot deklarasi).
+const ADDABLE_TYPES = ["text", "number", "boolean", "color", "list", "slot"] as const;
 type AddableType = (typeof ADDABLE_TYPES)[number];
 // Tipe yang tidak butuh input "default" di form.
-const NO_DEFAULT_INPUT = new Set<AddableType>(["color", "list"]);
+const NO_DEFAULT_INPUT = new Set<AddableType>(["color", "list", "slot"]);
 
 const ctxOf = (runtime: CanvasRuntime) => ({
   doc: runtime.doc,
@@ -53,6 +53,9 @@ function buildProp(type: AddableType, key: string, label: { id: string; en: stri
         itemSchema: [{ key: "label", label: { id: "Label", en: "Label" }, type: "text", default: "" }],
         default: [],
       };
+    case "slot":
+      // CMP-017: deklarasi slot (area isi). Node slot + konten default di canvas = follow-up (butuh Inspector).
+      return { key, label, type: "slot" };
   }
 }
 
