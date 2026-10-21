@@ -21,5 +21,6 @@ export {
   uuidV5,
 } from "./import";
 export { SEED_JSON_SCHEMAS, seedJsonSchema } from "./json-schema";
+export { LINT_RULES, type LintRule, type LintViolation, lintComponent } from "./lint";
 export { SEED_DATA_DIR, SEED_DIRS } from "./paths";
 export { formatSeedIssues, jsonPath, type SeedIssue, type SeedLibraryReport, validateSeedLibrary } from "./validate";
