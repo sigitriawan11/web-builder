@@ -1,3 +1,4 @@
+import { addComponentProp, bindProp, removeComponentProp, unbindProp, updateComponentProp } from "./component-props";
 import { registerAsset, replaceText, setImage, setLink, setNodeProps, setTextContent } from "./content";
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
@@ -36,8 +37,10 @@ export {
 export { plainToRichText } from "./content";
 export { type Subtree, SubtreeSchema } from "./subtree";
 export {
+  addComponentProp,
   addFont,
   applyThemePreset,
+  bindProp,
   clearBreakpointOverrides,
   createInstance,
   createNode,
@@ -51,6 +54,7 @@ export {
   insertSubtree,
   moveNode,
   registerAsset,
+  removeComponentProp,
   renameNode,
   reorderNode,
   reorderPages,
@@ -71,7 +75,9 @@ export {
   setTextContent,
   setVariant,
   setVisible,
+  unbindProp,
   ungroup,
+  updateComponentProp,
   updatePage,
   updateStyle,
   wrapInFrame,
@@ -118,4 +124,9 @@ export const COMMANDS = {
   setInstanceOverride,
   resetOverride,
   setSlotContent,
+  addComponentProp,
+  updateComponentProp,
+  removeComponentProp,
+  bindProp,
+  unbindProp,
 } as const;
