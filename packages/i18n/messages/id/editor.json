@@ -74,6 +74,25 @@
         "saving": "Menyimpan…",
         "saved": "Tersimpan",
         "failed": "Gagal menyimpan: {error}"
+      },
+      "props": {
+        "noDraft": "Buka draft untuk mengelola props.",
+        "empty": "Belum ada props.",
+        "add": "Tambah prop",
+        "key": "Key (camelCase)",
+        "labelId": "Label (ID)",
+        "labelEn": "Label (EN)",
+        "type": "Tipe",
+        "defaultValue": "Default",
+        "remove": "Hapus",
+        "failed": "Gagal: {error}",
+        "bindingTitle": "Binding node terpilih",
+        "bindingNone": "Pilih satu node di canvas untuk mem-binding propertinya.",
+        "bindContent": "Konten",
+        "bindVisible": "Terlihat",
+        "bindSelect": "— pilih prop —",
+        "bind": "Bind",
+        "unbind": "Lepas"
       }
     }
   },

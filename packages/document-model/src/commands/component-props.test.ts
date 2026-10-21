@@ -52,7 +52,11 @@ function baseDef(): ComponentDefinition {
 }
 
 // Node ComponentDefinition bertipe longgar (style/props/visible permisif) → cast ke bentuk yang kita periksa.
-type LooseNode = { props?: { content?: unknown }; visible?: unknown; style?: { base?: { fills?: { color?: unknown } } } };
+type LooseNode = {
+  props?: { content?: unknown };
+  visible?: unknown;
+  style?: { base?: { fills?: { color?: unknown } } };
+};
 
 function setup() {
   const doc = componentDefToYDoc(baseDef());

@@ -74,6 +74,25 @@
         "saving": "Saving…",
         "saved": "Saved",
         "failed": "Failed to save: {error}"
+      },
+      "props": {
+        "noDraft": "Open a draft to manage props.",
+        "empty": "No props yet.",
+        "add": "Add prop",
+        "key": "Key (camelCase)",
+        "labelId": "Label (ID)",
+        "labelEn": "Label (EN)",
+        "type": "Type",
+        "defaultValue": "Default",
+        "remove": "Remove",
+        "failed": "Failed: {error}",
+        "bindingTitle": "Selected node binding",
+        "bindingNone": "Select one node on the canvas to bind its properties.",
+        "bindContent": "Content",
+        "bindVisible": "Visible",
+        "bindSelect": "— pick a prop —",
+        "bind": "Bind",
+        "unbind": "Unbind"
       }
     }
   },

@@ -164,6 +164,38 @@ test("create component dari seleksi (CMP-011): seleksi → component baru + inst
   await expect(page.getByText(marker)).toBeVisible();
 });
 
+test("props & binding (CMP-020/021): tambah prop → bind visible node terpilih", async ({ page }) => {
+  const { componentId, marker } = await createComponentAsStaff(page);
+  await page.goto(`${APP_URL}/editor/library/components/${componentId}/draft`);
+  await expect(page.getByTestId("admin-badge")).toBeVisible();
+  await expect(page.getByText(marker)).toBeVisible();
+
+  const panel = page.getByTestId("component-panel");
+  await panel.getByRole("tab", { name: "Props" }).click();
+
+  // Tambah prop boolean "showText".
+  await panel.getByLabel("Key (camelCase)").fill("showText");
+  await panel.getByRole("combobox").first().selectOption("boolean");
+  await panel.getByRole("button", { name: "Add prop" }).click();
+  await expect(panel.getByTestId("prop-list").getByText("showText").first()).toBeVisible();
+
+  // Pilih node teks, lalu bind `visible` ke prop boolean.
+  await page.waitForFunction(() => Boolean((window as unknown as { __editorTestApi?: unknown }).__editorTestApi));
+  await page.evaluate(() =>
+    (window as unknown as { __editorTestApi?: { select(ids: string[]): void } }).__editorTestApi?.select([
+      "n_text0001",
+    ]),
+  );
+  const visibleRow = panel.getByTestId("bind-Visible");
+  await visibleRow.getByRole("combobox").selectOption("showText");
+  await visibleRow.getByRole("button", { name: "Bind" }).click();
+
+  // Baris menampilkan prop ter-bind + tombol Unbind; node tetap terlihat (visible={$prop} truthy).
+  await expect(visibleRow.getByText("showText")).toBeVisible();
+  await expect(visibleRow.getByRole("button", { name: "Unbind" })).toBeVisible();
+  await expect(page.getByText(marker)).toBeVisible();
+});
+
 test("user biasa (bukan staf): Mode Admin → tidak ditemukan (permukaan admin tak bocor)", async ({ page, context }) => {
   const { componentId, marker } = await createComponentAsStaff(page);
   await context.clearCookies();

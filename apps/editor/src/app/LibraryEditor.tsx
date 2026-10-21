@@ -48,35 +48,56 @@ export function LibraryEditor({ componentId }: { componentId: string }) {
 
 function LibraryWorkspace({ componentId, data }: { componentId: string; data: LibraryEditorSession }) {
   const t = useT();
+  const locale = useLocale();
   const { component, capabilities } = data;
-  const draftDocumentId = component.draftDocumentId;
 
-  if (!draftDocumentId) {
-    // Component tanpa draft aktif (mis. hanya versi published) — editing versi baru = T3.4.x.
+  if (!component.draftDocumentId) {
+    // Component tanpa draft aktif (mis. hanya versi published) — editing versi baru = T3.4.x. Panel tetap tampil
+    // (Metadata/Versions/Usage); tab Props menanti draft (runtime null).
     return (
-      <AdminShell componentId={componentId} component={component} capabilities={capabilities}>
+      <AdminShell
+        component={component}
+        capabilities={capabilities}
+        panel={
+          <ComponentPanel
+            componentId={componentId}
+            component={component}
+            locale={locale}
+            canEdit={capabilities.canEditDraft}
+            runtime={null}
+          />
+        }
+      >
         <p className="m-auto text-sm text-muted-foreground">{t("admin.canvasPending")}</p>
       </AdminShell>
     );
   }
   return (
-    <AdminShell componentId={componentId} component={component} capabilities={capabilities}>
-      <LibraryCanvas componentId={componentId} draftDocumentId={draftDocumentId} canEdit={capabilities.canEditDraft} />
-    </AdminShell>
+    <LibraryDraftEditor
+      componentId={componentId}
+      draftDocumentId={component.draftDocumentId}
+      component={component}
+      capabilities={capabilities}
+    />
   );
 }
 
-function LibraryCanvas({
+// Draft component terbuka: session/runtime dibuat DI SINI (di atas canvas & panel) agar panel kanan bisa membaca
+// propsSchema Y.Doc & menjalankan command (tab Props/binding, CMP-020/021) memakai runtime yang sama dengan canvas.
+function LibraryDraftEditor({
   componentId,
   draftDocumentId,
-  canEdit,
+  component,
+  capabilities,
 }: {
   componentId: string;
   draftDocumentId: string;
-  canEdit: boolean;
+  component: LibraryEditorSession["component"];
+  capabilities: LibraryEditorSession["capabilities"];
 }) {
   const t = useT();
   const locale = useLocale();
+  const canEdit = capabilities.canEditDraft;
   const { session } = useLibraryDocumentSession(draftDocumentId, componentId);
   const rootId = useRootId(session);
   const runtime = useComponentRuntime(session, rootId);
@@ -105,21 +126,36 @@ function LibraryCanvas({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [canEdit]);
 
-  if (!runtime) {
-    return <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>;
-  }
   return (
-    <>
-      {import.meta.env.DEV && session ? <LibraryTestHook session={session} runtime={runtime} /> : null}
-      <CanvasViewport runtime={runtime} />
-      <CreateComponentDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        runtime={runtime}
-        selectedIds={pendingSelection}
-        locale={locale}
-      />
-    </>
+    <AdminShell
+      component={component}
+      capabilities={capabilities}
+      panel={
+        <ComponentPanel
+          componentId={componentId}
+          component={component}
+          locale={locale}
+          canEdit={canEdit}
+          runtime={runtime}
+        />
+      }
+    >
+      {runtime ? (
+        <>
+          {import.meta.env.DEV && session ? <LibraryTestHook session={session} runtime={runtime} /> : null}
+          <CanvasViewport runtime={runtime} />
+          <CreateComponentDialog
+            open={createOpen}
+            onOpenChange={setCreateOpen}
+            runtime={runtime}
+            selectedIds={pendingSelection}
+            locale={locale}
+          />
+        </>
+      ) : (
+        <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
+      )}
+    </AdminShell>
   );
 }
 
@@ -169,18 +205,18 @@ function useComponentRuntime(session: DocumentSession | null, rootId: string | n
 }
 
 function AdminShell({
-  componentId,
   component,
   capabilities,
+  panel,
   children,
 }: {
-  componentId: string;
   component: LibraryEditorSession["component"];
   capabilities: LibraryEditorSession["capabilities"];
+  // Panel kanan (CMP-012/013/020/021) dibangun pemanggil agar bisa menerima runtime yang sama dengan canvas.
+  panel: ReactNode;
   children: ReactNode;
 }) {
   const t = useT();
-  const locale = useLocale();
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-admin-mode="library">
       <header className="flex items-center gap-3 border-b px-4 py-2">
@@ -200,13 +236,7 @@ function AdminShell({
       </header>
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 flex-1 bg-muted/40">{children}</div>
-        {/* CMP-012/CMP-013: panel kanan component (Metadata edit/baca, Versions, Usage + placeholder tab lain). */}
-        <ComponentPanel
-          componentId={componentId}
-          component={component}
-          locale={locale}
-          canEdit={capabilities.canEditDraft}
-        />
+        {panel}
       </div>
     </div>
   );

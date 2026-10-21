@@ -3,14 +3,16 @@ import type { LibraryComponentSummary, LibraryStatus } from "@platform/shared/co
 import { Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@platform/ui";
 import type { ReactNode } from "react";
 import { useT } from "../../app/i18n";
+import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { MetadataTab } from "./MetadataTab";
+import { PropsTab } from "./PropsTab";
 
 // CMP-012: panel kanan Mode Admin. Tab yang punya data sekarang terisi (Metadata baca, Versions, Usage); tab editing
 // (Props/Variants/Access/QA) placeholder — masing-masing dibangun di task tersendiri (T3.4.4/5/7/9, QA).
 const TABS = ["metadata", "props", "variants", "access", "qa", "versions", "usage"] as const;
 type TabKey = (typeof TABS)[number];
 // Tab yang belum punya editor sendiri → placeholder "coming soon".
-const PLACEHOLDER_TABS = new Set<TabKey>(["props", "variants", "access", "qa"]);
+const PLACEHOLDER_TABS = new Set<TabKey>(["variants", "access", "qa"]);
 
 const STATUS_VARIANT: Record<LibraryStatus, "default" | "secondary" | "outline"> = {
   draft: "secondary",
@@ -25,12 +27,15 @@ export function ComponentPanel({
   component,
   locale,
   canEdit,
+  runtime,
 }: {
   // UUID internal (sama dengan sesi editor & endpoint usage), bukan public_id.
   componentId: string;
   component: LibraryComponentSummary;
   locale: "id" | "en";
   canEdit: boolean;
+  // Runtime draft terbuka (CMP-020/021 Props/binding). Null bila belum ada draft (tab Props menanti).
+  runtime: CanvasRuntime | null;
 }) {
   const t = useT();
   return (
@@ -50,6 +55,10 @@ export function ComponentPanel({
 
         <TabsContent value="metadata">
           <MetadataTab componentId={componentId} component={component} locale={locale} canEdit={canEdit} />
+        </TabsContent>
+
+        <TabsContent value="props">
+          <PropsTab runtime={runtime} canEdit={canEdit} locale={locale} />
         </TabsContent>
 
         <TabsContent value="versions">
