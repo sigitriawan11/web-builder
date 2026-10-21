@@ -24,6 +24,7 @@ import {
 } from "./instance";
 import { moveNode } from "./move-node";
 import { renameNode, reorderNode, setHtmlId, setLocked, setTag, setVisible } from "./node-fields";
+import { clearNodeState, setNodeState } from "./node-state";
 import { createPage, deletePage, reorderPages, updatePage } from "./pages";
 import { clearBreakpointOverrides, setBreakpointOverride, setLayoutMode, setSettings } from "./style-commands";
 import { duplicateNodes, insertSubtree } from "./subtree";
@@ -52,6 +53,7 @@ export {
   applyThemePreset,
   bindProp,
   clearBreakpointOverrides,
+  clearNodeState,
   createInstance,
   createNode,
   createPage,
@@ -148,4 +150,6 @@ export const COMMANDS = {
   addVariantAxis,
   updateVariantAxis,
   removeVariantAxis,
+  setNodeState,
+  clearNodeState,
 } as const;
