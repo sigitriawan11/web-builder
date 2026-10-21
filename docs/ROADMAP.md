@@ -1349,7 +1349,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.5 — Lifecycle & versioning
 
-- [ ] **T3.5.1** State machine status component (draft → review → published → deprecated → archived) — CMP-040 · `apps/api/src/modules/library` · Verifikasi: unit test transisi terlarang
+- [x] **T3.5.1** State machine status component (draft → review → published → deprecated → archived) — CMP-040 · `apps/api/src/modules/library` · Verifikasi: unit test transisi terlarang
+  - Catatan (2026-10-21): `library-admin.status.ts` fungsi murni — `canTransition`/`assertComponentTransition` (lempar CONFLICT 409). Transisi: draft→in_review→published→deprecated→archived + reject (in_review→draft) + restore (deprecated→published). Di-wire ke service: **deprecate** wajib dari `published`, **archive** wajib dari `deprecated` (transisi tak valid → 409). Test: api unit +4; int test diperbarui (deprecate draft → 409, lalu publish→deprecate→archive). Gate hijau; api unit 60, int 172. **Follow-up:** endpoint submit/approve/reject (T3.5.2) + restore; status per-versi (`component_versions.status`) + `draft_version_id` tunggal.
 - [ ] **T3.5.2** Review & checklist QA (form checklist, hasil linter, screenshot 3 breakpoint) — CMP-041, CMP-133 · `apps/editor`, `apps/api` · Verifikasi: e2e publish ditolak bila QA belum lulus
 - [ ] **T3.5.3** Nomor versi semver-ish (deteksi breaking: prop dihapus/ganti tipe) — CMP-042 · `apps/api/src/modules/library` · Verifikasi: unit test diff props → MAJOR
 - [ ] **T3.5.4** Changelog per versi (wajib saat publish) — CMP-043 · `apps/api`, `apps/editor` · Verifikasi: int test
