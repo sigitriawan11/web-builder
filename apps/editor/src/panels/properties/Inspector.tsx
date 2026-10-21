@@ -145,13 +145,13 @@ function SettingsTab({
   const setVisibleAll = (visible: boolean) => {
     if (!runtime || readOnly) return;
     runtime.undo.stopCapturing();
-    runCommand({ doc: runtime.doc, origin: runtime.origin }, setVisible, { ids, visible });
+    runCommand(runtime.commandCtx, setVisible, { ids, visible });
     runtime.undo.stopCapturing();
   };
   const setLockedAll = (locked: boolean) => {
     if (!runtime || readOnly) return;
     runtime.undo.stopCapturing();
-    runCommand({ doc: runtime.doc, origin: runtime.origin }, setLocked, { ids, locked });
+    runCommand(runtime.commandCtx, setLocked, { ids, locked });
     runtime.undo.stopCapturing();
   };
 

@@ -79,7 +79,7 @@ export function FillSection({
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
       for (const target of nodes) {
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+        runCommand(runtime.commandCtx, updateStyle, {
           ids: [target.id],
           patch: { fills: next as Fill[] },
         });
@@ -100,7 +100,7 @@ export function FillSection({
     if (readOnly) return;
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
-      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      const ctx = runtime.commandCtx;
       runCommand(ctx, registerAsset, { id: assetId, entry });
       for (const target of nodes) {
         const current = resolveStyle(target.style, "base").fills ?? [];

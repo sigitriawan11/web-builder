@@ -17,7 +17,7 @@ export function useLockHide(runtime: CanvasRuntime): void {
       if (ids.length === 0) return;
       event.preventDefault();
 
-      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      const ctx = runtime.commandCtx;
       runtime.undo.stopCapturing();
       if (key === "l") {
         const lock = !ids.every((id) => runtime.nodeStore.getNode(id)?.locked === true);

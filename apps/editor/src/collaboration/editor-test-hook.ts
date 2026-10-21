@@ -40,7 +40,7 @@ declare global {
 export function useEditorTestHook(session: DocumentSession, runtime: CanvasRuntime, crash: () => void): void {
   useEffect(() => {
     if (!import.meta.env.DEV) return;
-    const ctx = { doc: runtime.doc, origin: runtime.origin };
+    const ctx = runtime.commandCtx;
     window.__editorTestApi = {
       getDoc: () => yDocToJson(runtime.doc),
       select: (ids) => selectionStore.getState().select(ids),

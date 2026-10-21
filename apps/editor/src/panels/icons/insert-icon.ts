@@ -47,7 +47,7 @@ export function insertIconNode(
   };
   const base = parentIsFlow ? { size } : { size, position: freeformPosition(runtime, parentId) };
   runtime.undo.stopCapturing();
-  const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, createNode, {
+  const result = runCommand(runtime.commandCtx, createNode, {
     parentId,
     type: "icon",
     props: { set, name },

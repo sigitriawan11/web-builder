@@ -22,7 +22,7 @@ export function useGroupShortcut(runtime: CanvasRuntime): void {
         const node = id ? runtime.nodeStore.getNode(id) : null;
         if (ids.length !== 1 || !node || !("children" in node) || node.type === "page") return;
         runtime.undo.stopCapturing();
-        const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, ungroup, { id: node.id });
+        const result = runCommand(runtime.commandCtx, ungroup, { id: node.id });
         runtime.undo.stopCapturing();
         if (result.ok) selectionStore.getState().select(result.affected.filter((a) => a !== node.parentId));
         return;
@@ -47,7 +47,7 @@ export function useGroupShortcut(runtime: CanvasRuntime): void {
       const rect = { x: x - (parentRect?.x ?? 0), y: y - (parentRect?.y ?? 0), width, height };
 
       runtime.undo.stopCapturing();
-      const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, groupNodes, { ids: [...ids], rect });
+      const result = runCommand(runtime.commandCtx, groupNodes, { ids: [...ids], rect });
       runtime.undo.stopCapturing();
       if (result.ok) selectionStore.getState().select([result.value]);
       else showToast("sections.wrapSameParent", "warning");

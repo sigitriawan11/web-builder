@@ -14,7 +14,7 @@ export function useEmptyTextCleanup(runtime: CanvasRuntime): void {
       if (ended === null || state.editingId === ended) return;
       const node = runtime.nodeStore.getNode(ended);
       if (node?.type === "text" && plainText(node.props.content).trim() === "") {
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, deleteNodes, { ids: [ended] });
+        runCommand(runtime.commandCtx, deleteNodes, { ids: [ended] });
       }
     });
   }, [runtime]);

@@ -26,7 +26,7 @@ export function TagSelect({
   const change = (tag: string) => {
     if (readOnly || tag === current) return;
     runtime.undo.stopCapturing();
-    runCommand({ doc: runtime.doc, origin: runtime.origin }, setTag, { id: node.id, tag });
+    runCommand(runtime.commandCtx, setTag, { id: node.id, tag });
     runtime.undo.stopCapturing();
   };
 

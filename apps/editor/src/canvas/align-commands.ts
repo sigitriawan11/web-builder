@@ -35,7 +35,7 @@ function applyDeltas(runtime: CanvasRuntime, deltas: Map<string, Delta>): void {
       const node = runtime.nodeStore.getNode(id);
       const position = node ? resolveStyle(node.style, "base").position : undefined;
       if (position?.type !== "absolute") continue;
-      runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+      runCommand(runtime.commandCtx, updateStyle, {
         ids: [id],
         patch: { position: { x: position.x + delta.dx, y: position.y + delta.dy } },
       });

@@ -36,7 +36,7 @@ export function useNudge(runtime: CanvasRuntime): void {
       lastNudgeAt = now;
 
       const amount = event.shiftKey ? BIG_NUDGE : 1;
-      const ctx: CommandContext = { doc: runtime.doc, origin: runtime.origin };
+      const ctx: CommandContext = runtime.commandCtx;
       // Multi-seleksi dalam satu transaksi (= satu langkah); keypress beruntun digabung captureTimeout.
       ctx.doc.transact(() => {
         for (const id of ids) nudgeNode(runtime, ctx, id, event.key as Arrow, amount);

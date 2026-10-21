@@ -94,7 +94,7 @@ export function insertImageNode(
     position?: { type: "absolute"; x: number; y: number };
   },
 ): string | null {
-  const ctx = { doc: runtime.doc, origin: runtime.origin };
+  const ctx = runtime.commandCtx;
   const size = input.size ?? { width: DEFAULT_SIZE, height: DEFAULT_HEIGHT };
   runtime.undo.stopCapturing();
   let newId: string | null = null;

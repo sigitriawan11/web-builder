@@ -53,7 +53,7 @@ export function PositionSizeSection({
     runtime.undo.stopCapturing();
   };
 
-  const ctx = () => ({ doc: runtime.doc, origin: runtime.origin });
+  const ctx = () => runtime.commandCtx;
   const setSize = (node: Node, axis: "width" | "height", value: number) => {
     runCommand(ctx(), updateStyle, {
       ids: [node.id],

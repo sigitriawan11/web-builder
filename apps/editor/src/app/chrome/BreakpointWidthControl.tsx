@@ -20,7 +20,7 @@ export function BreakpointWidthControl({ runtime, readOnly }: { runtime: CanvasR
     const clamped = Math.max(240, Math.min(10_000, Math.round(width)));
     const next = parsed.data.map((bp) => (bp.id === active ? { ...bp, previewWidth: clamped } : bp));
     runtime.undo.stopCapturing();
-    runCommand({ doc: runtime.doc, origin: runtime.origin }, setSettings, { patch: { breakpoints: next } });
+    runCommand(runtime.commandCtx, setSettings, { patch: { breakpoints: next } });
     runtime.undo.stopCapturing();
   };
 

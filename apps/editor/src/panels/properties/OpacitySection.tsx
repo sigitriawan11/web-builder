@@ -37,7 +37,7 @@ export function OpacitySection({
               runtime.doc.transact(() => {
                 for (const node of nodes) {
                   const next = Math.max(0, Math.min(100, update(percentOf(node))));
-                  runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+                  runCommand(runtime.commandCtx, updateStyle, {
                     ids: [node.id],
                     patch: { opacity: next / 100 },
                   });

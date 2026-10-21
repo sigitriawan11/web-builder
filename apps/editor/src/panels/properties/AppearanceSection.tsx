@@ -29,7 +29,7 @@ export function AppearanceSection({
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
       for (const node of frames) {
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, setNodeProps, {
+        runCommand(runtime.commandCtx, setNodeProps, {
           id: node.id,
           patch: { clipContent: on ? true : null },
         });

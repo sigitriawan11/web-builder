@@ -18,7 +18,7 @@ export function NameField({ runtime, node, readOnly }: { runtime: CanvasRuntime;
       return;
     }
     runtime.undo.stopCapturing();
-    runCommand({ doc: runtime.doc, origin: runtime.origin }, renameNode, { id: node.id, name });
+    runCommand(runtime.commandCtx, renameNode, { id: node.id, name });
     runtime.undo.stopCapturing();
   };
 

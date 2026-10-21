@@ -137,7 +137,7 @@ export function AutoLayoutGuides() {
       previewStore.getState().clear([id]);
       const gap = style?.layout && "gap" in style.layout ? style.layout.gap : { value: applied, unit: "px" as const };
       runtime.undo.stopCapturing();
-      runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, { ids: [id], patch: { layout: { gap } } });
+      runCommand(runtime.commandCtx, updateStyle, { ids: [id], patch: { layout: { gap } } });
       runtime.undo.stopCapturing();
     };
     window.addEventListener("pointermove", onMove);

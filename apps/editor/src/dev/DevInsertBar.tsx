@@ -34,7 +34,7 @@ export function DevInsertBar({ runtime, readOnly }: { runtime: CanvasRuntime; re
     if (!input) return;
     recordEditorAction(`devInsert:${kind}`);
     runtime.undo.stopCapturing();
-    const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, createNode, input);
+    const result = runCommand(runtime.commandCtx, createNode, input);
     // ED-037: node baru langsung terseleksi.
     if (result.ok) selectionStore.getState().select([String(result.value)]);
     else console.error("editor: tombol dev gagal membuat node", result);

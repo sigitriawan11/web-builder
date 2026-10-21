@@ -38,7 +38,7 @@ export function useWrapShortcut(runtime: CanvasRuntime): void {
         }
       }
       runtime.undo.stopCapturing();
-      const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, wrapInFrame, {
+      const result = runCommand(runtime.commandCtx, wrapInFrame, {
         ids: [...ids],
         ...(rect ? { rect } : {}),
       });

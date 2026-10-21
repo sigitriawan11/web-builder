@@ -65,7 +65,7 @@ const siteFont = siteFontFromSearch(window.location.search);
 function runtimeDeps(runtime: CanvasRuntime) {
   const interaction: InteractionAdapterDeps = { hitTest: runtime.hitTest, resolveTarget: runtime.resolveTarget };
   const drag: DragSessionDeps = {
-    opContext: { doc: runtime.doc, origin: runtime.origin },
+    opContext: runtime.commandCtx,
     geometry: runtime.geometry.store,
     nodeStore: runtime.nodeStore,
     hitTest: runtime.hitTest,
@@ -78,7 +78,7 @@ function runtimeDeps(runtime: CanvasRuntime) {
     deleteNode: (id) => {
       recordEditorAction("deleteBrokenNode");
       runtime.undo.stopCapturing();
-      const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, deleteNodes, { ids: [id] });
+      const result = runCommand(runtime.commandCtx, deleteNodes, { ids: [id] });
       if (!result.ok) console.error(`editor: node rusak "${id}" gagal dihapus`, result);
     },
     // Laporan user (ED-228) → Sentry; ID node bukan konten, isi node tidak dikirim.

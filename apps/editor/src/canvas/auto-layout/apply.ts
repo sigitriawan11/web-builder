@@ -19,7 +19,7 @@ import { type ChildRect, inferAutoLayout, type Rect } from "./infer";
 // keepVisualPosition saat hapus. Semua perubahan satu batch atomik (satu langkah undo).
 
 const px = (value: number) => ({ value, unit: "px" as const });
-const ctxOf = (runtime: CanvasRuntime) => ({ doc: runtime.doc, origin: runtime.origin });
+const ctxOf = (runtime: CanvasRuntime) => runtime.commandCtx;
 
 function childRects(runtime: CanvasRuntime, ids: readonly string[]): ChildRect[] {
   return ids.flatMap((id) => {

@@ -1,4 +1,5 @@
 import {
+  type CommandContext,
   moveNode,
   type Node,
   plainText,
@@ -116,7 +117,7 @@ export function LayersPanel({
     const base = docDropIndex(remaining.length, index);
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
-      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      const ctx = runtime.commandCtx;
       const parentRect = runtime.geometry.store.peekRect(targetParentId);
       // Urutan dokumen node yang ditarik = kebalikan urutan tampilan.
       [...dragIds].reverse().forEach((id, offset) => {
@@ -223,11 +224,11 @@ function LayerRow({ node, style, dragHandle }: NodeRendererProps<LayerNode>) {
   const name = rawName || t(`nodeType.${type}`);
   const editing = actions?.editingId === node.id;
 
-  const withUndo = (fn: (ctx: { doc: CanvasRuntime["doc"]; origin: CanvasRuntime["origin"] }) => void) => {
+  const withUndo = (fn: (ctx: CommandContext) => void) => {
     if (!actions || actions.readOnly) return;
     const { runtime } = actions;
     runtime.undo.stopCapturing();
-    fn({ doc: runtime.doc, origin: runtime.origin });
+    fn(runtime.commandCtx);
     runtime.undo.stopCapturing();
   };
   const commitRename = (value: string) => {

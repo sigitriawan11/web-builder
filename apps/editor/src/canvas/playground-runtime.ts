@@ -43,8 +43,7 @@ export function exposeDevApi(runtime: CanvasRuntime): void {
     __spike: {
       doc: runtime.doc,
       ops: { createNode, moveNode, updateStyle, deleteNodes, setLink },
-      run: (op: Parameters<typeof runCommand>[1], input: unknown) =>
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, op, input),
+      run: (op: Parameters<typeof runCommand>[1], input: unknown) => runCommand(runtime.commandCtx, op, input),
       // Dipakai E2E & benchmark canvas (T0.4.6, T0.7.3).
       camera: cameraStore,
       // T2.3.5: benchmark switch page.

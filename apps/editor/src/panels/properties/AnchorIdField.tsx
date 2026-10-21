@@ -21,7 +21,7 @@ export function AnchorIdField({ runtime, node, readOnly }: { runtime: CanvasRunt
       return;
     }
     runtime.undo.stopCapturing();
-    const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, setHtmlId, {
+    const result = runCommand(runtime.commandCtx, setHtmlId, {
       id: node.id,
       htmlId: slug === "" ? null : slug,
     });

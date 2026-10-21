@@ -103,7 +103,7 @@ export function LinkSection({
 
   const write = (link: LinkValue | null) => {
     runtime.undo.stopCapturing();
-    const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, setNodeProps, {
+    const result = runCommand(runtime.commandCtx, setNodeProps, {
       id: node.id,
       patch: { link },
     });

@@ -18,7 +18,7 @@ export function useOpacityShortcut(runtime: CanvasRuntime): void {
       runtime.doc.transact(() => {
         for (const id of ids) {
           if (runtime.nodeStore.getNode(id)?.locked) continue;
-          runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, { ids: [id], patch: { opacity } });
+          runCommand(runtime.commandCtx, updateStyle, { ids: [id], patch: { opacity } });
         }
       }, runtime.origin);
       runtime.undo.stopCapturing();

@@ -47,7 +47,7 @@ export function PageSettings({
     });
   const apply = (patch: Record<string, unknown>) => {
     runtime.undo.stopCapturing();
-    return runCommand({ doc: runtime.doc, origin: runtime.origin }, updatePage, { id: pageId, patch }).ok;
+    return runCommand(runtime.commandCtx, updatePage, { id: pageId, patch }).ok;
   };
 
   const commit = (field: Field) => {

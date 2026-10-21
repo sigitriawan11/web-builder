@@ -1,6 +1,7 @@
 import {
   addFont,
   applyStylePatch,
+  type CommandContext,
   type Node,
   resolveStyle,
   runCommand,
@@ -92,14 +93,11 @@ export function TypographySection({
 
   // Terapkan patch typography ke semua text node (satu transaksi = satu undo). Token di-expand dulu (DM-032) agar
   // field lain tidak hilang. `before` dipakai untuk aksi tambahan (mis. addFont) di transaksi yang sama.
-  const commitTypography = (
-    make: (node: Node) => Record<string, unknown>,
-    before?: (ctx: { doc: typeof runtime.doc; origin: typeof runtime.origin }) => void,
-  ) => {
+  const commitTypography = (make: (node: Node) => Record<string, unknown>, before?: (ctx: CommandContext) => void) => {
     if (readOnly) return;
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
-      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      const ctx = runtime.commandCtx;
       before?.(ctx);
       const ctxTheme = theme ? { theme } : {};
       for (const node of texts) {
@@ -142,7 +140,7 @@ export function TypographySection({
     if (readOnly) return;
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
-      const ctx = { doc: runtime.doc, origin: runtime.origin };
+      const ctx = runtime.commandCtx;
       for (const node of texts) {
         const rect = runtime.geometry.store.peekRect(node.id);
         const w = Math.round(rect?.width ?? 120);
@@ -171,7 +169,7 @@ export function TypographySection({
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
       for (const node of texts) {
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+        runCommand(runtime.commandCtx, updateStyle, {
           ids: [node.id],
           patch: { textAlignVertical: value },
         });

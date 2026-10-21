@@ -63,7 +63,7 @@ export function AutoLayoutSection({
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
       for (const node of nodes) {
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+        runCommand(runtime.commandCtx, updateStyle, {
           ids: [node.id],
           patch: { layout: patch },
         });
@@ -84,7 +84,7 @@ export function AutoLayoutSection({
         const layout = flexLayout(node);
         const patch = layout ? compute(layout) : null;
         if (patch)
-          runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+          runCommand(runtime.commandCtx, updateStyle, {
             ids: [node.id],
             patch: { layout: patch },
           });

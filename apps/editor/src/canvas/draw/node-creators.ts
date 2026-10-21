@@ -14,7 +14,7 @@ export interface CreateContext {
   rect: DrawRect;
 }
 
-const ctxOf = (runtime: CanvasRuntime) => ({ doc: runtime.doc, origin: runtime.origin });
+const ctxOf = (runtime: CanvasRuntime) => runtime.commandCtx;
 
 // Posisi/ukuran dari rect: flow → size fixed; freeform → absolute + size fixed.
 function boxStyle(context: CreateContext, extra: Record<string, unknown> = {}) {

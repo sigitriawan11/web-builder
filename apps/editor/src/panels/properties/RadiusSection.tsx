@@ -54,7 +54,7 @@ export function RadiusSection({
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
       for (const node of nodes) {
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+        runCommand(runtime.commandCtx, updateStyle, {
           ids: [node.id],
           patch: { radius: compute(radiusOf(node)) },
         });

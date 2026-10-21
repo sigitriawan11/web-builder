@@ -32,7 +32,7 @@ export function AutoLayoutHint({
       toggleAutoLayout(runtime, [node.id]);
     } else {
       runtime.undo.stopCapturing();
-      runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+      runCommand(runtime.commandCtx, updateStyle, {
         ids: [node.id],
         patch: { layout: { mode: "flex", direction: "column" } },
       });

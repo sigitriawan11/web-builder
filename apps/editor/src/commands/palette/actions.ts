@@ -31,7 +31,7 @@ export interface PaletteAction {
 
 const sel = () => selectionStore.getState().selectedIds;
 const hasSelection = () => sel().length > 0;
-const ctxOf = (runtime: CanvasRuntime) => ({ doc: runtime.doc, origin: runtime.origin });
+const ctxOf = (runtime: CanvasRuntime) => runtime.commandCtx;
 
 function toggleLockHide(runtime: CanvasRuntime, which: "lock" | "hide"): void {
   const ids = sel();

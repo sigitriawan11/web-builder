@@ -1,7 +1,8 @@
-import type { TxOrigin } from "@platform/document-model";
+import type { CommandContext, TxOrigin } from "@platform/document-model";
 import { ySyncPluginKey } from "@tiptap/y-tiptap";
 import { createContext, useContext } from "react";
 import type * as Y from "yjs";
+import type { ZodTypeAny } from "zod";
 import { useStore } from "zustand";
 import { createStore, type StoreApi } from "zustand/vanilla";
 import { NodeStore, type NodeValidator } from "../document/node-store";
@@ -29,6 +30,9 @@ export interface CanvasRuntime {
   doc: Y.Doc;
   // Origin transaksi lokal user ini (DM-060) — dilacak UndoManager.
   origin: Extract<TxOrigin, { kind: "user" }>;
+  // Konteks command siap pakai (doc+origin+nodeSchema). Semua pemanggil runCommand memakai ini agar pasca-cek
+  // dokumen component (ComponentNodeSchema) tidak memakai schema node situs (Mode Admin, CMP-010).
+  commandCtx: CommandContext;
   /** Page aktif saat ini (baca saat dipakai; komponen React memakai `usePageId`). */
   readonly pageId: string;
   readonly page: StoreApi<{ pageId: string }>;
@@ -57,11 +61,13 @@ export function createCanvasRuntime(options: {
   doc: Y.Doc;
   pageId: string;
   origin: Extract<TxOrigin, { kind: "user" }>;
-  // Mode Admin menyuntik `ComponentNodeSchema` (default = schema node situs).
-  nodeSchema?: NodeValidator;
+  // Mode Admin menyuntik `ComponentNodeSchema` (default = schema node situs). Dipakai NodeStore (validasi boundary)
+  // DAN pasca-cek command (lewat `commandCtx`).
+  nodeSchema?: ZodTypeAny;
 }): CanvasRuntime {
   const { doc, pageId, origin } = options;
-  const nodeStore = new NodeStore(doc, options.nodeSchema);
+  const nodeStore = new NodeStore(doc, options.nodeSchema as NodeValidator | undefined);
+  const commandCtx: CommandContext = { doc, origin, ...(options.nodeSchema ? { nodeSchema: options.nodeSchema } : {}) };
   const page = createStore<{ pageId: string }>()(() => ({ pageId }));
   const cameras = new Map<string, CameraState>();
   const geometry = createDomGeometry();
@@ -101,6 +107,7 @@ export function createCanvasRuntime(options: {
   return {
     doc,
     origin,
+    commandCtx,
     get pageId() {
       return page.getState().pageId;
     },

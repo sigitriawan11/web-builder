@@ -28,7 +28,7 @@ export function EffectsSection({
     runtime.undo.stopCapturing();
     runtime.doc.transact(() => {
       for (const target of nodes) {
-        runCommand({ doc: runtime.doc, origin: runtime.origin }, updateStyle, {
+        runCommand(runtime.commandCtx, updateStyle, {
           ids: [target.id],
           patch: { effects: next },
         });

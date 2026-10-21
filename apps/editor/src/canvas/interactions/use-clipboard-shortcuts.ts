@@ -133,7 +133,7 @@ export async function paste(runtime: CanvasRuntime, inPlace: boolean, upload?: I
     offsetRoots(subtree, step, step);
   }
   runtime.undo.stopCapturing();
-  const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, insertSubtree, {
+  const result = runCommand(runtime.commandCtx, insertSubtree, {
     parentId: pasteParent(runtime, new Set(subtree.rootIds)),
     subtree,
   });
@@ -226,7 +226,7 @@ function insertTextNode(runtime: CanvasRuntime, text: string): void {
         position: { type: "absolute" as const, ...viewportCenterLocal(runtime, parentId) },
       };
   runtime.undo.stopCapturing();
-  const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, createNode, {
+  const result = runCommand(runtime.commandCtx, createNode, {
     parentId,
     type: "text",
     props: { content, autoSize: "width" },
@@ -242,7 +242,7 @@ export function duplicate(runtime: CanvasRuntime): void {
   const roots = selectionRoots(runtime, selectionStore.getState().selectedIds);
   if (roots.length === 0) return;
   runtime.undo.stopCapturing();
-  const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, duplicateNodes, {
+  const result = runCommand(runtime.commandCtx, duplicateNodes, {
     ids: roots,
     offset: { x: 10, y: 10 },
   });
@@ -259,7 +259,7 @@ export function cut(runtime: CanvasRuntime): void {
   if (!copy(runtime)) return;
   const roots = selectionRoots(runtime, selectionStore.getState().selectedIds);
   runtime.undo.stopCapturing();
-  const result = runCommand({ doc: runtime.doc, origin: runtime.origin }, deleteNodes, { ids: roots });
+  const result = runCommand(runtime.commandCtx, deleteNodes, { ids: roots });
   runtime.undo.stopCapturing();
   if (result.ok) selectionStore.getState().clear();
   else showToastText(result.error.message);

@@ -63,7 +63,7 @@ export function ImageSection({
     fn();
     runtime.undo.stopCapturing();
   };
-  const ctx = () => ({ doc: runtime.doc, origin: runtime.origin });
+  const ctx = () => runtime.commandCtx;
 
   const commitAlt = () => {
     if (readOnly) return;

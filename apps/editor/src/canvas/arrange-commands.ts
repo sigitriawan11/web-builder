@@ -15,6 +15,6 @@ export function applyZOrder(runtime: CanvasRuntime, op: ZOrderOp): void {
   const to = zOrderIndex(parent.children.length, parent.children.indexOf(id), op);
   if (to === null) return;
   runtime.undo.stopCapturing();
-  runCommand({ doc: runtime.doc, origin: runtime.origin }, reorderNode, { id, index: to });
+  runCommand(runtime.commandCtx, reorderNode, { id, index: to });
   runtime.undo.stopCapturing();
 }

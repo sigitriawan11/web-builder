@@ -13,7 +13,7 @@ function insertParent(runtime: CanvasRuntime): string {
   return node && (node.type === "frame" || node.type === "page") ? node.id : runtime.pageId;
 }
 
-const ctxOf = (runtime: CanvasRuntime) => ({ doc: runtime.doc, origin: runtime.origin });
+const ctxOf = (runtime: CanvasRuntime) => runtime.commandCtx;
 
 function afterInsert(id: string | null): void {
   if (id) selectionStore.getState().select([id]);
