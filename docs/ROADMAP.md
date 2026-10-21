@@ -1386,7 +1386,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
   - Catatan (2026-10-21): axis variant (dari variantAxes) tampil sbg selector di `InstancePropsSection` → `setVariant` → re-resolve. Axis `state` dikecualikan (jadi pseudo-class, CMP-032). e2e: ganti `tone` → variant.tone update di doc. **SISA:** thumbnail mini per varian di dropdown (CMP-014, Epic 3.7); sembunyikan axis dari Simple mode (hiddenInSimple) = M4.
 - [ ] **T3.6.6** Swap instance (component lain kategori sama; mapping prop by key) — ED-154 · `apps/editor` · Verifikasi: e2e
 - [ ] **T3.6.7** Indikator override & reset overrides — ED-155 · `apps/editor` · Verifikasi: e2e reset → nilai default
-- [ ] **T3.6.8** Detach instance (UI + konfirmasi) — ED-156, CMP-057 · `apps/editor` · Verifikasi: e2e; undo
+- [x] **T3.6.8** Detach instance (UI + konfirmasi) — ED-156, CMP-057 · `apps/editor` · Verifikasi: e2e; undo
+  - Catatan (2026-10-21): tombol Detach di `InstancePropsSection` → `detachInstance` dgn ctx `getComponent` dari definisi yang sudah di-fetch panel (satu langkah undo). e2e: detach → tak ada node instance tersisa. **SISA:** dialog konfirmasi eksplisit (kini langsung).
 - [ ] **T3.6.9** Update versi component di instance (manual, admin/dev; UI user penuh di M4) — ED-158 · `apps/editor` · Verifikasi: e2e
 - [ ] **T3.6.10** (P1) Go to main component — ED-157 · `apps/editor` · Verifikasi: e2e
 
