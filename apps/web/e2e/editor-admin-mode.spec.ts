@@ -164,7 +164,7 @@ test("create component dari seleksi (CMP-011): seleksi → component baru + inst
   await expect(page.getByText(marker)).toBeVisible();
 });
 
-test("props & binding (CMP-020/021): tambah prop → bind visible node terpilih", async ({ page }) => {
+test("panel authoring: props/binding/repeat/access/variants (CMP-020/021/022/024/030)", async ({ page }) => {
   const { componentId, marker } = await createComponentAsStaff(page);
   await page.goto(`${APP_URL}/editor/library/components/${componentId}/draft`);
   await expect(page.getByTestId("admin-badge")).toBeVisible();
@@ -221,6 +221,15 @@ test("props & binding (CMP-020/021): tambah prop → bind visible node terpilih"
   const accessSelect = panel.getByTestId("access-editor").getByRole("combobox");
   await accessSelect.selectOption("content");
   await expect(accessSelect).toHaveValue("content");
+
+  // CMP-030: tab Variants — buat axis `layout` dengan 3 opsi.
+  await panel.getByRole("tab", { name: "Variants" }).click();
+  await panel.getByLabel("Name (camelCase)").fill("layout");
+  await panel.getByPlaceholder("Options (comma-separated)").fill("row, stack, grid");
+  await panel.getByRole("button", { name: "Add axis" }).click();
+  const variantList = panel.getByTestId("variant-list");
+  await expect(variantList.getByText("layout")).toBeVisible();
+  await expect(variantList.getByText("row · stack · grid")).toBeVisible();
 });
 
 test("user biasa (bukan staf): Mode Admin → tidak ditemukan (permukaan admin tak bocor)", async ({ page, context }) => {

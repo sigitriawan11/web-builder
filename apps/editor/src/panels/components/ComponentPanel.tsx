@@ -7,13 +7,14 @@ import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { AccessTab } from "./AccessTab";
 import { MetadataTab } from "./MetadataTab";
 import { PropsTab } from "./PropsTab";
+import { VariantsTab } from "./VariantsTab";
 
 // CMP-012: panel kanan Mode Admin. Tab yang punya data sekarang terisi (Metadata baca, Versions, Usage); tab editing
 // (Props/Variants/Access/QA) placeholder — masing-masing dibangun di task tersendiri (T3.4.4/5/7/9, QA).
 const TABS = ["metadata", "props", "variants", "access", "qa", "versions", "usage"] as const;
 type TabKey = (typeof TABS)[number];
 // Tab yang belum punya editor sendiri → placeholder "coming soon".
-const PLACEHOLDER_TABS = new Set<TabKey>(["variants", "qa"]);
+const PLACEHOLDER_TABS = new Set<TabKey>(["qa"]);
 
 const STATUS_VARIANT: Record<LibraryStatus, "default" | "secondary" | "outline"> = {
   draft: "secondary",
@@ -60,6 +61,10 @@ export function ComponentPanel({
 
         <TabsContent value="props">
           <PropsTab runtime={runtime} canEdit={canEdit} locale={locale} />
+        </TabsContent>
+
+        <TabsContent value="variants">
+          <VariantsTab runtime={runtime} canEdit={canEdit} />
         </TabsContent>
 
         <TabsContent value="access">

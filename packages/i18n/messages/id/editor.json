@@ -102,6 +102,15 @@
         "selectNode": "Pilih satu node untuk atur izin Simple mode.",
         "simpleAccess": "Izin Simple mode",
         "hardLocked": "Hard locked (tak bisa di-override)"
+      },
+      "variants": {
+        "noDraft": "Buka draft untuk mengelola variant.",
+        "empty": "Belum ada variant axis.",
+        "add": "Tambah axis",
+        "name": "Nama (camelCase)",
+        "options": "Opsi (pisah koma)",
+        "remove": "Hapus",
+        "failed": "Gagal: {error}"
       }
     }
   },

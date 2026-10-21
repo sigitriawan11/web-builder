@@ -102,6 +102,15 @@
         "selectNode": "Select one node to set its Simple-mode access.",
         "simpleAccess": "Simple-mode access",
         "hardLocked": "Hard locked (cannot be overridden)"
+      },
+      "variants": {
+        "noDraft": "Open a draft to manage variants.",
+        "empty": "No variant axes yet.",
+        "add": "Add axis",
+        "name": "Name (camelCase)",
+        "options": "Options (comma-separated)",
+        "remove": "Remove",
+        "failed": "Failed: {error}"
       }
     }
   },

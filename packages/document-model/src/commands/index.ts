@@ -7,6 +7,7 @@ import {
   unbindProp,
   updateComponentProp,
 } from "./component-props";
+import { addVariantAxis, removeVariantAxis, updateVariantAxis } from "./component-variants";
 import { registerAsset, replaceText, setImage, setLink, setNodeProps, setTextContent } from "./content";
 import { createNode } from "./create-node";
 import { deleteNodes } from "./delete-nodes";
@@ -47,6 +48,7 @@ export { type Subtree, SubtreeSchema } from "./subtree";
 export {
   addComponentProp,
   addFont,
+  addVariantAxis,
   applyThemePreset,
   bindProp,
   clearBreakpointOverrides,
@@ -63,6 +65,7 @@ export {
   moveNode,
   registerAsset,
   removeComponentProp,
+  removeVariantAxis,
   renameNode,
   reorderNode,
   reorderPages,
@@ -90,6 +93,7 @@ export {
   updateComponentProp,
   updatePage,
   updateStyle,
+  updateVariantAxis,
   wrapInFrame,
 };
 
@@ -141,4 +145,7 @@ export const COMMANDS = {
   unbindProp,
   setRepeatProp,
   setNodeAccess,
+  addVariantAxis,
+  updateVariantAxis,
+  removeVariantAxis,
 } as const;

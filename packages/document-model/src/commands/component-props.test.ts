@@ -13,6 +13,7 @@ import {
   unbindProp,
   updateComponentProp,
 } from "./component-props";
+import { addVariantAxis, removeVariantAxis, updateVariantAxis } from "./component-variants";
 
 const TEXT_PROP: PropDef = { key: "title", label: { id: "Judul", en: "Title" }, type: "text", default: "Halo" };
 const BOOL_PROP: PropDef = {
@@ -235,5 +236,35 @@ describe("nodeAccess (CMP-024)", () => {
     const cleared = runCommand(h.ctx, setNodeAccess, { nodeId: "n_text0001", access: null });
     expect(cleared.ok).toBe(true);
     expect(h.read().nodeAccess).toBeUndefined();
+  });
+});
+
+describe("variant axis (CMP-030)", () => {
+  const AXIS = { name: "layout", options: ["row", "stack", "grid"], default: "row" };
+
+  it("add/update/remove axis; duplikat → gagal; default bukan option → gagal", () => {
+    const h = setup();
+    const add = runCommand(h.ctx, addVariantAxis, AXIS);
+    expect(add.ok).toBe(true);
+    expect(h.read().variantAxes).toEqual([AXIS]);
+
+    const dup = runCommand(h.ctx, addVariantAxis, AXIS);
+    expect(dup.ok).toBe(false);
+    if (!dup.ok) expect(dup.error.code).toBe("INVALID_TARGET");
+
+    // default bukan salah satu option → ditolak schema (VariantAxisSchema.refine).
+    const bad = runCommand(h.ctx, addVariantAxis, { name: "size", options: ["sm"], default: "xl" });
+    expect(bad.ok).toBe(false);
+
+    const upd = runCommand(h.ctx, updateVariantAxis, {
+      name: "layout",
+      axis: { ...AXIS, options: ["row", "stack", "grid", "flow"] },
+    });
+    expect(upd.ok).toBe(true);
+    expect(h.read().variantAxes?.[0]?.options).toContain("flow");
+
+    const rem = runCommand(h.ctx, removeVariantAxis, { name: "layout" });
+    expect(rem.ok).toBe(true);
+    expect(h.read().variantAxes).toBeUndefined();
   });
 });
