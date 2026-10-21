@@ -17,6 +17,7 @@ const DEFINITION = {
   name: "InsertDemo",
   category: "card",
   propsSchema: [{ key: "title", label: { id: "Judul", en: "Title" }, type: "text", default: "Hello" }],
+  variantAxes: [{ name: "tone", options: ["solid", "outline"], default: "solid" }],
   rootId: "n_root0001",
   nodes: {
     n_root0001: {
@@ -36,7 +37,12 @@ const DEFINITION = {
 
 interface DNode {
   type: string;
-  props?: { componentId?: string; version?: number; propValues?: Record<string, unknown> };
+  props?: {
+    componentId?: string;
+    version?: number;
+    propValues?: Record<string, unknown>;
+    variant?: Record<string, string>;
+  };
 }
 const doc = (page: Page) => page.evaluate(() => window.__editorTestApi?.getDoc() as { nodes: Record<string, DNode> });
 
@@ -101,4 +107,10 @@ test("T3.6.1/T3.6.4: insert instance dari panel Components + edit prop lewat Ins
   await titleInput.fill("Changed");
   await titleInput.blur();
   await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.propValues?.title).toBe("Changed");
+
+  // T3.6.5/CMP-031: variant picker — ganti axis `tone` → `setVariant` ke doc.
+  const toneSelect = page.getByTestId("inspector").getByTestId("instance-variant-tone");
+  await expect(toneSelect).toBeVisible();
+  await toneSelect.selectOption("outline");
+  await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.variant?.tone).toBe("outline");
 });

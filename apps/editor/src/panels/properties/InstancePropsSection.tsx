@@ -1,4 +1,4 @@
-import { type Node, type PropDef, runCommand, setProp } from "@platform/document-model";
+import { type Node, type PropDef, runCommand, setProp, setVariant, type VariantAxis } from "@platform/document-model";
 import { useLibraryComponentDefinition } from "@platform/sdk/react";
 import { Checkbox, Input, NativeSelect } from "@platform/ui";
 import { useLocale, useT } from "../../app/i18n";
@@ -27,6 +27,7 @@ export function InstancePropsSection({
       componentId={node.props.componentId}
       version={node.props.version}
       propValues={node.props.propValues ?? {}}
+      variant={node.props.variant ?? {}}
       readOnly={readOnly}
     />
   );
@@ -38,6 +39,7 @@ function Form({
   componentId,
   version,
   propValues,
+  variant,
   readOnly,
 }: {
   runtime: CanvasRuntime;
@@ -45,6 +47,7 @@ function Form({
   componentId: string;
   version: number;
   propValues: Record<string, unknown>;
+  variant: Record<string, string>;
   readOnly: boolean;
 }) {
   const t = useT();
@@ -57,6 +60,12 @@ function Form({
     runCommand(runtime.commandCtx, setProp, { id: nodeId, key, value });
     runtime.undo.stopCapturing();
   };
+  const setVar = (axis: string, option: string) => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runCommand(runtime.commandCtx, setVariant, { id: nodeId, axis, option });
+    runtime.undo.stopCapturing();
+  };
 
   if (def.isPending)
     return (
@@ -65,25 +74,42 @@ function Form({
       </InspectorSection>
     );
 
-  const schema = (def.data as { propsSchema?: PropDef[] } | undefined)?.propsSchema ?? [];
-  const editable = schema.filter((prop) => EDITABLE.has(prop.type));
+  const data = def.data as { propsSchema?: PropDef[]; variantAxes?: VariantAxis[] } | undefined;
+  const editable = (data?.propsSchema ?? []).filter((prop) => EDITABLE.has(prop.type));
+  // CMP-031/CMP-032: axis `state` jadi pseudo-class (bukan picker manual) → tak ditampilkan di sini.
+  const axes = (data?.variantAxes ?? []).filter((axis) => axis.name !== "state");
 
   return (
     <InspectorSection id="instance-props" title={t("inspector.instance.title")}>
-      {editable.length === 0 ? (
+      {axes.length === 0 && editable.length === 0 ? (
         <p className="px-3 text-xs text-muted-foreground">{t("inspector.instance.none")}</p>
-      ) : (
-        editable.map((prop) => (
-          <InspectorRow key={prop.key} label={prop.label[locale] || prop.key}>
-            <PropControl
-              prop={prop}
-              value={propValues[prop.key]}
-              readOnly={readOnly}
-              onChange={(v) => set(prop.key, v)}
-            />
-          </InspectorRow>
-        ))
-      )}
+      ) : null}
+      {axes.map((axis) => (
+        <InspectorRow key={`v:${axis.name}`} label={axis.name}>
+          <NativeSelect
+            value={variant[axis.name] ?? axis.default}
+            disabled={readOnly}
+            data-testid={`instance-variant-${axis.name}`}
+            onChange={(e) => setVar(axis.name, e.target.value)}
+          >
+            {axis.options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </NativeSelect>
+        </InspectorRow>
+      ))}
+      {editable.map((prop) => (
+        <InspectorRow key={prop.key} label={prop.label[locale] || prop.key}>
+          <PropControl
+            prop={prop}
+            value={propValues[prop.key]}
+            readOnly={readOnly}
+            onChange={(v) => set(prop.key, v)}
+          />
+        </InspectorRow>
+      ))}
     </InspectorSection>
   );
 }
