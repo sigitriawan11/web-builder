@@ -1363,7 +1363,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [ ] **T3.5.7** (P1) Rollback (publish ulang konten versi lama sebagai versi baru) — CMP-046 · `apps/api` · Verifikasi: int test
 - [x] **T3.5.8** Definisi migrasi props saat breaking change (fungsi deklaratif rename/map) — CMP-054 · `packages/library-seed`, `packages/document-model` · Verifikasi: unit test migrasi propValues v1 → v2
   - Catatan (2026-10-21): `migrateInstance(props, migrations)→{props,warnings}` pure di `@platform/document-model`; `ComponentMigrationSchema` (ops terdaftar: rename/mapValues/moveInto/setDefault/drop+note/transform; variants rename+mapValues; nodeIds remap override; slots rename), berantai urut `fromMajor`. 8 unit test (data rename tak hilang; drop → warning bernilai lama). Gate hijau; document-model 769. **Follow-up (M4):** gate publish MAJOR tanpa migration ditolak; UI update instance user; `moveInto` ke list index; transform tambahan.
-- [ ] **T3.5.9** Pinned version: instance tidak berubah saat versi baru publish — CMP-050 · `apps/editor` · Verifikasi: e2e publish v2 → instance tetap v1
+- [~] **T3.5.9** Pinned version: instance tidak berubah saat versi baru publish — CMP-050 · `apps/editor` · Verifikasi: e2e publish v2 → instance tetap v1
+  - Catatan (2026-10-21): mekanisme pinning sudah ada — instance simpan `version` eksak (version_seq), `resolveInstance` & read API pakai versi itu verbatim (tak ada resolusi "latest"). Int test: dua versi definisi berbeda → read v6/v7 ambil definisi eksak masing-masing (tak bocor latest). Gate hijau; api int 175. **SISA (follow-up):** e2e penuh publish-situs (instance @v1 tetap HTML identik walau v2 terbit) — butuh insert instance (Epic 3.6) + pipeline publish; cache IndexedDB editor per `componentId@version`.
 
 #### Epic 3.6 — Instance di editor (Design mode)
 
