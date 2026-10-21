@@ -1361,7 +1361,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [x] **T3.5.6** Deprecate & archive (instance lama tetap render) — CMP-045 · `apps/api` · Verifikasi: int test
   - Catatan (2026-10-21): deprecate/archive mengubah `components.status` saja; baris `component_versions` published tetap immutable & terbaca via read API → instance situs lama tetap resolve. Int test: setelah deprecate & archive, GET versi 1 tetap 200. Status per-versi granular (component_versions.status deprecated/archived) = follow-up bila dibutuhkan.
 - [ ] **T3.5.7** (P1) Rollback (publish ulang konten versi lama sebagai versi baru) — CMP-046 · `apps/api` · Verifikasi: int test
-- [ ] **T3.5.8** Definisi migrasi props saat breaking change (fungsi deklaratif rename/map) — CMP-054 · `packages/library-seed`, `packages/document-model` · Verifikasi: unit test migrasi propValues v1 → v2
+- [x] **T3.5.8** Definisi migrasi props saat breaking change (fungsi deklaratif rename/map) — CMP-054 · `packages/library-seed`, `packages/document-model` · Verifikasi: unit test migrasi propValues v1 → v2
+  - Catatan (2026-10-21): `migrateInstance(props, migrations)→{props,warnings}` pure di `@platform/document-model`; `ComponentMigrationSchema` (ops terdaftar: rename/mapValues/moveInto/setDefault/drop+note/transform; variants rename+mapValues; nodeIds remap override; slots rename), berantai urut `fromMajor`. 8 unit test (data rename tak hilang; drop → warning bernilai lama). Gate hijau; document-model 769. **Follow-up (M4):** gate publish MAJOR tanpa migration ditolak; UI update instance user; `moveInto` ke list index; transform tambahan.
 - [ ] **T3.5.9** Pinned version: instance tidak berubah saat versi baru publish — CMP-050 · `apps/editor` · Verifikasi: e2e publish v2 → instance tetap v1
 
 #### Epic 3.6 — Instance di editor (Design mode)
