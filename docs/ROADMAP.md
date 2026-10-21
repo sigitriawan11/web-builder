@@ -1382,7 +1382,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [ ] **T3.6.3** Seleksi di dalam instance (klik → instance; dblclick → node editable; locked tidak) — ED-058 · `apps/editor` · Verifikasi: e2e
 - [x] **T3.6.4** Props panel instance (form dari propsSchema) — ED-153, ED-008 · `apps/editor/src/panels/properties/instance` · Verifikasi: e2e ubah prop → canvas update
   - Catatan (2026-10-21): `InstancePropsSection` di Inspector — instance terpilih → form dari propsSchema component (via `useLibraryComponentDefinition`); ubah → `setProp` → instance re-resolve. Kontrol text/number/boolean/enum (image/link/icon/color = follow-up). e2e: insert instance → edit field title → propValues.title update di doc. Berlaku di editor situs & Mode Admin (Inspector dipakai bersama).
-- [ ] **T3.6.5** Variant picker di instance — ED-152, CMP-031 · `apps/editor` · Verifikasi: e2e
+- [x] **T3.6.5** Variant picker di instance — ED-152, CMP-031 · `apps/editor` · Verifikasi: e2e
+  - Catatan (2026-10-21): axis variant (dari variantAxes) tampil sbg selector di `InstancePropsSection` → `setVariant` → re-resolve. Axis `state` dikecualikan (jadi pseudo-class, CMP-032). e2e: ganti `tone` → variant.tone update di doc. **SISA:** thumbnail mini per varian di dropdown (CMP-014, Epic 3.7); sembunyikan axis dari Simple mode (hiddenInSimple) = M4.
 - [ ] **T3.6.6** Swap instance (component lain kategori sama; mapping prop by key) — ED-154 · `apps/editor` · Verifikasi: e2e
 - [ ] **T3.6.7** Indikator override & reset overrides — ED-155 · `apps/editor` · Verifikasi: e2e reset → nilai default
 - [ ] **T3.6.8** Detach instance (UI + konfirmasi) — ED-156, CMP-057 · `apps/editor` · Verifikasi: e2e; undo
