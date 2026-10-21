@@ -67,6 +67,9 @@ beforeAll(async () => {
       definition: DEFINITION,
       contentHash: "deadbeef",
     },
+    // CMP-050: dua versi berbeda → read by version mengambil definisi EKSAK versi itu (pinned, bukan "latest").
+    { componentId, version: "6.0.0", versionSeq: 6, status: "published", definition: { rootId: "n1", marker: 6 } },
+    { componentId, version: "7.0.0", versionSeq: 7, status: "published", definition: { rootId: "n1", marker: 7 } },
   ]);
 });
 afterAll(async () => {
@@ -103,6 +106,14 @@ describe("GET /v1/library/components/:componentId/versions/:version", () => {
     const cookie = await register();
     expect((await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/4`)).status).toBe(200);
     expect((await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/5`)).status).toBe(500);
+  });
+
+  it("CMP-050: versi di-pin → read mengambil definisi EKSAK versi itu (bukan latest)", async () => {
+    const cookie = await register();
+    const v6 = await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/6`);
+    const v7 = await get(cookie, `/v1/library/components/${PUBLIC_ID}/versions/7`);
+    expect(v6.body.data.definition).toEqual({ rootId: "n1", marker: 6 });
+    expect(v7.body.data.definition).toEqual({ rootId: "n1", marker: 7 });
   });
 
   it("versi draft / yanked / tidak ada → 404", async () => {
