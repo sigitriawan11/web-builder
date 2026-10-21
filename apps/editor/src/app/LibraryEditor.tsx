@@ -145,7 +145,7 @@ function LibraryDraftEditor({
         }
         inspector={
           runtime && rootId ? (
-            <Inspector pageId={rootId} pageSettings={null} runtime={runtime} readOnly={!canEdit} />
+            <Inspector pageId={rootId} pageSettings={null} runtime={runtime} readOnly={!canEdit} states />
           ) : null
         }
       >

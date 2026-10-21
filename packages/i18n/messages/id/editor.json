@@ -480,7 +480,16 @@
     "loadingEager": "Eager",
     "anchorId": "Anchor ID",
     "anchorPlaceholder": "mis. tentang-kami",
-    "locked": "Terkunci"
+    "locked": "Terkunci",
+    "states": {
+      "title": "State interaktif",
+      "hover": "Hover",
+      "focus": "Fokus",
+      "pressed": "Ditekan",
+      "disabled": "Nonaktif",
+      "opacity": "Opasitas",
+      "clear": "Hapus"
+    }
   },
   "nodeType": {
     "page": "Page",

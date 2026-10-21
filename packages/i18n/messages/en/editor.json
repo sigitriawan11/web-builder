@@ -480,7 +480,16 @@
     "loadingEager": "Eager",
     "anchorId": "Anchor ID",
     "anchorPlaceholder": "e.g. about-us",
-    "locked": "Locked"
+    "locked": "Locked",
+    "states": {
+      "title": "Interactive states",
+      "hover": "Hover",
+      "focus": "Focus",
+      "pressed": "Pressed",
+      "disabled": "Disabled",
+      "opacity": "Opacity",
+      "clear": "Clear"
+    }
   },
   "nodeType": {
     "page": "Page",

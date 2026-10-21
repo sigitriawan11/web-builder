@@ -82,6 +82,7 @@ export {
   setLocked,
   setNodeAccess,
   setNodeProps,
+  setNodeState,
   setProp,
   setRepeatProp,
   setSettings,

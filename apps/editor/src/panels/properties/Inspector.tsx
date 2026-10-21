@@ -28,6 +28,7 @@ import { NameField } from "./NameField";
 import { OpacitySection } from "./OpacitySection";
 import { PositionSizeSection } from "./PositionSizeSection";
 import { RadiusSection } from "./RadiusSection";
+import { StatesSection } from "./StatesSection";
 import { StrokeSection } from "./StrokeSection";
 import { TagSelect } from "./TagSelect";
 import { TypographySection } from "./TypographySection";
@@ -69,12 +70,15 @@ function DesignTab({
   runtime,
   siteId,
   readOnly,
+  states,
 }: {
   pageId: string;
   nodes: readonly Node[];
   runtime: CanvasRuntime | null;
   siteId: string | undefined;
   readOnly: boolean;
+  // Mode Admin: tampilkan section States (CMP-032) utk satu node terpilih.
+  states: boolean;
 }) {
   const t = useT();
   const page = useNode(pageId);
@@ -118,6 +122,9 @@ function DesignTab({
       {runtime ? <AppearanceSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
       {runtime ? <ImageSection runtime={runtime} nodes={nodes} siteId={siteId} readOnly={readOnly} /> : null}
       {runtime ? <LinkSection runtime={runtime} nodes={nodes} readOnly={readOnly} /> : null}
+      {states && runtime && nodes.length === 1 && nodes[0] ? (
+        <StatesSection runtime={runtime} node={nodes[0]} readOnly={readOnly} />
+      ) : null}
     </>
   );
 }
@@ -204,6 +211,7 @@ export function Inspector({
   runtime,
   siteId,
   readOnly = false,
+  states = false,
 }: {
   pageId: string;
   pageSettings: ReactNode;
@@ -211,6 +219,8 @@ export function Inspector({
   // Editor situs: untuk ganti gambar dari pustaka/upload (ED-165). Playground tidak mengopernya.
   siteId?: string;
   readOnly?: boolean;
+  // Mode Admin (CMP-032): aktifkan section States di tab Design.
+  states?: boolean;
 }) {
   const t = useT();
   const selectedIds = useStore(selectionStore, (state) => state.selectedIds);
@@ -263,7 +273,14 @@ export function Inspector({
         className="min-h-0 flex-1 overflow-y-auto"
       >
         {rightTab === "design" ? (
-          <DesignTab pageId={pageId} nodes={nodes} runtime={runtime ?? null} siteId={siteId} readOnly={readOnly} />
+          <DesignTab
+            pageId={pageId}
+            nodes={nodes}
+            runtime={runtime ?? null}
+            siteId={siteId}
+            readOnly={readOnly}
+            states={states}
+          />
         ) : (
           <SettingsTab nodes={nodes} page={pageSettings} runtime={runtime ?? null} readOnly={readOnly} />
         )}

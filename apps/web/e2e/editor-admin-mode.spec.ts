@@ -139,6 +139,13 @@ test("staf: buka Mode Admin → badge ADMIN + canvas me-render component", async
   await visibleToggle.click();
   await expect(visibleToggle).toBeChecked();
 
+  // T3.4.11 UI (CMP-032): section States di tab Design — set opacity hover via Inspector (setNodeState).
+  await inspector.getByTestId("inspector-tab-design").click();
+  const hoverOpacity = inspector.getByTestId("inspector-state-hover-opacity");
+  await hoverOpacity.fill("50");
+  await hoverOpacity.press("Enter");
+  await expect(hoverOpacity).toHaveValue("50");
+
   // CMP-013: super_admin bisa edit metadata → simpan → "Saved"; nilai bertahan setelah reload.
   await panel.getByLabel("Display name (EN)").fill("Edited CTA");
   await panel.getByLabel("Tags (comma-separated)").fill("cta, with-icon");
