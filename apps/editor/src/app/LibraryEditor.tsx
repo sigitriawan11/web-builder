@@ -9,8 +9,10 @@ import type { DocumentSession } from "../collaboration/document-session";
 import { useEditorTestHook } from "../collaboration/editor-test-hook";
 import { useLibraryDocumentSession } from "../collaboration/use-library-document-session";
 import { isEditableEvent } from "../commands/is-editable-target";
+import { NodeStoreContext } from "../document/use-node";
 import { ComponentPanel } from "../panels/components/ComponentPanel";
 import { CreateComponentDialog } from "../panels/components/CreateComponentDialog";
+import { Inspector } from "../panels/properties/Inspector";
 import { selectionStore } from "../store/selection-store";
 import { useLocale, useT } from "./i18n";
 import { SiteNotFound } from "./SiteEditor";
@@ -127,35 +129,43 @@ function LibraryDraftEditor({
   }, [canEdit]);
 
   return (
-    <AdminShell
-      component={component}
-      capabilities={capabilities}
-      panel={
-        <ComponentPanel
-          componentId={componentId}
-          component={component}
-          locale={locale}
-          canEdit={canEdit}
-          runtime={runtime}
-        />
-      }
-    >
-      {runtime ? (
-        <>
-          {import.meta.env.DEV && session ? <LibraryTestHook session={session} runtime={runtime} /> : null}
-          <CanvasViewport runtime={runtime} />
-          <CreateComponentDialog
-            open={createOpen}
-            onOpenChange={setCreateOpen}
-            runtime={runtime}
-            selectedIds={pendingSelection}
+    // NodeStoreContext membungkus canvas & Inspector agar `useNode`/`useNodes` (Inspector) membaca store runtime.
+    <NodeStoreContext.Provider value={runtime?.nodeStore ?? null}>
+      <AdminShell
+        component={component}
+        capabilities={capabilities}
+        panel={
+          <ComponentPanel
+            componentId={componentId}
+            component={component}
             locale={locale}
+            canEdit={canEdit}
+            runtime={runtime}
           />
-        </>
-      ) : (
-        <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
-      )}
-    </AdminShell>
+        }
+        inspector={
+          runtime && rootId ? (
+            <Inspector pageId={rootId} pageSettings={null} runtime={runtime} readOnly={!canEdit} />
+          ) : null
+        }
+      >
+        {runtime ? (
+          <>
+            {import.meta.env.DEV && session ? <LibraryTestHook session={session} runtime={runtime} /> : null}
+            <CanvasViewport runtime={runtime} />
+            <CreateComponentDialog
+              open={createOpen}
+              onOpenChange={setCreateOpen}
+              runtime={runtime}
+              selectedIds={pendingSelection}
+              locale={locale}
+            />
+          </>
+        ) : (
+          <p className="m-auto text-sm text-muted-foreground">{t("app.loading")}</p>
+        )}
+      </AdminShell>
+    </NodeStoreContext.Provider>
   );
 }
 
@@ -208,12 +218,15 @@ function AdminShell({
   component,
   capabilities,
   panel,
+  inspector,
   children,
 }: {
   component: LibraryEditorSession["component"];
   capabilities: LibraryEditorSession["capabilities"];
-  // Panel kanan (CMP-012/013/020/021) dibangun pemanggil agar bisa menerima runtime yang sama dengan canvas.
+  // Panel KIRI = konfigurasi component (CMP-012/013/020/021); dibangun pemanggil agar berbagi runtime dengan canvas.
   panel: ReactNode;
+  // Panel KANAN = Inspector node (style/settings, ED-008). Null bila belum ada draft/runtime.
+  inspector?: ReactNode;
   children: ReactNode;
 }) {
   const t = useT();
@@ -235,8 +248,9 @@ function AdminShell({
         ) : null}
       </header>
       <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 flex-1 bg-muted/40">{children}</div>
         {panel}
+        <div className="flex min-h-0 flex-1 bg-muted/40">{children}</div>
+        {inspector}
       </div>
     </div>
   );

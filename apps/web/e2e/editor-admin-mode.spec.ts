@@ -121,6 +121,17 @@ test("staf: buka Mode Admin → badge ADMIN + canvas me-render component", async
   await expect(panel.getByRole("tab", { name: "Metadata" })).toBeVisible();
   await expect(panel.getByRole("tab", { name: "Props" })).toBeVisible();
 
+  // A2 (ED-008): Inspector node termount di Mode Admin — pilih node → Inspector tampil + menampilkan nama node.
+  await page.waitForFunction(() => Boolean((window as unknown as { __editorTestApi?: unknown }).__editorTestApi));
+  await page.evaluate(() =>
+    (window as unknown as { __editorTestApi?: { select(ids: string[]): void } }).__editorTestApi?.select([
+      "n_text0001",
+    ]),
+  );
+  const inspector = page.getByTestId("inspector");
+  await expect(inspector).toBeVisible();
+  await expect(inspector.getByText("Teks")).toBeVisible();
+
   // CMP-013: super_admin bisa edit metadata → simpan → "Saved"; nilai bertahan setelah reload.
   await panel.getByLabel("Display name (EN)").fill("Edited CTA");
   await panel.getByLabel("Tags (comma-separated)").fill("cta, with-icon");

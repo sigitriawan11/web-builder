@@ -40,7 +40,7 @@ export function ComponentPanel({
   const t = useT();
   return (
     <aside
-      className="flex w-80 shrink-0 flex-col border-l bg-background"
+      className="flex w-80 shrink-0 flex-col border-r bg-background"
       data-testid="component-panel"
       aria-label={t("admin.panel.title")}
     >
