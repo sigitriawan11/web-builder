@@ -95,7 +95,8 @@
         "unbind": "Unbind",
         "repeat": "Repeat (list)",
         "repeatSet": "Set",
-        "repeatClear": "Clear"
+        "repeatClear": "Clear",
+        "defaultEn": "Default (EN)"
       },
       "access": {
         "noDraft": "Open a draft to manage access.",

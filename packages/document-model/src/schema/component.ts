@@ -27,6 +27,8 @@ const propBase = {
   semanticRole: z.string().max(64).optional(),
   hiddenInSimple: z.boolean().optional(),
   order: z.number().int().optional(),
+  // CMP-016/DM-079: `default` = konten ID; `defaultI18n.en` = terjemahan EN (dipilih saat insert sesuai site.locale, M4).
+  defaultI18n: z.strictObject({ en: JsonValueSchema }).optional(),
 };
 
 // NodeType yang boleh mengisi slot (DM-019); dipakai juga `PropDef.type==="slot"`.
@@ -94,6 +96,7 @@ type PropDefCommon = {
   semanticRole?: string;
   hiddenInSimple?: boolean;
   order?: number;
+  defaultI18n?: { en: unknown };
 };
 export type PropDef = PropDefCommon &
   (

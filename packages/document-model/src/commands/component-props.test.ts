@@ -91,6 +91,20 @@ describe("command props component (CMP-020)", () => {
     if (!dup.ok) expect(dup.error.code).toBe("INVALID_TARGET");
   });
 
+  it("addComponentProp menyimpan defaultI18n EN (CMP-016)", () => {
+    const h = setup();
+    runCommand(h.ctx, addComponentProp, {
+      prop: {
+        key: "heading",
+        label: { id: "Judul", en: "Heading" },
+        type: "text",
+        default: "Halo",
+        defaultI18n: { en: "Hello" },
+      },
+    });
+    expect(h.read().propsSchema[0]).toMatchObject({ default: "Halo", defaultI18n: { en: "Hello" } });
+  });
+
   it("updateComponentProp mengganti definisi; rename key ditolak; tak ada → NOT_FOUND", () => {
     const h = setup();
     runCommand(h.ctx, addComponentProp, { prop: TEXT_PROP });

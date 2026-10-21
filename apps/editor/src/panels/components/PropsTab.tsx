@@ -34,10 +34,23 @@ const ctxOf = (runtime: CanvasRuntime) => ({
   nodeSchema: ComponentNodeSchema,
 });
 
-function buildProp(type: AddableType, key: string, label: { id: string; en: string }, defaultText: string): PropDef {
+function buildProp(
+  type: AddableType,
+  key: string,
+  label: { id: string; en: string },
+  defaultText: string,
+  defaultEn: string,
+): PropDef {
   switch (type) {
     case "text":
-      return { key, label, type: "text", default: defaultText };
+      // CMP-016: `default` = konten ID; `defaultI18n.en` = terjemahan EN (opsional).
+      return {
+        key,
+        label,
+        type: "text",
+        default: defaultText,
+        ...(defaultEn.trim() ? { defaultI18n: { en: defaultEn.trim() } } : {}),
+      };
     case "number":
       return { key, label, type: "number", default: Number(defaultText) || 0 };
     case "boolean":
@@ -125,6 +138,7 @@ function PropsEditor({ runtime, canEdit, locale }: { runtime: CanvasRuntime; can
   const [labelEn, setLabelEn] = useState("");
   const [type, setType] = useState<AddableType>("text");
   const [defaultText, setDefaultText] = useState("");
+  const [defaultEn, setDefaultEn] = useState("");
   const keyFieldId = useId();
 
   function run<T>(result: { ok: true; value: T } | { ok: false; error: { code: string } }): boolean {
@@ -138,12 +152,13 @@ function PropsEditor({ runtime, canEdit, locale }: { runtime: CanvasRuntime; can
 
   function addProp() {
     const label = { id: labelId.trim() || key.trim(), en: labelEn.trim() || key.trim() };
-    const prop = buildProp(type, key.trim(), label, defaultText);
+    const prop = buildProp(type, key.trim(), label, defaultText, defaultEn);
     if (run(runCommand(ctxOf(runtime), addComponentProp, { prop }))) {
       setKey("");
       setLabelId("");
       setLabelEn("");
       setDefaultText("");
+      setDefaultEn("");
     }
   }
 
@@ -209,6 +224,14 @@ function PropsEditor({ runtime, canEdit, locale }: { runtime: CanvasRuntime; can
               />
             ) : null}
           </div>
+          {/* CMP-016: default EN (terjemahan) — hanya tipe teks. */}
+          {type === "text" ? (
+            <Input
+              placeholder={t("admin.panel.props.defaultEn")}
+              value={defaultEn}
+              onChange={(e) => setDefaultEn(e.target.value)}
+            />
+          ) : null}
           <Button type="submit" disabled={key.trim().length === 0}>
             {t("admin.panel.props.add")}
           </Button>

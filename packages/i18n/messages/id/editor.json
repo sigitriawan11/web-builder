@@ -95,7 +95,8 @@
         "unbind": "Lepas",
         "repeat": "Ulang (list)",
         "repeatSet": "Set",
-        "repeatClear": "Hapus"
+        "repeatClear": "Hapus",
+        "defaultEn": "Default (EN)"
       },
       "access": {
         "noDraft": "Buka draft untuk mengatur akses.",
