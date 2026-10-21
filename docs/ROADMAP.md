@@ -1342,7 +1342,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [ ] **T3.4.11** States interaktif di Mode Admin (hover/focus/pressed/disabled) — CMP-032, ED-183 · `apps/editor` · Verifikasi: e2e preview hover
 - [ ] **T3.4.12** Slot area (definisi slot & konten default) — CMP-017, DM-019 · `apps/editor` · Verifikasi: e2e
 - [ ] **T3.4.13** Default content (teks/gambar contoh dwibahasa) — CMP-016, CMP-190 · `apps/editor` · Verifikasi: e2e
-- [ ] **T3.4.14** Aturan desain wajib (design rules linter: token-only warna, auto-layout, alt text, kontras) — CMP-015 · `apps/editor`, `packages/document-model` · Verifikasi: unit test linter
+- [~] **T3.4.14** Aturan desain wajib (design rules linter: token-only warna, auto-layout, alt text, kontras) — CMP-015 · `apps/editor`, `packages/document-model` · Verifikasi: unit test linter
+  - **Core selesai (2026-10-21):** `library-lint` fungsi murni browser-safe `@platform/library-seed/lint` (`lintComponent(def) → LintViolation[]{rule,nodeId?,message}`), export subpath siap dipakai editor. Aturan statis: **R-NAMING** (nama generik), **R-SIZE** (node >300 / JSON >200KB), **R-AUTOLAYOUT** (container ber-anak tanpa flex/grid; dekoratif dikecualikan), **R-TOKEN** (warna literal hex). 5 unit test; library-seed 24. **SISA (follow-up):** aturan berbasis render Playwright (**R-RESPONSIVE**, **R-A11Y** kontras/alt/ariaLabel, **R-SEMANTIC** penuh); integrasi panel QA editor + klik pelanggaran → pilih node + blok transisi `in_review` = **T3.5.2**.
 - [ ] **T3.4.15** Edit main component (admin only) dari instance → buka draft — CMP-073 · `apps/editor` · Verifikasi: e2e
 - [ ] **T3.4.16** Theme di Mode Admin (edit preset theme) — CMP-124, CMP-120 · `apps/editor/src/panels/theme` · Verifikasi: e2e simpan preset
 
