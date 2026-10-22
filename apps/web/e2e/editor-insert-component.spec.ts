@@ -112,7 +112,7 @@ test.beforeAll(async () => {
   }
 });
 
-test("T3.6.1/4/5/6/8: insert instance → edit prop/variant → swap → detach", async ({ page }) => {
+test("T3.6.1/4/5/6/7/8: insert instance → edit prop/variant → reset → swap → detach", async ({ page }) => {
   await page.goto(`${APP_URL}/sites`);
   await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Insert Component Test")}`);
   await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
@@ -140,6 +140,22 @@ test("T3.6.1/4/5/6/8: insert instance → edit prop/variant → swap → detach"
   // T3.6.5/CMP-031: variant picker — ganti axis `tone` → `setVariant` ke doc.
   const toneSelect = page.getByTestId("inspector").getByTestId("instance-variant-tone");
   await expect(toneSelect).toBeVisible();
+  await toneSelect.selectOption("outline");
+  await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.variant?.tone).toBe("outline");
+
+  // T3.6.7/ED-155: indikator ● override (prop & axis) + "Reset semua override" → instance kembali ke default.
+  const inspector = page.getByTestId("inspector");
+  await expect(inspector.getByTestId("instance-override-title")).toBeVisible();
+  await expect(inspector.getByTestId("instance-override-axis-tone")).toBeVisible();
+  await inspector.getByTestId("instance-reset-all").click();
+  await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.propValues?.title).toBeUndefined();
+  await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.variant?.tone).toBeUndefined();
+  await expect(inspector.getByTestId("instance-override-title")).toBeHidden();
+
+  // Set ulang (title + tone) agar langkah swap punya nilai untuk dibawa.
+  await titleInput.fill("Changed");
+  await titleInput.blur();
+  await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.propValues?.title).toBe("Changed");
   await toneSelect.selectOption("outline");
   await expect.poll(async () => (await doc(page)).nodes[selected]?.props?.variant?.tone).toBe("outline");
 

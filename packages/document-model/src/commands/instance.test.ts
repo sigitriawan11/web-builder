@@ -11,6 +11,7 @@ import { createNode } from "./create-node";
 import {
   createInstance,
   extractToInstance,
+  resetAllOverrides,
   resetOverride,
   setInstanceOverride,
   setProp,
@@ -140,6 +141,28 @@ describe("command instance (DM-074)", () => {
     // Tanpa registry → INVALID_TARGET.
     const noReg = runCommand(h.ctx, swapInstance, { id: instId, toComponentId: "cmp_to0001", toVersion: 1 });
     expect(noReg.ok).toBe(false);
+  });
+
+  it("resetAllOverrides: hapus propValues/variant/overrides, pertahankan slots (T3.6.7/ED-155)", () => {
+    const h = make();
+    const child = runCommand(h.ctx, createNode, { parentId: h.homeId, type: "frame" });
+    if (!child.ok) throw new Error(`createNode gagal: ${child.error.code}`);
+    runCommand(h.ctx, setInstanceOverride, { id: h.instId, path: "n_child0001", patch: { visible: false } });
+    runCommand(h.ctx, setSlotContent, { id: h.instId, slotName: "body", nodeIds: [child.value] });
+    const before = instanceProps(h.read(), h.instId);
+    expect(before.propValues).toBeDefined();
+    expect(before.variant).toBeDefined();
+    expect(before.overrides).toBeDefined();
+    expect(before.slots).toEqual({ body: [child.value] });
+
+    const result = runCommand(h.ctx, resetAllOverrides, { id: h.instId });
+    expect(result.ok).toBe(true);
+    const props = instanceProps(h.read(), h.instId);
+    expect(props.propValues).toBeUndefined();
+    expect(props.variant).toBeUndefined();
+    expect(props.overrides).toBeUndefined();
+    expect(props.componentId).toBe("cmp_btn0001");
+    expect(props.slots).toEqual({ body: [child.value] }); // slot (penempatan konten) dipertahankan
   });
 
   it("setProp menetapkan & menghapus nilai", () => {

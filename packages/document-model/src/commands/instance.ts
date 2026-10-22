@@ -465,6 +465,26 @@ export const resetOverride = defineCommand({
   },
 });
 
+// ED-155/CMP-073: reset SEMUA override instance → identik main component versi ter-pin. Hapus propValues (props jatuh
+// ke default propsSchema), variant (jatuh ke default axis), dan overrides per-node. `slots` dibiarkan (penempatan
+// konten struktural, bukan override gaya). Satu transaksi → satu undo.
+export const resetAllOverrides = defineCommand({
+  name: "resetAllOverrides",
+  description: { id: "Reset semua override instance.", en: "Reset all instance overrides." },
+  aiExposed: true,
+  input: z.strictObject({ id: NodeIdSchema }),
+  run(ctx, input) {
+    const node = instanceNode(ctx, input.id);
+    if (isFailure(node)) return node;
+    const error = updateProps(node, (props) => ({
+      componentId: props.componentId,
+      version: props.version,
+      ...(props.slots ? { slots: props.slots } : {}),
+    }));
+    return error ?? { ok: true, value: undefined, affected: [input.id] };
+  },
+});
+
 export const setSlotContent = defineCommand({
   name: "setSlotContent",
   description: {

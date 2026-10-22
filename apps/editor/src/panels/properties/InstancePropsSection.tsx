@@ -3,6 +3,7 @@ import {
   detachInstance,
   type Node,
   type PropDef,
+  resetAllOverrides,
   runCommand,
   setProp,
   setVariant,
@@ -44,6 +45,7 @@ export function InstancePropsSection({
       version={node.props.version}
       propValues={node.props.propValues ?? {}}
       variant={node.props.variant ?? {}}
+      overrideCount={Object.keys(node.props.overrides ?? {}).length}
       readOnly={readOnly}
     />
   );
@@ -56,6 +58,7 @@ function Form({
   version,
   propValues,
   variant,
+  overrideCount,
   readOnly,
 }: {
   runtime: CanvasRuntime;
@@ -64,6 +67,7 @@ function Form({
   version: number;
   propValues: Record<string, unknown>;
   variant: Record<string, string>;
+  overrideCount: number;
   readOnly: boolean;
 }) {
   const t = useT();
@@ -120,6 +124,14 @@ function Form({
     runCommand(runtime.commandCtx, setVariant, { id: nodeId, axis, option });
     runtime.undo.stopCapturing();
   };
+  // ED-155: reset satu prop (hapus propValue → jatuh ke default) / semua override.
+  const resetAll = () => {
+    if (readOnly) return;
+    runtime.undo.stopCapturing();
+    runCommand(runtime.commandCtx, resetAllOverrides, { id: nodeId });
+    runtime.undo.stopCapturing();
+    setDropped(null);
+  };
   // T3.6.8/CMP-057: detach butuh registry (`getComponent`) — pakai definisi yang sudah di-fetch panel ini.
   const detach = (componentDef: ComponentDefinition) => {
     if (readOnly) return;
@@ -146,6 +158,11 @@ function Form({
   const editable = (data?.propsSchema ?? []).filter((prop) => EDITABLE.has(prop.type));
   // CMP-031/CMP-032: axis `state` jadi pseudo-class (bukan picker manual) → tak ditampilkan di sini.
   const axes = (data?.variantAxes ?? []).filter((axis) => axis.name !== "state");
+  // ED-155: override = nilai berbeda dari default main component. Prop override = key ada di propValues;
+  // axis override = nilai dipilih ≠ default axis. `overrideCount` = override per-node (dibuat lewat edit child, M4).
+  const isAxisOverridden = (axis: VariantAxis) =>
+    variant[axis.name] !== undefined && variant[axis.name] !== axis.default;
+  const hasOverrides = Object.keys(propValues).length > 0 || overrideCount > 0 || axes.some(isAxisOverridden);
 
   return (
     <InspectorSection id="instance-props" title={t("inspector.instance.title")}>
@@ -154,28 +171,46 @@ function Form({
       ) : null}
       {axes.map((axis) => (
         <InspectorRow key={`v:${axis.name}`} label={axis.name}>
-          <NativeSelect
-            value={variant[axis.name] ?? axis.default}
-            disabled={readOnly}
-            data-testid={`instance-variant-${axis.name}`}
-            onChange={(e) => setVar(axis.name, e.target.value)}
-          >
-            {axis.options.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </NativeSelect>
+          <div className="flex items-center gap-1">
+            {!readOnly && isAxisOverridden(axis) ? (
+              <OverrideDot
+                title={t("inspector.instance.overridden")}
+                testId={`instance-override-axis-${axis.name}`}
+                onReset={() => setVar(axis.name, axis.default)}
+              />
+            ) : null}
+            <NativeSelect
+              value={variant[axis.name] ?? axis.default}
+              disabled={readOnly}
+              data-testid={`instance-variant-${axis.name}`}
+              onChange={(e) => setVar(axis.name, e.target.value)}
+            >
+              {axis.options.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </NativeSelect>
+          </div>
         </InspectorRow>
       ))}
       {editable.map((prop) => (
         <InspectorRow key={prop.key} label={prop.label[locale] || prop.key}>
-          <PropControl
-            prop={prop}
-            value={propValues[prop.key]}
-            readOnly={readOnly}
-            onChange={(v) => set(prop.key, v)}
-          />
+          <div className="flex items-center gap-1">
+            {!readOnly && prop.key in propValues ? (
+              <OverrideDot
+                title={t("inspector.instance.overridden")}
+                testId={`instance-override-${prop.key}`}
+                onReset={() => set(prop.key, undefined)}
+              />
+            ) : null}
+            <PropControl
+              prop={prop}
+              value={propValues[prop.key]}
+              readOnly={readOnly}
+              onChange={(v) => set(prop.key, v)}
+            />
+          </div>
         </InspectorRow>
       ))}
       {!readOnly && data && candidates.length > 0 ? (
@@ -209,12 +244,33 @@ function Form({
               {t("inspector.instance.update", { version: latest })}
             </Button>
           ) : null}
+          {hasOverrides ? (
+            <Button variant="outline" size="sm" data-testid="instance-reset-all" onClick={resetAll}>
+              {t("inspector.instance.resetAll")}
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" data-testid="instance-detach" onClick={() => detach(data)}>
             {t("inspector.instance.detach")}
           </Button>
         </div>
       ) : null}
     </InspectorSection>
+  );
+}
+
+// ED-155: titik ungu ● penanda properti ber-override; klik → reset ke default.
+function OverrideDot({ title, testId, onReset }: { title: string; testId: string; onReset: () => void }) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      data-testid={testId}
+      onClick={onReset}
+      className="shrink-0 text-primary text-xs leading-none hover:text-primary/70"
+    >
+      ●
+    </button>
   );
 }
 

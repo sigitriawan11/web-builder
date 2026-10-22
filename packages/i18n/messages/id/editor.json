@@ -499,7 +499,9 @@
       "update": "Perbarui ke v{version}",
       "swap": "Ganti component",
       "swapPlaceholder": "Pilih component lain…",
-      "dropped": "{count} konten tidak terbawa"
+      "dropped": "{count} konten tidak terbawa",
+      "resetAll": "Reset semua override",
+      "overridden": "Diubah dari default — klik untuk reset"
     }
   },
   "nodeType": {

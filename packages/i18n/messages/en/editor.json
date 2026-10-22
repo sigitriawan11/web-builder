@@ -499,7 +499,9 @@
       "update": "Update to v{version}",
       "swap": "Swap component",
       "swapPlaceholder": "Choose another component…",
-      "dropped": "{count} content not carried over"
+      "dropped": "{count} content not carried over",
+      "resetAll": "Reset all overrides",
+      "overridden": "Changed from default — click to reset"
     }
   },
   "nodeType": {
