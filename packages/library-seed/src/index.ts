@@ -14,6 +14,16 @@ export {
 } from "./component";
 export { ALLOWED_FONT_LICENSES, loadFonts, type SeedFont, SeedFontSchema, SeedFontsFileSchema } from "./fonts";
 export {
+  BRAND_ICONS,
+  FALLBACK_ICON,
+  type IconRef,
+  type IconSet,
+  isKnownIcon,
+  LUCIDE_ALIASES,
+  lucideIconNames,
+  resolveIcon,
+} from "./icons";
+export {
   contentHash,
   formatImportPlan,
   type LibraryImportPlan,
