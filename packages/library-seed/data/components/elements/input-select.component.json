@@ -1,0 +1,183 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_inputselect",
+  "slug": "input-select",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "InputSelect",
+    "displayName": {
+      "id": "Pilihan Dropdown",
+      "en": "Select Field"
+    },
+    "description": {
+      "id": "Kolom pilihan menyerupai dropdown dengan ikon panah bawah.",
+      "en": "A select-style field resembling a dropdown with a chevron."
+    },
+    "tags": ["input", "field", "select"],
+    "keywords": {
+      "id": ["elemen", "dasar", "input"],
+      "en": ["element", "input"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_inputs0"],
+          "nodes": {
+            "tmp_inputs0": {
+              "id": "tmp_inputs0",
+              "type": "frame",
+              "name": "Input",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_inputs1", "tmp_inputs2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_inputs1": {
+              "id": "tmp_inputs1",
+              "type": "text",
+              "name": "Placeholder",
+              "parentId": "tmp_inputs0",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pilih kategori"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_inputs2": {
+              "id": "tmp_inputs2",
+              "type": "icon",
+              "name": "Chevron",
+              "parentId": "tmp_inputs0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "chevron-down"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -15,10 +15,22 @@
       "id": "Kartu produk dengan label diskon dan harga coret.",
       "en": "A product card with a sale badge and a struck-through old price."
     },
-    "tags": ["product", "card", "sale"],
+    "tags": [
+      "product",
+      "card",
+      "sale"
+    ],
     "keywords": {
-      "id": ["produk", "kartu", "layanan"],
-      "en": ["product", "card", "service"]
+      "id": [
+        "produk",
+        "kartu",
+        "layanan"
+      ],
+      "en": [
+        "product",
+        "card",
+        "service"
+      ]
     },
     "aiHints": "Kartu produk promo: tampilkan badge diskon + harga lama dicoret."
   },
@@ -32,7 +44,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_produc0"],
+          "rootIds": [
+            "tmp_produc0"
+          ],
           "nodes": {
             "tmp_produc0": {
               "id": "tmp_produc0",
@@ -41,7 +55,10 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc1", "tmp_produc5"],
+              "children": [
+                "tmp_produc1",
+                "tmp_produc5"
+              ],
               "props": {
                 "role": "card"
               },
@@ -95,7 +112,10 @@
               "parentId": "tmp_produc0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc2", "tmp_produc3"],
+              "children": [
+                "tmp_produc2",
+                "tmp_produc3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -158,7 +178,9 @@
               "parentId": "tmp_produc1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc4"],
+              "children": [
+                "tmp_produc4"
+              ],
               "props": {
                 "role": "generic"
               },
@@ -256,7 +278,11 @@
               "parentId": "tmp_produc0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc6", "tmp_produc7", "tmp_produc10"],
+              "children": [
+                "tmp_produc6",
+                "tmp_produc7",
+                "tmp_produc10"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -343,7 +369,10 @@
               "parentId": "tmp_produc5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc8", "tmp_produc9"],
+              "children": [
+                "tmp_produc8",
+                "tmp_produc9"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -459,7 +488,9 @@
               "parentId": "tmp_produc5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc11"],
+              "children": [
+                "tmp_produc11"
+              ],
               "props": {
                 "role": "button"
               },

@@ -1,0 +1,146 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_icontextrow",
+  "slug": "icon-text-row",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "IconTextRow",
+    "displayName": {
+      "id": "Ikon + Teks (Baris)",
+      "en": "Icon + Text (Row)"
+    },
+    "description": {
+      "id": "Ikon kecil dengan teks pendek di sampingnya dalam satu baris.",
+      "en": "A small icon with short text beside it on a single line."
+    },
+    "tags": ["icon-text", "list"],
+    "keywords": {
+      "id": ["elemen", "dasar", "icon-text"],
+      "en": ["element", "icon-text"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_iconte0"],
+          "nodes": {
+            "tmp_iconte0": {
+              "id": "tmp_iconte0",
+              "type": "frame",
+              "name": "IconText",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_iconte1", "tmp_iconte2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_iconte1": {
+              "id": "tmp_iconte1",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_iconte0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "circle-check"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_iconte2": {
+              "id": "tmp_iconte2",
+              "type": "text",
+              "name": "Text",
+              "parentId": "tmp_iconte0",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Gratis ongkir se-Indonesia"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

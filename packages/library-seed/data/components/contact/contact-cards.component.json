@@ -15,10 +15,20 @@
       "id": "Tiga kartu: telepon, email, dan kunjungi — masing-masing dengan ikon.",
       "en": "Three cards: call, email, and visit — each with an icon."
     },
-    "tags": ["contact", "cards"],
+    "tags": [
+      "contact",
+      "cards"
+    ],
     "keywords": {
-      "id": ["kontak", "alamat", "hubungi"],
-      "en": ["contact", "address"]
+      "id": [
+        "kontak",
+        "alamat",
+        "hubungi"
+      ],
+      "en": [
+        "contact",
+        "address"
+      ]
     },
     "aiHints": "Tiga cara menghubungi dalam kartu terpisah dengan ikon besar."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_contac0"],
+          "rootIds": [
+            "tmp_contac0"
+          ],
           "nodes": {
             "tmp_contac0": {
               "id": "tmp_contac0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac1"],
+              "children": [
+                "tmp_contac1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_contac0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac2", "tmp_contac4"],
+              "children": [
+                "tmp_contac2",
+                "tmp_contac4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,9 @@
               "parentId": "tmp_contac1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac3"],
+              "children": [
+                "tmp_contac3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -195,7 +214,11 @@
               "parentId": "tmp_contac1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac5", "tmp_contac9", "tmp_contac13"],
+              "children": [
+                "tmp_contac5",
+                "tmp_contac9",
+                "tmp_contac13"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -227,7 +250,11 @@
               "parentId": "tmp_contac4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac6", "tmp_contac7", "tmp_contac8"],
+              "children": [
+                "tmp_contac6",
+                "tmp_contac7",
+                "tmp_contac8"
+              ],
               "props": {
                 "role": "card"
               },
@@ -401,7 +428,11 @@
               "parentId": "tmp_contac4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac10", "tmp_contac11", "tmp_contac12"],
+              "children": [
+                "tmp_contac10",
+                "tmp_contac11",
+                "tmp_contac12"
+              ],
               "props": {
                 "role": "card"
               },
@@ -575,7 +606,11 @@
               "parentId": "tmp_contac4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac14", "tmp_contac15", "tmp_contac16"],
+              "children": [
+                "tmp_contac14",
+                "tmp_contac15",
+                "tmp_contac16"
+              ],
               "props": {
                 "role": "card"
               },

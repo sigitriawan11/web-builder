@@ -15,10 +15,20 @@
       "id": "Form sederhana dengan nama, email, pesan, dan tombol kirim.",
       "en": "A simple form with name, email, message, and a send button."
     },
-    "tags": ["contact", "form"],
+    "tags": [
+      "contact",
+      "form"
+    ],
     "keywords": {
-      "id": ["kontak", "alamat", "hubungi"],
-      "en": ["contact", "address"]
+      "id": [
+        "kontak",
+        "alamat",
+        "hubungi"
+      ],
+      "en": [
+        "contact",
+        "address"
+      ]
     },
     "aiHints": "Form kontak ringkas: nama, email, pesan. Fungsi kirim via DATA-*."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_contac0"],
+          "rootIds": [
+            "tmp_contac0"
+          ],
           "nodes": {
             "tmp_contac0": {
               "id": "tmp_contac0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac1"],
+              "children": [
+                "tmp_contac1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_contac0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac2", "tmp_contac5"],
+              "children": [
+                "tmp_contac2",
+                "tmp_contac5"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,10 @@
               "parentId": "tmp_contac1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac3", "tmp_contac4"],
+              "children": [
+                "tmp_contac3",
+                "tmp_contac4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -238,7 +258,9 @@
               "parentId": "tmp_contac1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac6"],
+              "children": [
+                "tmp_contac6"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -269,7 +291,12 @@
               "parentId": "tmp_contac5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac7", "tmp_contac9", "tmp_contac11", "tmp_contac13"],
+              "children": [
+                "tmp_contac7",
+                "tmp_contac9",
+                "tmp_contac11",
+                "tmp_contac13"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -299,7 +326,9 @@
               "parentId": "tmp_contac6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac8"],
+              "children": [
+                "tmp_contac8"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -405,7 +434,9 @@
               "parentId": "tmp_contac6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac10"],
+              "children": [
+                "tmp_contac10"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -511,7 +542,9 @@
               "parentId": "tmp_contac6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac12"],
+              "children": [
+                "tmp_contac12"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -617,7 +650,9 @@
               "parentId": "tmp_contac6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac14"],
+              "children": [
+                "tmp_contac14"
+              ],
               "props": {
                 "role": "button"
               },

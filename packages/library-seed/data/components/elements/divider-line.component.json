@@ -15,19 +15,10 @@
       "id": "Garis tipis selebar penuh untuk memisahkan konten.",
       "en": "Thin full-width line to separate content."
     },
-    "tags": [
-      "divider",
-      "separator"
-    ],
+    "tags": ["divider", "separator"],
     "keywords": {
-      "id": [
-        "pembatas",
-        "garis"
-      ],
-      "en": [
-        "divider",
-        "separator"
-      ]
+      "id": ["pembatas", "garis"],
+      "en": ["divider", "separator"]
     },
     "aiHints": "Pemisah antar blok konten; jangan dipakai sebagai dekorasi tebal."
   },
@@ -41,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_divide0"
-          ],
+          "rootIds": ["tmp_divide0"],
           "nodes": {
             "tmp_divide0": {
               "id": "tmp_divide0",

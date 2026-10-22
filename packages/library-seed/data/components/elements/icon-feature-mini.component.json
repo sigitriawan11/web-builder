@@ -1,0 +1,189 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_iconfeaturemini",
+  "slug": "icon-feature-mini",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "IconFeatureMini",
+    "displayName": {
+      "id": "Fitur Mini",
+      "en": "Mini Feature"
+    },
+    "description": {
+      "id": "Ikon di atas judul dan satu baris deskripsi, tersusun vertikal.",
+      "en": "An icon above a title and a one-line description, stacked vertically."
+    },
+    "tags": ["icon-text", "feature"],
+    "keywords": {
+      "id": ["elemen", "dasar", "icon-text"],
+      "en": ["element", "icon-text"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_iconfe0"],
+          "nodes": {
+            "tmp_iconfe0": {
+              "id": "tmp_iconfe0",
+              "type": "frame",
+              "name": "Feature",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_iconfe1", "tmp_iconfe2", "tmp_iconfe3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_iconfe1": {
+              "id": "tmp_iconfe1",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_iconfe0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "zap"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 28,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 28,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_iconfe2": {
+              "id": "tmp_iconfe2",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_iconfe0",
+              "visible": true,
+              "locked": false,
+              "tag": "h4",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Cepat & ringan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_iconfe3": {
+              "id": "tmp_iconfe3",
+              "type": "text",
+              "name": "Desc",
+              "parentId": "tmp_iconfe0",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dioptimalkan agar cepat di semua perangkat."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

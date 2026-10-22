@@ -5,6 +5,7 @@ import { type ComponentSpec, toComponentFile } from "./builder";
 import { CONTENT } from "./catalog/content";
 import { CTA } from "./catalog/cta";
 import { ELEMENTS } from "./catalog/elements";
+import { ELEMENTS2 } from "./catalog/elements2";
 import { FAQ } from "./catalog/faq";
 import { FEATURES } from "./catalog/features";
 import { FOOTER } from "./catalog/footer";
@@ -22,6 +23,7 @@ const DATA = fileURLToPath(new URL("../data/components/", import.meta.url));
 
 const CATALOG: ComponentSpec[] = [
   ...ELEMENTS,
+  ...ELEMENTS2,
   ...HERO,
   ...FEATURES,
   ...CTA,

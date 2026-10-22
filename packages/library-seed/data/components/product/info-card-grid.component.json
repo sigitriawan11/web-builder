@@ -15,10 +15,21 @@
       "id": "Bagian dengan tiga kartu info ber-ikon dan judul bagian.",
       "en": "A section with three icon info cards and a section heading."
     },
-    "tags": ["info", "grid"],
+    "tags": [
+      "info",
+      "grid"
+    ],
     "keywords": {
-      "id": ["produk", "kartu", "layanan"],
-      "en": ["product", "card", "service"]
+      "id": [
+        "produk",
+        "kartu",
+        "layanan"
+      ],
+      "en": [
+        "product",
+        "card",
+        "service"
+      ]
     },
     "aiHints": "Tiga kartu info sejajar. Cocok untuk kategori atau langkah."
   },
@@ -32,7 +43,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_infoca0"],
+          "rootIds": [
+            "tmp_infoca0"
+          ],
           "nodes": {
             "tmp_infoca0": {
               "id": "tmp_infoca0",
@@ -41,7 +54,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca1"],
+              "children": [
+                "tmp_infoca1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +100,10 @@
               "parentId": "tmp_infoca0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca2", "tmp_infoca4"],
+              "children": [
+                "tmp_infoca2",
+                "tmp_infoca4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +136,9 @@
               "parentId": "tmp_infoca1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca3"],
+              "children": [
+                "tmp_infoca3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -195,7 +215,11 @@
               "parentId": "tmp_infoca1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca5", "tmp_infoca9", "tmp_infoca13"],
+              "children": [
+                "tmp_infoca5",
+                "tmp_infoca9",
+                "tmp_infoca13"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -227,7 +251,11 @@
               "parentId": "tmp_infoca4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca6", "tmp_infoca7", "tmp_infoca8"],
+              "children": [
+                "tmp_infoca6",
+                "tmp_infoca7",
+                "tmp_infoca8"
+              ],
               "props": {
                 "role": "card"
               },
@@ -401,7 +429,11 @@
               "parentId": "tmp_infoca4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca10", "tmp_infoca11", "tmp_infoca12"],
+              "children": [
+                "tmp_infoca10",
+                "tmp_infoca11",
+                "tmp_infoca12"
+              ],
               "props": {
                 "role": "card"
               },
@@ -575,7 +607,11 @@
               "parentId": "tmp_infoca4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca14", "tmp_infoca15", "tmp_infoca16"],
+              "children": [
+                "tmp_infoca14",
+                "tmp_infoca15",
+                "tmp_infoca16"
+              ],
               "props": {
                 "role": "card"
               },

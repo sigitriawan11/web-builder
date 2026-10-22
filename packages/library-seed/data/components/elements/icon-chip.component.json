@@ -15,19 +15,10 @@
       "id": "Chip kecil berisi ikon + label untuk fitur/keunggulan.",
       "en": "Small chip with icon + label for a feature/benefit."
     },
-    "tags": [
-      "chip",
-      "feature"
-    ],
+    "tags": ["chip", "feature"],
     "keywords": {
-      "id": [
-        "fitur",
-        "keunggulan"
-      ],
-      "en": [
-        "feature",
-        "benefit"
-      ]
+      "id": ["fitur", "keunggulan"],
+      "en": ["feature", "benefit"]
     },
     "aiHints": "Highlight satu keunggulan singkat; ikon Lucide relevan + 1–3 kata."
   },
@@ -41,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_iconch0"
-          ],
+          "rootIds": ["tmp_iconch0"],
           "nodes": {
             "tmp_iconch0": {
               "id": "tmp_iconch0",
@@ -52,10 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_iconch1",
-                "tmp_iconch2"
-              ],
+              "children": ["tmp_iconch1", "tmp_iconch2"],
               "props": {
                 "role": "generic"
               },

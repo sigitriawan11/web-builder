@@ -15,19 +15,10 @@
       "id": "Tombol utama ukuran besar untuk hero/CTA.",
       "en": "Large primary button for hero/CTA."
     },
-    "tags": [
-      "button",
-      "primary"
-    ],
+    "tags": ["button", "primary"],
     "keywords": {
-      "id": [
-        "tombol",
-        "ajakan"
-      ],
-      "en": [
-        "button",
-        "cta"
-      ]
+      "id": ["tombol", "ajakan"],
+      "en": ["button", "cta"]
     },
     "aiHints": "Satu aksi per section. Isi label dengan kata kerja singkat; pasang link WhatsApp atau halaman tujuan."
   },
@@ -41,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_button0"
-          ],
+          "rootIds": ["tmp_button0"],
           "nodes": {
             "tmp_button0": {
               "id": "tmp_button0",
@@ -52,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_button1"
-              ],
+              "children": ["tmp_button1"],
               "props": {
                 "role": "button"
               },

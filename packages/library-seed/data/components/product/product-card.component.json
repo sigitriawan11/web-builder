@@ -15,10 +15,21 @@
       "id": "Kartu produk dengan foto, nama, harga, dan tombol beli.",
       "en": "A product card with photo, name, price, and a buy button."
     },
-    "tags": ["product", "card"],
+    "tags": [
+      "product",
+      "card"
+    ],
     "keywords": {
-      "id": ["produk", "kartu", "layanan"],
-      "en": ["product", "card", "service"]
+      "id": [
+        "produk",
+        "kartu",
+        "layanan"
+      ],
+      "en": [
+        "product",
+        "card",
+        "service"
+      ]
     },
     "aiHints": "Satu kartu produk. Untuk katalog, susun beberapa dalam grid."
   },
@@ -32,7 +43,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_produc0"],
+          "rootIds": [
+            "tmp_produc0"
+          ],
           "nodes": {
             "tmp_produc0": {
               "id": "tmp_produc0",
@@ -41,7 +54,10 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc1", "tmp_produc3"],
+              "children": [
+                "tmp_produc1",
+                "tmp_produc3"
+              ],
               "props": {
                 "role": "card"
               },
@@ -95,7 +111,9 @@
               "parentId": "tmp_produc0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc2"],
+              "children": [
+                "tmp_produc2"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -158,7 +176,11 @@
               "parentId": "tmp_produc0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc4", "tmp_produc5", "tmp_produc7"],
+              "children": [
+                "tmp_produc4",
+                "tmp_produc5",
+                "tmp_produc7"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -245,7 +267,9 @@
               "parentId": "tmp_produc3",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc6"],
+              "children": [
+                "tmp_produc6"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -318,7 +342,9 @@
               "parentId": "tmp_produc3",
               "visible": true,
               "locked": false,
-              "children": ["tmp_produc8"],
+              "children": [
+                "tmp_produc8"
+              ],
               "props": {
                 "role": "button"
               },

@@ -15,10 +15,21 @@
       "id": "Kartu informasi serbaguna dengan ikon, judul, teks, dan tautan.",
       "en": "A versatile info card with icon, title, text, and a link."
     },
-    "tags": ["info", "card"],
+    "tags": [
+      "info",
+      "card"
+    ],
     "keywords": {
-      "id": ["produk", "kartu", "layanan"],
-      "en": ["product", "card", "service"]
+      "id": [
+        "produk",
+        "kartu",
+        "layanan"
+      ],
+      "en": [
+        "product",
+        "card",
+        "service"
+      ]
     },
     "aiHints": "Kartu info umum. Pakai untuk fitur, kategori, atau pengumuman."
   },
@@ -32,7 +43,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_infoca0"],
+          "rootIds": [
+            "tmp_infoca0"
+          ],
           "nodes": {
             "tmp_infoca0": {
               "id": "tmp_infoca0",
@@ -41,7 +54,12 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_infoca1", "tmp_infoca2", "tmp_infoca3", "tmp_infoca4"],
+              "children": [
+                "tmp_infoca1",
+                "tmp_infoca2",
+                "tmp_infoca3",
+                "tmp_infoca4"
+              ],
               "props": {
                 "role": "card"
               },

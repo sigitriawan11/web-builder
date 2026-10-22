@@ -15,19 +15,10 @@
       "id": "Label kecil berlatar surface dengan teks primer.",
       "en": "Small surface-filled label with primary text."
     },
-    "tags": [
-      "badge",
-      "soft"
-    ],
+    "tags": ["badge", "soft"],
     "keywords": {
-      "id": [
-        "label",
-        "fitur"
-      ],
-      "en": [
-        "badge",
-        "feature"
-      ]
+      "id": ["label", "fitur"],
+      "en": ["badge", "feature"]
     },
     "aiHints": "Penanda fitur/highlight; teks pendek."
   },
@@ -41,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_badges0"
-          ],
+          "rootIds": ["tmp_badges0"],
           "nodes": {
             "tmp_badges0": {
               "id": "tmp_badges0",
@@ -52,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_badges1"
-              ],
+              "children": ["tmp_badges1"],
               "props": {
                 "role": "generic"
               },

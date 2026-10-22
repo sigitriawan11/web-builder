@@ -15,19 +15,10 @@
       "id": "Label kecil berlatar primer (mis. \"Baru\", \"Promo\").",
       "en": "Small primary-filled label (e.g. \"New\", \"Sale\")."
     },
-    "tags": [
-      "badge",
-      "label"
-    ],
+    "tags": ["badge", "label"],
     "keywords": {
-      "id": [
-        "label",
-        "status"
-      ],
-      "en": [
-        "badge",
-        "tag"
-      ]
+      "id": ["label", "status"],
+      "en": ["badge", "tag"]
     },
     "aiHints": "Penanda status singkat 1–2 kata; jangan untuk kalimat panjang."
   },
@@ -41,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_badges0"
-          ],
+          "rootIds": ["tmp_badges0"],
           "nodes": {
             "tmp_badges0": {
               "id": "tmp_badges0",
@@ -52,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_badges1"
-              ],
+              "children": ["tmp_badges1"],
               "props": {
                 "role": "generic"
               },

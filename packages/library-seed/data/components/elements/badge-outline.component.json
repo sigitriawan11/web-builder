@@ -15,19 +15,10 @@
       "id": "Label kecil bergaris tepi, latar transparan.",
       "en": "Small outlined label on transparent background."
     },
-    "tags": [
-      "badge",
-      "outline"
-    ],
+    "tags": ["badge", "outline"],
     "keywords": {
-      "id": [
-        "label",
-        "kategori"
-      ],
-      "en": [
-        "badge",
-        "category"
-      ]
+      "id": ["label", "kategori"],
+      "en": ["badge", "category"]
     },
     "aiHints": "Penanda kategori/tag; teks pendek."
   },
@@ -41,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_badgeo0"
-          ],
+          "rootIds": ["tmp_badgeo0"],
           "nodes": {
             "tmp_badgeo0": {
               "id": "tmp_badgeo0",
@@ -52,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_badgeo1"
-              ],
+              "children": ["tmp_badgeo1"],
               "props": {
                 "role": "generic"
               },

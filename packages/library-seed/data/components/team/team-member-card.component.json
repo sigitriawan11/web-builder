@@ -15,10 +15,20 @@
       "id": "Satu kartu anggota dengan foto besar, bio, dan ikon sosial.",
       "en": "A single member card with a large photo, bio, and social icons."
     },
-    "tags": ["team", "card"],
+    "tags": [
+      "team",
+      "card"
+    ],
     "keywords": {
-      "id": ["tim", "orang", "profil"],
-      "en": ["team", "people"]
+      "id": [
+        "tim",
+        "orang",
+        "profil"
+      ],
+      "en": [
+        "team",
+        "people"
+      ]
     },
     "aiHints": "Sorot satu orang penting (pendiri) dengan bio singkat."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_teamme0"],
+          "rootIds": [
+            "tmp_teamme0"
+          ],
           "nodes": {
             "tmp_teamme0": {
               "id": "tmp_teamme0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_teamme1"],
+              "children": [
+                "tmp_teamme1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,9 @@
               "parentId": "tmp_teamme0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_teamme2"],
+              "children": [
+                "tmp_teamme2"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +134,10 @@
               "parentId": "tmp_teamme1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_teamme3", "tmp_teamme4"],
+              "children": [
+                "tmp_teamme3",
+                "tmp_teamme4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -192,7 +211,12 @@
               "parentId": "tmp_teamme2",
               "visible": true,
               "locked": false,
-              "children": ["tmp_teamme5", "tmp_teamme6", "tmp_teamme7", "tmp_teamme8"],
+              "children": [
+                "tmp_teamme5",
+                "tmp_teamme6",
+                "tmp_teamme7",
+                "tmp_teamme8"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -351,7 +375,11 @@
               "parentId": "tmp_teamme4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_teamme9", "tmp_teamme10", "tmp_teamme11"],
+              "children": [
+                "tmp_teamme9",
+                "tmp_teamme10",
+                "tmp_teamme11"
+              ],
               "props": {},
               "style": {
                 "base": {

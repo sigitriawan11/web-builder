@@ -1,0 +1,115 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_mediavideolite",
+  "slug": "media-video-lite",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "VideoLite",
+    "displayName": {
+      "id": "Video Lite",
+      "en": "Video (Lite)"
+    },
+    "description": {
+      "id": "Placeholder video 16:9 dengan tombol putar di tengah.",
+      "en": "A 16:9 video placeholder with a play button in the center."
+    },
+    "tags": ["media", "video"],
+    "keywords": {
+      "id": ["elemen", "dasar", "media"],
+      "en": ["element", "media"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_mediav0"],
+          "nodes": {
+            "tmp_mediav0": {
+              "id": "tmp_mediav0",
+              "type": "frame",
+              "name": "Video",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_mediav1"],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1.7778
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_mediav1": {
+              "id": "tmp_mediav1",
+              "type": "icon",
+              "name": "Play",
+              "parentId": "tmp_mediav0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "circle-play"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 56,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 56,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

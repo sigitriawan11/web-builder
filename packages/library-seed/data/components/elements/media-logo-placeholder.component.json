@@ -1,0 +1,132 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_medialogoplaceholder",
+  "slug": "media-logo-placeholder",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "LogoPlaceholder",
+    "displayName": {
+      "id": "Placeholder Logo",
+      "en": "Logo Placeholder"
+    },
+    "description": {
+      "id": "Kotak logo abu-abu untuk barisan mitra atau klien.",
+      "en": "A grey logo box for a row of partners or clients."
+    },
+    "tags": ["media", "logo"],
+    "keywords": {
+      "id": ["elemen", "dasar", "media"],
+      "en": ["element", "media"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_medial0"],
+          "nodes": {
+            "tmp_medial0": {
+              "id": "tmp_medial0",
+              "type": "frame",
+              "name": "Logo",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_medial1"],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.4"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.4"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 140,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 48,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.md"
+                  }
+                }
+              }
+            },
+            "tmp_medial1": {
+              "id": "tmp_medial1",
+              "type": "icon",
+              "name": "Mark",
+              "parentId": "tmp_medial0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "image"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 24,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 24,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

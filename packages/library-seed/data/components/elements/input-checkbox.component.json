@@ -1,0 +1,194 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_inputcheckbox",
+  "slug": "input-checkbox",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "InputCheckbox",
+    "displayName": {
+      "id": "Checkbox + Label",
+      "en": "Checkbox + Label"
+    },
+    "description": {
+      "id": "Kotak centang dengan label teks di sampingnya.",
+      "en": "A checkbox with a text label beside it."
+    },
+    "tags": ["input", "checkbox"],
+    "keywords": {
+      "id": ["elemen", "dasar", "input"],
+      "en": ["element", "input"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_inputc0"],
+          "nodes": {
+            "tmp_inputc0": {
+              "id": "tmp_inputc0",
+              "type": "frame",
+              "name": "Checkbox",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_inputc1", "tmp_inputc3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_inputc1": {
+              "id": "tmp_inputc1",
+              "type": "frame",
+              "name": "Box",
+              "parentId": "tmp_inputc0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_inputc2"],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.sm"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_inputc2": {
+              "id": "tmp_inputc2",
+              "type": "icon",
+              "name": "Check",
+              "parentId": "tmp_inputc1",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "check"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 14,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 14,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_inputc3": {
+              "id": "tmp_inputc3",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_inputc0",
+              "visible": true,
+              "locked": false,
+              "tag": "label",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Saya setuju dengan syarat & ketentuan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

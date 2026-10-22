@@ -15,10 +15,20 @@
       "id": "Info kontak di kiri dan form pesan di kanan dalam dua kolom.",
       "en": "Contact info on the left and a message form on the right in two columns."
     },
-    "tags": ["contact", "split"],
+    "tags": [
+      "contact",
+      "split"
+    ],
     "keywords": {
-      "id": ["kontak", "alamat", "hubungi"],
-      "en": ["contact", "address"]
+      "id": [
+        "kontak",
+        "alamat",
+        "hubungi"
+      ],
+      "en": [
+        "contact",
+        "address"
+      ]
     },
     "aiHints": "Gabungkan info kontak dan form dalam satu section dua kolom."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_contac0"],
+          "rootIds": [
+            "tmp_contac0"
+          ],
           "nodes": {
             "tmp_contac0": {
               "id": "tmp_contac0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac1"],
+              "children": [
+                "tmp_contac1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_contac0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac2", "tmp_contac4"],
+              "children": [
+                "tmp_contac2",
+                "tmp_contac4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,9 @@
               "parentId": "tmp_contac1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac3"],
+              "children": [
+                "tmp_contac3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -195,7 +214,10 @@
               "parentId": "tmp_contac1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac5", "tmp_contac26"],
+              "children": [
+                "tmp_contac5",
+                "tmp_contac26"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -226,7 +248,12 @@
               "parentId": "tmp_contac4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac6", "tmp_contac11", "tmp_contac16", "tmp_contac21"],
+              "children": [
+                "tmp_contac6",
+                "tmp_contac11",
+                "tmp_contac16",
+                "tmp_contac21"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -256,7 +283,10 @@
               "parentId": "tmp_contac5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac7", "tmp_contac8"],
+              "children": [
+                "tmp_contac7",
+                "tmp_contac8"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -317,7 +347,10 @@
               "parentId": "tmp_contac6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac9", "tmp_contac10"],
+              "children": [
+                "tmp_contac9",
+                "tmp_contac10"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -433,7 +466,10 @@
               "parentId": "tmp_contac5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac12", "tmp_contac13"],
+              "children": [
+                "tmp_contac12",
+                "tmp_contac13"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -494,7 +530,10 @@
               "parentId": "tmp_contac11",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac14", "tmp_contac15"],
+              "children": [
+                "tmp_contac14",
+                "tmp_contac15"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -610,7 +649,10 @@
               "parentId": "tmp_contac5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac17", "tmp_contac18"],
+              "children": [
+                "tmp_contac17",
+                "tmp_contac18"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -671,7 +713,10 @@
               "parentId": "tmp_contac16",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac19", "tmp_contac20"],
+              "children": [
+                "tmp_contac19",
+                "tmp_contac20"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -787,7 +832,10 @@
               "parentId": "tmp_contac5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac22", "tmp_contac23"],
+              "children": [
+                "tmp_contac22",
+                "tmp_contac23"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -848,7 +896,10 @@
               "parentId": "tmp_contac21",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac24", "tmp_contac25"],
+              "children": [
+                "tmp_contac24",
+                "tmp_contac25"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -964,7 +1015,12 @@
               "parentId": "tmp_contac4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac27", "tmp_contac29", "tmp_contac31", "tmp_contac33"],
+              "children": [
+                "tmp_contac27",
+                "tmp_contac29",
+                "tmp_contac31",
+                "tmp_contac33"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -994,7 +1050,9 @@
               "parentId": "tmp_contac26",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac28"],
+              "children": [
+                "tmp_contac28"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -1100,7 +1158,9 @@
               "parentId": "tmp_contac26",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac30"],
+              "children": [
+                "tmp_contac30"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -1206,7 +1266,9 @@
               "parentId": "tmp_contac26",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac32"],
+              "children": [
+                "tmp_contac32"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -1312,7 +1374,9 @@
               "parentId": "tmp_contac26",
               "visible": true,
               "locked": false,
-              "children": ["tmp_contac34"],
+              "children": [
+                "tmp_contac34"
+              ],
               "props": {
                 "role": "button"
               },

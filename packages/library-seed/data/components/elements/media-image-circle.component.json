@@ -1,0 +1,81 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_mediaimagecircle",
+  "slug": "media-image-circle",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "ImageCircle",
+    "displayName": {
+      "id": "Gambar Bulat",
+      "en": "Circle Image"
+    },
+    "description": {
+      "id": "Placeholder gambar berbentuk lingkaran untuk avatar atau logo.",
+      "en": "A circular image placeholder for an avatar or logo."
+    },
+    "tags": ["media", "image", "avatar"],
+    "keywords": {
+      "id": ["elemen", "dasar", "media"],
+      "en": ["element", "media"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_mediai0"],
+          "nodes": {
+            "tmp_mediai0": {
+              "id": "tmp_mediai0",
+              "type": "frame",
+              "name": "ImageCircle",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 120,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 120,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.full"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

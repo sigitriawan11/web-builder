@@ -1,0 +1,78 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_mediaimageframe",
+  "slug": "media-image-frame",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "ImageFrame",
+    "displayName": {
+      "id": "Bingkai Gambar",
+      "en": "Image Frame"
+    },
+    "description": {
+      "id": "Placeholder gambar persegi panjang dengan sudut membulat.",
+      "en": "A rectangular image placeholder with rounded corners."
+    },
+    "tags": ["media", "image"],
+    "keywords": {
+      "id": ["elemen", "dasar", "media"],
+      "en": ["element", "media"]
+    },
+    "aiHints": "Elemen kecil untuk menyusun section. Gabungkan beberapa untuk membentuk blok."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_mediai0"],
+          "nodes": {
+            "tmp_mediai0": {
+              "id": "tmp_mediai0",
+              "type": "frame",
+              "name": "Image",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1.5
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
