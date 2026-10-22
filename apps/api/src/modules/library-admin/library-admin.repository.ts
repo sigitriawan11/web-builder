@@ -96,6 +96,33 @@ export async function listAdminComponents(
   return { items, total: row?.total ?? 0 };
 }
 
+export interface VersionListRow {
+  version: string | null;
+  versionSeq: number | null;
+  status: (typeof schema.libraryStatusEnum.enumValues)[number];
+  bump: (typeof schema.versionBumpEnum.enumValues)[number] | null;
+  changelog: { id: string; en: string } | null;
+  yanked: boolean;
+  createdAt: Date;
+}
+
+/** Riwayat versi component (T3.8.2) — terbaru dulu. Draft (versionSeq null) ikut agar admin lihat state saat ini. */
+export async function listVersions(exec: DbExecutor, componentId: string): Promise<VersionListRow[]> {
+  return exec
+    .select({
+      version: componentVersions.version,
+      versionSeq: componentVersions.versionSeq,
+      status: componentVersions.status,
+      bump: componentVersions.bump,
+      changelog: componentVersions.changelog,
+      yanked: componentVersions.yanked,
+      createdAt: componentVersions.createdAt,
+    })
+    .from(componentVersions)
+    .where(eq(componentVersions.componentId, componentId))
+    .orderBy(desc(componentVersions.versionSeq));
+}
+
 export type ComponentRow = typeof components.$inferSelect;
 export type VersionRow = typeof componentVersions.$inferSelect;
 export type ComponentInsert = typeof components.$inferInsert;

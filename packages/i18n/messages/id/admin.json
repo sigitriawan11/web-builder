@@ -20,5 +20,19 @@
       "deprecated": "Usang",
       "archived": "Diarsip"
     }
+  },
+  "libraryDetail": {
+    "back": "Kembali ke pustaka",
+    "versions": "Versi",
+    "changelog": "Changelog",
+    "created": "Dibuat",
+    "usage": "Pemakaian",
+    "usageSites": "{count} situs",
+    "noUsage": "Belum dipakai di situs mana pun.",
+    "actions": "Aksi",
+    "deprecate": "Usangkan",
+    "archive": "Arsipkan",
+    "deprecateHint": "Sembunyikan dari galeri; instance lama tetap jalan.",
+    "archiveHint": "Hapus dari galeri sepenuhnya."
   }
 }

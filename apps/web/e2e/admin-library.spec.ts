@@ -62,7 +62,7 @@ const definition = () => ({
   },
 });
 
-async function createComponentAsStaff(page: Page): Promise<{ publicId: string; name: string }> {
+async function createComponentAsStaff(page: Page): Promise<{ id: string; publicId: string; name: string }> {
   const email = uniqueEmail("admlib");
   await register(page, email);
   await expect(page).toHaveURL(/\/verify-email\?step=code/);
@@ -84,12 +84,24 @@ async function createComponentAsStaff(page: Page): Promise<{ publicId: string; n
           definition: def,
         }),
       });
-      return { status: res.status, body: (await res.json()) as { data?: { publicId: string } } };
+      return { status: res.status, body: (await res.json()) as { data?: { id: string; publicId: string } } };
     },
     { categoryId, def: definition(), slug: `e2e-adm-${uuidv7()}`, name },
   );
   expect(created.status).toBe(201);
-  return { publicId: created.body.data?.publicId ?? "", name };
+  return { id: created.body.data?.id ?? "", publicId: created.body.data?.publicId ?? "", name };
+}
+
+async function publish(page: Page, id: string): Promise<void> {
+  const res = await page.evaluate(async (id) => {
+    const r = await fetch(`/api/v1/admin/library/components/${id}/draft/publish`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ bump: "minor", changelog: { id: "Rilis", en: "Release" } }),
+    });
+    return r.status;
+  }, id);
+  expect(res).toBe(200);
 }
 
 test("staf: /admin/library menampilkan daftar + filter status", async ({ page }) => {
@@ -107,6 +119,22 @@ test("staf: /admin/library menampilkan daftar + filter status", async ({ page })
   await expect(page.getByTestId(`admin-library-row-${publicId}`)).toBeVisible();
   await page.getByTestId("admin-library-filter-published").click();
   await expect(page.getByTestId(`admin-library-row-${publicId}`)).toBeHidden();
+});
+
+test("T3.8.2: detail component → versi + changelog + aksi deprecate", async ({ page }) => {
+  const { id } = await createComponentAsStaff(page);
+  await publish(page, id);
+
+  await page.goto(`${APP_URL}/admin/library/${id}`);
+  // Riwayat versi memuat versi published.
+  await expect(page.getByTestId("admin-component-versions")).toBeVisible();
+  await expect(page.getByTestId("admin-component-versions")).toContainText("0.1.0");
+  await expect(page.getByTestId("admin-component-versions")).toContainText("Release");
+
+  // Deprecate → status COMPONENT berubah (router.refresh); tombol deprecate jadi nonaktif.
+  await page.getByTestId("admin-component-deprecate").click();
+  await expect(page.getByTestId("admin-component-status")).toContainText("Deprecated");
+  await expect(page.getByTestId("admin-component-deprecate")).toBeDisabled();
 });
 
 test("non-staf: /admin/library → 404 (permukaan admin tak bocor)", async ({ page }) => {

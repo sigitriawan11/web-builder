@@ -14,6 +14,7 @@ import type {
   realtimeTokenRequest,
   saveDraftRequest,
   usageRequest,
+  versionsRequest,
 } from "./library-admin.schema";
 import type { LibraryAdminService, StaffActor } from "./library-admin.service";
 
@@ -52,6 +53,9 @@ export function createLibraryAdminController(service: LibraryAdminService) {
   const usage: ValidatedHandler<typeof usageRequest> = async (req, res) => {
     res.json({ data: await service.usage(req.valid.params.id), meta: meta(res) });
   };
+  const versions: ValidatedHandler<typeof versionsRequest> = async (req, res) => {
+    res.json({ data: await service.versions(req.valid.params.id), meta: meta(res) });
+  };
   const editorSession: ValidatedHandler<typeof editorSessionRequest> = async (req, res) => {
     res.json({ data: await service.getEditorSession(actor(req), req.valid.params.id), meta: meta(res) });
   };
@@ -87,5 +91,6 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     categories,
     listComponents,
     capabilities,
+    versions,
   };
 }

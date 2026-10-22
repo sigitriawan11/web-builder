@@ -21,6 +21,7 @@ import {
   realtimeTokenRequest,
   saveDraftRequest,
   usageRequest,
+  versionsRequest,
 } from "./library-admin.schema";
 import { createLibraryAdminService } from "./library-admin.service";
 
@@ -84,6 +85,7 @@ export function createLibraryAdminRouter(deps: {
   );
   router.post("/components/:id/archive", ...guard(PUBLISH_ROLES), ...validated(archiveRequest, controller.archive));
   router.get("/components/:id/usage", ...guard(READ_ROLES), ...validated(usageRequest, controller.usage));
+  router.get("/components/:id/versions", ...guard(READ_ROLES), ...validated(versionsRequest, controller.versions));
   router.get("/components/:id", ...guard(READ_ROLES), ...validated(editorSessionRequest, controller.editorSession));
   // Definisi draft by public_id (registry editor me-resolve instance draft, CMP-011) — path terpisah dari `:id` UUID.
   router.get(

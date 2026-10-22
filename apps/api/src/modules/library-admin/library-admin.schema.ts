@@ -65,6 +65,9 @@ export const archiveRequest = { params: IdParams, body: z.object({}).optional() 
 
 export const usageRequest = { params: IdParams };
 
+// Riwayat versi (T3.8.2) — detail admin.
+export const versionsRequest = { params: IdParams };
+
 // Bootstrap sesi editor Mode Admin (CMP-010): metadata component + kapabilitas user.
 export const editorSessionRequest = { params: IdParams };
 

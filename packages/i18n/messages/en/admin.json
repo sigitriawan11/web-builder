@@ -20,5 +20,19 @@
       "deprecated": "Deprecated",
       "archived": "Archived"
     }
+  },
+  "libraryDetail": {
+    "back": "Back to library",
+    "versions": "Versions",
+    "changelog": "Changelog",
+    "created": "Created",
+    "usage": "Usage",
+    "usageSites": "{count} sites",
+    "noUsage": "Not used on any site yet.",
+    "actions": "Actions",
+    "deprecate": "Deprecate",
+    "archive": "Archive",
+    "deprecateHint": "Hide from the gallery; existing instances keep working.",
+    "archiveHint": "Remove from the gallery entirely."
   }
 }

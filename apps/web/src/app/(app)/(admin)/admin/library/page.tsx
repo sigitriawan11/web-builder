@@ -85,7 +85,11 @@ export default async function AdminLibraryPage({
             <tbody>
               {items.map((item) => (
                 <tr key={item.id} className="border-b last:border-0" data-testid={`admin-library-row-${item.publicId}`}>
-                  <td className="px-3 py-2 font-medium">{item.name}</td>
+                  <td className="px-3 py-2 font-medium">
+                    <Link href={`/admin/library/${item.id}`} className="hover:underline">
+                      {item.name}
+                    </Link>
+                  </td>
                   <td className="px-3 py-2 text-muted-foreground">{item.kind}</td>
                   <td className="px-3 py-2 text-muted-foreground">{item.categorySlug}</td>
                   <td className="px-3 py-2">

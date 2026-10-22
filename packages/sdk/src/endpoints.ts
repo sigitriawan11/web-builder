@@ -12,6 +12,7 @@ import {
   LibraryCategorySchema,
   LibraryComponentListItemSchema,
   LibraryComponentUsageSchema,
+  LibraryComponentVersionSchema,
   LibraryDraftDefinitionSchema,
   LibraryEditorSessionSchema,
   LibraryPublishedDefinitionSchema,
@@ -143,6 +144,13 @@ export function createPlatformApi(client: ApiClient) {
             schema: dataEnvelope(CreateLibraryComponentResponseSchema),
           })
           .then(unwrap),
+      /** Riwayat versi component (T3.8.2) untuk detail admin — terbaru dulu. */
+      versions: (componentId: string) =>
+        client
+          .request("GET", `/v1/admin/library/components/${componentId}/versions`, {
+            schema: dataEnvelope(z.array(LibraryComponentVersionSchema)),
+          })
+          .then(unwrap),
       /** Pemakaian per versi/docState (CMP-012/CMP-159) untuk tab Usage panel Mode Admin. */
       usage: (componentId: string) =>
         client
@@ -153,6 +161,12 @@ export function createPlatformApi(client: ApiClient) {
       /** Simpan metadata draft (CMP-013) — PUT draft, 204. Definisi node diedit lewat realtime, bukan di sini. */
       saveDraft: (componentId: string, body: SaveLibraryDraftBody) =>
         client.request("PUT", `/v1/admin/library/components/${componentId}/draft`, { body }),
+      /** Deprecate component (CMP-045/T3.8.2) — 204. `replacedBy` (UUID) opsional untuk saran migrasi. */
+      deprecate: (componentId: string, body: { replacedBy?: string } = {}) =>
+        client.request("POST", `/v1/admin/library/components/${componentId}/deprecate`, { body }),
+      /** Archive component (CMP-051/T3.8.2) — 204; disembunyikan dari galeri. */
+      archive: (componentId: string) =>
+        client.request("POST", `/v1/admin/library/components/${componentId}/archive`, { body: {} }),
       /** Sesi editor Mode Admin (CMP-010): metadata component + kapabilitas user. Non-staf → 404. */
       editorSession: (componentId: string) =>
         client

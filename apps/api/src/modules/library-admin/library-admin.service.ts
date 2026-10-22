@@ -15,6 +15,7 @@ import {
   type LibraryAdminListQuery,
   type LibraryCapabilities,
   type LibraryComponentSummary,
+  type LibraryComponentVersion,
   type LibraryEditorSession,
   REALTIME_TOKEN_AUDIENCE,
   REALTIME_TOKEN_TTL_SECONDS,
@@ -302,6 +303,22 @@ export function createLibraryAdminService(deps: {
       const component = await repo.findComponent(db, componentId);
       if (!component) throw new AppError("NOT_FOUND");
       return repo.usageByComponent(db, componentId);
+    },
+
+    /** T3.8.2: riwayat versi (versi/status/changelog/tanggal) untuk detail admin. */
+    async versions(componentId: string): Promise<LibraryComponentVersion[]> {
+      const component = await repo.findComponent(db, componentId);
+      if (!component) throw new AppError("NOT_FOUND");
+      const rows = await repo.listVersions(db, componentId);
+      return rows.map((row) => ({
+        version: row.version,
+        versionSeq: row.versionSeq,
+        status: row.status,
+        bump: row.bump,
+        changelog: row.changelog,
+        yanked: row.yanked,
+        createdAt: row.createdAt.toISOString(),
+      }));
     },
 
     /** Bootstrap sesi editor Mode Admin (CMP-010): metadata + kapabilitas user dari `users.staff_role`. */

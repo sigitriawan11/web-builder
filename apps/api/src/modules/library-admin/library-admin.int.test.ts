@@ -166,6 +166,15 @@ describe("admin library CRUD (CMP-159)", () => {
     expect(published.status).toBe(200);
     expect(published.body.data).toEqual({ version: "0.1.0", versionSeq: 1 });
 
+    // T3.8.2: riwayat versi admin memuat versi published + changelog.
+    const versions = await request(target).get(`/v1/admin/library/components/${id}/versions`).set("cookie", admin);
+    expect(versions.status).toBe(200);
+    expect(versions.body.data[0]).toMatchObject({
+      version: "0.1.0",
+      status: "published",
+      changelog: { en: "Initial" },
+    });
+
     // Editor read API (T3.3.8) kini menemukan versi published.
     const read = await request(target).get(`/v1/library/components/${publicId}/versions/1`).set("cookie", admin);
     expect(read.status).toBe(200);

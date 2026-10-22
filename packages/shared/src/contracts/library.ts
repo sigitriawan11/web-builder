@@ -136,6 +136,18 @@ export const LibraryAdminListSchema = z.object({
 });
 export type LibraryAdminList = z.infer<typeof LibraryAdminListSchema>;
 
+// Versi component (T3.8.2): riwayat untuk detail admin. `changelog` dwibahasa (null = belum ada / draft awal).
+export const LibraryComponentVersionSchema = z.object({
+  version: z.string().nullable(),
+  versionSeq: z.number().int().positive().nullable(),
+  status: LibraryStatusSchema,
+  bump: z.enum(["major", "minor", "patch"]).nullable(),
+  changelog: LocalizedTextSchema.nullable(),
+  yanked: z.boolean(),
+  createdAt: z.string(),
+});
+export type LibraryComponentVersion = z.infer<typeof LibraryComponentVersionSchema>;
+
 // Query daftar admin (filter status/kategori/pencarian + paginasi).
 export const LibraryAdminListQuerySchema = z.object({
   status: LibraryStatusSchema.optional(),
