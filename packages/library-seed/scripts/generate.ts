@@ -3,13 +3,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type ComponentSpec, toComponentFile } from "./builder";
 import { ELEMENTS } from "./catalog/elements";
+import { HERO } from "./catalog/hero";
 
 // Generator file seed component dari katalog (T3.11.x). `pnpm --filter @platform/library-seed gen`. File di-emit ke
 // `data/components/<kategori>/<slug>.component.json`; validasi dijalankan oleh `library-seed` test (validateSeedLibrary).
 
 const DATA = fileURLToPath(new URL("../data/components/", import.meta.url));
 
-const CATALOG: ComponentSpec[] = [...ELEMENTS];
+const CATALOG: ComponentSpec[] = [...ELEMENTS, ...HERO];
 
 let written = 0;
 for (const spec of CATALOG) {

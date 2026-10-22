@@ -1,0 +1,504 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_heroimagebelow",
+  "slug": "hero-image-below",
+  "kind": "section",
+  "categorySlug": "hero",
+  "meta": {
+    "name": "HeroImageBelow",
+    "displayName": {
+      "id": "Hero Gambar Bawah",
+      "en": "Hero with Image Below"
+    },
+    "description": {
+      "id": "Hero terpusat dengan gambar besar di bawah teks dan tombol.",
+      "en": "Centered hero with a large image below the text and buttons."
+    },
+    "tags": ["hero", "centered", "image"],
+    "keywords": {
+      "id": ["hero", "pembuka", "judul utama"],
+      "en": ["hero", "headline"]
+    },
+    "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_heroim0"],
+          "nodes": {
+            "tmp_heroim0": {
+              "id": "tmp_heroim0",
+              "type": "frame",
+              "name": "HeroImageBelow",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_heroim1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.24"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.24"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_heroim1": {
+              "id": "tmp_heroim1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_heroim0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_heroim2", "tmp_heroim9", "tmp_heroim10"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_heroim2": {
+              "id": "tmp_heroim2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_heroim1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_heroim3", "tmp_heroim4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 720,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_heroim3": {
+              "id": "tmp_heroim3",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_heroim2",
+              "visible": true,
+              "locked": false,
+              "tag": "h1",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Lihat bisnis Anda tumbuh online"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.display"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_heroim4": {
+              "id": "tmp_heroim4",
+              "type": "text",
+              "name": "Lead",
+              "parentId": "tmp_heroim2",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Website cepat, rapi, dan siap jualan dalam hitungan menit."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_heroim5": {
+              "id": "tmp_heroim5",
+              "type": "frame",
+              "name": "CtaPrimary",
+              "parentId": "tmp_heroim1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_heroim6"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_heroim6": {
+              "id": "tmp_heroim6",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_heroim5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Mulai Sekarang"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            },
+            "tmp_heroim7": {
+              "id": "tmp_heroim7",
+              "type": "frame",
+              "name": "CtaSecondary",
+              "parentId": "tmp_heroim1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_heroim8"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  }
+                }
+              }
+            },
+            "tmp_heroim8": {
+              "id": "tmp_heroim8",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_heroim7",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pelajari Lebih"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_heroim9": {
+              "id": "tmp_heroim9",
+              "type": "frame",
+              "name": "Actions",
+              "parentId": "tmp_heroim1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_heroim5", "tmp_heroim7"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_heroim10": {
+              "id": "tmp_heroim10",
+              "type": "frame",
+              "name": "HeroImage",
+              "parentId": "tmp_heroim1",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 420,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,446 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_herowhatsapp",
+  "slug": "hero-whatsapp",
+  "kind": "section",
+  "categorySlug": "hero",
+  "meta": {
+    "name": "HeroWhatsApp",
+    "displayName": {
+      "id": "Hero WhatsApp",
+      "en": "WhatsApp Hero"
+    },
+    "description": {
+      "id": "Hero dengan CTA WhatsApp untuk UMKM.",
+      "en": "Hero with a WhatsApp CTA for small businesses."
+    },
+    "tags": ["hero", "whatsapp", "umkm"],
+    "keywords": {
+      "id": ["hero", "pembuka", "judul utama"],
+      "en": ["hero", "headline"]
+    },
+    "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_herowh0"],
+          "nodes": {
+            "tmp_herowh0": {
+              "id": "tmp_herowh0",
+              "type": "frame",
+              "name": "HeroWhatsApp",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_herowh1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.24"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.24"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_herowh1": {
+              "id": "tmp_herowh1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_herowh0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_herowh2", "tmp_herowh9"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_herowh2": {
+              "id": "tmp_herowh2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_herowh1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_herowh3", "tmp_herowh4", "tmp_herowh5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 720,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_herowh3": {
+              "id": "tmp_herowh3",
+              "type": "text",
+              "name": "Eyebrow",
+              "parentId": "tmp_herowh2",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "UMKM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_herowh4": {
+              "id": "tmp_herowh4",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_herowh2",
+              "visible": true,
+              "locked": false,
+              "tag": "h1",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pesan langsung lewat WhatsApp"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.display"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_herowh5": {
+              "id": "tmp_herowh5",
+              "type": "text",
+              "name": "Lead",
+              "parentId": "tmp_herowh2",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pelanggan klik, chat masuk ke WhatsApp Anda. Tanpa ribet."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_herowh6": {
+              "id": "tmp_herowh6",
+              "type": "frame",
+              "name": "CtaWa",
+              "parentId": "tmp_herowh1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_herowh7", "tmp_herowh8"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.success"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_herowh7": {
+              "id": "tmp_herowh7",
+              "type": "icon",
+              "name": "ButtonIcon",
+              "parentId": "tmp_herowh6",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "whatsapp"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            },
+            "tmp_herowh8": {
+              "id": "tmp_herowh8",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_herowh6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Chat WhatsApp"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            },
+            "tmp_herowh9": {
+              "id": "tmp_herowh9",
+              "type": "frame",
+              "name": "Actions",
+              "parentId": "tmp_herowh1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_herowh6"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

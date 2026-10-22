@@ -271,6 +271,143 @@ export function section(
   return { root, inner };
 }
 
+const setChildren = (tree: Tree, id: string, children: string[]): string => {
+  (tree.nodes[id] as { children: string[] }).children = children;
+  return id;
+};
+
+// Blok judul: eyebrow (overline) opsional + heading + lead (subteks) opsional. Rata kiri/tengah.
+export function headingGroup(
+  tree: Tree,
+  parentId: string,
+  opts: {
+    eyebrow?: string;
+    heading: string;
+    lead?: string;
+    headingTypography?: string;
+    headingTag?: string;
+    align?: "start" | "center";
+    maxTextWidth?: number;
+  },
+): string {
+  const group = tree.frame({
+    name: "Heading",
+    parentId,
+    layout: flex("column", { align: opts.align ?? "center", gap: 3 }),
+    style: {
+      size: {
+        width: FILL,
+        height: HUG,
+        ...(opts.maxTextWidth ? { maxWidth: { value: opts.maxTextWidth, unit: "px" } } : {}),
+      },
+    },
+  });
+  const kids: string[] = [];
+  if (opts.eyebrow)
+    kids.push(
+      tree.text({
+        name: "Eyebrow",
+        parentId: group,
+        text: opts.eyebrow,
+        typography: "typography.overline",
+        color: "color.primary",
+        tag: "span",
+        width: HUG,
+      }),
+    );
+  kids.push(
+    tree.text({
+      name: "Title",
+      parentId: group,
+      text: opts.heading,
+      typography: opts.headingTypography ?? "typography.h2",
+      color: "color.onSurface",
+      tag: opts.headingTag ?? "h2",
+      width: FILL,
+    }),
+  );
+  if (opts.lead)
+    kids.push(
+      tree.text({
+        name: "Lead",
+        parentId: group,
+        text: opts.lead,
+        typography: "typography.body",
+        color: "color.muted",
+        tag: "p",
+        width: FILL,
+      }),
+    );
+  return setChildren(tree, group, kids);
+}
+
+// Baris tombol (row, gap). Tombol dibuat lewat `button()`.
+export function buttonRow(
+  tree: Tree,
+  parentId: string,
+  buttons: string[],
+  align: "start" | "center" = "center",
+): string {
+  const row = tree.frame({
+    name: "Actions",
+    parentId,
+    layout: flex("row", { align: "center", justify: align, gap: 3, wrap: true }),
+    style: { size: size(HUG, HUG) },
+  });
+  return setChildren(tree, row, buttons);
+}
+
+// Kartu bersurface (padding, radius lg, shadow sm). Kembalikan id; isi diisi caller lalu `setChildren`.
+export function card(
+  tree: Tree,
+  parentId: string,
+  opts: {
+    name?: string;
+    gap?: number;
+    pad?: number;
+    align?: "start" | "center";
+    width?: Json | typeof FILL | typeof HUG;
+  } = {},
+): string {
+  return tree.frame({
+    name: opts.name ?? "Card",
+    parentId,
+    role: "card",
+    layout: flex("column", { align: opts.align ?? "start", gap: opts.gap ?? 3, padding: padAll(opts.pad ?? 6) }),
+    style: {
+      size: size(opts.width ?? FILL, HUG),
+      fills: [{ type: "solid", color: T("color.background") }],
+      radius: T("radius.lg"),
+      strokes: [{ color: T("color.border"), width: { value: 1, unit: "px" } }],
+    },
+  });
+}
+
+// Placeholder gambar (frame surface, aspect ratio). Konten default tak pakai aset berlisensi → aman tanpa manifest.
+export function imageBox(
+  tree: Tree,
+  parentId: string,
+  opts: { name?: string; aspect?: number; minHeight?: number } = {},
+): string {
+  return tree.frame({
+    name: opts.name ?? "Image",
+    parentId,
+    role: "generic",
+    style: {
+      size: {
+        width: FILL,
+        height: HUG,
+        ...(opts.aspect ? { aspectRatio: opts.aspect } : {}),
+        ...(opts.minHeight ? { minHeight: { value: opts.minHeight, unit: "px" } } : {}),
+      },
+      fills: [{ type: "solid", color: T("color.surface") }],
+      radius: T("radius.lg"),
+    },
+  });
+}
+
+export { setChildren };
+
 // ── File component lengkap ────────────────────────────────────────────────
 export interface ComponentSpec {
   slug: string;
