@@ -16,6 +16,9 @@ import {
   LibraryDraftDefinitionSchema,
   LibraryEditorSessionSchema,
   LibraryPublishedDefinitionSchema,
+  LibraryThemeListSchema,
+  LibraryThemeSchema,
+  LibraryThemeSummarySchema,
   type ListSitesQuery,
   listEnvelope,
   type PresignUploadRequest,
@@ -23,6 +26,7 @@ import {
   ProfileSchema,
   RealtimeTokenResponseSchema,
   type SaveLibraryDraftBody,
+  type SaveLibraryThemeBody,
   SessionInfoSchema,
   SiteSchema,
   type UpdateProfileBody,
@@ -186,6 +190,24 @@ export function createPlatformApi(client: ApiClient) {
         client
           .request("GET", `/v1/admin/library/component-drafts/${componentId}`, {
             schema: dataEnvelope(LibraryDraftDefinitionSchema),
+          })
+          .then(unwrap),
+      /** Daftar preset theme platform (ringkasan) untuk panel/matrix theme Mode Admin (CMP-124). Non-staf → 404. */
+      listThemes: () =>
+        client
+          .request("GET", "/v1/admin/library/themes", { schema: dataEnvelope(LibraryThemeListSchema) })
+          .then(unwrap),
+      /** Satu preset platform (definisi theme lengkap) untuk editor theme (CMP-124). */
+      getTheme: (slug: string) =>
+        client
+          .request("GET", `/v1/admin/library/themes/${slug}`, { schema: dataEnvelope(LibraryThemeSchema) })
+          .then(unwrap),
+      /** Simpan preset (edit admin, CMP-124) → ringkasan baru (version naik). */
+      saveTheme: (slug: string, body: SaveLibraryThemeBody) =>
+        client
+          .request("PUT", `/v1/admin/library/themes/${slug}`, {
+            body,
+            schema: dataEnvelope(LibraryThemeSummarySchema),
           })
           .then(unwrap),
       /** Daftar component published utk panel Insert (T3.6.1) — filter kategori (slug) & pencarian nama. */

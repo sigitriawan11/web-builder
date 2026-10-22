@@ -29,6 +29,8 @@ export const queryKeys = {
     definition: (componentId: string, version: number) => ["library", "definition", componentId, version] as const,
     usage: (componentId: string) => ["library", "usage", componentId] as const,
     components: (query: { category?: string; search?: string }) => ["library", "components", query] as const,
+    themes: ["library", "themes"] as const,
+    theme: (slug: string) => ["library", "theme", slug] as const,
   },
 };
 
@@ -77,6 +79,10 @@ export function createQueries(api: PlatformApi) {
         queryKey: queryKeys.library.components(query),
         queryFn: () => api.library.listComponents(query),
       }),
+    // CMP-124: preset theme platform untuk panel theme Mode Admin.
+    libraryThemes: () => queryOptions({ queryKey: queryKeys.library.themes, queryFn: () => api.library.listThemes() }),
+    libraryTheme: (slug: string) =>
+      queryOptions({ queryKey: queryKeys.library.theme(slug), queryFn: () => api.library.getTheme(slug) }),
   };
 }
 
@@ -124,6 +130,13 @@ export function createMutations(api: PlatformApi, queryClient: QueryClient) {
     }) => {
       await api.library.saveDraft(input.componentId, input.body);
       await queryClient.invalidateQueries({ queryKey: queryKeys.library.editorSession(input.componentId) });
+    },
+    // CMP-124: simpan preset theme → refetch daftar + detail preset (version naik).
+    saveLibraryTheme: async (input: { slug: string; body: Parameters<PlatformApi["library"]["saveTheme"]>[1] }) => {
+      const summary = await api.library.saveTheme(input.slug, input.body);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.library.themes });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.library.theme(input.slug) });
+      return summary;
     },
   };
 }
