@@ -1462,7 +1462,10 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
   - 8: team-grid-3/4, team-member-card (team); contact-info/form/split/cards, map-embed (contact).
 - [x] **T3.11.13** Product & Cards umum (bagian M3): product card statis, service card, info card — CMP-088 · library · Verifikasi: ≥ 6 variasi
   - 7: product-card, product-card-sale, product-grid, service-card, service-grid, info-card, info-card-grid.
-- [ ] **T3.11.14** Audit library M3: hitung per kategori vs CMP-093, uji kontras semua preset, perbaiki gagal — CMP-080, CMP-133 · admin · Verifikasi: laporan jumlah; ≥ 85 variasi published di akhir M3
+- [x] **T3.11.14** Audit library M3: hitung per kategori vs CMP-093, uji kontras semua preset, perbaiki gagal — CMP-080, CMP-133 · admin · Verifikasi: laporan jumlah; ≥ 85 variasi published di akhir M3
+  - Gate audit otomatis: `test/audit.test.ts` (jumlah per kategori + minimum M3 + kontras 6 preset).
+  - Laporan jumlah (108 total ≥ 85): navigation 14, hero 10, features 9, content 16, social-proof 8, pricing 3+faq 3+cta 5 (=11), team 3+contact 5 (=8), product 7, elements 25. Semua minimum M3 CMP-093 terpenuhi; 6 theme preset lulus WCAG AA.
+  - Follow-up M4 (target penuh CMP-093): Team/Contact/Blog → 20 (Blog belum ada), Product & Cards → 20, Hero → 18, Content → 20, Elements → 30, dll.
 
 #### Epic 3.12 — Dogfooding template internal
 
