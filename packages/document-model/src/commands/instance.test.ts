@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { setupDoc } from "../../test/command-harness";
 import { minimalDocument } from "../../test/fixtures/basic-documents";
-import type { ComponentDefinition, InstanceProps, SiteDocument } from "../schema";
+import type { ComponentDefinition, InstanceProps, PropDef, SiteDocument } from "../schema";
 import { ComponentNodeSchema } from "../validate/component";
 import { componentDefToYDoc } from "../yjs/component-mapping";
 import { yDocToJson } from "../yjs/mapping";
@@ -16,6 +16,7 @@ import {
   setProp,
   setSlotContent,
   setVariant,
+  swapInstance,
   updateInstanceVersion,
 } from "./instance";
 
@@ -63,6 +64,82 @@ describe("command instance (DM-074)", () => {
     // Target bukan instance → INVALID_TARGET.
     const bad = runCommand(h.ctx, updateInstanceVersion, { id: h.homeId, version: 2 });
     expect(bad.ok).toBe(false);
+  });
+
+  it("swapInstance: mapping by key + semanticRole, drop sisanya (T3.6.6/CMP-074)", () => {
+    const h = setupDoc(minimalDocument());
+    const homeId = h.read().pageOrder[0] as string;
+    const created = runCommand(h.ctx, createInstance, {
+      parentId: homeId,
+      componentId: "cmp_from0001",
+      version: 1,
+      propValues: { label: "Pesan", extra: "Lama" },
+      variant: { tone: "primary" },
+    });
+    if (!created.ok) throw new Error(`createInstance gagal: ${created.error.code}`);
+    const instId = created.value;
+
+    const rootNode = (id: string) => ({
+      [id]: {
+        id,
+        type: "frame" as const,
+        name: "Root",
+        parentId: null,
+        visible: true,
+        locked: false,
+        tag: "div",
+        children: [],
+        style: { base: {} },
+        props: {},
+      },
+    });
+    const text = (key: string, semanticRole?: string): PropDef =>
+      ({ key, label: { id: key, en: key }, type: "text", ...(semanticRole ? { semanticRole } : {}) }) as PropDef;
+    const FROM: ComponentDefinition = {
+      schemaVersion: 1,
+      id: "cmp_from0001",
+      version: 1,
+      name: "From",
+      category: "card",
+      propsSchema: [text("label", "heading"), text("extra")],
+      variantAxes: [{ name: "tone", options: ["primary", "ghost"], default: "primary" }],
+      rootId: "n_root0001",
+      nodes: rootNode("n_root0001"),
+    };
+    const TO: ComponentDefinition = {
+      schemaVersion: 1,
+      id: "cmp_to0001",
+      version: 1,
+      name: "To",
+      category: "card",
+      propsSchema: [
+        text("label"),
+        text("headingText", "heading"),
+        { key: "count", label: { id: "count", en: "count" }, type: "number" } as PropDef,
+      ],
+      variantAxes: [{ name: "tone", options: ["primary", "outline"], default: "primary" }],
+      rootId: "n_root0001",
+      nodes: rootNode("n_root0001"),
+    };
+    const ctx: CommandContext = {
+      ...h.ctx,
+      getComponent: (cid, v) =>
+        cid === "cmp_from0001" && v === 1 ? FROM : cid === "cmp_to0001" && v === 1 ? TO : undefined,
+    };
+    const result = runCommand(ctx, swapInstance, { id: instId, toComponentId: "cmp_to0001", toVersion: 1 });
+    if (!result.ok) throw new Error(`swap gagal: ${result.error.code}`);
+    expect(result.value.droppedKeys).toEqual(["extra"]);
+    const props = instanceProps(h.read(), instId);
+    expect(props.componentId).toBe("cmp_to0001");
+    expect(props.version).toBe(1);
+    // `label` dibawa by key; `headingText` dibawa by semanticRole "heading"; `extra` hilang.
+    expect(props.propValues).toEqual({ label: "Pesan", headingText: "Pesan" });
+    expect(props.variant).toEqual({ tone: "primary" }); // "primary" valid di axis tone tujuan
+    expect(h.read().componentDeps.cmp_to0001).toEqual({ version: 1, source: "library" });
+
+    // Tanpa registry → INVALID_TARGET.
+    const noReg = runCommand(h.ctx, swapInstance, { id: instId, toComponentId: "cmp_to0001", toVersion: 1 });
+    expect(noReg.ok).toBe(false);
   });
 
   it("setProp menetapkan & menghapus nilai", () => {

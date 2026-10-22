@@ -21,6 +21,7 @@ import {
   setProp,
   setSlotContent,
   setVariant,
+  swapInstance,
   updateInstanceVersion,
 } from "./instance";
 import { moveNode } from "./move-node";
@@ -92,6 +93,7 @@ export {
   setTextContent,
   setVariant,
   setVisible,
+  swapInstance,
   unbindProp,
   ungroup,
   updateComponentProp,
@@ -140,6 +142,7 @@ export const COMMANDS = {
   detachInstance,
   setProp,
   setVariant,
+  swapInstance,
   updateInstanceVersion,
   setInstanceOverride,
   resetOverride,

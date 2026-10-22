@@ -496,7 +496,10 @@
       "loading": "Loading props…",
       "none": "This component has no editable props.",
       "detach": "Detach",
-      "update": "Update to v{version}"
+      "update": "Update to v{version}",
+      "swap": "Swap component",
+      "swapPlaceholder": "Choose another component…",
+      "dropped": "{count} content not carried over"
     }
   },
   "nodeType": {

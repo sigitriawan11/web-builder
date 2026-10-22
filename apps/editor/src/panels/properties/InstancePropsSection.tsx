@@ -6,11 +6,17 @@ import {
   runCommand,
   setProp,
   setVariant,
+  swapInstance,
   updateInstanceVersion,
   type VariantAxis,
 } from "@platform/document-model";
-import { useLibraryComponentDefinition, useLibraryComponents } from "@platform/sdk/react";
+import {
+  useFetchLibraryComponentDefinition,
+  useLibraryComponentDefinition,
+  useLibraryComponents,
+} from "@platform/sdk/react";
 import { Button, Checkbox, Input, NativeSelect } from "@platform/ui";
+import { useState } from "react";
 import { useLocale, useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
@@ -65,13 +71,41 @@ function Form({
   const def = useLibraryComponentDefinition(componentId, version);
   // T3.6.9: versi published terbaru (cari di daftar) → tawarkan update bila lebih baru dari yang di-pin.
   const list = useLibraryComponents();
-  const latest = list.data?.find((c) => c.publicId === componentId)?.version;
+  const current = list.data?.find((c) => c.publicId === componentId);
+  const latest = current?.version;
+  // T3.6.6/CMP-074: kandidat swap = component published kategori sama (selain diri sendiri).
+  const candidates = (list.data ?? []).filter(
+    (c) => c.publicId !== componentId && c.categorySlug === current?.categorySlug,
+  );
+  const fetchDef = useFetchLibraryComponentDefinition();
+  const [dropped, setDropped] = useState<number | null>(null);
 
   const updateVersion = () => {
     if (readOnly || latest === undefined) return;
     runtime.undo.stopCapturing();
     runCommand(runtime.commandCtx, updateInstanceVersion, { id: nodeId, version: latest });
     runtime.undo.stopCapturing();
+  };
+
+  const swap = async (sourceDef: ComponentDefinition, targetId: string, targetVersion: number) => {
+    if (readOnly) return;
+    const target = (await fetchDef(targetId, targetVersion)) as ComponentDefinition;
+    runtime.undo.stopCapturing();
+    const result = runCommand(
+      {
+        ...runtime.commandCtx,
+        getComponent: (cid, v) =>
+          cid === componentId && v === version
+            ? sourceDef
+            : cid === targetId && v === targetVersion
+              ? target
+              : undefined,
+      },
+      swapInstance,
+      { id: nodeId, toComponentId: targetId, toVersion: targetVersion },
+    );
+    runtime.undo.stopCapturing();
+    if (result.ok) setDropped((result.value as { droppedKeys: string[] }).droppedKeys.length);
   };
 
   const set = (key: string, value: unknown) => {
@@ -144,6 +178,30 @@ function Form({
           />
         </InspectorRow>
       ))}
+      {!readOnly && data && candidates.length > 0 ? (
+        <InspectorRow label={t("inspector.instance.swap")}>
+          <NativeSelect
+            value=""
+            data-testid="instance-swap"
+            onChange={(e) => {
+              const target = candidates.find((c) => c.publicId === e.target.value);
+              if (target) void swap(data, target.publicId, target.version);
+            }}
+          >
+            <option value="">{t("inspector.instance.swapPlaceholder")}</option>
+            {candidates.map((c) => (
+              <option key={c.publicId} value={c.publicId}>
+                {c.displayName[locale] || c.name}
+              </option>
+            ))}
+          </NativeSelect>
+        </InspectorRow>
+      ) : null}
+      {dropped !== null && dropped > 0 ? (
+        <p className="px-3 pt-1 text-xs text-amber-600" data-testid="instance-swap-dropped">
+          {t("inspector.instance.dropped", { count: dropped })}
+        </p>
+      ) : null}
       {!readOnly && data ? (
         <div className="flex flex-wrap gap-2 px-3 pt-2">
           {latest !== undefined && latest > version ? (

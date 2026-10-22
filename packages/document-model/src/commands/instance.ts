@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createId } from "../ids";
 import { detachToSubtree } from "../resolve/detach";
 import {
+  type ComponentDefinition,
   ComponentIdSchema,
   type InstanceProps,
   InstancePropsSchema,
@@ -11,6 +12,7 @@ import {
   NodePatchSchema,
   NodePathSchema,
   NodeSchema,
+  type PropDef,
   PropValueSchema,
   StylePatchSchema,
   StyleSchema,
@@ -260,6 +262,119 @@ export const updateInstanceVersion = defineCommand({
       .getMap<unknown>(YDOC_KEYS.componentDeps)
       .set(componentId, { version: input.version, source: input.source ?? "library" });
     return { ok: true, value: undefined, affected: [input.id] };
+  },
+});
+
+// CMP-074/ED-154: hasil pemetaan propValues saat swap — nilai terbawa (by key/role) + key sumber yang hilang.
+function mapPropValues(
+  fromSchema: readonly PropDef[],
+  toSchema: readonly PropDef[],
+  oldValues: Record<string, unknown>,
+): { propValues: Record<string, unknown>; droppedKeys: string[] } {
+  const fromByKey = new Map(fromSchema.map((p) => [p.key, p]));
+  const fromByRole = new Map<string, PropDef>();
+  for (const p of fromSchema) if (p.semanticRole && !fromByRole.has(p.semanticRole)) fromByRole.set(p.semanticRole, p);
+  const propValues: Record<string, unknown> = {};
+  const carried = new Set<string>();
+  for (const tp of toSchema) {
+    // 1) key + tipe sama → bawa langsung.
+    const sameKey = fromByKey.get(tp.key);
+    if (sameKey && sameKey.type === tp.type && tp.key in oldValues) {
+      propValues[tp.key] = oldValues[tp.key];
+      carried.add(tp.key);
+      continue;
+    }
+    // 2) semanticRole + tipe sama → bawa walau key berbeda (CMP-074 #2).
+    if (tp.semanticRole) {
+      const src = fromByRole.get(tp.semanticRole);
+      if (src && src.type === tp.type && src.key in oldValues) {
+        propValues[tp.key] = oldValues[src.key];
+        carried.add(src.key);
+      }
+    }
+  }
+  return { propValues, droppedKeys: Object.keys(oldValues).filter((k) => !carried.has(k)) };
+}
+
+// CMP-074/ED-154: ganti component instance dengan component lain (picker `kind`/kategori sama ditegakkan di UI).
+// Mapping prop by key+tipe lalu by semanticRole; variant dibawa bila axis+option masih valid; overrides style & slot
+// DIBUANG (tak bisa dipetakan andal, CMP-074 #4). Satu transaksi → satu langkah undo. Butuh `ctx.getComponent`.
+export const swapInstance = defineCommand({
+  name: "swapInstance",
+  description: { id: "Ganti component sebuah instance.", en: "Swap an instance's component." },
+  aiExposed: true,
+  input: z.strictObject({
+    id: NodeIdSchema,
+    toComponentId: ComponentIdSchema,
+    toVersion: z.number().int().positive(),
+    source: z.enum(["library", "site", "marketplace"]).optional(),
+  }),
+  run(ctx, input) {
+    if (!ctx.getComponent)
+      return fail("INVALID_TARGET", { id: "registry component tidak tersedia", en: "component registry unavailable" }, [
+        "id",
+      ]);
+    const node = instanceNode(ctx, input.id);
+    if (isFailure(node)) return node;
+    const propsMap = node.get("props");
+    if (!(propsMap instanceof Y.Map))
+      return fail("INVALID_RESULT", { id: "props instance bukan Y.Map", en: "instance props is not a Y.Map" }, [
+        "props",
+      ]);
+    const current = propsMap.toJSON() as InstanceProps;
+    const fromDef = ctx.getComponent(current.componentId, current.version);
+    const toDef = ctx.getComponent(input.toComponentId, input.toVersion);
+    for (const [def, cid, v] of [
+      [fromDef, current.componentId, current.version],
+      [toDef, input.toComponentId, input.toVersion],
+    ] as const)
+      if (!def)
+        return fail(
+          "NOT_FOUND",
+          { id: `Component "${cid}@${v}" tidak ada di registry`, en: `Component "${cid}@${v}" not in registry` },
+          ["id"],
+        );
+    const from = fromDef as ComponentDefinition;
+    const to = toDef as ComponentDefinition;
+
+    const { propValues, droppedKeys } = mapPropValues(
+      from.propsSchema as PropDef[],
+      to.propsSchema as PropDef[],
+      current.propValues ?? {},
+    );
+    const variant: Record<string, string> = {};
+    for (const axis of to.variantAxes ?? []) {
+      const chosen = current.variant?.[axis.name];
+      if (chosen !== undefined && axis.options.includes(chosen)) variant[axis.name] = chosen;
+    }
+
+    // Overrides & slot dibuang (node ID tak bisa dipetakan antar-component).
+    const next: InstanceProps = {
+      componentId: input.toComponentId,
+      version: input.toVersion,
+      ...(Object.keys(variant).length > 0 ? { variant } : {}),
+      ...(Object.keys(propValues).length > 0 ? { propValues } : {}),
+    };
+    const parsed = InstancePropsSchema.safeParse(next);
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      return fail(
+        "INVALID_RESULT",
+        { id: `props instance tidak valid: ${issue?.message}`, en: `invalid instance props: ${issue?.message}` },
+        ["props", ...(issue?.path.map(String) ?? [])],
+      );
+    }
+    propsMap.set("componentId", input.toComponentId);
+    propsMap.set("version", input.toVersion);
+    for (const key of ["variant", "propValues", "overrides", "slots"] as const) {
+      const value = parsed.data[key];
+      if (value === undefined || (typeof value === "object" && Object.keys(value).length === 0)) propsMap.delete(key);
+      else propsMap.set(key, cloneJson(value));
+    }
+    ctx.doc
+      .getMap<unknown>(YDOC_KEYS.componentDeps)
+      .set(input.toComponentId, { version: input.toVersion, source: input.source ?? "library" });
+    return { ok: true, value: { droppedKeys }, affected: [input.id] };
   },
 });
 

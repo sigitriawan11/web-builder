@@ -45,6 +45,13 @@ export const useLibraryEditorSession = (componentId: string) =>
 /** Definisi component (draft version 0 / published) untuk resolusi instance di canvas (CMP-011). */
 export const useLibraryComponentDefinition = (componentId: string, version: number) =>
   useQuery({ ...useQueries().libraryComponentDefinition(componentId, version), retry: false });
+/** Ambil definisi component secara imperatif (mis. target swap) — cached via QueryClient (T3.6.6). */
+export function useFetchLibraryComponentDefinition() {
+  const queries = useQueries();
+  const queryClient = useQueryClient();
+  return (componentId: string, version: number) =>
+    queryClient.fetchQuery(queries.libraryComponentDefinition(componentId, version));
+}
 /** Pemakaian per versi/docState (CMP-012 tab Usage). */
 export const useLibraryComponentUsage = (componentId: string) =>
   useQuery({ ...useQueries().libraryComponentUsage(componentId), retry: false });

@@ -496,7 +496,10 @@
       "loading": "Memuat props…",
       "none": "Component ini tanpa props yang bisa diubah.",
       "detach": "Lepas (detach)",
-      "update": "Perbarui ke v{version}"
+      "update": "Perbarui ke v{version}",
+      "swap": "Ganti component",
+      "swapPlaceholder": "Pilih component lain…",
+      "dropped": "{count} konten tidak terbawa"
     }
   },
   "nodeType": {
