@@ -1398,7 +1398,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.7 — Thumbnail & renderer service
 
-- [ ] **T3.7.1** `renderer-service` di worker: pool Chromium Playwright (1 browser, N context), API `screenshot({ html, viewport })` — ARCHITECTURE §5.4 · `apps/worker/src/renderer-service` · Verifikasi: int test screenshot HTML sederhana
+- [x] **T3.7.1** `renderer-service` di worker: pool Chromium Playwright (1 browser, N context), API `screenshot({ html, viewport })` — ARCHITECTURE §5.4 · `apps/worker/src/renderer-service` · Verifikasi: int test screenshot HTML sederhana
+  - `createRendererService({contexts=2, deviceScaleFactor=1})`: lazy-launch 1 browser Chromium, pool N context (batas konkurensi via antrian), 1 page per screenshot. `screenshot({html|url, viewport, fullPage})` tervalidasi Zod → PNG Buffer; `url` wajib tepercaya (SSRF di pemanggil). Int test (4): HTML→PNG, 3 paralel @ N=2, tolak html+url bersamaan, tolak setelah close — hijau lokal (Chromium). **Dep baru:** `playwright@1.63.0` di `apps/worker` (dimandatkan ARCHITECTURE §5.4; image prod `mcr.microsoft.com/playwright`). **SISA:** dipakai processor `thumbnails` (T3.7.2) & AI render_preview (T3.13.10).
 - [ ] **T3.7.2** Processor `thumbnails` (dedupe jobId, simpan ke `assets` bucket) — CMP-014 · `apps/worker/src/processors/thumbnails.ts` · Verifikasi: int test publish component → thumbnail 3 breakpoint
 - [ ] **T3.7.3** Thumbnail ditampilkan di panel Components & admin — CMP-014 · `apps/editor`, `apps/web` · Verifikasi: e2e
 
