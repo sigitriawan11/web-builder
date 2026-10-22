@@ -21,7 +21,8 @@ const rootNodes = {
     locked: false,
     tag: "div",
     children: [],
-    style: { base: {} },
+    // Ukuran tetap → instance punya geometri nyata (perlu untuk uji drag/smart-insert T3.6.2).
+    style: { base: { size: { width: { mode: "fill" }, height: { mode: "fixed", value: 80, unit: "px" } } } },
     props: {},
   },
 };
@@ -54,6 +55,7 @@ const SWAP_DEFINITION = {
 
 interface DNode {
   type: string;
+  children?: string[];
   props?: {
     componentId?: string;
     version?: number;
@@ -98,6 +100,15 @@ test.beforeAll(async () => {
   const client = new pg.Client({ connectionString: E2E_DATABASE_URL });
   await client.connect();
   try {
+    // Idempoten (retry Playwright menjalankan ulang beforeAll pada DB yang sama): buang seed sebelumnya dulu.
+    await client.query("update components set latest_version_id = null where public_id = any($1)", [
+      [PUBLIC_ID, SWAP_ID],
+    ]);
+    await client.query(
+      "delete from component_versions where component_id in (select id from components where public_id = any($1))",
+      [[PUBLIC_ID, SWAP_ID]],
+    );
+    await client.query("delete from components where public_id = any($1)", [[PUBLIC_ID, SWAP_ID]]);
     const categoryId = uuidv7();
     await client.query(
       `insert into library_categories (id, slug, scope, type, name) values ($1,$2,'component','functional',$3)
@@ -172,4 +183,50 @@ test("T3.6.1/4/5/6/7/8: insert instance → edit prop/variant → reset → swap
   await page.getByTestId("inspector").getByTestId("instance-detach").click();
   await expect(page.getByTestId("inspector").getByTestId("instance-detach")).toBeHidden();
   await expect.poll(async () => Object.values((await doc(page)).nodes).some((n) => n.type === "instance")).toBe(false);
+});
+
+test("T3.6.2/ED-170: drag component dari panel → smart insert antara dua instance", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Drag Insert Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+  await page.evaluate(() => window.__editorTestApi?.setCamera({ x: 0, y: 0, zoom: 1 }));
+  const pageId = await firstPageId(page);
+
+  await page.getByTestId("left-tab-insert").click();
+  const button = page.getByTestId("components-panel").getByTestId(`insert-component-${PUBLIC_ID}`);
+  await expect(button).toBeVisible();
+
+  // Dua instance disisipkan via klik (append ke page) → tersusun vertikal di page (flex column).
+  await button.click();
+  await button.click();
+  await expect.poll(async () => (await doc(page)).nodes[pageId]?.children?.length ?? 0).toBe(2);
+  const before = (await doc(page)).nodes[pageId]?.children ?? [];
+  const [first, second] = before;
+
+  // Titik drop = dekat tepi ATAS instance kedua (dalam pita tepi) → bubble ke page, indeks 1 (antara keduanya).
+  const canvas = await page.getByTestId("editor-canvas").boundingBox();
+  if (!canvas) throw new Error("canvas tidak terlihat");
+  const geo = await page.evaluate((id) => window.__editorTestApi?.getGeometry(id) ?? null, second as string);
+  if (!geo) throw new Error("geometri instance kedua tidak ada");
+  const dropX = canvas.x + geo.x + geo.width / 2;
+  const dropY = canvas.y + geo.y + 4;
+
+  const btnBox = await button.boundingBox();
+  if (!btnBox) throw new Error("tombol panel tidak terlihat");
+  await page.mouse.move(btnBox.x + btnBox.width / 2, btnBox.y + btnBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(dropX, dropY, { steps: 12 });
+  // Ghost + penanda sisip (horizontal, antar section/instance) tampil selama drag.
+  await expect(page.locator(".overlay-reorder-ghost")).toBeVisible();
+  await expect(page.locator(".overlay-insertion-marker")).toBeVisible();
+  await page.mouse.up();
+
+  // Instance baru mendarat di indeks 1 (antara `first` dan `second`).
+  await expect.poll(async () => (await doc(page)).nodes[pageId]?.children?.length ?? 0).toBe(3);
+  const after = (await doc(page)).nodes[pageId]?.children ?? [];
+  expect(after[0]).toBe(first);
+  expect(after[2]).toBe(second);
+  expect(after[1]).not.toBe(first);
+  expect(after[1]).not.toBe(second);
+  expect((await doc(page)).nodes[after[1] as string]?.type).toBe("instance");
 });

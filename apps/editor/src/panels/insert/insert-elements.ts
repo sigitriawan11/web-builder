@@ -94,14 +94,17 @@ export function insertDivider(runtime: CanvasRuntime): string | null {
 
 // T3.6.1 (ED-151): sisip instance component library published ke parent terpilih/page aktif. `version` = version_seq
 // (pin, CMP-050). Resolusi definisi untuk render terjadi di `InstanceNodeView` (publishedDefinition).
+// T3.6.2 (ED-170): `target` opsional dari drag-drop canvas → sisip ke parent+index geometrik (smart insert).
 export function insertComponentInstance(
   runtime: CanvasRuntime,
   component: { publicId: string; version: number },
+  target?: { parentId: string; index: number } | null,
 ): string | null {
   runtime.undo.stopCapturing();
-  const parentId = insertParent(runtime);
+  const parentId = target?.parentId ?? insertParent(runtime);
   const result = runCommand(ctxOf(runtime), createInstance, {
     parentId,
+    ...(target ? { index: target.index } : {}),
     componentId: component.publicId,
     version: component.version,
     source: "library",

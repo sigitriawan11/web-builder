@@ -2,10 +2,11 @@ import { useLibraryComponents } from "@platform/sdk/react";
 import type { LibraryComponentListItem } from "@platform/shared/contracts";
 import { useLocale, useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
+import { startPanelInsertDrag } from "../../canvas/drag/insert-drop";
 import { insertComponentInstance } from "./insert-elements";
 
-// T3.6.1/ED-151: daftar component library published, dikelompokkan per kategori (slug dari item). Klik → sisip
-// instance ke parent terpilih/page aktif. Drag-ke-canvas & smart insert = T3.6.2.
+// T3.6.1/ED-151 + T3.6.2/ED-170: daftar component library published, dikelompokkan per kategori (slug dari item).
+// Klik → sisip ke parent terpilih/page aktif; drag ke canvas → smart insert (parent+index geometrik, penanda sisip).
 export function ComponentsPanel({ runtime, readOnly }: { runtime: CanvasRuntime; readOnly: boolean }) {
   const t = useT();
   const locale = useLocale();
@@ -38,6 +39,16 @@ export function ComponentsPanel({ runtime, readOnly }: { runtime: CanvasRuntime;
                 disabled={readOnly}
                 data-testid={`insert-component-${item.publicId}`}
                 className="flex items-center gap-2 rounded border px-2 py-1.5 text-left text-xs hover:bg-accent disabled:opacity-50"
+                onPointerDown={(e) => {
+                  if (readOnly || e.button !== 0) return;
+                  startPanelInsertDrag({
+                    runtime,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    onDrop: (target) =>
+                      insertComponentInstance(runtime, { publicId: item.publicId, version: item.version }, target),
+                  });
+                }}
                 onClick={() => insertComponentInstance(runtime, { publicId: item.publicId, version: item.version })}
               >
                 <span className="font-medium">{item.displayName[locale] || item.name}</span>
