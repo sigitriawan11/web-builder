@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "seedVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "fonts": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "fontsourceId": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "license": {
+            "type": "string",
+            "enum": [
+              "OFL-1.1",
+              "Apache-2.0"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "sans-serif",
+              "serif",
+              "display",
+              "monospace"
+            ]
+          },
+          "subsets": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "latin",
+                "latin-ext"
+              ]
+            }
+          },
+          "weights": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 900
+            }
+          }
+        },
+        "required": [
+          "family",
+          "fontsourceId",
+          "license",
+          "category",
+          "subsets",
+          "weights"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "seedVersion",
+    "fonts"
+  ],
+  "additionalProperties": false
+}

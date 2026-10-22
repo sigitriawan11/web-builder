@@ -1,0 +1,101 @@
+{
+  "seedVersion": 1,
+  "fonts": [
+    {
+      "family": "Inter",
+      "fontsourceId": "inter",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 500, 600, 700]
+    },
+    {
+      "family": "Roboto",
+      "fontsourceId": "roboto",
+      "license": "Apache-2.0",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 500, 700]
+    },
+    {
+      "family": "Open Sans",
+      "fontsourceId": "open-sans",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 600, 700]
+    },
+    {
+      "family": "Lato",
+      "fontsourceId": "lato",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 700]
+    },
+    {
+      "family": "Montserrat",
+      "fontsourceId": "montserrat",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 500, 600, 700]
+    },
+    {
+      "family": "Poppins",
+      "fontsourceId": "poppins",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 500, 600, 700]
+    },
+    {
+      "family": "Nunito",
+      "fontsourceId": "nunito",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 600, 700]
+    },
+    {
+      "family": "Work Sans",
+      "fontsourceId": "work-sans",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 500, 600]
+    },
+    {
+      "family": "Source Sans 3",
+      "fontsourceId": "source-sans-3",
+      "license": "OFL-1.1",
+      "category": "sans-serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 600, 700]
+    },
+    {
+      "family": "Playfair Display",
+      "fontsourceId": "playfair-display",
+      "license": "OFL-1.1",
+      "category": "serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 600, 700]
+    },
+    {
+      "family": "Merriweather",
+      "fontsourceId": "merriweather",
+      "license": "OFL-1.1",
+      "category": "serif",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 700]
+    },
+    {
+      "family": "JetBrains Mono",
+      "fontsourceId": "jetbrains-mono",
+      "license": "OFL-1.1",
+      "category": "monospace",
+      "subsets": ["latin", "latin-ext"],
+      "weights": [400, 500, 700]
+    }
+  ]
+}

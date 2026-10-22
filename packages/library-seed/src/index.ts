@@ -12,6 +12,7 @@ export {
   SeedComponentVersionSchema,
   type SeedFile,
 } from "./component";
+export { ALLOWED_FONT_LICENSES, loadFonts, type SeedFont, SeedFontSchema, SeedFontsFileSchema } from "./fonts";
 export {
   contentHash,
   formatImportPlan,
