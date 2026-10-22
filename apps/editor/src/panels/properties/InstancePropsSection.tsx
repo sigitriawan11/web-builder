@@ -6,9 +6,10 @@ import {
   runCommand,
   setProp,
   setVariant,
+  updateInstanceVersion,
   type VariantAxis,
 } from "@platform/document-model";
-import { useLibraryComponentDefinition } from "@platform/sdk/react";
+import { useLibraryComponentDefinition, useLibraryComponents } from "@platform/sdk/react";
 import { Button, Checkbox, Input, NativeSelect } from "@platform/ui";
 import { useLocale, useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
@@ -62,6 +63,16 @@ function Form({
   const t = useT();
   const locale = useLocale();
   const def = useLibraryComponentDefinition(componentId, version);
+  // T3.6.9: versi published terbaru (cari di daftar) → tawarkan update bila lebih baru dari yang di-pin.
+  const list = useLibraryComponents();
+  const latest = list.data?.find((c) => c.publicId === componentId)?.version;
+
+  const updateVersion = () => {
+    if (readOnly || latest === undefined) return;
+    runtime.undo.stopCapturing();
+    runCommand(runtime.commandCtx, updateInstanceVersion, { id: nodeId, version: latest });
+    runtime.undo.stopCapturing();
+  };
 
   const set = (key: string, value: unknown) => {
     if (readOnly) return;
@@ -134,7 +145,12 @@ function Form({
         </InspectorRow>
       ))}
       {!readOnly && data ? (
-        <div className="px-3 pt-2">
+        <div className="flex flex-wrap gap-2 px-3 pt-2">
+          {latest !== undefined && latest > version ? (
+            <Button variant="outline" size="sm" data-testid="instance-update-version" onClick={updateVersion}>
+              {t("inspector.instance.update", { version: latest })}
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" data-testid="instance-detach" onClick={() => detach(data)}>
             {t("inspector.instance.detach")}
           </Button>

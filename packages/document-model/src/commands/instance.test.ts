@@ -16,6 +16,7 @@ import {
   setProp,
   setSlotContent,
   setVariant,
+  updateInstanceVersion,
 } from "./instance";
 
 function make() {
@@ -50,6 +51,18 @@ describe("command instance (DM-074)", () => {
       variant: { tone: "primary" },
     });
     expect(doc.componentDeps.cmp_btn0001).toEqual({ version: 1, source: "library" });
+  });
+
+  it("updateInstanceVersion: pin ulang versi + componentDeps (T3.6.9)", () => {
+    const h = make();
+    const result = runCommand(h.ctx, updateInstanceVersion, { id: h.instId, version: 2 });
+    expect(result.ok).toBe(true);
+    const doc = h.read();
+    expect(instanceProps(doc, h.instId).version).toBe(2);
+    expect(doc.componentDeps.cmp_btn0001).toEqual({ version: 2, source: "library" });
+    // Target bukan instance → INVALID_TARGET.
+    const bad = runCommand(h.ctx, updateInstanceVersion, { id: h.homeId, version: 2 });
+    expect(bad.ok).toBe(false);
   });
 
   it("setProp menetapkan & menghapus nilai", () => {

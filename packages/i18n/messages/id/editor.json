@@ -495,7 +495,8 @@
       "title": "Props instance",
       "loading": "Memuat props…",
       "none": "Component ini tanpa props yang bisa diubah.",
-      "detach": "Lepas (detach)"
+      "detach": "Lepas (detach)",
+      "update": "Perbarui ke v{version}"
     }
   },
   "nodeType": {

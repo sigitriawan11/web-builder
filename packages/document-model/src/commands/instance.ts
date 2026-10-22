@@ -230,6 +230,39 @@ export const extractToInstance = defineCommand({
   },
 });
 
+// DM-074/T3.6.9: pin ulang instance ke versi published lain (update manual admin/dev). Migrasi propValues otomatis
+// (migrateInstance) saat MAJOR = follow-up; di sini hanya ganti `version` + `componentDeps`.
+export const updateInstanceVersion = defineCommand({
+  name: "updateInstanceVersion",
+  description: { id: "Pin instance ke versi component lain.", en: "Pin an instance to another component version." },
+  aiExposed: true,
+  input: z.strictObject({
+    id: NodeIdSchema,
+    version: z.number().int().positive(),
+    source: z.enum(["library", "site", "marketplace"]).optional(),
+  }),
+  run(ctx, input) {
+    const node = instanceNode(ctx, input.id);
+    if (isFailure(node)) return node;
+    const propsMap = node.get("props");
+    if (!(propsMap instanceof Y.Map))
+      return fail("INVALID_RESULT", { id: "props instance bukan Y.Map", en: "instance props is not a Y.Map" }, [
+        "props",
+      ]);
+    const componentId = propsMap.get("componentId");
+    if (typeof componentId !== "string")
+      return fail("INVALID_RESULT", { id: "componentId instance hilang", en: "instance componentId missing" }, [
+        "props",
+        "componentId",
+      ]);
+    propsMap.set("version", input.version);
+    ctx.doc
+      .getMap<unknown>(YDOC_KEYS.componentDeps)
+      .set(componentId, { version: input.version, source: input.source ?? "library" });
+    return { ok: true, value: undefined, affected: [input.id] };
+  },
+});
+
 export const setProp = defineCommand({
   name: "setProp",
   description: { id: "Set nilai prop instance.", en: "Set an instance prop value." },

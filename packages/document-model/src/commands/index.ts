@@ -21,6 +21,7 @@ import {
   setProp,
   setSlotContent,
   setVariant,
+  updateInstanceVersion,
 } from "./instance";
 import { moveNode } from "./move-node";
 import { renameNode, reorderNode, setHtmlId, setLocked, setTag, setVisible } from "./node-fields";
@@ -94,6 +95,7 @@ export {
   unbindProp,
   ungroup,
   updateComponentProp,
+  updateInstanceVersion,
   updatePage,
   updateStyle,
   updateVariantAxis,
@@ -138,6 +140,7 @@ export const COMMANDS = {
   detachInstance,
   setProp,
   setVariant,
+  updateInstanceVersion,
   setInstanceOverride,
   resetOverride,
   setSlotContent,
