@@ -1,4 +1,4 @@
-import { and, asc, type Db, eq, ilike, schema } from "@platform/db";
+import { and, asc, type Db, eq, ilike, isNull, schema } from "@platform/db";
 
 // SATU-SATUNYA tempat modul library mengakses tabel (CLAUDE.md, ARCHITECTURE §6.2). Library platform = global (bukan
 // tenant): tidak ada scope workspace/site; hanya versi `published` & `owner_type='platform'` yang boleh dibaca.
@@ -22,9 +22,11 @@ export async function listPublishedComponents(
   db: Db,
   filter: { category?: string; search?: string },
 ): Promise<LibraryListItem[]> {
+  // CMP-004: query library publik HANYA owner_type='platform' + published + belum di-archive (sampai P2 library user).
   const conditions = [
     eq(components.ownerType, "platform"),
     eq(components.status, "published"),
+    isNull(components.archivedAt),
     eq(componentVersions.status, "published"),
     eq(componentVersions.yanked, false),
   ];
@@ -85,6 +87,8 @@ export async function findPublishedDefinition(
       and(
         eq(components.publicId, publicId),
         eq(components.ownerType, "platform"),
+        // CMP-004: definisi versi published tetap bisa di-resolve walau component di-archive (situs lama tak rusak,
+        // CMP-002 AC) — maka TIDAK memfilter archivedAt di sini; hanya di daftar galeri publik.
         eq(componentVersions.versionSeq, versionSeq),
         eq(componentVersions.status, "published"),
         eq(componentVersions.yanked, false),

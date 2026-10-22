@@ -174,6 +174,55 @@ describe("GET /v1/library/components/:componentId/versions/:version", () => {
     expect(none.body.data).toEqual([]);
   });
 
+  it("CMP-004/T3.10.2: daftar publik hanya owner_type=platform + published + belum di-archive", async () => {
+    const cookie = await register();
+    const catId = uuidv7();
+    await testDb.db.insert(schema.libraryCategories).values({
+      id: catId,
+      slug: "own-cat",
+      scope: "component",
+      type: "functional",
+      name: { id: "O", en: "O" },
+    });
+    const seed = async (
+      publicId: string,
+      ownerType: "platform" | "user",
+      status: "published" | "archived",
+      archived: boolean,
+    ) => {
+      const id = uuidv7();
+      await testDb.db.insert(schema.components).values({
+        id,
+        publicId,
+        slug: publicId,
+        ownerType,
+        ...(ownerType === "user" ? { ownerId: uuidv7() } : {}),
+        kind: "section",
+        categoryId: catId,
+        name: publicId,
+        displayName: { id: publicId, en: publicId },
+        description: { id: "d", en: "d" },
+        status,
+        latestVersion: "1.0.0",
+        ...(archived ? { archivedAt: new Date() } : {}),
+      });
+      const [ver] = await testDb.db
+        .insert(schema.componentVersions)
+        .values({ componentId: id, version: "1.0.0", versionSeq: 1, status: "published", definition: {} })
+        .returning();
+      await testDb.db.update(schema.components).set({ latestVersionId: ver?.id }).where(eq(schema.components.id, id));
+    };
+    await seed("cmp_ownplat01", "platform", "published", false); // terlihat
+    await seed("cmp_ownuser01", "user", "published", false); // tersembunyi (library user, P2)
+    await seed("cmp_ownarch01", "platform", "archived", true); // tersembunyi (di-archive)
+
+    const list = await get(cookie, "/v1/library/components?category=own-cat");
+    const ids = (list.body.data as { publicId: string }[]).map((c) => c.publicId);
+    expect(ids).toContain("cmp_ownplat01");
+    expect(ids).not.toContain("cmp_ownuser01");
+    expect(ids).not.toContain("cmp_ownarch01");
+  });
+
   it("tanpa sesi → 401; componentId/versi tidak valid → 422", async () => {
     const cookie = await register();
     expect((await get(null, `/v1/library/components/${PUBLIC_ID}/versions/1`)).status).toBe(401);
