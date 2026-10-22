@@ -1,0 +1,1414 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_contactsplit",
+  "slug": "contact-split",
+  "kind": "section",
+  "categorySlug": "contact",
+  "meta": {
+    "name": "ContactSplit",
+    "displayName": {
+      "id": "Kontak + Form",
+      "en": "Contact + Form"
+    },
+    "description": {
+      "id": "Info kontak di kiri dan form pesan di kanan dalam dua kolom.",
+      "en": "Contact info on the left and a message form on the right in two columns."
+    },
+    "tags": ["contact", "split"],
+    "keywords": {
+      "id": ["kontak", "alamat", "hubungi"],
+      "en": ["contact", "address"]
+    },
+    "aiHints": "Gabungkan info kontak dan form dalam satu section dua kolom."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_contac0"],
+          "nodes": {
+            "tmp_contac0": {
+              "id": "tmp_contac0",
+              "type": "frame",
+              "name": "ContactSplit",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac1": {
+              "id": "tmp_contac1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_contac0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac2", "tmp_contac4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac2": {
+              "id": "tmp_contac2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_contac1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 600,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac3": {
+              "id": "tmp_contac3",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_contac2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Mari terhubung"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_contac4": {
+              "id": "tmp_contac4",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_contac1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac5", "tmp_contac26"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.10"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac5": {
+              "id": "tmp_contac5",
+              "type": "frame",
+              "name": "InfoList",
+              "parentId": "tmp_contac4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac6", "tmp_contac11", "tmp_contac16", "tmp_contac21"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac6": {
+              "id": "tmp_contac6",
+              "type": "frame",
+              "name": "Info",
+              "parentId": "tmp_contac5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac7", "tmp_contac8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac7": {
+              "id": "tmp_contac7",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_contac6",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "map-pin"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_contac8": {
+              "id": "tmp_contac8",
+              "type": "frame",
+              "name": "Text",
+              "parentId": "tmp_contac6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac9", "tmp_contac10"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.0"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac9": {
+              "id": "tmp_contac9",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_contac8",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Alamat"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_contac10": {
+              "id": "tmp_contac10",
+              "type": "text",
+              "name": "Value",
+              "parentId": "tmp_contac8",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Jl. Merdeka No. 10, Jakarta Pusat"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_contac11": {
+              "id": "tmp_contac11",
+              "type": "frame",
+              "name": "Info",
+              "parentId": "tmp_contac5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac12", "tmp_contac13"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac12": {
+              "id": "tmp_contac12",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_contac11",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "phone"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_contac13": {
+              "id": "tmp_contac13",
+              "type": "frame",
+              "name": "Text",
+              "parentId": "tmp_contac11",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac14", "tmp_contac15"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.0"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac14": {
+              "id": "tmp_contac14",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_contac13",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Telepon"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_contac15": {
+              "id": "tmp_contac15",
+              "type": "text",
+              "name": "Value",
+              "parentId": "tmp_contac13",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "+62 812 3456 7890"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_contac16": {
+              "id": "tmp_contac16",
+              "type": "frame",
+              "name": "Info",
+              "parentId": "tmp_contac5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac17", "tmp_contac18"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac17": {
+              "id": "tmp_contac17",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_contac16",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "mail"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_contac18": {
+              "id": "tmp_contac18",
+              "type": "frame",
+              "name": "Text",
+              "parentId": "tmp_contac16",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac19", "tmp_contac20"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.0"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac19": {
+              "id": "tmp_contac19",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_contac18",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Email"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_contac20": {
+              "id": "tmp_contac20",
+              "type": "text",
+              "name": "Value",
+              "parentId": "tmp_contac18",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "halo@brand.com"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_contac21": {
+              "id": "tmp_contac21",
+              "type": "frame",
+              "name": "Info",
+              "parentId": "tmp_contac5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac22", "tmp_contac23"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac22": {
+              "id": "tmp_contac22",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_contac21",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "clock"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 22,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_contac23": {
+              "id": "tmp_contac23",
+              "type": "frame",
+              "name": "Text",
+              "parentId": "tmp_contac21",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac24", "tmp_contac25"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.0"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac24": {
+              "id": "tmp_contac24",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_contac23",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Jam Buka"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_contac25": {
+              "id": "tmp_contac25",
+              "type": "text",
+              "name": "Value",
+              "parentId": "tmp_contac23",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Senin–Sabtu, 08.00–20.00"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_contac26": {
+              "id": "tmp_contac26",
+              "type": "frame",
+              "name": "Form",
+              "parentId": "tmp_contac4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac27", "tmp_contac29", "tmp_contac31", "tmp_contac33"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "stretch",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_contac27": {
+              "id": "tmp_contac27",
+              "type": "frame",
+              "name": "Input",
+              "parentId": "tmp_contac26",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac28"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_contac28": {
+              "id": "tmp_contac28",
+              "type": "text",
+              "name": "Placeholder",
+              "parentId": "tmp_contac27",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Nama Anda"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_contac29": {
+              "id": "tmp_contac29",
+              "type": "frame",
+              "name": "Input",
+              "parentId": "tmp_contac26",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac30"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_contac30": {
+              "id": "tmp_contac30",
+              "type": "text",
+              "name": "Placeholder",
+              "parentId": "tmp_contac29",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Email"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_contac31": {
+              "id": "tmp_contac31",
+              "type": "frame",
+              "name": "Input",
+              "parentId": "tmp_contac26",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac32"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_contac32": {
+              "id": "tmp_contac32",
+              "type": "text",
+              "name": "Placeholder",
+              "parentId": "tmp_contac31",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pesan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_contac33": {
+              "id": "tmp_contac33",
+              "type": "frame",
+              "name": "Submit",
+              "parentId": "tmp_contac26",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_contac34"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_contac34": {
+              "id": "tmp_contac34",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_contac33",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kirim Pesan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

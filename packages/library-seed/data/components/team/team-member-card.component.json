@@ -1,0 +1,475 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_teammembercard",
+  "slug": "team-member-card",
+  "kind": "section",
+  "categorySlug": "team",
+  "meta": {
+    "name": "TeamMemberCard",
+    "displayName": {
+      "id": "Kartu Anggota Tim",
+      "en": "Team Member Card"
+    },
+    "description": {
+      "id": "Satu kartu anggota dengan foto besar, bio, dan ikon sosial.",
+      "en": "A single member card with a large photo, bio, and social icons."
+    },
+    "tags": ["team", "card"],
+    "keywords": {
+      "id": ["tim", "orang", "profil"],
+      "en": ["team", "people"]
+    },
+    "aiHints": "Sorot satu orang penting (pendiri) dengan bio singkat."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_teamme0"],
+          "nodes": {
+            "tmp_teamme0": {
+              "id": "tmp_teamme0",
+              "type": "frame",
+              "name": "TeamMemberCard",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamme1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamme1": {
+              "id": "tmp_teamme1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_teamme0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamme2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamme2": {
+              "id": "tmp_teamme2",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_teamme1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamme3", "tmp_teamme4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 760,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamme3": {
+              "id": "tmp_teamme3",
+              "type": "frame",
+              "name": "Avatar",
+              "parentId": "tmp_teamme2",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1,
+                    "minHeight": {
+                      "value": 200,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_teamme4": {
+              "id": "tmp_teamme4",
+              "type": "frame",
+              "name": "Bio",
+              "parentId": "tmp_teamme2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamme5", "tmp_teamme6", "tmp_teamme7", "tmp_teamme8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamme5": {
+              "id": "tmp_teamme5",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_teamme4",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rani Pratama"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h3"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_teamme6": {
+              "id": "tmp_teamme6",
+              "type": "text",
+              "name": "Role",
+              "parentId": "tmp_teamme4",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pendiri & CEO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_teamme7": {
+              "id": "tmp_teamme7",
+              "type": "text",
+              "name": "Text",
+              "parentId": "tmp_teamme4",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Membangun brand ini dari nol dengan keyakinan bahwa bisnis kecil pun layak tampil profesional."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamme8": {
+              "id": "tmp_teamme8",
+              "type": "frame",
+              "name": "Socials",
+              "parentId": "tmp_teamme4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamme9", "tmp_teamme10", "tmp_teamme11"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamme9": {
+              "id": "tmp_teamme9",
+              "type": "icon",
+              "name": "S1",
+              "parentId": "tmp_teamme8",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "instagram"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamme10": {
+              "id": "tmp_teamme10",
+              "type": "icon",
+              "name": "S2",
+              "parentId": "tmp_teamme8",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "linkedin"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamme11": {
+              "id": "tmp_teamme11",
+              "type": "icon",
+              "name": "S3",
+              "parentId": "tmp_teamme8",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "whatsapp"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 20,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

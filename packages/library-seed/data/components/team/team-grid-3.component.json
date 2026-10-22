@@ -1,0 +1,1154 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_teamgrid3",
+  "slug": "team-grid-3",
+  "kind": "section",
+  "categorySlug": "team",
+  "meta": {
+    "name": "TeamGrid3",
+    "displayName": {
+      "id": "Tim 3 Orang",
+      "en": "Team (3 people)"
+    },
+    "description": {
+      "id": "Grid tiga anggota tim dengan foto, nama, dan peran.",
+      "en": "A grid of three team members with photo, name, and role."
+    },
+    "tags": ["team", "grid"],
+    "keywords": {
+      "id": ["tim", "orang", "profil"],
+      "en": ["team", "people"]
+    },
+    "aiHints": "Tampilkan 3–8 anggota inti: foto, nama, jabatan. Jaga konsisten."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_teamgr0"],
+          "nodes": {
+            "tmp_teamgr0": {
+              "id": "tmp_teamgr0",
+              "type": "frame",
+              "name": "TeamGrid3",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr1": {
+              "id": "tmp_teamgr1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_teamgr0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr2", "tmp_teamgr6"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr2": {
+              "id": "tmp_teamgr2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_teamgr1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr3", "tmp_teamgr4", "tmp_teamgr5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 640,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr3": {
+              "id": "tmp_teamgr3",
+              "type": "text",
+              "name": "Eyebrow",
+              "parentId": "tmp_teamgr2",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "TIM KAMI"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr4": {
+              "id": "tmp_teamgr4",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_teamgr2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Orang-orang di balik layar"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr5": {
+              "id": "tmp_teamgr5",
+              "type": "text",
+              "name": "Lead",
+              "parentId": "tmp_teamgr2",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tim kecil yang berdedikasi untuk kesuksesan Anda."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr6": {
+              "id": "tmp_teamgr6",
+              "type": "frame",
+              "name": "Grid",
+              "parentId": "tmp_teamgr1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr7", "tmp_teamgr15", "tmp_teamgr23"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "stretch",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr7": {
+              "id": "tmp_teamgr7",
+              "type": "frame",
+              "name": "Member",
+              "parentId": "tmp_teamgr6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr8", "tmp_teamgr9", "tmp_teamgr10", "tmp_teamgr11"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr8": {
+              "id": "tmp_teamgr8",
+              "type": "frame",
+              "name": "Avatar",
+              "parentId": "tmp_teamgr7",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1,
+                    "minHeight": {
+                      "value": 160,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr9": {
+              "id": "tmp_teamgr9",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_teamgr7",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rani Pratama"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr10": {
+              "id": "tmp_teamgr10",
+              "type": "text",
+              "name": "Role",
+              "parentId": "tmp_teamgr7",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pendiri & CEO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr11": {
+              "id": "tmp_teamgr11",
+              "type": "frame",
+              "name": "Socials",
+              "parentId": "tmp_teamgr7",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr12", "tmp_teamgr13", "tmp_teamgr14"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr12": {
+              "id": "tmp_teamgr12",
+              "type": "icon",
+              "name": "S1",
+              "parentId": "tmp_teamgr11",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "instagram"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr13": {
+              "id": "tmp_teamgr13",
+              "type": "icon",
+              "name": "S2",
+              "parentId": "tmp_teamgr11",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "linkedin"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr14": {
+              "id": "tmp_teamgr14",
+              "type": "icon",
+              "name": "S3",
+              "parentId": "tmp_teamgr11",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "whatsapp"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr15": {
+              "id": "tmp_teamgr15",
+              "type": "frame",
+              "name": "Member",
+              "parentId": "tmp_teamgr6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr16", "tmp_teamgr17", "tmp_teamgr18", "tmp_teamgr19"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr16": {
+              "id": "tmp_teamgr16",
+              "type": "frame",
+              "name": "Avatar",
+              "parentId": "tmp_teamgr15",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1,
+                    "minHeight": {
+                      "value": 160,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr17": {
+              "id": "tmp_teamgr17",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_teamgr15",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Budi Santoso"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr18": {
+              "id": "tmp_teamgr18",
+              "type": "text",
+              "name": "Role",
+              "parentId": "tmp_teamgr15",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kepala Operasi"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr19": {
+              "id": "tmp_teamgr19",
+              "type": "frame",
+              "name": "Socials",
+              "parentId": "tmp_teamgr15",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr20", "tmp_teamgr21", "tmp_teamgr22"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr20": {
+              "id": "tmp_teamgr20",
+              "type": "icon",
+              "name": "S1",
+              "parentId": "tmp_teamgr19",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "instagram"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr21": {
+              "id": "tmp_teamgr21",
+              "type": "icon",
+              "name": "S2",
+              "parentId": "tmp_teamgr19",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "linkedin"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr22": {
+              "id": "tmp_teamgr22",
+              "type": "icon",
+              "name": "S3",
+              "parentId": "tmp_teamgr19",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "whatsapp"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr23": {
+              "id": "tmp_teamgr23",
+              "type": "frame",
+              "name": "Member",
+              "parentId": "tmp_teamgr6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr24", "tmp_teamgr25", "tmp_teamgr26", "tmp_teamgr27"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr24": {
+              "id": "tmp_teamgr24",
+              "type": "frame",
+              "name": "Avatar",
+              "parentId": "tmp_teamgr23",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1,
+                    "minHeight": {
+                      "value": 160,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr25": {
+              "id": "tmp_teamgr25",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_teamgr23",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Sari Dewi"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr26": {
+              "id": "tmp_teamgr26",
+              "type": "text",
+              "name": "Role",
+              "parentId": "tmp_teamgr23",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pemasaran"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr27": {
+              "id": "tmp_teamgr27",
+              "type": "frame",
+              "name": "Socials",
+              "parentId": "tmp_teamgr23",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_teamgr28", "tmp_teamgr29", "tmp_teamgr30"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_teamgr28": {
+              "id": "tmp_teamgr28",
+              "type": "icon",
+              "name": "S1",
+              "parentId": "tmp_teamgr27",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "instagram"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr29": {
+              "id": "tmp_teamgr29",
+              "type": "icon",
+              "name": "S2",
+              "parentId": "tmp_teamgr27",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "linkedin"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_teamgr30": {
+              "id": "tmp_teamgr30",
+              "type": "icon",
+              "name": "S3",
+              "parentId": "tmp_teamgr27",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "whatsapp"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 18,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

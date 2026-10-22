@@ -1,0 +1,420 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_productcard",
+  "slug": "product-card",
+  "kind": "element",
+  "categorySlug": "product",
+  "meta": {
+    "name": "ProductCard",
+    "displayName": {
+      "id": "Kartu Produk",
+      "en": "Product Card"
+    },
+    "description": {
+      "id": "Kartu produk dengan foto, nama, harga, dan tombol beli.",
+      "en": "A product card with photo, name, price, and a buy button."
+    },
+    "tags": ["product", "card"],
+    "keywords": {
+      "id": ["produk", "kartu", "layanan"],
+      "en": ["product", "card", "service"]
+    },
+    "aiHints": "Satu kartu produk. Untuk katalog, susun beberapa dalam grid."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_produc0"],
+          "nodes": {
+            "tmp_produc0": {
+              "id": "tmp_produc0",
+              "type": "frame",
+              "name": "Product",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc1", "tmp_produc3"],
+              "props": {
+                "role": "card"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc1": {
+              "id": "tmp_produc1",
+              "type": "frame",
+              "name": "Media",
+              "parentId": "tmp_produc0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc2": {
+              "id": "tmp_produc2",
+              "type": "frame",
+              "name": "Photo",
+              "parentId": "tmp_produc1",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_produc3": {
+              "id": "tmp_produc3",
+              "type": "frame",
+              "name": "Body",
+              "parentId": "tmp_produc0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc4", "tmp_produc5", "tmp_produc7"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.4"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.4"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc4": {
+              "id": "tmp_produc4",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_produc3",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kaos Katun Premium"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_produc5": {
+              "id": "tmp_produc5",
+              "type": "frame",
+              "name": "PriceRow",
+              "parentId": "tmp_produc3",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc6"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc6": {
+              "id": "tmp_produc6",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_produc5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp120rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_produc7": {
+              "id": "tmp_produc7",
+              "type": "frame",
+              "name": "Add",
+              "parentId": "tmp_produc3",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc8"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.2"
+                      },
+                      "right": {
+                        "$token": "space.5"
+                      },
+                      "bottom": {
+                        "$token": "space.2"
+                      },
+                      "left": {
+                        "$token": "space.5"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc8": {
+              "id": "tmp_produc8",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_produc7",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tambah ke Keranjang"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

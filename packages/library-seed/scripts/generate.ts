@@ -11,7 +11,9 @@ import { FOOTER } from "./catalog/footer";
 import { HERO } from "./catalog/hero";
 import { NAVBAR } from "./catalog/navbar";
 import { PRICING } from "./catalog/pricing";
+import { PRODUCT } from "./catalog/product";
 import { SOCIAL_PROOF } from "./catalog/social-proof";
+import { TEAM_CONTACT } from "./catalog/team-contact";
 
 // Generator file seed component dari katalog (T3.11.x). `pnpm --filter @platform/library-seed gen`. File di-emit ke
 // `data/components/<kategori>/<slug>.component.json`; validasi dijalankan oleh `library-seed` test (validateSeedLibrary).
@@ -29,6 +31,8 @@ const CATALOG: ComponentSpec[] = [
   ...NAVBAR,
   ...FOOTER,
   ...CONTENT,
+  ...TEAM_CONTACT,
+  ...PRODUCT,
 ];
 
 let written = 0;

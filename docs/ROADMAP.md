@@ -1457,8 +1457,10 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
   - 8 varian: testimonial single/grid-3/grid-2-rated/list, rating-summary, logo-cloud, trust-stats, quote-banner. Toolkit (avatar/stars/person); lolos validateSeedLibrary.
 - [x] **T3.11.11** Pricing/FAQ/CTA: pricing cards, price list jasa, FAQ accordion, CTA banner, CTA WhatsApp — CMP-086 · library · Verifikasi: ≥ 11 variasi
   - 11 varian: CTA (banner/boxed/whatsapp/split/newsletter), FAQ (list/2-col/with-cta), Pricing (3-tier/single/price-list jasa). Toolkit + inputBox; lolos validateSeedLibrary.
-- [ ] **T3.11.12** Team/Contact: team grid, contact info, map embed — CMP-087 · library · Verifikasi: ≥ 7 variasi
-- [ ] **T3.11.13** Product & Cards umum (bagian M3): product card statis, service card, info card — CMP-088 · library · Verifikasi: ≥ 6 variasi
+- [x] **T3.11.12** Team/Contact: team grid, contact info, map embed — CMP-087 · library · Verifikasi: ≥ 7 variasi
+  - 8: team-grid-3/4, team-member-card (team); contact-info/form/split/cards, map-embed (contact).
+- [x] **T3.11.13** Product & Cards umum (bagian M3): product card statis, service card, info card — CMP-088 · library · Verifikasi: ≥ 6 variasi
+  - 7: product-card, product-card-sale, product-grid, service-card, service-grid, info-card, info-card-grid.
 - [ ] **T3.11.14** Audit library M3: hitung per kategori vs CMP-093, uji kontras semua preset, perbaiki gagal — CMP-080, CMP-133 · admin · Verifikasi: laporan jumlah; ≥ 85 variasi published di akhir M3
 
 #### Epic 3.12 — Dogfooding template internal

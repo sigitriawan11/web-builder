@@ -1,0 +1,270 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_infocard",
+  "slug": "info-card",
+  "kind": "element",
+  "categorySlug": "product",
+  "meta": {
+    "name": "InfoCard",
+    "displayName": {
+      "id": "Kartu Info",
+      "en": "Info Card"
+    },
+    "description": {
+      "id": "Kartu informasi serbaguna dengan ikon, judul, teks, dan tautan.",
+      "en": "A versatile info card with icon, title, text, and a link."
+    },
+    "tags": ["info", "card"],
+    "keywords": {
+      "id": ["produk", "kartu", "layanan"],
+      "en": ["product", "card", "service"]
+    },
+    "aiHints": "Kartu info umum. Pakai untuk fitur, kategori, atau pengumuman."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_infoca0"],
+          "nodes": {
+            "tmp_infoca0": {
+              "id": "tmp_infoca0",
+              "type": "frame",
+              "name": "InfoCard",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_infoca1", "tmp_infoca2", "tmp_infoca3", "tmp_infoca4"],
+              "props": {
+                "role": "card"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.6"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.6"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_infoca1": {
+              "id": "tmp_infoca1",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_infoca0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "info"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 28,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 28,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_infoca2": {
+              "id": "tmp_infoca2",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_infoca0",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Judul informasi"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_infoca3": {
+              "id": "tmp_infoca3",
+              "type": "text",
+              "name": "Desc",
+              "parentId": "tmp_infoca0",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Keterangan singkat yang menjelaskan isi kartu ini kepada pembaca."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_infoca4": {
+              "id": "tmp_infoca4",
+              "type": "text",
+              "name": "Link",
+              "parentId": "tmp_infoca0",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pelajari lebih lanjut →"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -15,10 +15,21 @@
       "id": "Tabel jam buka per hari untuk informasi pelanggan.",
       "en": "A per-day opening hours table for customer information."
     },
-    "tags": ["content", "hours"],
+    "tags": [
+      "content",
+      "hours"
+    ],
     "keywords": {
-      "id": ["konten", "teks", "galeri"],
-      "en": ["content", "text", "gallery"]
+      "id": [
+        "konten",
+        "teks",
+        "galeri"
+      ],
+      "en": [
+        "content",
+        "text",
+        "gallery"
+      ]
     },
     "aiHints": "Blok konten informatif. Jaga keterbacaan: paragraf pendek, heading jelas."
   },
@@ -32,7 +43,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_conten0"],
+          "rootIds": [
+            "tmp_conten0"
+          ],
           "nodes": {
             "tmp_conten0": {
               "id": "tmp_conten0",
@@ -41,7 +54,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten1"],
+              "children": [
+                "tmp_conten1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +100,10 @@
               "parentId": "tmp_conten0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten2", "tmp_conten4"],
+              "children": [
+                "tmp_conten2",
+                "tmp_conten4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +136,9 @@
               "parentId": "tmp_conten1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten3"],
+              "children": [
+                "tmp_conten3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -195,7 +215,12 @@
               "parentId": "tmp_conten1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten5", "tmp_conten8", "tmp_conten11", "tmp_conten14"],
+              "children": [
+                "tmp_conten5",
+                "tmp_conten8",
+                "tmp_conten11",
+                "tmp_conten14"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -229,7 +254,10 @@
               "parentId": "tmp_conten4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten6", "tmp_conten7"],
+              "children": [
+                "tmp_conten6",
+                "tmp_conten7"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -346,7 +374,10 @@
               "parentId": "tmp_conten4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten9", "tmp_conten10"],
+              "children": [
+                "tmp_conten9",
+                "tmp_conten10"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -463,7 +494,10 @@
               "parentId": "tmp_conten4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten12", "tmp_conten13"],
+              "children": [
+                "tmp_conten12",
+                "tmp_conten13"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -580,7 +614,10 @@
               "parentId": "tmp_conten4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_conten15", "tmp_conten16"],
+              "children": [
+                "tmp_conten15",
+                "tmp_conten16"
+              ],
               "props": {},
               "style": {
                 "base": {

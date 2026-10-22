@@ -1,0 +1,1448 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_productgrid",
+  "slug": "product-grid",
+  "kind": "section",
+  "categorySlug": "product",
+  "meta": {
+    "name": "ProductGrid",
+    "displayName": {
+      "id": "Grid Produk",
+      "en": "Product Grid"
+    },
+    "description": {
+      "id": "Bagian katalog dengan judul dan beberapa kartu produk.",
+      "en": "A catalog section with a title and several product cards."
+    },
+    "tags": ["product", "grid"],
+    "keywords": {
+      "id": ["produk", "kartu", "layanan"],
+      "en": ["product", "card", "service"]
+    },
+    "aiHints": "Katalog produk 3+ item dalam grid. Judul di atas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_produc0"],
+          "nodes": {
+            "tmp_produc0": {
+              "id": "tmp_produc0",
+              "type": "frame",
+              "name": "ProductGrid",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc1": {
+              "id": "tmp_produc1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_produc0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc2", "tmp_produc6"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc2": {
+              "id": "tmp_produc2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_produc1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc3", "tmp_produc4", "tmp_produc5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 600,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc3": {
+              "id": "tmp_produc3",
+              "type": "text",
+              "name": "Eyebrow",
+              "parentId": "tmp_produc2",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "KATALOG"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_produc4": {
+              "id": "tmp_produc4",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_produc2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Produk unggulan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_produc5": {
+              "id": "tmp_produc5",
+              "type": "text",
+              "name": "Lead",
+              "parentId": "tmp_produc2",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pilihan terbaik untuk Anda."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_produc6": {
+              "id": "tmp_produc6",
+              "type": "frame",
+              "name": "Grid",
+              "parentId": "tmp_produc1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc7", "tmp_produc16", "tmp_produc25"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "stretch",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc7": {
+              "id": "tmp_produc7",
+              "type": "frame",
+              "name": "Product",
+              "parentId": "tmp_produc6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc8", "tmp_produc10"],
+              "props": {
+                "role": "card"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc8": {
+              "id": "tmp_produc8",
+              "type": "frame",
+              "name": "Media",
+              "parentId": "tmp_produc7",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc9"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc9": {
+              "id": "tmp_produc9",
+              "type": "frame",
+              "name": "Photo",
+              "parentId": "tmp_produc8",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_produc10": {
+              "id": "tmp_produc10",
+              "type": "frame",
+              "name": "Body",
+              "parentId": "tmp_produc7",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc11", "tmp_produc12", "tmp_produc14"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.4"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.4"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc11": {
+              "id": "tmp_produc11",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_produc10",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kaos Katun Premium"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_produc12": {
+              "id": "tmp_produc12",
+              "type": "frame",
+              "name": "PriceRow",
+              "parentId": "tmp_produc10",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc13"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc13": {
+              "id": "tmp_produc13",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_produc12",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp120rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_produc14": {
+              "id": "tmp_produc14",
+              "type": "frame",
+              "name": "Add",
+              "parentId": "tmp_produc10",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc15"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.2"
+                      },
+                      "right": {
+                        "$token": "space.5"
+                      },
+                      "bottom": {
+                        "$token": "space.2"
+                      },
+                      "left": {
+                        "$token": "space.5"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc15": {
+              "id": "tmp_produc15",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_produc14",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tambah ke Keranjang"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            },
+            "tmp_produc16": {
+              "id": "tmp_produc16",
+              "type": "frame",
+              "name": "Product",
+              "parentId": "tmp_produc6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc17", "tmp_produc19"],
+              "props": {
+                "role": "card"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc17": {
+              "id": "tmp_produc17",
+              "type": "frame",
+              "name": "Media",
+              "parentId": "tmp_produc16",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc18"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc18": {
+              "id": "tmp_produc18",
+              "type": "frame",
+              "name": "Photo",
+              "parentId": "tmp_produc17",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_produc19": {
+              "id": "tmp_produc19",
+              "type": "frame",
+              "name": "Body",
+              "parentId": "tmp_produc16",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc20", "tmp_produc21", "tmp_produc23"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.4"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.4"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc20": {
+              "id": "tmp_produc20",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_produc19",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tas Kanvas"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_produc21": {
+              "id": "tmp_produc21",
+              "type": "frame",
+              "name": "PriceRow",
+              "parentId": "tmp_produc19",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc22"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc22": {
+              "id": "tmp_produc22",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_produc21",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp185rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_produc23": {
+              "id": "tmp_produc23",
+              "type": "frame",
+              "name": "Add",
+              "parentId": "tmp_produc19",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc24"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.2"
+                      },
+                      "right": {
+                        "$token": "space.5"
+                      },
+                      "bottom": {
+                        "$token": "space.2"
+                      },
+                      "left": {
+                        "$token": "space.5"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc24": {
+              "id": "tmp_produc24",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_produc23",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tambah ke Keranjang"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            },
+            "tmp_produc25": {
+              "id": "tmp_produc25",
+              "type": "frame",
+              "name": "Product",
+              "parentId": "tmp_produc6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc26", "tmp_produc28"],
+              "props": {
+                "role": "card"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc26": {
+              "id": "tmp_produc26",
+              "type": "frame",
+              "name": "Media",
+              "parentId": "tmp_produc25",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc27"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc27": {
+              "id": "tmp_produc27",
+              "type": "frame",
+              "name": "Photo",
+              "parentId": "tmp_produc26",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_produc28": {
+              "id": "tmp_produc28",
+              "type": "frame",
+              "name": "Body",
+              "parentId": "tmp_produc25",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc29", "tmp_produc30", "tmp_produc32"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.4"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.4"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc29": {
+              "id": "tmp_produc29",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_produc28",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Topi Rajut"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_produc30": {
+              "id": "tmp_produc30",
+              "type": "frame",
+              "name": "PriceRow",
+              "parentId": "tmp_produc28",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc31"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_produc31": {
+              "id": "tmp_produc31",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_produc30",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp75rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_produc32": {
+              "id": "tmp_produc32",
+              "type": "frame",
+              "name": "Add",
+              "parentId": "tmp_produc28",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_produc33"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.2"
+                      },
+                      "right": {
+                        "$token": "space.5"
+                      },
+                      "bottom": {
+                        "$token": "space.2"
+                      },
+                      "left": {
+                        "$token": "space.5"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_produc33": {
+              "id": "tmp_produc33",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_produc32",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tambah ke Keranjang"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

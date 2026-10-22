@@ -1,0 +1,216 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_servicecard",
+  "slug": "service-card",
+  "kind": "element",
+  "categorySlug": "product",
+  "meta": {
+    "name": "ServiceCard",
+    "displayName": {
+      "id": "Kartu Layanan",
+      "en": "Service Card"
+    },
+    "description": {
+      "id": "Kartu layanan dengan ikon, judul, dan deskripsi singkat.",
+      "en": "A service card with an icon, title, and short description."
+    },
+    "tags": ["service", "card"],
+    "keywords": {
+      "id": ["produk", "kartu", "layanan"],
+      "en": ["product", "card", "service"]
+    },
+    "aiHints": "Satu kartu layanan/benefit. Ikon + judul + 1 kalimat."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_servic0"],
+          "nodes": {
+            "tmp_servic0": {
+              "id": "tmp_servic0",
+              "type": "frame",
+              "name": "Service",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_servic1", "tmp_servic2", "tmp_servic3"],
+              "props": {
+                "role": "card"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.6"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.6"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_servic1": {
+              "id": "tmp_servic1",
+              "type": "icon",
+              "name": "Icon",
+              "parentId": "tmp_servic0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "sparkles"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 32,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 32,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_servic2": {
+              "id": "tmp_servic2",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_servic0",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Desain Profesional"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_servic3": {
+              "id": "tmp_servic3",
+              "type": "text",
+              "name": "Desc",
+              "parentId": "tmp_servic0",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Template rapi siap pakai untuk berbagai jenis bisnis."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
