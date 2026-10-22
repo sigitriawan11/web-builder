@@ -119,6 +119,23 @@
         "schemaInvalid": "Definisi belum valid ({count} masalah) — perbaiki dulu.",
         "title": "Aturan desain (linter)"
       }
+    },
+    "theme": {
+      "title": "Edit theme preset",
+      "colorsHeading": "Warna",
+      "previewHeading": "Pratinjau",
+      "previewHeadingSample": "Judul contoh",
+      "previewBody": "Teks isi yang menunjukkan warna dan kontras pada permukaan.",
+      "previewButton": "Tombol utama",
+      "previewCard": "Kartu",
+      "save": "Simpan preset",
+      "saving": "Menyimpan…",
+      "saved": "Tersimpan (versi {version})",
+      "loading": "Memuat preset…",
+      "notFound": "Preset tidak ditemukan.",
+      "readOnly": "Baca saja — role kamu tidak dapat menyimpan preset.",
+      "contrastWarn": "Kontras rendah terhadap latar ({ratio}:1)",
+      "failed": "Gagal menyimpan: {error}"
     }
   },
   "app": {

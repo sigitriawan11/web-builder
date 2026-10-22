@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { editorUrl, libraryDraftUrl, parseEditorRoute } from "./router";
+import { editorUrl, libraryDraftUrl, libraryThemeUrl, parseEditorRoute } from "./router";
 
 const SITE = "0199f0aa-1234-7abc-8def-0123456789ab";
 // Mode Admin memakai UUID component (konsisten dengan API admin).
@@ -24,6 +24,10 @@ describe("parseEditorRoute", () => {
     ["/editor/library/components/cmp_button01/draft", "", { kind: "not-found" }],
     ["/editor/library/components/bukan-id/draft", "", { kind: "not-found" }],
     [`/editor/library/components/${CMP}`, "", { kind: "not-found" }],
+    // Edit theme preset (CMP-124) — slug kebab-case.
+    ["/editor/library/themes/modern-blue", "", { kind: "theme", slug: "modern-blue" }],
+    ["/editor/library/themes/modern-blue/", "", { kind: "theme", slug: "modern-blue" }],
+    ["/editor/library/themes/Bad_Slug", "", { kind: "not-found" }],
   ] as const)("%s%s", (pathname, search, expected) => {
     expect(parseEditorRoute(pathname, search)).toEqual(expected);
   });
@@ -36,5 +40,10 @@ describe("parseEditorRoute", () => {
   it("libraryDraftUrl", () => {
     expect(libraryDraftUrl(CMP)).toBe(`/editor/library/components/${CMP}/draft`);
     expect(() => libraryDraftUrl("bukan-id")).toThrow();
+  });
+
+  it("libraryThemeUrl", () => {
+    expect(libraryThemeUrl("modern-blue")).toBe("/editor/library/themes/modern-blue");
+    expect(() => libraryThemeUrl("Bad_Slug")).toThrow();
   });
 });

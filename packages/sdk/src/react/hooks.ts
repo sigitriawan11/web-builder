@@ -60,6 +60,12 @@ export const useLibraryComponents = (query: { category?: string; search?: string
   useQuery(useQueries().libraryComponents(query));
 /** Simpan metadata draft (CMP-013); menyegarkan sesi editor. */
 export const useSaveLibraryDraft = () => useMutation({ mutationFn: useMutations().saveLibraryDraft });
+/** Daftar preset theme platform (CMP-124); 404 = bukan staf. */
+export const useLibraryThemes = () => useQuery({ ...useQueries().libraryThemes(), retry: false });
+/** Satu preset theme platform by slug (CMP-124). */
+export const useLibraryTheme = (slug: string) => useQuery({ ...useQueries().libraryTheme(slug), retry: false });
+/** Simpan preset theme (CMP-124); menyegarkan daftar + detail. */
+export const useSaveLibraryTheme = () => useMutation({ mutationFn: useMutations().saveLibraryTheme });
 
 export const useCreateSite = () => useMutation({ mutationFn: useMutations().createSite });
 export const useRenameSite = () => useMutation({ mutationFn: useMutations().renameSite });

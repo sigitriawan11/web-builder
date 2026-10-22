@@ -119,6 +119,23 @@
         "schemaInvalid": "Definition is not valid yet ({count} issues) — fix those first.",
         "title": "Design rules (linter)"
       }
+    },
+    "theme": {
+      "title": "Edit theme preset",
+      "colorsHeading": "Colors",
+      "previewHeading": "Preview",
+      "previewHeadingSample": "Sample heading",
+      "previewBody": "Body text showing color and contrast on surfaces.",
+      "previewButton": "Primary button",
+      "previewCard": "Card",
+      "save": "Save preset",
+      "saving": "Saving…",
+      "saved": "Saved (version {version})",
+      "loading": "Loading preset…",
+      "notFound": "Preset not found.",
+      "readOnly": "Read-only — your role cannot save presets.",
+      "contrastWarn": "Low contrast against background ({ratio}:1)",
+      "failed": "Failed to save: {error}"
     }
   },
   "app": {

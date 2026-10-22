@@ -9,6 +9,7 @@ import { parseEditorRoute } from "./router";
 const SiteEditor = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteEditor })));
 const SiteNotFound = lazy(() => import("./SiteEditor").then((module) => ({ default: module.SiteNotFound })));
 const LibraryEditor = lazy(() => import("./LibraryEditor").then((module) => ({ default: module.LibraryEditor })));
+const ThemeEditor = lazy(() => import("./ThemeEditor").then((module) => ({ default: module.ThemeEditor })));
 const Playground = lazy(() => import("./Playground").then((module) => ({ default: module.Playground })));
 const WysiwygHarness = lazy(() => import("./WysiwygHarness").then((module) => ({ default: module.WysiwygHarness })));
 
@@ -23,6 +24,8 @@ export function App() {
             <SiteEditor siteId={route.siteId} pageId={route.pageId} />
           ) : route.kind === "library" ? (
             <LibraryEditor componentId={route.componentId} />
+          ) : route.kind === "theme" ? (
+            <ThemeEditor slug={route.slug} />
           ) : route.kind === "playground" ? (
             <Playground />
           ) : route.kind === "wysiwyg" ? (
