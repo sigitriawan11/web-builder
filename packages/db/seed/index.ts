@@ -28,7 +28,7 @@ if (args.has("--library")) {
   try {
     const counts = await importLibraryToDb(db);
     console.log(
-      `Library ter-import — kategori: ${counts.categories}, component: ${counts.components}, versi baru: ${counts.versions}`,
+      `Library ter-import — kategori: ${counts.categories}, component: ${counts.components}, versi baru: ${counts.versions}, theme: ${counts.themes}`,
     );
   } finally {
     await close();

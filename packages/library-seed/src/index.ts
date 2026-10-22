@@ -12,6 +12,7 @@ export {
   SeedComponentVersionSchema,
   type SeedFile,
 } from "./component";
+export { contrastRatio, relativeLuminance, WCAG_AA_LARGE, WCAG_AA_NORMAL } from "./contrast";
 export { ALLOWED_FONT_LICENSES, loadFonts, type SeedFont, SeedFontSchema, SeedFontsFileSchema } from "./fonts";
 export {
   BRAND_ICONS,
@@ -34,4 +35,5 @@ export {
 export { SEED_JSON_SCHEMAS, seedJsonSchema } from "./json-schema";
 export { LINT_RULES, type LintRule, type LintViolation, lintComponent } from "./lint";
 export { SEED_DATA_DIR, SEED_DIRS } from "./paths";
+export { type SeedTheme, SeedThemeSchema, THEME_PRESETS } from "./themes";
 export { formatSeedIssues, jsonPath, type SeedIssue, type SeedLibraryReport, validateSeedLibrary } from "./validate";

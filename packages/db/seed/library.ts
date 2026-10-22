@@ -4,12 +4,13 @@ import {
   formatSeedIssues,
   loadCategories,
   planLibraryImport,
+  THEME_PRESETS,
   uuidV5,
   validateSeedLibrary,
 } from "@platform/library-seed";
 import { and, eq } from "drizzle-orm";
 import type { Db } from "../src/client";
-import { components, componentVersions, libraryCategories } from "../src/schema/library";
+import { components, componentVersions, libraryCategories, themes } from "../src/schema/library";
 
 // CMP-142: validasi + rencana import library seed (tidak menyentuh DB). Mengembalikan exit code untuk CLI.
 export function seedLibrary(options: { dryRun: boolean }): { code: number; valid: boolean } {
@@ -29,6 +30,7 @@ export interface LibraryImportCounts {
   categories: number;
   components: number;
   versions: number;
+  themes: number;
 }
 
 /**
@@ -124,5 +126,33 @@ export async function importLibraryToDb(db: Db): Promise<LibraryImportCounts> {
     });
   }
 
-  return { categories: categories.length, components: files.length, versions: versionCount };
+  // CMP-120/CMP-124 (T3.11.1): preset theme platform (published). `tokens` jsonb menyimpan definisi Theme LENGKAP
+  // (tokens + fonts) agar situs bisa menyalinnya utuh saat memilih preset (DM-044). Idempoten (upsert by id = uuidV5).
+  await db.transaction(async (tx) => {
+    for (const preset of THEME_PRESETS) {
+      const value = {
+        id: uuidV5(`theme:${preset.slug}`),
+        slug: preset.slug,
+        ownerType: "platform" as const,
+        displayName: preset.displayName,
+        tokens: preset.theme as unknown as Record<string, unknown>,
+        mode: preset.mode,
+        tags: preset.tags,
+        industries: preset.industries,
+        status: "published" as const,
+        sortOrder: preset.sortOrder,
+      };
+      await tx
+        .insert(themes)
+        .values(value)
+        .onConflictDoUpdate({ target: themes.id, set: { ...value, updatedAt: new Date() } });
+    }
+  });
+
+  return {
+    categories: categories.length,
+    components: files.length,
+    versions: versionCount,
+    themes: THEME_PRESETS.length,
+  };
 }
