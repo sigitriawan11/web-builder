@@ -1407,7 +1407,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.8 — Admin web: library management dasar
 
-- [ ] **T3.8.1** Route `(admin)/admin/library` (role + 2FA) daftar component/theme, filter status/kategori — ACC-208 · `apps/web/(admin)` · Verifikasi: e2e
+- [x] **T3.8.1** Route `(admin)/admin/library` (role + 2FA) daftar component/theme, filter status/kategori — ACC-208 · `apps/web/(admin)` · Verifikasi: e2e
+  - **API:** `GET /v1/admin/library/components` (semua status, filter status/kategori/pencarian + paginasi) + `GET /v1/admin/library/capabilities` (role-gating web) — guard `READ_ROLES`, non-staf → **404** (permukaan tak bocor); repo `listAdminComponents` (join kategori, count). **SDK:** `library.listAdminComponents`/`capabilities`. **Web:** `(app)/(admin)/layout.tsx` gerbang via `getStaffCapabilities` (404→`notFound`), halaman `/admin/library` (tabel status/kategori/versi/usage/diperbarui + filter status). i18n `admin.library.*`. Int test (capabilities per role + list + filter + 404 non-staf) & e2e (staf lihat daftar+filter; non-staf→404) hijau lokal. **SISA:** thumbnail di tabel admin & filter kategori UI (T3.7.3 admin); **2FA belum ditegakkan** (T3.8.3) — route baru role-gated saja untuk sekarang.
 - [ ] **T3.8.2** Detail component: versi, changelog, usage count, aksi deprecate/archive — ACC-208, CMP-045, CMP-051 · `apps/web/(admin)` · Verifikasi: e2e
 - [ ] **T3.8.3** 2FA wajib untuk staff (TOTP Better Auth plugin) — ACC-200 (bagian staff), ACC-006 (staff) · `apps/api/src/auth`, `apps/web` · Verifikasi: e2e admin tanpa 2FA ditolak
 

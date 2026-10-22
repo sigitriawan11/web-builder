@@ -114,6 +114,38 @@ export const LibraryComponentUsageSchema = z.object({
 });
 export type LibraryComponentUsage = z.infer<typeof LibraryComponentUsageSchema>;
 
+// Item daftar admin library (ACC-208/T3.8.1): semua status (bukan hanya published), lintas kategori. Dibaca admin web.
+export const LibraryAdminComponentSchema = z.object({
+  id: UuidV7Schema,
+  publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
+  name: z.string(),
+  displayName: LocalizedTextSchema,
+  kind: ComponentKindSchema,
+  categorySlug: z.string(),
+  status: LibraryStatusSchema,
+  latestVersion: z.string().nullable(),
+  usageSiteCount: z.number().int().nonnegative(),
+  hasDraft: z.boolean(),
+  updatedAt: z.string(),
+});
+export type LibraryAdminComponent = z.infer<typeof LibraryAdminComponentSchema>;
+
+export const LibraryAdminListSchema = z.object({
+  items: z.array(LibraryAdminComponentSchema),
+  total: z.number().int().nonnegative(),
+});
+export type LibraryAdminList = z.infer<typeof LibraryAdminListSchema>;
+
+// Query daftar admin (filter status/kategori/pencarian + paginasi).
+export const LibraryAdminListQuerySchema = z.object({
+  status: LibraryStatusSchema.optional(),
+  category: z.string().optional(),
+  search: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+export type LibraryAdminListQuery = z.infer<typeof LibraryAdminListQuerySchema>;
+
 // Buat component (Mode Admin create-from-selection, CMP-011) — `definition` divalidasi `validateComponentDefinition`
 // di server. `slug` kebab-case unik per owner.
 export const CreateLibraryComponentBodySchema = z.object({

@@ -1,3 +1,4 @@
+import { LibraryAdminListQuerySchema } from "@platform/shared/contracts";
 import { z } from "zod";
 
 // Request admin library (CMP-159). Definisi component divalidasi lebih dalam oleh `validateComponentDefinition`
@@ -77,3 +78,9 @@ export const draftDefinitionRequest = {
 
 // Daftar kategori (CMP-150) — tanpa params.
 export const categoriesRequest = {};
+
+// ACC-208/T3.8.1: daftar component admin (filter status/kategori/pencarian + paginasi).
+export const adminListComponentsRequest = { query: LibraryAdminListQuerySchema };
+
+// Kapabilitas user saat ini (role-gating UI admin) — tanpa params.
+export const capabilitiesRequest = {};

@@ -1,1 +1,24 @@
-{}
+{
+  "library": {
+    "title": "Component library",
+    "description": "All platform components across every status.",
+    "empty": "No components match this filter.",
+    "filterAll": "All statuses",
+    "columns": {
+      "name": "Name",
+      "kind": "Kind",
+      "category": "Category",
+      "status": "Status",
+      "version": "Version",
+      "usage": "Sites",
+      "updated": "Updated"
+    },
+    "status": {
+      "draft": "Draft",
+      "in_review": "In review",
+      "published": "Published",
+      "deprecated": "Deprecated",
+      "archived": "Archived"
+    }
+  }
+}

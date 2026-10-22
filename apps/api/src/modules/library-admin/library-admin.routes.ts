@@ -9,7 +9,9 @@ import { validated } from "../../middleware/validate";
 import type { QueueProducer } from "../../queues/producer";
 import { createLibraryAdminController } from "./library-admin.controller";
 import {
+  adminListComponentsRequest,
   archiveRequest,
+  capabilitiesRequest,
   categoriesRequest,
   createComponentRequest,
   deprecateRequest,
@@ -64,6 +66,10 @@ export function createLibraryAdminRouter(deps: {
   ];
 
   router.get("/categories", ...guard(READ_ROLES), ...validated(categoriesRequest, controller.categories));
+  // Role-gating UI admin (T3.8.1): kapabilitas user saat ini. Non-staf → 404 (guard).
+  router.get("/capabilities", ...guard(READ_ROLES), ...validated(capabilitiesRequest, controller.capabilities));
+  // Daftar component admin (ACC-208) — semua status. Harus SEBELUM `/components/:id` agar tidak tertangkap param.
+  router.get("/components", ...guard(READ_ROLES), ...validated(adminListComponentsRequest, controller.listComponents));
   router.post("/components", ...guard(DRAFT_ROLES), ...validated(createComponentRequest, controller.create));
   router.put("/components/:id/draft", ...guard(DRAFT_ROLES), ...validated(saveDraftRequest, controller.saveDraft));
   router.post(

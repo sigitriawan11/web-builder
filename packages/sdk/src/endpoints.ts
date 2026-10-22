@@ -6,6 +6,9 @@ import {
   CreateLibraryComponentResponseSchema,
   type CreateSiteBody,
   dataEnvelope,
+  type LibraryAdminListQuery,
+  LibraryAdminListSchema,
+  LibraryCapabilitiesSchema,
   LibraryCategorySchema,
   LibraryComponentListItemSchema,
   LibraryComponentUsageSchema,
@@ -121,6 +124,16 @@ export function createPlatformApi(client: ApiClient) {
       categories: () =>
         client
           .request("GET", "/v1/admin/library/categories", { schema: dataEnvelope(z.array(LibraryCategorySchema)) })
+          .then(unwrap),
+      /** Daftar component admin (ACC-208/T3.8.1) — semua status, filter + paginasi. Non-staf → 404. */
+      listAdminComponents: (query: Partial<LibraryAdminListQuery> = {}) =>
+        client
+          .request("GET", "/v1/admin/library/components", { query, schema: dataEnvelope(LibraryAdminListSchema) })
+          .then(unwrap),
+      /** Kapabilitas user saat ini (role-gating UI admin). Non-staf → 404. */
+      capabilities: () =>
+        client
+          .request("GET", "/v1/admin/library/capabilities", { schema: dataEnvelope(LibraryCapabilitiesSchema) })
           .then(unwrap),
       /** Buat component (create-from-selection, CMP-011) → { id (UUID), publicId (cmp_) }. */
       createComponent: (body: CreateLibraryComponentBody) =>

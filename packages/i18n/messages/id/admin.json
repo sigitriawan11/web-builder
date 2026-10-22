@@ -1,1 +1,24 @@
-{}
+{
+  "library": {
+    "title": "Pustaka component",
+    "description": "Semua component platform di seluruh status.",
+    "empty": "Tak ada component yang cocok dengan filter ini.",
+    "filterAll": "Semua status",
+    "columns": {
+      "name": "Nama",
+      "kind": "Jenis",
+      "category": "Kategori",
+      "status": "Status",
+      "version": "Versi",
+      "usage": "Situs",
+      "updated": "Diperbarui"
+    },
+    "status": {
+      "draft": "Draf",
+      "in_review": "Direview",
+      "published": "Terbit",
+      "deprecated": "Usang",
+      "archived": "Diarsip"
+    }
+  }
+}

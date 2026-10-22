@@ -2,7 +2,9 @@ import { isIP } from "node:net";
 import type { Request, Response } from "express";
 import type { ValidatedHandler } from "../../middleware/validate";
 import type {
+  adminListComponentsRequest,
   archiveRequest,
+  capabilitiesRequest,
   categoriesRequest,
   createComponentRequest,
   deprecateRequest,
@@ -56,6 +58,12 @@ export function createLibraryAdminController(service: LibraryAdminService) {
   const categories: ValidatedHandler<typeof categoriesRequest> = async (_req, res) => {
     res.json({ data: await service.listCategories(), meta: meta(res) });
   };
+  const listComponents: ValidatedHandler<typeof adminListComponentsRequest> = async (req, res) => {
+    res.json({ data: await service.listComponents(req.valid.query), meta: meta(res) });
+  };
+  const capabilities: ValidatedHandler<typeof capabilitiesRequest> = async (req, res) => {
+    res.json({ data: await service.capabilities(actor(req).userId), meta: meta(res) });
+  };
   const realtimeToken: ValidatedHandler<typeof realtimeTokenRequest> = async (req, res) => {
     const data = await service.issueRealtimeToken(actor(req), req.valid.params.id);
     res.set("Cache-Control", "no-store"); // token berumur pendek; jangan di-cache.
@@ -77,5 +85,7 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     realtimeToken,
     draftDefinition,
     categories,
+    listComponents,
+    capabilities,
   };
 }

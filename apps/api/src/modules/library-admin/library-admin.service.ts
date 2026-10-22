@@ -11,6 +11,9 @@ import {
 import { AppError, uuidv7 } from "@platform/shared";
 import {
   componentThumbnailJobId,
+  type LibraryAdminList,
+  type LibraryAdminListQuery,
+  type LibraryCapabilities,
   type LibraryComponentSummary,
   type LibraryEditorSession,
   REALTIME_TOKEN_AUDIENCE,
@@ -117,6 +120,34 @@ export function createLibraryAdminService(deps: {
   }
 
   return {
+    /** ACC-208/T3.8.1: daftar component admin (semua status, lintas kategori) + total utk paginasi. */
+    async listComponents(query: LibraryAdminListQuery): Promise<LibraryAdminList> {
+      const { items, total } = await repo.listAdminComponents(db, query);
+      return {
+        total,
+        items: items.map((row) => ({
+          id: row.id,
+          publicId: row.publicId,
+          name: row.name,
+          displayName: row.displayName,
+          kind: row.kind,
+          categorySlug: row.categorySlug,
+          status: row.status,
+          latestVersion: row.latestVersion,
+          usageSiteCount: row.usageSiteCount,
+          hasDraft: row.draftDocumentId !== null,
+          updatedAt: row.updatedAt.toISOString(),
+        })),
+      };
+    },
+
+    /** Kapabilitas user saat ini (CMP-010) utk role-gating UI admin. Non-staf tak sampai sini (router → 404). */
+    async capabilities(userId: string): Promise<LibraryCapabilities> {
+      const role = await findStaffRole(db, userId);
+      if (!role) throw new AppError("NOT_FOUND");
+      return capabilitiesFor(role);
+    },
+
     /** Buat component platform + draft sebagai dokumen Yjs `kind='component'` (CMP-010/CMP-011, Approach A). */
     async createComponent(actor: StaffActor, input: CreateInput): Promise<{ id: string; publicId: string }> {
       const id = uuidv7();

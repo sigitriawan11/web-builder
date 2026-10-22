@@ -111,8 +111,42 @@ describe("admin library CRUD (CMP-159)", () => {
     expect((await request(target).get(`/v1/admin/library/components/${id}/usage`).set("cookie", plain)).status).toBe(
       404,
     );
+    // T3.8.1: daftar admin & kapabilitas juga 404 utk non-staf (permukaan tak bocor).
+    expect((await request(target).get("/v1/admin/library/components").set("cookie", plain)).status).toBe(404);
+    expect((await request(target).get("/v1/admin/library/capabilities").set("cookie", plain)).status).toBe(404);
     // Tanpa sesi → 401 (requireAuth sebelum requireStaffRole).
     expect((await request(target).post("/v1/admin/library/components").send(createBody("x2"))).status).toBe(401);
+  });
+
+  it("T3.8.1: capabilities per role + daftar admin (semua status, filter status)", async () => {
+    const admin = await register("library_admin");
+    const caps = await request(target).get("/v1/admin/library/capabilities").set("cookie", admin);
+    expect(caps.status).toBe(200);
+    expect(caps.body.data).toEqual({ role: "library_admin", canEditDraft: true, canPublish: true });
+
+    const designer = await register("designer");
+    const designerCaps = await request(target).get("/v1/admin/library/capabilities").set("cookie", designer);
+    expect(designerCaps.body.data).toEqual({ role: "designer", canEditDraft: true, canPublish: false });
+
+    // Buat draft → muncul di daftar admin dengan status draft.
+    const created = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody("daftar-admin"));
+    expect(created.status).toBe(201);
+    const { publicId } = created.body.data as { publicId: string };
+
+    const all = await request(target).get("/v1/admin/library/components").set("cookie", admin);
+    expect(all.status).toBe(200);
+    const row = (all.body.data.items as { publicId: string; status: string }[]).find((c) => c.publicId === publicId);
+    expect(row?.status).toBe("draft");
+    expect(all.body.data.total).toBeGreaterThanOrEqual(1);
+
+    // Filter status=published tidak memuat draft tadi.
+    const publishedOnly = await request(target)
+      .get("/v1/admin/library/components?status=published")
+      .set("cookie", admin);
+    expect((publishedOnly.body.data.items as { publicId: string }[]).some((c) => c.publicId === publicId)).toBe(false);
   });
 
   it("staf library_admin: create → publish → baca via editor API; audit tercatat", async () => {
