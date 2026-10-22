@@ -657,5 +657,12 @@
   },
   "autoLayoutGuides": {
     "gapHandle": "Gap"
+  },
+  "componentKind": {
+    "element": "Elemen",
+    "block": "Blok",
+    "section": "Seksi",
+    "page": "Halaman",
+    "layout": "Tata letak"
   }
 }

@@ -657,5 +657,12 @@
   },
   "autoLayoutGuides": {
     "gapHandle": "Gap"
+  },
+  "componentKind": {
+    "element": "Element",
+    "block": "Block",
+    "section": "Section",
+    "page": "Page",
+    "layout": "Layout"
   }
 }

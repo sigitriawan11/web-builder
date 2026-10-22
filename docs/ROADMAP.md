@@ -1425,7 +1425,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.10 — Konsep library & dokumentasi internal
 
-- [ ] **T3.10.1** Implementasi glosarium & tipe `kind` component (element/block/section/page) di schema & UI — CMP-001, CMP-002, CMP-003 · `packages/document-model`, `apps/editor` · Verifikasi: unit test enum `kind`
+- [x] **T3.10.1** Implementasi glosarium & tipe `kind` component (element/block/section/page) di schema & UI — CMP-001, CMP-002, CMP-003 · `packages/document-model`, `apps/editor` · Verifikasi: unit test enum `kind`
+  - Enum `kind` (element/block/section/page/layout) sudah ada & konsisten: kontrak shared `ComponentKindSchema` == DB `componentKindEnum` (unit test `library-kind.test.ts` cegah drift). library-seed `ComponentKindSchema` sengaja subset 4 (tanpa `page` — subtree seed tak boleh berisi page node; terdokumentasi). Validator section-root-`fill` (CMP-003 AC) sudah di library-seed `checkSubtrees`. **UI (CMP-001 ID/EN):** i18n `componentKind.*` + ComponentsPanel kini menampilkan label kind terlokalkan. Glosarium penuh (CMP-001/002) ditulis di README library (T3.10.3). **SISA:** label kind terlokalkan di admin web (kini raw); filter Insert per-kind (tab Elements/Blocks/Sections) = CMP-075/M4.
 - [ ] **T3.10.2** Kepemilikan & visibilitas library (scope `platform` vs `workspace`) — CMP-004 · `apps/api/src/modules/library` · Verifikasi: int test workspace lain tidak melihat component workspace
 - [ ] **T3.10.3** Panduan produksi library (style guide internal: spacing, token, penamaan) — CMP-015, CMP-133 · `packages/library-seed/README` · Verifikasi: owner review
 

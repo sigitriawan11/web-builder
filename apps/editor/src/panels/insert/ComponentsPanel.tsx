@@ -62,7 +62,8 @@ export function ComponentsPanel({ runtime, readOnly }: { runtime: CanvasRuntime;
                   />
                 ) : null}
                 <span className="font-medium">{item.displayName[locale] || item.name}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground">{item.kind}</span>
+                {/* CMP-001: istilah kind dilokalkan (Elemen/Blok/Seksi/…). */}
+                <span className="ml-auto text-[10px] text-muted-foreground">{t(`componentKind.${item.kind}`)}</span>
               </button>
             ))}
           </div>
