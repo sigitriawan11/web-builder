@@ -1,4 +1,41 @@
 {
   "seedVersion": 1,
-  "assets": []
+  "assets": [
+    {
+      "assetId": "ast_seedhero01",
+      "file": "images/placeholder-hero.svg",
+      "kind": "svg",
+      "width": 1600,
+      "height": 900,
+      "license": "CC0-1.0",
+      "source": "Own work (Platform seed)",
+      "sourceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "author": "Platform",
+      "attributionRequired": false
+    },
+    {
+      "assetId": "ast_seedsquare1",
+      "file": "images/placeholder-square.svg",
+      "kind": "svg",
+      "width": 800,
+      "height": 800,
+      "license": "CC0-1.0",
+      "source": "Own work (Platform seed)",
+      "sourceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "author": "Platform",
+      "attributionRequired": false
+    },
+    {
+      "assetId": "ast_seedwide01",
+      "file": "images/placeholder-wide.svg",
+      "kind": "svg",
+      "width": 1200,
+      "height": 600,
+      "license": "CC0-1.0",
+      "source": "Own work (Platform seed)",
+      "sourceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "author": "Platform",
+      "attributionRequired": false
+    }
+  ]
 }

@@ -1416,7 +1416,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.9 — Aset library
 
-- [ ] **T3.9.1** Pustaka gambar contoh berlisensi (kurasi, metadata lisensi, upload ke bucket `assets`) — CMP-190 · `packages/library-seed/src/assets` · Verifikasi: setiap gambar punya sumber & lisensi tercatat
+- [x] **T3.9.1** Pustaka gambar contoh berlisensi (kurasi, metadata lisensi, upload ke bucket `assets`) — CMP-190 · `packages/library-seed/src/assets` · Verifikasi: setiap gambar punya sumber & lisensi tercatat
+  - `SeedAssetSchema` diperluas: `license`, `source`, `sourceUrl?`, `author?`, `attributionRequired` dipaksa `false` (CMP-190: konten default wajib tanpa kewajiban atribusi). Seed awal: 3 placeholder SVG (own work, CC0) di `data/assets/images/` + entri manifest. Unit test (`assets.test.ts`): tiap aset punya lisensi+sumber, `attributionRequired=false`, file ada, assetId unik; JSON Schema snapshot disinkronkan. **OPEN CMP-190 (sumber stok):** adopsi usulan spec = **library foto internal terkurasi dulu** (integrasi stok P1). **SISA:** kurasi ~1.000 foto/industri (produksi konten, bertahap) + upload WebP/AVIF ke bucket saat seed (worker image-processing).
 - [ ] **T3.9.2** Daftar font terkurasi (Google Fonts OFL/Apache) untuk theme preset — CMP-191 · `packages/library-seed/src/themes` · Verifikasi: unit test semua font punya lisensi valid
 - [ ] **T3.9.3** Set ikon: Lucide + ikon sosial/merek sesuai keputusan OPEN — CMP-192 · `packages/library-seed/src/icons` · Verifikasi: unit test ikon yang dirujuk component ada
 
