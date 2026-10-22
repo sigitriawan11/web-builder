@@ -142,6 +142,7 @@ export function createApp(deps: AppDeps): Express {
         db: deps.db,
         ...(deps.redis ? { redis: deps.redis } : {}),
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
+        ...(deps.storage ? { storage: deps.storage } : {}),
       }),
     );
     // CRUD admin library (CMP-159) — role staf; non-staf → 404.

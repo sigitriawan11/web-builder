@@ -51,6 +51,16 @@ export function ComponentsPanel({ runtime, readOnly }: { runtime: CanvasRuntime;
                 }}
                 onClick={() => insertComponentInstance(runtime, { publicId: item.publicId, version: item.version })}
               >
+                {/* T3.7.3/CMP-014: thumbnail breakpoint base (presigned). Lazy-load; tanpa thumbnail → tanpa gambar. */}
+                {item.thumbnailUrl ? (
+                  <img
+                    src={item.thumbnailUrl}
+                    alt=""
+                    loading="lazy"
+                    data-testid={`component-thumb-${item.publicId}`}
+                    className="h-8 w-12 shrink-0 rounded border object-cover"
+                  />
+                ) : null}
                 <span className="font-medium">{item.displayName[locale] || item.name}</span>
                 <span className="ml-auto text-[10px] text-muted-foreground">{item.kind}</span>
               </button>

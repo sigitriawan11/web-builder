@@ -2,7 +2,7 @@ import { and, asc, type Db, eq, ilike, schema } from "@platform/db";
 
 // SATU-SATUNYA tempat modul library mengakses tabel (CLAUDE.md, ARCHITECTURE §6.2). Library platform = global (bukan
 // tenant): tidak ada scope workspace/site; hanya versi `published` & `owner_type='platform'` yang boleh dibaca.
-const { components, componentVersions, libraryCategories } = schema;
+const { components, componentVersions, componentVersionThumbnails, libraryCategories } = schema;
 
 export interface LibraryListItem {
   publicId: string;
@@ -12,6 +12,8 @@ export interface LibraryListItem {
   kind: (typeof components.kind.enumValues)[number];
   version: number;
   thumbnailUrl: string | null;
+  // CMP-014: key objek thumbnail breakpoint `base` di bucket `assets` (null bila belum di-generate). Service presign → URL.
+  thumbnailKey: string | null;
 }
 
 // Daftar component published (T3.6.1) utk panel Insert: hanya `status='published'` (bukan deprecated/archived) & punya
@@ -37,10 +39,19 @@ export async function listPublishedComponents(
       kind: components.kind,
       version: componentVersions.versionSeq,
       thumbnailUrl: components.thumbnailUrl,
+      thumbnailKey: componentVersionThumbnails.assetKey,
     })
     .from(components)
     .innerJoin(libraryCategories, eq(components.categoryId, libraryCategories.id))
     .innerJoin(componentVersions, eq(components.latestVersionId, componentVersions.id))
+    // CMP-014: thumbnail breakpoint `base` dari versi terbaru (left join: komponen tanpa thumbnail tetap tampil).
+    .leftJoin(
+      componentVersionThumbnails,
+      and(
+        eq(componentVersionThumbnails.componentVersionId, components.latestVersionId),
+        eq(componentVersionThumbnails.breakpoint, "base"),
+      ),
+    )
     .where(and(...conditions))
     .orderBy(asc(components.name));
   // `version_seq` bertipe nullable di schema; innerJoin versi published menjamin ada → saring null defensif.

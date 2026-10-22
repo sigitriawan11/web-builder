@@ -103,7 +103,7 @@ async function seedComponent(
   publicId: string,
   name: string,
   definition: unknown,
-) {
+): Promise<string> {
   const componentId = uuidv7();
   const versionId = uuidv7();
   await client.query(
@@ -126,6 +126,7 @@ async function seedComponent(
      values ($1,$2,'1.0.0',1,'published',$3,$4)`,
     [versionId, componentId, JSON.stringify(definition), JSON.stringify({ id: "r", en: "r" })],
   );
+  return versionId;
 }
 
 test.beforeAll(async () => {
@@ -148,8 +149,14 @@ test.beforeAll(async () => {
       [categoryId, `insdemo-cat-${categoryId}`, JSON.stringify({ id: "Demo", en: "Demo" })],
     );
     // Dua component kategori sama → T3.6.6 swap (InsertDemo → InsertDemoB).
-    await seedComponent(client, categoryId, PUBLIC_ID, "InsertDemo", DEFINITION);
+    const versionId = await seedComponent(client, categoryId, PUBLIC_ID, "InsertDemo", DEFINITION);
     await seedComponent(client, categoryId, SWAP_ID, "InsertDemoB", SWAP_DEFINITION);
+    // T3.7.3/CMP-014: thumbnail base utk PUBLIC_ID (key saja; presign tak butuh objek nyata) → panel tampilkan <img>.
+    await client.query(
+      `insert into component_version_thumbnails (id, component_version_id, breakpoint, asset_key, width, height)
+       values ($1,$2,'base',$3,1440,320)`,
+      [uuidv7(), versionId, `thumbnails/components/${versionId}/base.png`],
+    );
   } finally {
     await client.end();
   }
@@ -261,6 +268,19 @@ test("T3.6.2/ED-170: drag component dari panel → smart insert antara dua insta
   expect(after[1]).not.toBe(first);
   expect(after[1]).not.toBe(second);
   expect((await doc(page)).nodes[after[1] as string]?.type).toBe("instance");
+});
+
+test("T3.7.3/CMP-014: panel Components menampilkan thumbnail (base) component", async ({ page }) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Thumb Panel Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  await page.getByTestId("left-tab-insert").click();
+  const thumb = page.getByTestId("components-panel").getByTestId(`component-thumb-${PUBLIC_ID}`);
+  await expect(thumb).toBeVisible();
+  // src = URL presigned thumbnail base (key dari component_version_thumbnails).
+  const src = await thumb.getAttribute("src");
+  expect(src ?? "").toContain(`thumbnails/components/`);
 });
 
 test("T3.6.3/ED-058: double-click masuk ke child instance → override teks & visibility; hardLocked tak bisa diubah", async ({
