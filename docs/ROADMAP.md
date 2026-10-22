@@ -1469,8 +1469,10 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 #### Epic 3.12 — Dogfooding template internal
 
-- [ ] **T3.12.1** Susun 2 halaman contoh (kuliner & company profile) hanya dari component published — CMP-080 · editor · Verifikasi: node bebas < 10%
-- [ ] **T3.12.2** Catat gap library (item yang kurang) sebagai task tambahan Epic 3.11 / Epic 4.4 — CMP-080 · docs · Verifikasi: daftar gap di Lampiran D
+- [x] **T3.12.1** Susun 2 halaman contoh (kuliner & company profile) hanya dari component published — CMP-080 · editor · Verifikasi: node bebas < 10%
+  - 2 halaman sbg fixture komposisi (`data/templates/*.page.json`): kuliner-warung-nusantara (8 blok, 124 node, free 0.80%), company-profile-maju-bersama (9 blok, 150 node, free 0.66%). Semua blok ter-resolve ke component published; gate `test/dogfooding.test.ts` (free < 10%). Model template penuh (instance+binding) = epic terpisah; halaman di sini = daftar blok di-stack (audit via `auditPages`).
+- [x] **T3.12.2** Catat gap library (item yang kurang) sebagai task tambahan Epic 3.11 / Epic 4.4 — CMP-080 · docs · Verifikasi: daftar gap di Lampiran D
+  - Daftar gap dicatat di Lampiran D (2026-10-22). Kedua halaman dogfood tak punya blok hilang; gap = cakupan menuju target penuh CMP-093 (M4) + beberapa blok interaktif/dinamis.
 
 #### Epic 3.13 — (Opsional, disarankan) Fondasi agent AI khusus admin
 
@@ -2940,6 +2942,7 @@ Catat setiap perubahan struktural: task ditambah/dipecah/dipindah/dibatalkan, ke
 
 | Tanggal | Fase/Task | Perubahan | Alasan | Oleh |
 |---|---|---|---|---|
+| 2026-10-22 | T3.12.2 / CMP-080 (gap dogfooding) | **Gap library teridentifikasi saat dogfooding 2 halaman** (kedua halaman tetap lolos, 0 blok hilang). Untuk M4 (target penuh CMP-093): (a) kategori **Blog** belum ada (target Team/Contact/Blog 20); (b) **Product & Cards** 7→20, **Hero** 10→18, **Content** 16→20, **Feature** 9→15, **Social proof** 8→12, **Pricing/FAQ/CTA** 11→16, **Elements** 25→30, **Navigation** 14→22. (c) Blok interaktif/dinamis yg belum ada & akan dibutuhkan template nyata: FAQ **accordion** (kini statis), **form kontak tervalidasi** (DATA-*), **map embed asli**, **tabs**, **breadcrumb/pagination**, hero **video bg**. (d) **Model template penuh** (instance+binding+page root) = epic terpisah; dogfooding kini pakai stack-of-blocks. | Dogfooding T3.12.1 membuktikan library M3 cukup menyusun halaman kuliner & company profile dari component published; sisanya = cakupan M4 (Epic 4.4) & fitur dinamis (M5+), dicatat agar tak terlupa. | Claude Code (otonom M3) |
 | 2026-10-19 | T2.13.9 (schema v4→v5) | **schemaVersion 4→5**: tipe node `group` (DM-012) + invariant tolak fills/strokes/layout pada group. Migrasi `v4ToV5` identitas; fixtures `v5/`, lock, factory `schemaVersion:5`. `moveNode` memperlakukan group sebagai target freeform. | Group = P1·M2 (OPEN 02#6 sudah diputuskan: node type sendiri). Tipe node baru = perubahan schema → bump+migrasi+fixture. | Claude Code (rekomendasi, mohon dikonfirmasi) |
 | 2026-10-19 | T2.10.4 (schema v3→v4) | **schemaVersion 3→4**: `FillSchema` tambah `linearGradient`/`radialGradient` (DM-029, stops 2–10 offset menaik). Migrasi `v3ToV4` identitas; fixtures `v4/`, lock, factory `schemaVersion:4` diperbarui. | Gradient = P1·M2 di spec; aditif, tapi CLAUDE.md wajib bump+migrasi+fixture. (Idealnya dibundel dgn grid v3; dipisah karena task terpisah di ROADMAP.) | Claude Code (rekomendasi, mohon dikonfirmasi) |
 | 2026-10-19 | T2.8.14 (schema v2→v3) | **schemaVersion 2→3**: `LayoutSchema` tambah `mode:"grid"` + `GridTrack` + `flexChild.gridColumn/gridRow` (DM-011/DM-026). Migrasi `v2ToV3` identitas; fixtures `v3/`, `schema.lock.json`, factory `schemaVersion:3` diperbarui. | Grid = P1·M2 di spec; aditif & kompatibel mundur, tapi CLAUDE.md mewajibkan bump+migrasi+fixture untuk perubahan schema (sama seperti v1→v2). Belum deploy → bump aman. | Claude Code (rekomendasi, mohon dikonfirmasi) |

@@ -34,6 +34,7 @@ export {
 } from "./import";
 export { SEED_JSON_SCHEMAS, seedJsonSchema } from "./json-schema";
 export { LINT_RULES, type LintRule, type LintViolation, lintComponent } from "./lint";
+export { auditPages, type PageAudit, readPageFiles, type SeedPage, SeedPageSchema } from "./pages";
 export { SEED_DATA_DIR, SEED_DIRS } from "./paths";
 export { type SeedTheme, SeedThemeSchema, THEME_PRESETS } from "./themes";
 export { formatSeedIssues, jsonPath, type SeedIssue, type SeedLibraryReport, validateSeedLibrary } from "./validate";

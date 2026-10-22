@@ -1,0 +1,24 @@
+{
+  "$schema": "../../schema/page-seed.schema.json",
+  "seedVersion": 1,
+  "slug": "kuliner-warung-nusantara",
+  "categorySlug": "kuliner",
+  "displayName": {
+    "id": "Warung Nusantara",
+    "en": "Nusantara Eatery"
+  },
+  "description": {
+    "id": "Halaman contoh rumah makan: menu, galeri, ulasan, jam buka, dan ajakan pesan via WhatsApp.",
+    "en": "A sample eatery page: menu, gallery, reviews, opening hours, and an order-by-WhatsApp call to action."
+  },
+  "blocks": [
+    "navbar-whatsapp",
+    "hero-background",
+    "content-menu-list",
+    "content-gallery-grid",
+    "testimonial-grid-3",
+    "content-hours",
+    "cta-whatsapp",
+    "footer-social"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "seedVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "categorySlug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "displayName": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "en"
+      ],
+      "additionalProperties": false
+    },
+    "description": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 30,
+          "maxLength": 500
+        },
+        "en": {
+          "type": "string",
+          "minLength": 30,
+          "maxLength": 500
+        }
+      },
+      "required": [
+        "id",
+        "en"
+      ],
+      "additionalProperties": false
+    },
+    "blocks": {
+      "minItems": 3,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      }
+    }
+  },
+  "required": [
+    "seedVersion",
+    "slug",
+    "categorySlug",
+    "displayName",
+    "description",
+    "blocks"
+  ],
+  "additionalProperties": false
+}

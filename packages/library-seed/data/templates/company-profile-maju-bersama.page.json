@@ -1,0 +1,25 @@
+{
+  "$schema": "../../schema/page-seed.schema.json",
+  "seedVersion": 1,
+  "slug": "company-profile-maju-bersama",
+  "categorySlug": "company-profile",
+  "displayName": {
+    "id": "Maju Bersama",
+    "en": "Maju Bersama"
+  },
+  "description": {
+    "id": "Halaman profil perusahaan: hero, keunggulan, cerita, tim, bukti sosial, FAQ, dan ajakan kontak.",
+    "en": "A company profile page: hero, benefits, story, team, social proof, FAQ, and a contact call to action."
+  },
+  "blocks": [
+    "navbar-cta",
+    "hero-split-image-right",
+    "features-grid-3",
+    "content-about-story",
+    "social-proof-stats",
+    "team-grid-3",
+    "faq-list",
+    "cta-banner",
+    "footer-columns"
+  ]
+}
