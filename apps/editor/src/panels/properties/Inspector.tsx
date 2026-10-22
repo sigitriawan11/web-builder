@@ -5,6 +5,7 @@ import { useStore } from "zustand";
 import { useT } from "../../app/i18n";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { useNode, useNodes } from "../../document/use-node";
+import { childSelectionStore } from "../../store/child-selection-store";
 import { selectionStore } from "../../store/selection-store";
 import {
   clampInspectorWidth,
@@ -22,6 +23,7 @@ import { EffectsSection } from "./EffectsSection";
 import { FillSection } from "./FillSection";
 import { ImageSection } from "./ImageSection";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
+import { InstanceChildOverrideSection } from "./InstanceChildOverrideSection";
 import { InstancePropsSection } from "./InstancePropsSection";
 import { LinkSection } from "./LinkSection";
 import { isMixed, mixedValue } from "./mixed";
@@ -83,6 +85,20 @@ function DesignTab({
 }) {
   const t = useT();
   const page = useNode(pageId);
+  const childSelection = useStore(childSelectionStore, (state) => state.selection);
+  // ED-058/T3.6.3: mode "di dalam instance" — satu instance terpilih & child-nya diklik dua kali → Inspector hanya
+  // menampilkan override child yang diizinkan (bukan section node biasa yang mengedit akar instance).
+  const instanceNode = nodes.length === 1 && nodes[0]?.type === "instance" ? nodes[0] : null;
+  if (runtime && instanceNode && childSelection && childSelection.instanceId === instanceNode.id) {
+    return (
+      <InstanceChildOverrideSection
+        runtime={runtime}
+        instanceNode={instanceNode}
+        childSelection={childSelection}
+        readOnly={readOnly}
+      />
+    );
+  }
   if (nodes.length === 0) {
     return (
       <InspectorSection id="page" title={t("inspector.page")}>

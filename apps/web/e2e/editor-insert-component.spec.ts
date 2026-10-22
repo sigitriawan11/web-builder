@@ -11,6 +11,7 @@ test.use({ locale: "en-US", storageState: OWNER_STATE });
 
 const PUBLIC_ID = "cmp_insdemo01";
 const SWAP_ID = "cmp_insdemo02";
+const fillSize = (h: number) => ({ width: { mode: "fill" }, height: { mode: "fixed", value: h, unit: "px" } });
 const rootNodes = {
   n_root0001: {
     id: "n_root0001",
@@ -20,9 +21,37 @@ const rootNodes = {
     visible: true,
     locked: false,
     tag: "div",
+    // Dua child (vertikal) → geometri nyata (T3.6.2) + target double-click child (T3.6.3).
+    children: ["n_label0001", "n_lockrow0001"],
+    style: {
+      base: {
+        layout: { mode: "flex", direction: "column" },
+        size: { width: { mode: "fill" }, height: { mode: "hug" } },
+      },
+    },
+    props: {},
+  },
+  n_label0001: {
+    id: "n_label0001",
+    type: "text",
+    name: "Label",
+    parentId: "n_root0001",
+    visible: true,
+    locked: false,
+    tag: "p",
+    style: { base: { size: fillSize(40) } },
+    props: { content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Label" }] }] } },
+  },
+  n_lockrow0001: {
+    id: "n_lockrow0001",
+    type: "frame",
+    name: "Locked",
+    parentId: "n_root0001",
+    visible: true,
+    locked: false,
+    tag: "div",
     children: [],
-    // Ukuran tetap → instance punya geometri nyata (perlu untuk uji drag/smart-insert T3.6.2).
-    style: { base: { size: { width: { mode: "fill" }, height: { mode: "fixed", value: 80, unit: "px" } } } },
+    style: { base: { size: fillSize(40), fills: [{ type: "solid", color: "#eeeeee" }] } },
     props: {},
   },
 };
@@ -39,6 +68,8 @@ const DEFINITION = {
   variantAxes: [{ name: "tone", options: ["solid", "outline"], default: "solid" }],
   rootId: "n_root0001",
   nodes: rootNodes,
+  // DM-079: n_lockrow0001 terkunci penuh → tak bisa di-override (T3.6.3).
+  nodeAccess: { n_lockrow0001: { hardLocked: true } },
 };
 // Target swap: kategori sama; prop `headingText` dgn semanticRole "heading" → menerima nilai `title`.
 const SWAP_DEFINITION = {
@@ -61,6 +92,7 @@ interface DNode {
     version?: number;
     propValues?: Record<string, unknown>;
     variant?: Record<string, string>;
+    overrides?: Record<string, { visible?: boolean; props?: { content?: unknown } }>;
   };
 }
 const doc = (page: Page) => page.evaluate(() => window.__editorTestApi?.getDoc() as { nodes: Record<string, DNode> });
@@ -229,4 +261,48 @@ test("T3.6.2/ED-170: drag component dari panel → smart insert antara dua insta
   expect(after[1]).not.toBe(first);
   expect(after[1]).not.toBe(second);
   expect((await doc(page)).nodes[after[1] as string]?.type).toBe("instance");
+});
+
+test("T3.6.3/ED-058: double-click masuk ke child instance → override teks & visibility; hardLocked tak bisa diubah", async ({
+  page,
+}) => {
+  await page.goto(`${APP_URL}/sites`);
+  await page.goto(`${APP_URL}/editor/${await createSiteViaApi(page, "Child Override Test")}`);
+  await expect(page.locator('[data-connection-status="synced"]')).toBeVisible();
+
+  await page.getByTestId("left-tab-insert").click();
+  await page.getByTestId("components-panel").getByTestId(`insert-component-${PUBLIC_ID}`).click();
+  const instId = (await page.evaluate(() => window.__editorTestApi?.getSelection() ?? []))[0] as string;
+  const inspector = page.getByTestId("inspector");
+
+  // Double-click child teks (resolved id `${instId}:n_label0001`) → masuk mode override; Inspector tampilkan kontrol.
+  await page.locator(`[data-resolved-id="${instId}:n_label0001"]`).dblclick();
+  const textInput = inspector.getByTestId("instance-child-text");
+  await expect(textInput).toBeVisible();
+
+  // Override teks → props.overrides[n_label0001].props.content tertulis.
+  await textInput.fill("Halo");
+  await textInput.blur();
+  await expect
+    .poll(async () => {
+      const content = (await doc(page)).nodes[instId]?.props?.overrides?.n_label0001?.props?.content;
+      return JSON.stringify(content ?? "");
+    })
+    .toContain("Halo");
+
+  // Override visibility → overrides[n_label0001].visible === false.
+  await inspector.getByTestId("instance-child-visible").click();
+  await expect.poll(async () => (await doc(page)).nodes[instId]?.props?.overrides?.n_label0001?.visible).toBe(false);
+
+  // Child hardLocked (n_lockrow0001) → masuk mode tapi tak ada kontrol (pesan terkunci).
+  await page.locator(`[data-resolved-id="${instId}:n_lockrow0001"]`).dblclick();
+  await expect(inspector.getByTestId("instance-child-locked")).toBeVisible();
+  await expect(inspector.getByTestId("instance-child-visible")).toBeHidden();
+
+  // Klik tunggal di area kosong canvas → keluar mode child (kembali ke props instance / tak ada override UI).
+  const canvas = await page.getByTestId("editor-canvas").boundingBox();
+  if (!canvas) throw new Error("canvas tidak terlihat");
+  await page.mouse.click(canvas.x + canvas.width - 12, canvas.y + canvas.height - 12);
+  await expect(inspector.getByTestId("instance-child-text")).toBeHidden();
+  await expect(inspector.getByTestId("instance-child-locked")).toBeHidden();
 });

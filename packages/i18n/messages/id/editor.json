@@ -502,6 +502,14 @@
       "dropped": "{count} konten tidak terbawa",
       "resetAll": "Reset semua override",
       "overridden": "Diubah dari default — klik untuk reset"
+    },
+    "childOverride": {
+      "title": "Edit di dalam instance",
+      "visible": "Tampilkan",
+      "text": "Teks",
+      "reset": "Reset override",
+      "locked": "Elemen ini terkunci dan tidak bisa diubah.",
+      "missing": "Elemen tidak ditemukan di component."
     }
   },
   "nodeType": {

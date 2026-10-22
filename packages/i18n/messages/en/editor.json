@@ -502,6 +502,14 @@
       "dropped": "{count} content not carried over",
       "resetAll": "Reset all overrides",
       "overridden": "Changed from default — click to reset"
+    },
+    "childOverride": {
+      "title": "Edit inside instance",
+      "visible": "Visible",
+      "text": "Text",
+      "reset": "Reset override",
+      "locked": "This element is locked and cannot be edited.",
+      "missing": "Element not found in the component."
     }
   },
   "nodeType": {
