@@ -1,0 +1,22 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { type ComponentSpec, toComponentFile } from "./builder";
+import { ELEMENTS } from "./catalog/elements";
+
+// Generator file seed component dari katalog (T3.11.x). `pnpm --filter @platform/library-seed gen`. File di-emit ke
+// `data/components/<kategori>/<slug>.component.json`; validasi dijalankan oleh `library-seed` test (validateSeedLibrary).
+
+const DATA = fileURLToPath(new URL("../data/components/", import.meta.url));
+
+const CATALOG: ComponentSpec[] = [...ELEMENTS];
+
+let written = 0;
+for (const spec of CATALOG) {
+  const file = toComponentFile(spec);
+  const path = join(DATA, spec.categorySlug, `${spec.slug}.component.json`);
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${JSON.stringify(file, null, 2)}\n`);
+  written++;
+}
+console.log(`Generated ${written} component(s) across ${new Set(CATALOG.map((c) => c.categorySlug)).size} categori.`);

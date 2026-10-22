@@ -34,6 +34,8 @@ describe("planLibraryImport", () => {
       { version: "1.0.0", status: "published", contentHash: expect.stringMatching(/^[0-9a-f]{64}$/) },
     ]);
     expect(planLibraryImport()).toEqual(plan);
-    expect(formatImportPlan(plan)).toMatch(/Component: 1 \(1 versi\)\n {2}- button-primary \[element\/elements\]/);
+    // Katalog bertambah (T3.11.x); jangan hard-code jumlah — cukup pastikan button-primary ada di rencana.
+    expect(plan.components.length).toBeGreaterThanOrEqual(11);
+    expect(formatImportPlan(plan)).toContain("- button-primary [element/elements]");
   });
 });

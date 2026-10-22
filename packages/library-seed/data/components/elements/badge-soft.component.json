@@ -1,0 +1,153 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_badgesoft",
+  "slug": "badge-soft",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "BadgeSoft",
+    "displayName": {
+      "id": "Badge Lembut",
+      "en": "Soft Badge"
+    },
+    "description": {
+      "id": "Label kecil berlatar surface dengan teks primer.",
+      "en": "Small surface-filled label with primary text."
+    },
+    "tags": [
+      "badge",
+      "soft"
+    ],
+    "keywords": {
+      "id": [
+        "label",
+        "fitur"
+      ],
+      "en": [
+        "badge",
+        "feature"
+      ]
+    },
+    "aiHints": "Penanda fitur/highlight; teks pendek."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": [
+            "tmp_badges0"
+          ],
+          "nodes": {
+            "tmp_badges0": {
+              "id": "tmp_badges0",
+              "type": "frame",
+              "name": "Badge",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": [
+                "tmp_badges1"
+              ],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.1"
+                      },
+                      "right": {
+                        "$token": "space.3"
+                      },
+                      "bottom": {
+                        "$token": "space.1"
+                      },
+                      "left": {
+                        "$token": "space.3"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.full"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_badges1": {
+              "id": "tmp_badges1",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_badges0",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Unggulan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.caption"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

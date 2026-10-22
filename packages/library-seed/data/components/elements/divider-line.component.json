@@ -1,0 +1,86 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_dividerline",
+  "slug": "divider-line",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "Divider",
+    "displayName": {
+      "id": "Garis Pembatas",
+      "en": "Divider"
+    },
+    "description": {
+      "id": "Garis tipis selebar penuh untuk memisahkan konten.",
+      "en": "Thin full-width line to separate content."
+    },
+    "tags": [
+      "divider",
+      "separator"
+    ],
+    "keywords": {
+      "id": [
+        "pembatas",
+        "garis"
+      ],
+      "en": [
+        "divider",
+        "separator"
+      ]
+    },
+    "aiHints": "Pemisah antar blok konten; jangan dipakai sebagai dekorasi tebal."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": [
+            "tmp_divide0"
+          ],
+          "nodes": {
+            "tmp_divide0": {
+              "id": "tmp_divide0",
+              "type": "shape",
+              "name": "Divider",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "shape": "line"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 1,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.border"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

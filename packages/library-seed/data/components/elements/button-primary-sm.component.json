@@ -1,0 +1,156 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_buttonprimarysm",
+  "slug": "button-primary-sm",
+  "kind": "element",
+  "categorySlug": "elements",
+  "meta": {
+    "name": "ButtonSmall",
+    "displayName": {
+      "id": "Tombol Kecil",
+      "en": "Small Button"
+    },
+    "description": {
+      "id": "Tombol utama ukuran kecil untuk ruang sempit.",
+      "en": "Small primary button for tight spaces."
+    },
+    "tags": [
+      "button",
+      "primary"
+    ],
+    "keywords": {
+      "id": [
+        "tombol",
+        "ajakan"
+      ],
+      "en": [
+        "button",
+        "cta"
+      ]
+    },
+    "aiHints": "Satu aksi per section. Isi label dengan kata kerja singkat; pasang link WhatsApp atau halaman tujuan."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": [
+            "tmp_button0"
+          ],
+          "nodes": {
+            "tmp_button0": {
+              "id": "tmp_button0",
+              "type": "frame",
+              "name": "Button",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": [
+                "tmp_button1"
+              ],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.2"
+                      },
+                      "right": {
+                        "$token": "space.5"
+                      },
+                      "bottom": {
+                        "$token": "space.2"
+                      },
+                      "left": {
+                        "$token": "space.5"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_button1": {
+              "id": "tmp_button1",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_button0",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pesan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
