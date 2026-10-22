@@ -1445,7 +1445,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [ ] **T3.11.5** Navigation: Footer (4 varian) + Floating WhatsApp button — CMP-081 · library · Verifikasi: ≥ 6 variasi (total Nav ≥ 14 bersama M4)
 - [x] **T3.11.6** Hero batch: centered, split image, background image — CMP-082 · library · Verifikasi: ≥ 10 variasi
   - 10 hero (centered/centered-badge/split-left/split-right/background/minimal/whatsapp/left-aligned/image-below/trust-logos) via toolkit; section root width fill, token+auto-layout, lolos validateSeedLibrary. Gambar = placeholder frame (swap aset nanti).
-- [ ] **T3.11.7** Feature/Benefit: feature grid ikon, alternating, checklist, steps/process — CMP-083 · library · Verifikasi: ≥ 9 variasi
+- [x] **T3.11.7** Feature/Benefit: feature grid ikon, alternating, checklist, steps/process — CMP-083 · library · Verifikasi: ≥ 9 variasi
+  - 9 varian (grid 3/4/2, checklist, steps, alternating, stats, icon-list 2-col, split-checklist) via toolkit; token+auto-layout, lolos validateSeedLibrary.
 - [ ] **T3.11.8** Content batch 1: text block, image+text, gallery grid, video embed — CMP-084 · library · Verifikasi: ≥ 8 variasi
 - [ ] **T3.11.9** Content batch 2: about/story, menu restoran/daftar harga, jadwal/jam operasional — CMP-084 · library · Verifikasi: ≥ 6 variasi (total Content ≥ 14)
 - [ ] **T3.11.10** Social proof: testimonial cards, rating, logo cloud, stats — CMP-085 · library · Verifikasi: ≥ 8 variasi

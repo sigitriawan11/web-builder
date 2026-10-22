@@ -15,10 +15,20 @@
       "id": "Hero ringkas: judul + satu tombol.",
       "en": "Compact hero: title + one button."
     },
-    "tags": ["hero", "minimal"],
+    "tags": [
+      "hero",
+      "minimal"
+    ],
     "keywords": {
-      "id": ["hero", "pembuka", "judul utama"],
-      "en": ["hero", "headline"]
+      "id": [
+        "hero",
+        "pembuka",
+        "judul utama"
+      ],
+      "en": [
+        "hero",
+        "headline"
+      ]
     },
     "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_heromi0"],
+          "rootIds": [
+            "tmp_heromi0"
+          ],
           "nodes": {
             "tmp_heromi0": {
               "id": "tmp_heromi0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heromi1"],
+              "children": [
+                "tmp_heromi1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_heromi0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heromi2", "tmp_heromi6"],
+              "children": [
+                "tmp_heromi2",
+                "tmp_heromi6"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,9 @@
               "parentId": "tmp_heromi1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heromi3"],
+              "children": [
+                "tmp_heromi3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -195,7 +214,9 @@
               "parentId": "tmp_heromi1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heromi5"],
+              "children": [
+                "tmp_heromi5"
+              ],
               "props": {
                 "role": "button"
               },
@@ -296,7 +317,9 @@
               "parentId": "tmp_heromi1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heromi4"],
+              "children": [
+                "tmp_heromi4"
+              ],
               "props": {},
               "style": {
                 "base": {

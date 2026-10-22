@@ -15,10 +15,20 @@
       "id": "Pembuka terpusat: judul besar, subjudul, dua tombol.",
       "en": "Centered opener: big title, subtitle, two buttons."
     },
-    "tags": ["hero", "centered"],
+    "tags": [
+      "hero",
+      "centered"
+    ],
     "keywords": {
-      "id": ["hero", "pembuka", "judul utama"],
-      "en": ["hero", "headline"]
+      "id": [
+        "hero",
+        "pembuka",
+        "judul utama"
+      ],
+      "en": [
+        "hero",
+        "headline"
+      ]
     },
     "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_heroce0"],
+          "rootIds": [
+            "tmp_heroce0"
+          ],
           "nodes": {
             "tmp_heroce0": {
               "id": "tmp_heroce0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroce1"],
+              "children": [
+                "tmp_heroce1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_heroce0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroce2", "tmp_heroce9"],
+              "children": [
+                "tmp_heroce2",
+                "tmp_heroce9"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,10 @@
               "parentId": "tmp_heroce1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroce3", "tmp_heroce4"],
+              "children": [
+                "tmp_heroce3",
+                "tmp_heroce4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -238,7 +258,9 @@
               "parentId": "tmp_heroce1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroce6"],
+              "children": [
+                "tmp_heroce6"
+              ],
               "props": {
                 "role": "button"
               },
@@ -339,7 +361,9 @@
               "parentId": "tmp_heroce1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroce8"],
+              "children": [
+                "tmp_heroce8"
+              ],
               "props": {
                 "role": "button"
               },
@@ -432,7 +456,10 @@
               "parentId": "tmp_heroce1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroce5", "tmp_heroce7"],
+              "children": [
+                "tmp_heroce5",
+                "tmp_heroce7"
+              ],
               "props": {},
               "style": {
                 "base": {

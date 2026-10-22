@@ -15,10 +15,20 @@
       "id": "Hero dengan latar surface penuh dan teks terpusat.",
       "en": "Hero with full surface background and centered text."
     },
-    "tags": ["hero", "background"],
+    "tags": [
+      "hero",
+      "background"
+    ],
     "keywords": {
-      "id": ["hero", "pembuka", "judul utama"],
-      "en": ["hero", "headline"]
+      "id": [
+        "hero",
+        "pembuka",
+        "judul utama"
+      ],
+      "en": [
+        "hero",
+        "headline"
+      ]
     },
     "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_heroba0"],
+          "rootIds": [
+            "tmp_heroba0"
+          ],
           "nodes": {
             "tmp_heroba0": {
               "id": "tmp_heroba0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroba1"],
+              "children": [
+                "tmp_heroba1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -93,7 +107,10 @@
               "parentId": "tmp_heroba0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroba2", "tmp_heroba7"],
+              "children": [
+                "tmp_heroba2",
+                "tmp_heroba7"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -126,7 +143,10 @@
               "parentId": "tmp_heroba1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroba3", "tmp_heroba4"],
+              "children": [
+                "tmp_heroba3",
+                "tmp_heroba4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -246,7 +266,9 @@
               "parentId": "tmp_heroba1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroba6"],
+              "children": [
+                "tmp_heroba6"
+              ],
               "props": {
                 "role": "button"
               },
@@ -347,7 +369,9 @@
               "parentId": "tmp_heroba1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_heroba5"],
+              "children": [
+                "tmp_heroba5"
+              ],
               "props": {},
               "style": {
                 "base": {
