@@ -641,8 +641,8 @@ platform library
 - **Prioritas · Fase:** P0 · M3
 - **Deskripsi:** Menu "Edit komponen utama" hanya tampil untuk user dengan role admin library, dan membuka component di Mode Admin (tab baru) sebagai **draft baru** — tidak pernah mengedit versi published di tempat. User biasa melihat menu "Lihat info komponen" (nama, versi, changelog, deskripsi).
 - **Acceptance criteria:**
-  - [ ] User non-admin tidak pernah melihat menu edit main component; API menolak.
-  - [ ] Admin yang membuka dari situs user mendapat draft; situs user tidak berubah sampai ia memilih update.
+  - [x] User non-admin tidak pernah melihat menu edit main component; API menolak.
+  - [x] Admin yang membuka dari situs user mendapat draft; situs user tidak berubah sampai ia memilih update.
 
 ### CMP-074 Swap component
 - **Prioritas · Fase:** P0 · M4
