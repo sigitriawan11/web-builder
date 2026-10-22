@@ -1,0 +1,741 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_pricingservicelist",
+  "slug": "pricing-service-list",
+  "kind": "section",
+  "categorySlug": "pricing",
+  "meta": {
+    "name": "PriceList",
+    "displayName": {
+      "id": "Daftar Harga Jasa",
+      "en": "Service Price List"
+    },
+    "description": {
+      "id": "Daftar layanan dengan harga di sisi kanan tiap baris.",
+      "en": "A list of services with prices aligned to the right of each row."
+    },
+    "tags": ["pricing", "service", "list"],
+    "keywords": {
+      "id": ["harga", "paket", "biaya"],
+      "en": ["pricing", "plans"]
+    },
+    "aiHints": "Tampilkan 1–3 paket; sorot paket populer; daftar fitur jelas + 1 tombol per paket."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_pricin0"],
+          "nodes": {
+            "tmp_pricin0": {
+              "id": "tmp_pricin0",
+              "type": "frame",
+              "name": "PriceList",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin1": {
+              "id": "tmp_pricin1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_pricin0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin2", "tmp_pricin5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin2": {
+              "id": "tmp_pricin2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_pricin1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin3", "tmp_pricin4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 600,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin3": {
+              "id": "tmp_pricin3",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_pricin2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Daftar harga layanan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_pricin4": {
+              "id": "tmp_pricin4",
+              "type": "text",
+              "name": "Lead",
+              "parentId": "tmp_pricin2",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Harga jujur, tanpa biaya tersembunyi."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_pricin5": {
+              "id": "tmp_pricin5",
+              "type": "frame",
+              "name": "List",
+              "parentId": "tmp_pricin1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin6", "tmp_pricin9", "tmp_pricin12", "tmp_pricin15"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "stretch",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 680,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin6": {
+              "id": "tmp_pricin6",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_pricin5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin7", "tmp_pricin8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin7": {
+              "id": "tmp_pricin7",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_pricin6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Cuci Mobil Standar"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_pricin8": {
+              "id": "tmp_pricin8",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_pricin6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp35rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_pricin9": {
+              "id": "tmp_pricin9",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_pricin5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin10", "tmp_pricin11"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin10": {
+              "id": "tmp_pricin10",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_pricin9",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Cuci + Poles"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_pricin11": {
+              "id": "tmp_pricin11",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_pricin9",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp75rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_pricin12": {
+              "id": "tmp_pricin12",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_pricin5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin13", "tmp_pricin14"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin13": {
+              "id": "tmp_pricin13",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_pricin12",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Salon Interior"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_pricin14": {
+              "id": "tmp_pricin14",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_pricin12",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp150rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_pricin15": {
+              "id": "tmp_pricin15",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_pricin5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_pricin16", "tmp_pricin17"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_pricin16": {
+              "id": "tmp_pricin16",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_pricin15",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Paket Lengkap"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_pricin17": {
+              "id": "tmp_pricin17",
+              "type": "text",
+              "name": "Price",
+              "parentId": "tmp_pricin15",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rp250rb"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

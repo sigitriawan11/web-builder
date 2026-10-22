@@ -15,10 +15,20 @@
       "id": "Tiga kartu fitur berikon dengan judul dan deskripsi singkat.",
       "en": "Three icon feature cards with title and short description."
     },
-    "tags": ["features", "grid"],
+    "tags": [
+      "features",
+      "grid"
+    ],
     "keywords": {
-      "id": ["fitur", "keunggulan", "manfaat"],
-      "en": ["features", "benefits"]
+      "id": [
+        "fitur",
+        "keunggulan",
+        "manfaat"
+      ],
+      "en": [
+        "features",
+        "benefits"
+      ]
     },
     "aiHints": "Daftar 3–6 keunggulan. Tiap item: ikon relevan, judul 2–4 kata, 1 kalimat manfaat konkret."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_featur0"],
+          "rootIds": [
+            "tmp_featur0"
+          ],
           "nodes": {
             "tmp_featur0": {
               "id": "tmp_featur0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_featur1"],
+              "children": [
+                "tmp_featur1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_featur0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_featur2", "tmp_featur6"],
+              "children": [
+                "tmp_featur2",
+                "tmp_featur6"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,11 @@
               "parentId": "tmp_featur1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_featur3", "tmp_featur4", "tmp_featur5"],
+              "children": [
+                "tmp_featur3",
+                "tmp_featur4",
+                "tmp_featur5"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -281,7 +302,11 @@
               "parentId": "tmp_featur1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_featur7", "tmp_featur11", "tmp_featur15"],
+              "children": [
+                "tmp_featur7",
+                "tmp_featur11",
+                "tmp_featur15"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -313,7 +338,11 @@
               "parentId": "tmp_featur6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_featur8", "tmp_featur9", "tmp_featur10"],
+              "children": [
+                "tmp_featur8",
+                "tmp_featur9",
+                "tmp_featur10"
+              ],
               "props": {
                 "role": "card"
               },
@@ -498,7 +527,11 @@
               "parentId": "tmp_featur6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_featur12", "tmp_featur13", "tmp_featur14"],
+              "children": [
+                "tmp_featur12",
+                "tmp_featur13",
+                "tmp_featur14"
+              ],
               "props": {
                 "role": "card"
               },
@@ -683,7 +716,11 @@
               "parentId": "tmp_featur6",
               "visible": true,
               "locked": false,
-              "children": ["tmp_featur16", "tmp_featur17", "tmp_featur18"],
+              "children": [
+                "tmp_featur16",
+                "tmp_featur17",
+                "tmp_featur18"
+              ],
               "props": {
                 "role": "card"
               },

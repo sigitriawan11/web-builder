@@ -30,7 +30,7 @@ export const padAll = (step: number): Json => padXY(step, step);
 
 export interface FlexOpts {
   align?: "start" | "center" | "end" | "stretch";
-  justify?: "start" | "center" | "end" | "between";
+  justify?: "start" | "center" | "end" | "spaceBetween";
   gap?: number; // langkah token space
   wrap?: boolean;
   padding?: Json;
@@ -404,6 +404,31 @@ export function imageBox(
       radius: T("radius.lg"),
     },
   });
+}
+
+// Input visual (placeholder) — frame border + teks muted. Konten default; fungsi form = DATA-* (follow-up).
+export function inputBox(tree: Tree, parentId: string, placeholder: string): string {
+  const box = tree.frame({
+    name: "Input",
+    parentId,
+    layout: flex("row", { align: "center", padding: padXY(4, 3) }),
+    style: {
+      size: size(FILL, HUG),
+      fills: [{ type: "solid", color: T("color.background") }],
+      radius: T("radius.md"),
+      strokes: [{ color: T("color.border"), width: { value: 1, unit: "px" } }],
+    },
+  });
+  const t = tree.text({
+    name: "Placeholder",
+    parentId: box,
+    text: placeholder,
+    typography: "typography.body",
+    color: "color.muted",
+    tag: "span",
+    width: FILL,
+  });
+  return setChildren(tree, box, [t]);
 }
 
 export { setChildren };

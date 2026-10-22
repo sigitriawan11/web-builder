@@ -1,0 +1,983 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_faqtwocolumn",
+  "slug": "faq-two-column",
+  "kind": "section",
+  "categorySlug": "faq",
+  "meta": {
+    "name": "FaqTwoColumn",
+    "displayName": {
+      "id": "FAQ Dua Kolom",
+      "en": "Two-column FAQ"
+    },
+    "description": {
+      "id": "Pertanyaan tersusun dalam dua kolom agar lebih ringkas.",
+      "en": "Questions arranged in two columns for a compact layout."
+    },
+    "tags": ["faq", "two-column"],
+    "keywords": {
+      "id": ["faq", "tanya jawab", "pertanyaan"],
+      "en": ["faq", "questions"]
+    },
+    "aiHints": "4–8 pertanyaan umum calon pelanggan + jawaban singkat & jelas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_faqtwo0"],
+          "nodes": {
+            "tmp_faqtwo0": {
+              "id": "tmp_faqtwo0",
+              "type": "frame",
+              "name": "FaqTwoColumn",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo1": {
+              "id": "tmp_faqtwo1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_faqtwo0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo2", "tmp_faqtwo4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo2": {
+              "id": "tmp_faqtwo2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_faqtwo1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 640,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo3": {
+              "id": "tmp_faqtwo3",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_faqtwo2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Masih ada pertanyaan?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo4": {
+              "id": "tmp_faqtwo4",
+              "type": "frame",
+              "name": "Columns",
+              "parentId": "tmp_faqtwo1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo5", "tmp_faqtwo15"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.8"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo5": {
+              "id": "tmp_faqtwo5",
+              "type": "frame",
+              "name": "Col",
+              "parentId": "tmp_faqtwo4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo6", "tmp_faqtwo9", "tmp_faqtwo12"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo6": {
+              "id": "tmp_faqtwo6",
+              "type": "frame",
+              "name": "Item",
+              "parentId": "tmp_faqtwo5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo7", "tmp_faqtwo8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo7": {
+              "id": "tmp_faqtwo7",
+              "type": "text",
+              "name": "Question",
+              "parentId": "tmp_faqtwo6",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Apakah saya perlu bisa coding?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo8": {
+              "id": "tmp_faqtwo8",
+              "type": "text",
+              "name": "Answer",
+              "parentId": "tmp_faqtwo6",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tidak sama sekali. Cukup pilih template, ubah teks dan gambar, lalu publish."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo9": {
+              "id": "tmp_faqtwo9",
+              "type": "frame",
+              "name": "Item",
+              "parentId": "tmp_faqtwo5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo10", "tmp_faqtwo11"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo10": {
+              "id": "tmp_faqtwo10",
+              "type": "text",
+              "name": "Question",
+              "parentId": "tmp_faqtwo9",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Berapa biayanya?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo11": {
+              "id": "tmp_faqtwo11",
+              "type": "text",
+              "name": "Answer",
+              "parentId": "tmp_faqtwo9",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Anda bisa mulai gratis. Upgrade ke paket berbayar kapan pun Anda butuh fitur lebih."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo12": {
+              "id": "tmp_faqtwo12",
+              "type": "frame",
+              "name": "Item",
+              "parentId": "tmp_faqtwo5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo13", "tmp_faqtwo14"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo13": {
+              "id": "tmp_faqtwo13",
+              "type": "text",
+              "name": "Question",
+              "parentId": "tmp_faqtwo12",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Bisakah pakai domain sendiri?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo14": {
+              "id": "tmp_faqtwo14",
+              "type": "text",
+              "name": "Answer",
+              "parentId": "tmp_faqtwo12",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Bisa. Hubungkan domain yang sudah Anda miliki atau beli domain baru langsung dari dashboard."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo15": {
+              "id": "tmp_faqtwo15",
+              "type": "frame",
+              "name": "Col",
+              "parentId": "tmp_faqtwo4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo16", "tmp_faqtwo19", "tmp_faqtwo22"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo16": {
+              "id": "tmp_faqtwo16",
+              "type": "frame",
+              "name": "Item",
+              "parentId": "tmp_faqtwo15",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo17", "tmp_faqtwo18"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo17": {
+              "id": "tmp_faqtwo17",
+              "type": "text",
+              "name": "Question",
+              "parentId": "tmp_faqtwo16",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Apakah website-nya cepat di HP?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo18": {
+              "id": "tmp_faqtwo18",
+              "type": "text",
+              "name": "Answer",
+              "parentId": "tmp_faqtwo16",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Ya. Semua template responsif dan dioptimalkan agar cepat di perangkat mobile."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo19": {
+              "id": "tmp_faqtwo19",
+              "type": "frame",
+              "name": "Item",
+              "parentId": "tmp_faqtwo15",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo20", "tmp_faqtwo21"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo20": {
+              "id": "tmp_faqtwo20",
+              "type": "text",
+              "name": "Question",
+              "parentId": "tmp_faqtwo19",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Bagaimana jika butuh bantuan?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo21": {
+              "id": "tmp_faqtwo21",
+              "type": "text",
+              "name": "Answer",
+              "parentId": "tmp_faqtwo19",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tim dukungan kami siap membantu via email dan WhatsApp dalam bahasa Indonesia."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo22": {
+              "id": "tmp_faqtwo22",
+              "type": "frame",
+              "name": "Item",
+              "parentId": "tmp_faqtwo15",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_faqtwo23", "tmp_faqtwo24"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo23": {
+              "id": "tmp_faqtwo23",
+              "type": "text",
+              "name": "Question",
+              "parentId": "tmp_faqtwo22",
+              "visible": true,
+              "locked": false,
+              "tag": "h3",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Apakah ada kontrak jangka panjang?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_faqtwo24": {
+              "id": "tmp_faqtwo24",
+              "type": "text",
+              "name": "Answer",
+              "parentId": "tmp_faqtwo22",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tidak ada. Anda bebas berhenti atau mengganti paket kapan saja."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

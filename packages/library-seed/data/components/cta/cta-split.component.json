@@ -1,0 +1,411 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_ctasplit",
+  "slug": "cta-split",
+  "kind": "section",
+  "categorySlug": "cta",
+  "meta": {
+    "name": "CtaSplit",
+    "displayName": {
+      "id": "CTA Dua Kolom",
+      "en": "Split CTA"
+    },
+    "description": {
+      "id": "Teks ajakan di kiri dan tombol di kanan dalam satu baris.",
+      "en": "CTA copy on the left and a button on the right in one row."
+    },
+    "tags": ["cta", "split"],
+    "keywords": {
+      "id": ["ajakan", "cta", "daftar"],
+      "en": ["cta", "sign up"]
+    },
+    "aiHints": "Ajakan bertindak di akhir halaman: 1 kalimat kuat + 1 tombol jelas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_ctaspl0"],
+          "nodes": {
+            "tmp_ctaspl0": {
+              "id": "tmp_ctaspl0",
+              "type": "frame",
+              "name": "CtaSplit",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctaspl1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.18"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.18"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_ctaspl1": {
+              "id": "tmp_ctaspl1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_ctaspl0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctaspl2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.5"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_ctaspl2": {
+              "id": "tmp_ctaspl2",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_ctaspl1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctaspl3", "tmp_ctaspl8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_ctaspl3": {
+              "id": "tmp_ctaspl3",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_ctaspl2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctaspl4", "tmp_ctaspl5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 560,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_ctaspl4": {
+              "id": "tmp_ctaspl4",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_ctaspl3",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Bangun kehadiran online Anda"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_ctaspl5": {
+              "id": "tmp_ctaspl5",
+              "type": "text",
+              "name": "Lead",
+              "parentId": "tmp_ctaspl3",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Gratis untuk memulai."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_ctaspl6": {
+              "id": "tmp_ctaspl6",
+              "type": "frame",
+              "name": "Cta",
+              "parentId": "tmp_ctaspl2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctaspl7"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_ctaspl7": {
+              "id": "tmp_ctaspl7",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_ctaspl6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Mulai"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            },
+            "tmp_ctaspl8": {
+              "id": "tmp_ctaspl8",
+              "type": "frame",
+              "name": "Actions",
+              "parentId": "tmp_ctaspl2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctaspl6"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

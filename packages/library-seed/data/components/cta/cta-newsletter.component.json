@@ -1,0 +1,480 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_ctanewsletter",
+  "slug": "cta-newsletter",
+  "kind": "section",
+  "categorySlug": "cta",
+  "meta": {
+    "name": "CtaNewsletter",
+    "displayName": {
+      "id": "CTA Newsletter",
+      "en": "Newsletter CTA"
+    },
+    "description": {
+      "id": "Ajakan berlangganan dengan kolom email dan tombol daftar.",
+      "en": "Subscribe call-to-action with an email field and a sign-up button."
+    },
+    "tags": ["cta", "newsletter"],
+    "keywords": {
+      "id": ["ajakan", "cta", "daftar"],
+      "en": ["cta", "sign up"]
+    },
+    "aiHints": "Ajakan bertindak di akhir halaman: 1 kalimat kuat + 1 tombol jelas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_ctanew0"],
+          "nodes": {
+            "tmp_ctanew0": {
+              "id": "tmp_ctanew0",
+              "type": "frame",
+              "name": "CtaNewsletter",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctanew1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_ctanew1": {
+              "id": "tmp_ctanew1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_ctanew0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctanew2", "tmp_ctanew5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.5"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_ctanew2": {
+              "id": "tmp_ctanew2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_ctanew1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctanew3", "tmp_ctanew4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 600,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_ctanew3": {
+              "id": "tmp_ctanew3",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_ctanew2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dapatkan tips bisnis setiap minggu"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_ctanew4": {
+              "id": "tmp_ctanew4",
+              "type": "text",
+              "name": "Lead",
+              "parentId": "tmp_ctanew2",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Langsung ke email Anda, gratis."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_ctanew5": {
+              "id": "tmp_ctanew5",
+              "type": "frame",
+              "name": "Form",
+              "parentId": "tmp_ctanew1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctanew6", "tmp_ctanew8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 520,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_ctanew6": {
+              "id": "tmp_ctanew6",
+              "type": "frame",
+              "name": "Input",
+              "parentId": "tmp_ctanew5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctanew7"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_ctanew7": {
+              "id": "tmp_ctanew7",
+              "type": "text",
+              "name": "Placeholder",
+              "parentId": "tmp_ctanew6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Alamat email Anda"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_ctanew8": {
+              "id": "tmp_ctanew8",
+              "type": "frame",
+              "name": "Submit",
+              "parentId": "tmp_ctanew5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_ctanew9"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.3"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.3"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_ctanew9": {
+              "id": "tmp_ctanew9",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_ctanew8",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Berlangganan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,14 +1,4 @@
-import {
-  type ButtonVariant,
-  button,
-  type ComponentSpec,
-  flex,
-  HUG,
-  type Json,
-  padXY,
-  T,
-  type Tree,
-} from "../builder";
+import { type ButtonVariant, button, type ComponentSpec, flex, HUG, type Json, padXY, T, type Tree } from "../builder";
 
 // T3.11.2 — Elements batch 1: Buttons (secondary/ghost/WhatsApp + size), Badges, Dividers. ≥10 varian.
 // Catatan: `button-primary` sudah ada (hand-written); di sini varian lainnya.
