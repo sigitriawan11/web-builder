@@ -1,0 +1,499 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_socialproofstats",
+  "slug": "social-proof-stats",
+  "kind": "section",
+  "categorySlug": "social-proof",
+  "meta": {
+    "name": "SocialStats",
+    "displayName": {
+      "id": "Statistik Kepercayaan",
+      "en": "Trust Stats"
+    },
+    "description": {
+      "id": "Baris angka pencapaian sebagai bukti sosial.",
+      "en": "A row of achievement numbers as social proof."
+    },
+    "tags": ["social-proof", "stats"],
+    "keywords": {
+      "id": ["testimoni", "ulasan", "kepercayaan"],
+      "en": ["testimonial", "reviews", "trust"]
+    },
+    "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_social0"],
+          "nodes": {
+            "tmp_social0": {
+              "id": "tmp_social0",
+              "type": "frame",
+              "name": "SocialStats",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_social1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.18"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.18"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_social1": {
+              "id": "tmp_social1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_social0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_social2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_social2": {
+              "id": "tmp_social2",
+              "type": "frame",
+              "name": "Stats",
+              "parentId": "tmp_social1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_social3", "tmp_social6", "tmp_social9"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_social3": {
+              "id": "tmp_social3",
+              "type": "frame",
+              "name": "Stat",
+              "parentId": "tmp_social2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_social4", "tmp_social5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_social4": {
+              "id": "tmp_social4",
+              "type": "text",
+              "name": "Value",
+              "parentId": "tmp_social3",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "10rb+"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h1"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_social5": {
+              "id": "tmp_social5",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_social3",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pengguna aktif"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_social6": {
+              "id": "tmp_social6",
+              "type": "frame",
+              "name": "Stat",
+              "parentId": "tmp_social2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_social7", "tmp_social8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_social7": {
+              "id": "tmp_social7",
+              "type": "text",
+              "name": "Value",
+              "parentId": "tmp_social6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "50rb+"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h1"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_social8": {
+              "id": "tmp_social8",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_social6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Website dibuat"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_social9": {
+              "id": "tmp_social9",
+              "type": "frame",
+              "name": "Stat",
+              "parentId": "tmp_social2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_social10", "tmp_social11"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_social10": {
+              "id": "tmp_social10",
+              "type": "text",
+              "name": "Value",
+              "parentId": "tmp_social9",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "4.9★"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h1"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_social11": {
+              "id": "tmp_social11",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_social9",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Rating rata-rata"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

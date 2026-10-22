@@ -8,13 +8,14 @@ import { FAQ } from "./catalog/faq";
 import { FEATURES } from "./catalog/features";
 import { HERO } from "./catalog/hero";
 import { PRICING } from "./catalog/pricing";
+import { SOCIAL_PROOF } from "./catalog/social-proof";
 
 // Generator file seed component dari katalog (T3.11.x). `pnpm --filter @platform/library-seed gen`. File di-emit ke
 // `data/components/<kategori>/<slug>.component.json`; validasi dijalankan oleh `library-seed` test (validateSeedLibrary).
 
 const DATA = fileURLToPath(new URL("../data/components/", import.meta.url));
 
-const CATALOG: ComponentSpec[] = [...ELEMENTS, ...HERO, ...FEATURES, ...CTA, ...FAQ, ...PRICING];
+const CATALOG: ComponentSpec[] = [...ELEMENTS, ...HERO, ...FEATURES, ...CTA, ...FAQ, ...PRICING, ...SOCIAL_PROOF];
 
 let written = 0;
 for (const spec of CATALOG) {

@@ -1449,7 +1449,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
   - 9 varian (grid 3/4/2, checklist, steps, alternating, stats, icon-list 2-col, split-checklist) via toolkit; token+auto-layout, lolos validateSeedLibrary.
 - [ ] **T3.11.8** Content batch 1: text block, image+text, gallery grid, video embed — CMP-084 · library · Verifikasi: ≥ 8 variasi
 - [ ] **T3.11.9** Content batch 2: about/story, menu restoran/daftar harga, jadwal/jam operasional — CMP-084 · library · Verifikasi: ≥ 6 variasi (total Content ≥ 14)
-- [ ] **T3.11.10** Social proof: testimonial cards, rating, logo cloud, stats — CMP-085 · library · Verifikasi: ≥ 8 variasi
+- [x] **T3.11.10** Social proof: testimonial cards, rating, logo cloud, stats — CMP-085 · library · Verifikasi: ≥ 8 variasi
+  - 8 varian: testimonial single/grid-3/grid-2-rated/list, rating-summary, logo-cloud, trust-stats, quote-banner. Toolkit (avatar/stars/person); lolos validateSeedLibrary.
 - [x] **T3.11.11** Pricing/FAQ/CTA: pricing cards, price list jasa, FAQ accordion, CTA banner, CTA WhatsApp — CMP-086 · library · Verifikasi: ≥ 11 variasi
   - 11 varian: CTA (banner/boxed/whatsapp/split/newsletter), FAQ (list/2-col/with-cta), Pricing (3-tier/single/price-list jasa). Toolkit + inputBox; lolos validateSeedLibrary.
 - [ ] **T3.11.12** Team/Contact: team grid, contact info, map embed — CMP-087 · library · Verifikasi: ≥ 7 variasi

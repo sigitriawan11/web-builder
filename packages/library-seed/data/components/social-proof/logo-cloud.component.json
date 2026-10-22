@@ -1,0 +1,389 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_logocloud",
+  "slug": "logo-cloud",
+  "kind": "section",
+  "categorySlug": "social-proof",
+  "meta": {
+    "name": "LogoCloud",
+    "displayName": {
+      "id": "Barisan Logo",
+      "en": "Logo Cloud"
+    },
+    "description": {
+      "id": "Judul kecil dengan barisan logo mitra atau klien.",
+      "en": "A small title with a row of partner or client logos."
+    },
+    "tags": ["social-proof", "logos"],
+    "keywords": {
+      "id": ["testimoni", "ulasan", "kepercayaan"],
+      "en": ["testimonial", "reviews", "trust"]
+    },
+    "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_logocl0"],
+          "nodes": {
+            "tmp_logocl0": {
+              "id": "tmp_logocl0",
+              "type": "frame",
+              "name": "LogoCloud",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_logocl1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.16"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.16"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_logocl1": {
+              "id": "tmp_logocl1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_logocl0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_logocl2", "tmp_logocl3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_logocl2": {
+              "id": "tmp_logocl2",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_logocl1",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dipercaya oleh bisnis di seluruh Indonesia"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_logocl3": {
+              "id": "tmp_logocl3",
+              "type": "frame",
+              "name": "Logos",
+              "parentId": "tmp_logocl1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_logocl4", "tmp_logocl5", "tmp_logocl6", "tmp_logocl7", "tmp_logocl8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.8"
+                    },
+                    "wrap": true
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_logocl4": {
+              "id": "tmp_logocl4",
+              "type": "frame",
+              "name": "Logo1",
+              "parentId": "tmp_logocl3",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 36,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_logocl5": {
+              "id": "tmp_logocl5",
+              "type": "frame",
+              "name": "Logo2",
+              "parentId": "tmp_logocl3",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 36,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_logocl6": {
+              "id": "tmp_logocl6",
+              "type": "frame",
+              "name": "Logo3",
+              "parentId": "tmp_logocl3",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 36,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_logocl7": {
+              "id": "tmp_logocl7",
+              "type": "frame",
+              "name": "Logo4",
+              "parentId": "tmp_logocl3",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 36,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_logocl8": {
+              "id": "tmp_logocl8",
+              "type": "frame",
+              "name": "Logo5",
+              "parentId": "tmp_logocl3",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 36,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

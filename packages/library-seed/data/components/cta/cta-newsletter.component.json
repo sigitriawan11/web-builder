@@ -15,10 +15,20 @@
       "id": "Ajakan berlangganan dengan kolom email dan tombol daftar.",
       "en": "Subscribe call-to-action with an email field and a sign-up button."
     },
-    "tags": ["cta", "newsletter"],
+    "tags": [
+      "cta",
+      "newsletter"
+    ],
     "keywords": {
-      "id": ["ajakan", "cta", "daftar"],
-      "en": ["cta", "sign up"]
+      "id": [
+        "ajakan",
+        "cta",
+        "daftar"
+      ],
+      "en": [
+        "cta",
+        "sign up"
+      ]
     },
     "aiHints": "Ajakan bertindak di akhir halaman: 1 kalimat kuat + 1 tombol jelas."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_ctanew0"],
+          "rootIds": [
+            "tmp_ctanew0"
+          ],
           "nodes": {
             "tmp_ctanew0": {
               "id": "tmp_ctanew0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctanew1"],
+              "children": [
+                "tmp_ctanew1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_ctanew0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctanew2", "tmp_ctanew5"],
+              "children": [
+                "tmp_ctanew2",
+                "tmp_ctanew5"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,10 @@
               "parentId": "tmp_ctanew1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctanew3", "tmp_ctanew4"],
+              "children": [
+                "tmp_ctanew3",
+                "tmp_ctanew4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -238,7 +258,10 @@
               "parentId": "tmp_ctanew1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctanew6", "tmp_ctanew8"],
+              "children": [
+                "tmp_ctanew6",
+                "tmp_ctanew8"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -272,7 +295,9 @@
               "parentId": "tmp_ctanew5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctanew7"],
+              "children": [
+                "tmp_ctanew7"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -378,7 +403,9 @@
               "parentId": "tmp_ctanew5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctanew9"],
+              "children": [
+                "tmp_ctanew9"
+              ],
               "props": {
                 "role": "button"
               },

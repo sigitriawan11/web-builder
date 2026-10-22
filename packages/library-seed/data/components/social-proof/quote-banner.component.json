@@ -1,0 +1,236 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_quotebanner",
+  "slug": "quote-banner",
+  "kind": "section",
+  "categorySlug": "social-proof",
+  "meta": {
+    "name": "QuoteBanner",
+    "displayName": {
+      "id": "Banner Kutipan",
+      "en": "Quote Banner"
+    },
+    "description": {
+      "id": "Kutipan besar terpusat sebagai sorotan testimoni.",
+      "en": "A large centered quote as a highlighted testimonial."
+    },
+    "tags": ["social-proof", "quote"],
+    "keywords": {
+      "id": ["testimoni", "ulasan", "kepercayaan"],
+      "en": ["testimonial", "reviews", "trust"]
+    },
+    "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_quoteb0"],
+          "nodes": {
+            "tmp_quoteb0": {
+              "id": "tmp_quoteb0",
+              "type": "frame",
+              "name": "QuoteBanner",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_quoteb1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.22"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.22"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_quoteb1": {
+              "id": "tmp_quoteb1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_quoteb0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_quoteb2", "tmp_quoteb3", "tmp_quoteb4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_quoteb2": {
+              "id": "tmp_quoteb2",
+              "type": "icon",
+              "name": "QuoteIcon",
+              "parentId": "tmp_quoteb1",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "quote"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 40,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 40,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_quoteb3": {
+              "id": "tmp_quoteb3",
+              "type": "text",
+              "name": "Quote",
+              "parentId": "tmp_quoteb1",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "“Akhirnya bisnis kecil seperti kami punya website yang terlihat profesional.”"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_quoteb4": {
+              "id": "tmp_quoteb4",
+              "type": "text",
+              "name": "Who",
+              "parentId": "tmp_quoteb1",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "— Rina, Pemilik Katering"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

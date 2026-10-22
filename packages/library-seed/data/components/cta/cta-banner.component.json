@@ -15,10 +15,20 @@
       "id": "Banner ajakan terpusat dengan judul dan satu tombol.",
       "en": "Centered call-to-action banner with a title and one button."
     },
-    "tags": ["cta", "banner"],
+    "tags": [
+      "cta",
+      "banner"
+    ],
     "keywords": {
-      "id": ["ajakan", "cta", "daftar"],
-      "en": ["cta", "sign up"]
+      "id": [
+        "ajakan",
+        "cta",
+        "daftar"
+      ],
+      "en": [
+        "cta",
+        "sign up"
+      ]
     },
     "aiHints": "Ajakan bertindak di akhir halaman: 1 kalimat kuat + 1 tombol jelas."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_ctaban0"],
+          "rootIds": [
+            "tmp_ctaban0"
+          ],
           "nodes": {
             "tmp_ctaban0": {
               "id": "tmp_ctaban0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctaban1"],
+              "children": [
+                "tmp_ctaban1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -93,7 +107,10 @@
               "parentId": "tmp_ctaban0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctaban2", "tmp_ctaban7"],
+              "children": [
+                "tmp_ctaban2",
+                "tmp_ctaban7"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -126,7 +143,10 @@
               "parentId": "tmp_ctaban1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctaban3", "tmp_ctaban4"],
+              "children": [
+                "tmp_ctaban3",
+                "tmp_ctaban4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -246,7 +266,9 @@
               "parentId": "tmp_ctaban1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctaban6"],
+              "children": [
+                "tmp_ctaban6"
+              ],
               "props": {
                 "role": "button"
               },
@@ -347,7 +369,9 @@
               "parentId": "tmp_ctaban1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_ctaban5"],
+              "children": [
+                "tmp_ctaban5"
+              ],
               "props": {},
               "style": {
                 "base": {

@@ -1,0 +1,352 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_testimonialsingle",
+  "slug": "testimonial-single",
+  "kind": "section",
+  "categorySlug": "social-proof",
+  "meta": {
+    "name": "TestimonialSingle",
+    "displayName": {
+      "id": "Testimoni Tunggal",
+      "en": "Single Testimonial"
+    },
+    "description": {
+      "id": "Satu kutipan pelanggan besar dengan foto dan nama di tengah.",
+      "en": "A single large customer quote with photo and name, centered."
+    },
+    "tags": ["social-proof", "testimonial"],
+    "keywords": {
+      "id": ["testimoni", "ulasan", "kepercayaan"],
+      "en": ["testimonial", "reviews", "trust"]
+    },
+    "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_testim0"],
+          "nodes": {
+            "tmp_testim0": {
+              "id": "tmp_testim0",
+              "type": "frame",
+              "name": "TestimonialSingle",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_testim1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_testim1": {
+              "id": "tmp_testim1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_testim0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_testim2", "tmp_testim3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_testim2": {
+              "id": "tmp_testim2",
+              "type": "text",
+              "name": "Quote",
+              "parentId": "tmp_testim1",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "“Platform ini mengubah cara saya berjualan. Dalam seminggu, omzet naik dua kali lipat.”"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h3"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_testim3": {
+              "id": "tmp_testim3",
+              "type": "frame",
+              "name": "Person",
+              "parentId": "tmp_testim1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_testim4", "tmp_testim5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_testim4": {
+              "id": "tmp_testim4",
+              "type": "frame",
+              "name": "Avatar",
+              "parentId": "tmp_testim3",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 48,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 48,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.full"
+                  }
+                }
+              }
+            },
+            "tmp_testim5": {
+              "id": "tmp_testim5",
+              "type": "frame",
+              "name": "Meta",
+              "parentId": "tmp_testim3",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_testim6", "tmp_testim7"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_testim6": {
+              "id": "tmp_testim6",
+              "type": "text",
+              "name": "Name",
+              "parentId": "tmp_testim5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dewi Lestari"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_testim7": {
+              "id": "tmp_testim7",
+              "type": "text",
+              "name": "Role",
+              "parentId": "tmp_testim5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Pemilik Kedai Kopi"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.caption"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

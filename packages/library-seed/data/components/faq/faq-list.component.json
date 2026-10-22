@@ -15,10 +15,20 @@
       "id": "Judul dengan daftar pertanyaan dan jawaban satu kolom.",
       "en": "A title with a single-column list of questions and answers."
     },
-    "tags": ["faq", "list"],
+    "tags": [
+      "faq",
+      "list"
+    ],
     "keywords": {
-      "id": ["faq", "tanya jawab", "pertanyaan"],
-      "en": ["faq", "questions"]
+      "id": [
+        "faq",
+        "tanya jawab",
+        "pertanyaan"
+      ],
+      "en": [
+        "faq",
+        "questions"
+      ]
     },
     "aiHints": "4–8 pertanyaan umum calon pelanggan + jawaban singkat & jelas."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_faqlis0"],
+          "rootIds": [
+            "tmp_faqlis0"
+          ],
           "nodes": {
             "tmp_faqlis0": {
               "id": "tmp_faqlis0",
@@ -41,7 +53,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis1"],
+              "children": [
+                "tmp_faqlis1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +99,10 @@
               "parentId": "tmp_faqlis0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis2", "tmp_faqlis5"],
+              "children": [
+                "tmp_faqlis2",
+                "tmp_faqlis5"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,10 @@
               "parentId": "tmp_faqlis1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis3", "tmp_faqlis4"],
+              "children": [
+                "tmp_faqlis3",
+                "tmp_faqlis4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -279,7 +299,10 @@
               "parentId": "tmp_faqlis5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis7", "tmp_faqlis8"],
+              "children": [
+                "tmp_faqlis7",
+                "tmp_faqlis8"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -395,7 +418,10 @@
               "parentId": "tmp_faqlis5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis10", "tmp_faqlis11"],
+              "children": [
+                "tmp_faqlis10",
+                "tmp_faqlis11"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -511,7 +537,10 @@
               "parentId": "tmp_faqlis5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis13", "tmp_faqlis14"],
+              "children": [
+                "tmp_faqlis13",
+                "tmp_faqlis14"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -627,7 +656,10 @@
               "parentId": "tmp_faqlis5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis16", "tmp_faqlis17"],
+              "children": [
+                "tmp_faqlis16",
+                "tmp_faqlis17"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -743,7 +775,10 @@
               "parentId": "tmp_faqlis5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis19", "tmp_faqlis20"],
+              "children": [
+                "tmp_faqlis19",
+                "tmp_faqlis20"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -859,7 +894,10 @@
               "parentId": "tmp_faqlis5",
               "visible": true,
               "locked": false,
-              "children": ["tmp_faqlis22", "tmp_faqlis23"],
+              "children": [
+                "tmp_faqlis22",
+                "tmp_faqlis23"
+              ],
               "props": {},
               "style": {
                 "base": {
