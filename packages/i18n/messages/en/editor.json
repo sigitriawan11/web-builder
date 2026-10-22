@@ -518,7 +518,8 @@
       "swapPlaceholder": "Choose another component…",
       "dropped": "{count} content not carried over",
       "resetAll": "Reset all overrides",
-      "overridden": "Changed from default — click to reset"
+      "overridden": "Changed from default — click to reset",
+      "editMain": "Edit main component"
     },
     "childOverride": {
       "title": "Edit inside instance",

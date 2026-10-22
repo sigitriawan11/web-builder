@@ -13,12 +13,15 @@ import {
 } from "@platform/document-model";
 import {
   useFetchLibraryComponentDefinition,
+  useLibraryCapabilities,
   useLibraryComponentDefinition,
   useLibraryComponents,
+  useStartComponentDraft,
 } from "@platform/sdk/react";
 import { Button, Checkbox, Input, NativeSelect } from "@platform/ui";
 import { useState } from "react";
 import { useLocale, useT } from "../../app/i18n";
+import { libraryDraftUrl } from "../../app/router";
 import type { CanvasRuntime } from "../../canvas/canvas-runtime";
 import { InspectorRow, InspectorSection } from "./InspectorSection";
 import { NumberInput } from "./inputs/NumberInput";
@@ -83,6 +86,15 @@ function Form({
   );
   const fetchDef = useFetchLibraryComponentDefinition();
   const [dropped, setDropped] = useState<number | null>(null);
+  // CMP-073: "Edit main component" hanya untuk staf yang boleh edit draft library; non-staf → kapabilitas 404 → sembunyi.
+  const capabilities = useLibraryCapabilities();
+  const canEditMain = capabilities.data?.canEditDraft ?? false;
+  const startDraft = useStartComponentDraft();
+  const editMain = async () => {
+    const result = await startDraft.mutateAsync(componentId);
+    // Draft dibuka di tab baru (CMP-073); situs user tak berubah sampai admin publish & update.
+    window.open(libraryDraftUrl(result.id), "_blank", "noopener");
+  };
 
   const updateVersion = () => {
     if (readOnly || latest === undefined) return;
@@ -251,6 +263,20 @@ function Form({
           ) : null}
           <Button variant="outline" size="sm" data-testid="instance-detach" onClick={() => detach(data)}>
             {t("inspector.instance.detach")}
+          </Button>
+        </div>
+      ) : null}
+      {/* CMP-073: edit komponen utama (admin library) — membuka draft dari versi published di tab baru. */}
+      {canEditMain ? (
+        <div className="flex flex-wrap gap-2 px-3 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid="instance-edit-main"
+            disabled={startDraft.isPending}
+            onClick={() => void editMain()}
+          >
+            {t("inspector.instance.editMain")}
           </Button>
         </div>
       ) : null}

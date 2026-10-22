@@ -179,6 +179,13 @@ export const CreateLibraryComponentResponseSchema = z.object({
   publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
 });
 
+// CMP-073 "Edit main component": pastikan draft lalu kembalikan UUID component (seed = UUID v5 → `LibraryEntityIdSchema`).
+export const StartComponentDraftResponseSchema = z.object({
+  id: LibraryEntityIdSchema,
+  publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
+});
+export type StartComponentDraftResponse = z.infer<typeof StartComponentDraftResponseSchema>;
+
 // --- Theme preset (CMP-120/CMP-124, Mode Admin) ---
 // `theme` = definisi Theme LENGKAP (tokens + fonts) divalidasi `ThemeSchema` (document-model) di server, seperti
 // `definition` component. `mode` = terang/gelap. `version` naik tiap simpan (situs yang sudah menyalin tak tersentuh).

@@ -66,6 +66,10 @@ export const useLibraryThemes = () => useQuery({ ...useQueries().libraryThemes()
 export const useLibraryTheme = (slug: string) => useQuery({ ...useQueries().libraryTheme(slug), retry: false });
 /** Simpan preset theme (CMP-124); menyegarkan daftar + detail. */
 export const useSaveLibraryTheme = () => useMutation({ mutationFn: useMutations().saveLibraryTheme });
+/** Kapabilitas staf (CMP-010/CMP-073) utk gating aksi admin di editor; 404 = bukan staf. */
+export const useLibraryCapabilities = () => useQuery({ ...useQueries().libraryCapabilities(), retry: false });
+/** CMP-073 "Edit main component": pastikan draft dari published → UUID. */
+export const useStartComponentDraft = () => useMutation({ mutationFn: useMutations().startComponentDraft });
 
 export const useCreateSite = () => useMutation({ mutationFn: useMutations().createSite });
 export const useRenameSite = () => useMutation({ mutationFn: useMutations().renameSite });

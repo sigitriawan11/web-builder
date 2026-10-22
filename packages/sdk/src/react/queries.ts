@@ -31,6 +31,7 @@ export const queryKeys = {
     components: (query: { category?: string; search?: string }) => ["library", "components", query] as const,
     themes: ["library", "themes"] as const,
     theme: (slug: string) => ["library", "theme", slug] as const,
+    capabilities: ["library", "capabilities"] as const,
   },
 };
 
@@ -83,6 +84,9 @@ export function createQueries(api: PlatformApi) {
     libraryThemes: () => queryOptions({ queryKey: queryKeys.library.themes, queryFn: () => api.library.listThemes() }),
     libraryTheme: (slug: string) =>
       queryOptions({ queryKey: queryKeys.library.theme(slug), queryFn: () => api.library.getTheme(slug) }),
+    // CMP-010/CMP-073: kapabilitas staf (role-gating UI); 404 = bukan staf (editor memperlakukan non-admin).
+    libraryCapabilities: () =>
+      queryOptions({ queryKey: queryKeys.library.capabilities, queryFn: () => api.library.capabilities() }),
   };
 }
 
@@ -138,6 +142,8 @@ export function createMutations(api: PlatformApi, queryClient: QueryClient) {
       await queryClient.invalidateQueries({ queryKey: queryKeys.library.theme(input.slug) });
       return summary;
     },
+    // CMP-073: pastikan draft dari published → UUID untuk membuka Mode Admin.
+    startComponentDraft: (publicId: string) => api.library.startComponentDraft(publicId),
   };
 }
 

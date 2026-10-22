@@ -518,7 +518,8 @@
       "swapPlaceholder": "Pilih component lain…",
       "dropped": "{count} konten tidak terbawa",
       "resetAll": "Reset semua override",
-      "overridden": "Diubah dari default — klik untuk reset"
+      "overridden": "Diubah dari default — klik untuk reset",
+      "editMain": "Edit komponen utama"
     },
     "childOverride": {
       "title": "Edit di dalam instance",

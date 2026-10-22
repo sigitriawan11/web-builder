@@ -29,6 +29,7 @@ import {
   type SaveLibraryThemeBody,
   SessionInfoSchema,
   SiteSchema,
+  StartComponentDraftResponseSchema,
   type UpdateProfileBody,
   type UpdateSiteBody,
   WorkspaceListItemSchema,
@@ -208,6 +209,13 @@ export function createPlatformApi(client: ApiClient) {
           .request("PUT", `/v1/admin/library/themes/${slug}`, {
             body,
             schema: dataEnvelope(LibraryThemeSummarySchema),
+          })
+          .then(unwrap),
+      /** CMP-073 "Edit main component": pastikan draft (by public_id) → UUID component untuk membuka Mode Admin. */
+      startComponentDraft: (publicId: string) =>
+        client
+          .request("POST", `/v1/admin/library/component-drafts/${publicId}/start`, {
+            schema: dataEnvelope(StartComponentDraftResponseSchema),
           })
           .then(unwrap),
       /** Daftar component published utk panel Insert (T3.6.1) — filter kategori (slug) & pencarian nama. */

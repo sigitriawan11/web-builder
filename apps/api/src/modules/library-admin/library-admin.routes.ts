@@ -23,6 +23,7 @@ import {
   realtimeTokenRequest,
   saveDraftRequest,
   saveThemeRequest,
+  startDraftRequest,
   usageRequest,
   versionsRequest,
 } from "./library-admin.schema";
@@ -95,6 +96,12 @@ export function createLibraryAdminRouter(deps: {
     "/component-drafts/:componentId",
     ...guard(READ_ROLES),
     ...validated(draftDefinitionRequest, controller.draftDefinition),
+  );
+  // CMP-073 "Edit main component": pastikan draft dari published (mutasi) → UUID; hanya role edit-draft (non-admin 403).
+  router.post(
+    "/component-drafts/:componentId/start",
+    ...guard(DRAFT_ROLES),
+    ...validated(startDraftRequest, controller.startDraft),
   );
   // Token realtime draft component (D3) — semua staf (viewer = read-only).
   router.post(

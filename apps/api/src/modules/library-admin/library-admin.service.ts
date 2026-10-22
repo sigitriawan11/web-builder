@@ -191,6 +191,32 @@ export function createLibraryAdminService(deps: {
       return { id, publicId };
     },
 
+    /**
+     * CMP-073 "Edit main component": pastikan ada draft untuk component (by public_id) lalu kembalikan UUID-nya agar
+     * editor membuka Mode Admin. Draft dibuat dari versi published TERAKHIR — tak pernah mengedit published di tempat;
+     * situs user tak berubah sampai admin mem-publish & meng-update. Idempoten: draft yang sudah ada dipakai ulang.
+     */
+    async startDraftForEditing(actor: StaffActor, publicId: string): Promise<{ id: string; publicId: string }> {
+      const component = await repo.findComponentByPublicId(db, publicId);
+      if (!component) throw new AppError("NOT_FOUND");
+      if (component.draftDocumentId) return { id: component.id, publicId: component.publicId };
+      if (!component.latestVersionId) throw new AppError("CONFLICT", undefined, { reason: "no_published_version" });
+      const version = await repo.findVersion(db, component.latestVersionId);
+      if (!version) throw new AppError("CONFLICT", undefined, { reason: "no_published_version" });
+      const definition = validateDefinition(version.definition);
+      await withTransaction(db, logger, async (tx) => {
+        const draftDocumentId = await repo.createComponentDraftDocument(tx, {
+          schemaVersion: CURRENT_COMPONENT_SCHEMA_VERSION,
+          state: componentDefToState(definition),
+          json: asJsonb(definition),
+          createdBy: actor.userId,
+        });
+        await repo.updateComponent(tx, component.id, { draftDocumentId });
+      });
+      await audit(actor, "library_component.edit_main", component.id, { publicId });
+      return { id: component.id, publicId: component.publicId };
+    },
+
     /** Simpan metadata draft (name/displayName/tags/…). Definisi diedit lewat Yjs/realtime (Approach A), bukan di sini. */
     async saveDraft(actor: StaffActor, componentId: string, input: SaveDraftInput): Promise<void> {
       const component = await repo.findComponent(db, componentId);

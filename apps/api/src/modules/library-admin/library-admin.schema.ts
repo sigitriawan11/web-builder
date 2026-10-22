@@ -79,6 +79,11 @@ export const draftDefinitionRequest = {
   params: z.object({ componentId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/, "componentId cmp_… (DM-007)") }),
 };
 
+// CMP-073 "Edit main component": pastikan draft dari versi published (by public_id). POST (mutasi).
+export const startDraftRequest = {
+  params: z.object({ componentId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/, "componentId cmp_… (DM-007)") }),
+};
+
 // Daftar kategori (CMP-150) — tanpa params.
 export const categoriesRequest = {};
 

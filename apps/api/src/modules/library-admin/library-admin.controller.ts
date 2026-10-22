@@ -16,6 +16,7 @@ import type {
   realtimeTokenRequest,
   saveDraftRequest,
   saveThemeRequest,
+  startDraftRequest,
   usageRequest,
   versionsRequest,
 } from "./library-admin.schema";
@@ -90,6 +91,9 @@ export function createLibraryAdminController(service: LibraryAdminService) {
   const saveTheme: ValidatedHandler<typeof saveThemeRequest> = async (req, res) => {
     res.json({ data: await service.saveTheme(actor(req), req.valid.params.slug, req.valid.body), meta: meta(res) });
   };
+  const startDraft: ValidatedHandler<typeof startDraftRequest> = async (req, res) => {
+    res.json({ data: await service.startDraftForEditing(actor(req), req.valid.params.componentId), meta: meta(res) });
+  };
   return {
     create,
     saveDraft,
@@ -107,5 +111,6 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     listThemes,
     getTheme,
     saveTheme,
+    startDraft,
   };
 }

@@ -486,6 +486,68 @@ describe("admin library CRUD (CMP-159)", () => {
   });
 });
 
+describe("edit main component — start draft (CMP-073)", () => {
+  /** Buat + publish component, lalu kosongkan draftDocumentId (seperti component seed yang hanya published). */
+  async function publishedComponentWithoutDraft(): Promise<{ id: string; publicId: string }> {
+    const admin = await register("library_admin");
+    const created = await request(target)
+      .post("/v1/admin/library/components")
+      .set("cookie", admin)
+      .send(createBody(`edit-main-${uuidv7()}`));
+    const { id, publicId } = created.body.data as { id: string; publicId: string };
+    await request(target)
+      .post(`/v1/admin/library/components/${id}/draft/publish`)
+      .set("cookie", admin)
+      .send({ bump: "minor", changelog: label });
+    await testDb.db.update(schema.components).set({ draftDocumentId: null }).where(eq(schema.components.id, id));
+    return { id, publicId };
+  }
+
+  it("non-staf → 404; staf read-only → 403", async () => {
+    const { publicId } = await publishedComponentWithoutDraft();
+    const plain = await register();
+    expect(
+      (await request(target).post(`/v1/admin/library/component-drafts/${publicId}/start`).set("cookie", plain)).status,
+    ).toBe(404);
+    const readOnly = await register("staff");
+    expect(
+      (await request(target).post(`/v1/admin/library/component-drafts/${publicId}/start`).set("cookie", readOnly))
+        .status,
+    ).toBe(403);
+  });
+
+  it("designer: buat draft dari versi published; idempoten", async () => {
+    const { id, publicId } = await publishedComponentWithoutDraft();
+    const designer = await register("designer");
+
+    const started = await request(target)
+      .post(`/v1/admin/library/component-drafts/${publicId}/start`)
+      .set("cookie", designer);
+    expect(started.status).toBe(200);
+    expect(started.body.data.id).toBe(id);
+
+    // Draft kini ada (dibuat dari published).
+    const [row] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    expect(row?.draftDocumentId).not.toBeNull();
+    const firstDraft = row?.draftDocumentId;
+
+    // Panggil lagi → pakai draft yang sama (idempoten).
+    const again = await request(target)
+      .post(`/v1/admin/library/component-drafts/${publicId}/start`)
+      .set("cookie", designer);
+    expect(again.status).toBe(200);
+    const [row2] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    expect(row2?.draftDocumentId).toBe(firstDraft);
+
+    // Audit edit_main tertulis.
+    const audits = await testDb.db
+      .select()
+      .from(schema.auditLogs)
+      .where(and(eq(schema.auditLogs.targetId, id), eq(schema.auditLogs.action, "library_component.edit_main")));
+    expect(audits.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
 describe("admin library themes (CMP-124)", () => {
   async function seedTheme(slug: string): Promise<void> {
     await testDb.db
