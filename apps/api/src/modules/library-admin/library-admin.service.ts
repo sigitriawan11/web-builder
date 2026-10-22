@@ -10,16 +10,18 @@ import {
 } from "@platform/document-model";
 import { AppError, uuidv7 } from "@platform/shared";
 import {
+  componentThumbnailJobId,
   type LibraryComponentSummary,
   type LibraryEditorSession,
   REALTIME_TOKEN_AUDIENCE,
   REALTIME_TOKEN_TTL_SECONDS,
   type RealtimeTokenResponse,
 } from "@platform/shared/contracts";
-import { type Logger, signToken, stableHash } from "@platform/shared/node";
+import { getContext, type Logger, signToken, stableHash } from "@platform/shared/node";
 import type { z } from "zod";
 import { recordAudit } from "../../audit/audit.repository";
 import { findStaffRole, type StaffRole } from "../../middleware/staff.repository";
+import type { QueueProducer } from "../../queues/producer";
 import { withTransaction } from "../../queues/with-transaction";
 import * as repo from "./library-admin.repository";
 import type {
@@ -96,6 +98,8 @@ export function createLibraryAdminService(deps: {
   logger: Logger;
   // Konfigurasi realtime untuk token editor draft component (D3). Tanpa ini, endpoint token tidak dipasang.
   realtime?: { tokenSecret: string; url: string; now?: () => number };
+  // CMP-014: enqueue thumbnail saat publish. Tanpa ini (mis. test tanpa Redis), publish tetap jalan.
+  queues?: QueueProducer;
 }) {
   const { db, logger } = deps;
 
@@ -198,8 +202,8 @@ export function createLibraryAdminService(deps: {
 
       const version = bumpSemver(component.latestVersion, input.bump);
       const versionSeq = (await repo.maxVersionSeq(db, componentId)) + 1;
-      await withTransaction(db, logger, async (tx) => {
-        const versionId = await repo.insertVersion(tx, {
+      const versionId = await withTransaction(db, logger, async (tx) => {
+        const newVersionId = await repo.insertVersion(tx, {
           componentId,
           status: "published",
           version,
@@ -212,11 +216,24 @@ export function createLibraryAdminService(deps: {
         });
         await repo.updateComponent(tx, componentId, {
           status: "published",
-          latestVersionId: versionId,
+          latestVersionId: newVersionId,
           latestVersion: version,
         });
+        return newVersionId;
       });
       await audit(actor, "library_component.publish", componentId, { version, versionSeq, bump: input.bump });
+      // CMP-014: render thumbnail 3 breakpoint SETELAH commit (dedupe per versi). Gagal enqueue tak menggagalkan publish.
+      if (deps.queues) {
+        try {
+          await deps.queues.enqueue(
+            "thumbnails",
+            { requestId: getContext()?.requestId ?? uuidv7(), target: "component", componentVersionId: versionId },
+            { jobId: componentThumbnailJobId(versionId) },
+          );
+        } catch (error) {
+          logger.error({ err: error, componentId, versionId }, "gagal enqueue thumbnail; publish tetap sukses");
+        }
+      }
       return { version, versionSeq };
     },
 

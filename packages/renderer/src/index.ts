@@ -66,3 +66,4 @@ export {
 } from "./responsive/estimate-width";
 export { renderRichText } from "./rich-text";
 export { escapeHtml, renderToStaticHtml, type StaticPage, type StaticRenderOptions } from "./static";
+export { type ComponentPreviewOptions, renderComponentPreview } from "./static/component-preview";

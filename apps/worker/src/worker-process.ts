@@ -15,6 +15,7 @@ import { createHealthApp, listen } from "./health/health-server";
 import { createImageStorage } from "./lib/storage";
 import { createProcessors } from "./processors";
 import type { ProcessorRegistry } from "./processors/types";
+import { createRendererService } from "./renderer-service";
 import { registerCleanupSchedules } from "./runtime/schedules";
 import { selectQueues, startWorkers } from "./runtime/workers";
 
@@ -47,9 +48,10 @@ interface WorkerResources {
   processors: ProcessorRegistry;
   emailProvider: ReturnType<typeof createEmailProvider>;
   closeDb: () => Promise<void>;
+  closeRenderer: () => Promise<void>;
 }
 
-/** Dependensi nyata processor (DB, provider email); test boleh menyuntik `processors` sendiri. */
+/** Dependensi nyata processor (DB, provider email, renderer-service); test boleh menyuntik `processors` sendiri. */
 function createResources(env: WorkerEnv): WorkerResources {
   const { db, close: closeDb } = createDb({
     connectionString: env.DATABASE_URL,
@@ -60,9 +62,12 @@ function createResources(env: WorkerEnv): WorkerResources {
       ? { provider: "smtp", smtpUrl: env.SMTP_URL ?? "" }
       : { provider: "resend", apiKey: env.RESEND_API_KEY ?? "" },
   );
+  // Renderer-service lazy-launch browser (hanya saat ada job thumbnails) → aman dibuat di sini tanpa biaya awal.
+  const renderer = createRendererService();
   const processors = createProcessors({
     db,
     storage: createImageStorage(env),
+    renderer,
     email: {
       db,
       provider: emailProvider,
@@ -71,7 +76,7 @@ function createResources(env: WorkerEnv): WorkerResources {
       ...(env.EMAIL_REPLY_TO ? { replyTo: env.EMAIL_REPLY_TO } : {}),
     },
   });
-  return { processors, emailProvider, closeDb };
+  return { processors, emailProvider, closeDb, closeRenderer: () => renderer.close() };
 }
 
 export async function startWorkerProcess(
@@ -118,6 +123,7 @@ export async function startWorkerProcess(
       await health.close();
       redis.disconnect();
       resources?.emailProvider.close?.();
+      await resources?.closeRenderer();
       await resources?.closeDb();
       await telemetry.flush();
       logger.info("worker shutdown selesai");

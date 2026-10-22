@@ -91,8 +91,12 @@ export type CleanupTask = (typeof CLEANUP_TASKS)[number];
 export const JOB_PAYLOADS = {
   // Idempoten per deploymentId.
   publish: z.object({ ...jobBase, siteId: UuidV7Schema, deploymentId: UuidV7Schema }),
-  // Dedupe dengan jobId `thumb:<documentId>:<snapshotId>`.
-  thumbnails: z.object({ ...jobBase, documentId: UuidV7Schema, snapshotId: UuidV7Schema }),
+  // Thumbnail render (CMP-014). `component` = versi library (dedupe `thumb:component:<id>`); `document` = snapshot
+  // page situs (M4, dedupe `thumb:<documentId>:<snapshotId>`). Discriminated agar processor memilih sumber definisi.
+  thumbnails: z.discriminatedUnion("target", [
+    z.object({ ...jobBase, target: z.literal("component"), componentVersionId: UuidV7Schema }),
+    z.object({ ...jobBase, target: z.literal("document"), documentId: UuidV7Schema, snapshotId: UuidV7Schema }),
+  ]),
   // Pemrosesan gambar setelah upload (ARCHITECTURE §9.9): cek magic bytes, strip EXIF, varian, blurhash, sha256 →
   // status ready/rejected. `assetId` = ID dokumen (`ast_…`); worker membaca storageKey/workspace dari tabel `assets`.
   "image-processing": z.object({ ...jobBase, assetId: z.string().regex(/^ast_[0-9a-z]{6,24}$/) }),
@@ -143,6 +147,11 @@ export function parseJobPayload<Q extends keyof typeof JOB_PAYLOADS>(queue: Q, p
 
 export function thumbnailJobId(documentId: string, snapshotId: string): string {
   return `thumb:${documentId}:${snapshotId}`;
+}
+
+/** Dedupe thumbnail versi component (CMP-014): satu job per versi. */
+export function componentThumbnailJobId(componentVersionId: string): string {
+  return `thumb:component:${componentVersionId}`;
 }
 
 // Field payload berisi URL bertoken (Better Auth) — tidak boleh tersimpan utuh di DLQ (keputusan owner T1.13.3).

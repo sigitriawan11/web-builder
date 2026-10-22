@@ -378,9 +378,15 @@ importers:
       '@platform/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@platform/document-model':
+        specifier: workspace:*
+        version: link:../../packages/document-model
       '@platform/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@platform/renderer':
+        specifier: workspace:*
+        version: link:../../packages/renderer
       '@platform/shared':
         specifier: workspace:*
         version: link:../../packages/shared

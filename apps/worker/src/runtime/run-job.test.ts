@@ -5,7 +5,8 @@ import { createWorkerLogger } from "../worker-process";
 import { jobRunner } from "./run-job";
 
 const logger = createWorkerLogger({ APP_ENV: "local", LOG_LEVEL: "fatal" }, { write: () => {} });
-const ids = { documentId: "01a135f2-b67d-71b3-9fbc-775f6ef635e9", snapshotId: "01a135f2-b6cc-77fb-893d-af4f62d11c71" };
+// Payload thumbnails = discriminated union (CMP-014); varian component published.
+const ids = { target: "component" as const, componentVersionId: "01a135f2-b67d-71b3-9fbc-775f6ef635e9" };
 const fakeJob = (data: unknown, attemptsMade = 0) => ({ id: "42", data, attemptsMade }) as unknown as Job;
 
 describe("jobRunner", () => {

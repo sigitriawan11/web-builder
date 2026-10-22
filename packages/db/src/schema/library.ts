@@ -137,6 +137,29 @@ export const componentVersions = pgTable(
   ],
 );
 
+// CMP-014: thumbnail per breakpoint untuk sebuah versi component. Tabel TERPISAH (bukan kolom di `component_versions`)
+// karena baris published immutable (trigger) — thumbnail dihasilkan worker SETELAH publish. `assetKey` = key objek di
+// bucket `assets`; URL publik diturunkan dari key (tak disimpan). Upsert ulang saat re-generate.
+export const componentThumbnailBreakpointEnum = pgEnum("component_thumbnail_breakpoint", ["base", "tablet", "mobile"]);
+
+export const componentVersionThumbnails = pgTable(
+  "component_version_thumbnails",
+  {
+    id: id(),
+    componentVersionId: uuid()
+      .notNull()
+      .references(() => componentVersions.id, { onDelete: "cascade" }),
+    breakpoint: componentThumbnailBreakpointEnum().notNull(),
+    assetKey: text().notNull(),
+    width: integer().notNull(),
+    height: integer().notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("component_version_thumbnails_version_bp_idx").on(table.componentVersionId, table.breakpoint),
+  ],
+);
+
 export const themeModeEnum = pgEnum("theme_mode", ["light", "dark"]);
 export const usageDocStateEnum = pgEnum("usage_doc_state", ["draft", "published"]);
 

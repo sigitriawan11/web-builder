@@ -6,6 +6,7 @@ import { requireAuth } from "../../middleware/auth-session";
 import { byUserOrIp, RATE_LIMITS, rateLimit } from "../../middleware/rate-limit";
 import { requireStaffRole } from "../../middleware/staff";
 import { validated } from "../../middleware/validate";
+import type { QueueProducer } from "../../queues/producer";
 import { createLibraryAdminController } from "./library-admin.controller";
 import {
   archiveRequest,
@@ -36,12 +37,14 @@ export function createLibraryAdminRouter(deps: {
   realtime?: { tokenSecret: string; url: string };
   redis?: Redis;
   rateLimitPrefix?: string;
+  queues?: QueueProducer;
 }): Router {
   const controller = createLibraryAdminController(
     createLibraryAdminService({
       db: deps.db,
       logger: deps.logger,
       ...(deps.realtime ? { realtime: deps.realtime } : {}),
+      ...(deps.queues ? { queues: deps.queues } : {}),
     }),
   );
   const router = express.Router();
