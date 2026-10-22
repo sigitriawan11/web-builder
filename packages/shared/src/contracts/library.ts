@@ -4,10 +4,14 @@ import { UuidV7Schema } from "../ids";
 // DTO library platform untuk editor Mode Admin (CMP-010/CMP-158). `componentId` dokumen = `cmp_…` (public_id);
 // `id` = UUID internal. Role staf menentukan kapabilitas (baca vs edit draft vs publish).
 
+// CMP-141: ID entitas library (component/category) = UUID **v5** (deterministik dari slug) untuk seed, **v7** untuk
+// yang dibuat di editor (lihat `components.id` di packages/db). Jadi terima UUID versi apa pun, bukan hanya v7.
+export const LibraryEntityIdSchema = z.uuid();
+
 export const LocalizedTextSchema = z.object({ id: z.string(), en: z.string() });
 
 export const LibraryCategorySchema = z.object({
-  id: UuidV7Schema,
+  id: LibraryEntityIdSchema,
   slug: z.string(),
   type: z.enum(["functional", "industry"]),
   name: LocalizedTextSchema,
@@ -24,7 +28,7 @@ export const LibraryKeywordsSchema = z.object({ id: z.array(z.string()), en: z.a
 export const LibraryFeatureSchema = z.enum(["dynamic", "auth", "commerce"]);
 
 export const LibraryComponentSummarySchema = z.object({
-  id: UuidV7Schema,
+  id: LibraryEntityIdSchema,
   // ID yang dirujuk dokumen (DM-018).
   publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
   kind: ComponentKindSchema,
@@ -37,7 +41,7 @@ export const LibraryComponentSummarySchema = z.object({
   // Dokumen Yjs draft (kind=component) yang dibuka editor Mode Admin; null bila belum ada draft.
   draftDocumentId: UuidV7Schema.nullable(),
   // Metadata (CMP-013) untuk tab Metadata panel Mode Admin.
-  categoryId: UuidV7Schema,
+  categoryId: LibraryEntityIdSchema,
   tags: z.array(z.string()),
   keywords: LibraryKeywordsSchema.nullable(),
   industries: z.array(z.string()),
@@ -54,7 +58,7 @@ export const SaveLibraryDraftBodySchema = z
   .object({
     displayName: LocalizedTextSchema,
     description: LocalizedTextSchema,
-    categoryId: UuidV7Schema,
+    categoryId: LibraryEntityIdSchema,
     tags: z.array(TagSchema).max(30),
     keywords: LibraryKeywordsSchema,
     industries: z.array(TagSchema).max(30),
@@ -116,7 +120,7 @@ export type LibraryComponentUsage = z.infer<typeof LibraryComponentUsageSchema>;
 
 // Item daftar admin library (ACC-208/T3.8.1): semua status (bukan hanya published), lintas kategori. Dibaca admin web.
 export const LibraryAdminComponentSchema = z.object({
-  id: UuidV7Schema,
+  id: LibraryEntityIdSchema,
   publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
   name: z.string(),
   displayName: LocalizedTextSchema,
@@ -162,7 +166,7 @@ export type LibraryAdminListQuery = z.infer<typeof LibraryAdminListQuerySchema>;
 // di server. `slug` kebab-case unik per owner.
 export const CreateLibraryComponentBodySchema = z.object({
   slug: z.string().regex(/^[a-z0-9][a-z0-9-]{1,62}$/),
-  categoryId: UuidV7Schema,
+  categoryId: LibraryEntityIdSchema,
   kind: ComponentKindSchema,
   name: z.string().min(1),
   displayName: LocalizedTextSchema,
