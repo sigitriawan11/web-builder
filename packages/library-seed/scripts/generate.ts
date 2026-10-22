@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type ComponentSpec, toComponentFile } from "./builder";
+import { CONTENT } from "./catalog/content";
 import { CTA } from "./catalog/cta";
 import { ELEMENTS } from "./catalog/elements";
 import { FAQ } from "./catalog/faq";
@@ -27,6 +28,7 @@ const CATALOG: ComponentSpec[] = [
   ...SOCIAL_PROOF,
   ...NAVBAR,
   ...FOOTER,
+  ...CONTENT,
 ];
 
 let written = 0;

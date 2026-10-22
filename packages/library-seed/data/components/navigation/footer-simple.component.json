@@ -15,10 +15,20 @@
       "id": "Footer ringkas dengan logo, baris tautan, dan hak cipta.",
       "en": "A compact footer with logo, a row of links, and copyright."
     },
-    "tags": ["footer", "simple"],
+    "tags": [
+      "footer",
+      "simple"
+    ],
     "keywords": {
-      "id": ["footer", "kaki", "tautan"],
-      "en": ["footer", "links"]
+      "id": [
+        "footer",
+        "kaki",
+        "tautan"
+      ],
+      "en": [
+        "footer",
+        "links"
+      ]
     },
     "aiHints": "Kaki situs: tautan penting, info kontak, hak cipta. Jaga rapi dan ringkas."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_footer0"],
+          "rootIds": [
+            "tmp_footer0"
+          ],
           "nodes": {
             "tmp_footer0": {
               "id": "tmp_footer0",
@@ -41,7 +53,10 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer1", "tmp_footer8"],
+              "children": [
+                "tmp_footer1",
+                "tmp_footer8"
+              ],
               "tag": "footer",
               "props": {
                 "role": "container"
@@ -96,7 +111,10 @@
               "parentId": "tmp_footer0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer2", "tmp_footer3"],
+              "children": [
+                "tmp_footer2",
+                "tmp_footer3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -167,7 +185,12 @@
               "parentId": "tmp_footer1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer4", "tmp_footer5", "tmp_footer6", "tmp_footer7"],
+              "children": [
+                "tmp_footer4",
+                "tmp_footer5",
+                "tmp_footer6",
+                "tmp_footer7"
+              ],
               "props": {},
               "style": {
                 "base": {

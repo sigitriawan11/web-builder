@@ -1,0 +1,338 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_contentimagetextleft",
+  "slug": "content-image-text-left",
+  "kind": "section",
+  "categorySlug": "content",
+  "meta": {
+    "name": "ImageTextLeft",
+    "displayName": {
+      "id": "Gambar + Teks (Kiri)",
+      "en": "Image + Text (Left)"
+    },
+    "description": {
+      "id": "Gambar di kiri dan teks penjelas di kanan.",
+      "en": "An image on the left and explanatory text on the right."
+    },
+    "tags": ["content", "image-text"],
+    "keywords": {
+      "id": ["konten", "teks", "galeri"],
+      "en": ["content", "text", "gallery"]
+    },
+    "aiHints": "Blok konten informatif. Jaga keterbacaan: paragraf pendek, heading jelas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_conten0"],
+          "nodes": {
+            "tmp_conten0": {
+              "id": "tmp_conten0",
+              "type": "frame",
+              "name": "ImageTextLeft",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten1": {
+              "id": "tmp_conten1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_conten0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten2": {
+              "id": "tmp_conten2",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_conten1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten7", "tmp_conten3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.10"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten3": {
+              "id": "tmp_conten3",
+              "type": "frame",
+              "name": "Text",
+              "parentId": "tmp_conten2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten4", "tmp_conten6"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten4": {
+              "id": "tmp_conten4",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_conten3",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 520,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten5": {
+              "id": "tmp_conten5",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_conten4",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dikerjakan dengan sepenuh hati"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten6": {
+              "id": "tmp_conten6",
+              "type": "text",
+              "name": "Paragraph",
+              "parentId": "tmp_conten3",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kami membantu bisnis kecil dan menengah tampil profesional di dunia digital. Dengan alat yang mudah dan desain siap pakai, Anda bisa fokus pada yang terpenting: melayani pelanggan."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten7": {
+              "id": "tmp_conten7",
+              "type": "frame",
+              "name": "Image",
+              "parentId": "tmp_conten2",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 320,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

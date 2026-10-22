@@ -6,7 +6,6 @@ import {
   HUG,
   imageBox,
   padXY,
-  section,
   setChildren,
   size,
   T,

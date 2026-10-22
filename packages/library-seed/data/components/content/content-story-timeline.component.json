@@ -1,0 +1,840 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_contentstorytimeline",
+  "slug": "content-story-timeline",
+  "kind": "section",
+  "categorySlug": "content",
+  "meta": {
+    "name": "StoryTimeline",
+    "displayName": {
+      "id": "Perjalanan / Lini Masa",
+      "en": "Story / Timeline"
+    },
+    "description": {
+      "id": "Lini masa perjalanan usaha dengan tahun dan tonggak penting.",
+      "en": "A timeline of the business journey with years and key milestones."
+    },
+    "tags": ["content", "about", "story"],
+    "keywords": {
+      "id": ["konten", "teks", "galeri"],
+      "en": ["content", "text", "gallery"]
+    },
+    "aiHints": "Blok konten informatif. Jaga keterbacaan: paragraf pendek, heading jelas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_conten0"],
+          "nodes": {
+            "tmp_conten0": {
+              "id": "tmp_conten0",
+              "type": "frame",
+              "name": "StoryTimeline",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten1": {
+              "id": "tmp_conten1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_conten0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten2", "tmp_conten5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.8"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten2": {
+              "id": "tmp_conten2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_conten1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten3", "tmp_conten4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 600,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten3": {
+              "id": "tmp_conten3",
+              "type": "text",
+              "name": "Eyebrow",
+              "parentId": "tmp_conten2",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "PERJALANAN KAMI"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_conten4": {
+              "id": "tmp_conten4",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_conten2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tumbuh bersama pelanggan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten5": {
+              "id": "tmp_conten5",
+              "type": "frame",
+              "name": "Timeline",
+              "parentId": "tmp_conten1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten6", "tmp_conten11", "tmp_conten16"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.5"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 680,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten6": {
+              "id": "tmp_conten6",
+              "type": "frame",
+              "name": "Milestone",
+              "parentId": "tmp_conten5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten7", "tmp_conten8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.5"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten7": {
+              "id": "tmp_conten7",
+              "type": "text",
+              "name": "Year",
+              "parentId": "tmp_conten6",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "2021"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h3"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_conten8": {
+              "id": "tmp_conten8",
+              "type": "frame",
+              "name": "Info",
+              "parentId": "tmp_conten6",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten9", "tmp_conten10"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten9": {
+              "id": "tmp_conten9",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_conten8",
+              "visible": true,
+              "locked": false,
+              "tag": "h4",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Awal mula"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten10": {
+              "id": "tmp_conten10",
+              "type": "text",
+              "name": "Desc",
+              "parentId": "tmp_conten8",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dimulai dari satu kedai kecil dengan satu menu andalan."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_conten11": {
+              "id": "tmp_conten11",
+              "type": "frame",
+              "name": "Milestone",
+              "parentId": "tmp_conten5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten12", "tmp_conten13"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.5"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten12": {
+              "id": "tmp_conten12",
+              "type": "text",
+              "name": "Year",
+              "parentId": "tmp_conten11",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "2023"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h3"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_conten13": {
+              "id": "tmp_conten13",
+              "type": "frame",
+              "name": "Info",
+              "parentId": "tmp_conten11",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten14", "tmp_conten15"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten14": {
+              "id": "tmp_conten14",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_conten13",
+              "visible": true,
+              "locked": false,
+              "tag": "h4",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Buka cabang"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten15": {
+              "id": "tmp_conten15",
+              "type": "text",
+              "name": "Desc",
+              "parentId": "tmp_conten13",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Membuka tiga cabang baru dan mulai layanan antar."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_conten16": {
+              "id": "tmp_conten16",
+              "type": "frame",
+              "name": "Milestone",
+              "parentId": "tmp_conten5",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten17", "tmp_conten18"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.5"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten17": {
+              "id": "tmp_conten17",
+              "type": "text",
+              "name": "Year",
+              "parentId": "tmp_conten16",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "2026"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h3"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_conten18": {
+              "id": "tmp_conten18",
+              "type": "frame",
+              "name": "Info",
+              "parentId": "tmp_conten16",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten19", "tmp_conten20"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.1"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten19": {
+              "id": "tmp_conten19",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_conten18",
+              "visible": true,
+              "locked": false,
+              "tag": "h4",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Hadir online"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten20": {
+              "id": "tmp_conten20",
+              "type": "text",
+              "name": "Desc",
+              "parentId": "tmp_conten18",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kini melayani pemesanan daring ke seluruh kota."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

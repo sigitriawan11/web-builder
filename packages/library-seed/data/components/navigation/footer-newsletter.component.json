@@ -15,10 +15,20 @@
       "id": "Footer dengan form langganan email dan kolom tautan.",
       "en": "Footer with an email subscribe form and link columns."
     },
-    "tags": ["footer", "newsletter"],
+    "tags": [
+      "footer",
+      "newsletter"
+    ],
     "keywords": {
-      "id": ["footer", "kaki", "tautan"],
-      "en": ["footer", "links"]
+      "id": [
+        "footer",
+        "kaki",
+        "tautan"
+      ],
+      "en": [
+        "footer",
+        "links"
+      ]
     },
     "aiHints": "Kaki situs: tautan penting, info kontak, hak cipta. Jaga rapi dan ringkas."
   },
@@ -32,7 +42,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_footer0"],
+          "rootIds": [
+            "tmp_footer0"
+          ],
           "nodes": {
             "tmp_footer0": {
               "id": "tmp_footer0",
@@ -41,7 +53,10 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer1", "tmp_footer14"],
+              "children": [
+                "tmp_footer1",
+                "tmp_footer14"
+              ],
               "tag": "footer",
               "props": {
                 "role": "container"
@@ -96,7 +111,10 @@
               "parentId": "tmp_footer0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer2", "tmp_footer9"],
+              "children": [
+                "tmp_footer2",
+                "tmp_footer9"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -128,7 +146,10 @@
               "parentId": "tmp_footer1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer3", "tmp_footer4"],
+              "children": [
+                "tmp_footer3",
+                "tmp_footer4"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -201,7 +222,10 @@
               "parentId": "tmp_footer2",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer5", "tmp_footer7"],
+              "children": [
+                "tmp_footer5",
+                "tmp_footer7"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -235,7 +259,9 @@
               "parentId": "tmp_footer4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer6"],
+              "children": [
+                "tmp_footer6"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -341,7 +367,9 @@
               "parentId": "tmp_footer4",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer8"],
+              "children": [
+                "tmp_footer8"
+              ],
               "props": {
                 "role": "button"
               },
@@ -442,7 +470,12 @@
               "parentId": "tmp_footer1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_footer10", "tmp_footer11", "tmp_footer12", "tmp_footer13"],
+              "children": [
+                "tmp_footer10",
+                "tmp_footer11",
+                "tmp_footer12",
+                "tmp_footer13"
+              ],
               "props": {},
               "style": {
                 "base": {

@@ -1,0 +1,273 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_contentvideo",
+  "slug": "content-video",
+  "kind": "section",
+  "categorySlug": "content",
+  "meta": {
+    "name": "VideoEmbed",
+    "displayName": {
+      "id": "Sematan Video",
+      "en": "Video Embed"
+    },
+    "description": {
+      "id": "Area video besar dengan tombol putar dan keterangan.",
+      "en": "A large video area with a play button and caption."
+    },
+    "tags": ["content", "video"],
+    "keywords": {
+      "id": ["konten", "teks", "galeri"],
+      "en": ["content", "text", "gallery"]
+    },
+    "aiHints": "Blok konten informatif. Jaga keterbacaan: paragraf pendek, heading jelas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_conten0"],
+          "nodes": {
+            "tmp_conten0": {
+              "id": "tmp_conten0",
+              "type": "frame",
+              "name": "VideoEmbed",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten1": {
+              "id": "tmp_conten1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_conten0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten2", "tmp_conten4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten2": {
+              "id": "tmp_conten2",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_conten1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 600,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten3": {
+              "id": "tmp_conten3",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_conten2",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Lihat cara kerjanya"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten4": {
+              "id": "tmp_conten4",
+              "type": "frame",
+              "name": "Video",
+              "parentId": "tmp_conten1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten5"],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center"
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "aspectRatio": 1.7778,
+                    "maxWidth": {
+                      "value": 880,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_conten5": {
+              "id": "tmp_conten5",
+              "type": "icon",
+              "name": "Play",
+              "parentId": "tmp_conten4",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "lucide",
+                "name": "circle-play"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 64,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 64,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

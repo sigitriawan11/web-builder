@@ -1,0 +1,389 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_contentaboutstory",
+  "slug": "content-about-story",
+  "kind": "section",
+  "categorySlug": "content",
+  "meta": {
+    "name": "AboutStory",
+    "displayName": {
+      "id": "Tentang / Cerita",
+      "en": "About / Story"
+    },
+    "description": {
+      "id": "Bagian tentang kami dengan gambar dan narasi perjalanan usaha.",
+      "en": "An about section with an image and the business's story."
+    },
+    "tags": ["content", "about"],
+    "keywords": {
+      "id": ["konten", "teks", "galeri"],
+      "en": ["content", "text", "gallery"]
+    },
+    "aiHints": "Blok konten informatif. Jaga keterbacaan: paragraf pendek, heading jelas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_conten0"],
+          "nodes": {
+            "tmp_conten0": {
+              "id": "tmp_conten0",
+              "type": "frame",
+              "name": "AboutStory",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten1"],
+              "tag": "section",
+              "props": {
+                "role": "section"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.20"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.20"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_conten1": {
+              "id": "tmp_conten1",
+              "type": "frame",
+              "name": "Container",
+              "parentId": "tmp_conten0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten2"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.6"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "$token": "size.container"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten2": {
+              "id": "tmp_conten2",
+              "type": "frame",
+              "name": "Row",
+              "parentId": "tmp_conten1",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten3", "tmp_conten4"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.10"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten3": {
+              "id": "tmp_conten3",
+              "type": "frame",
+              "name": "Portrait",
+              "parentId": "tmp_conten2",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 360,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_conten4": {
+              "id": "tmp_conten4",
+              "type": "frame",
+              "name": "Text",
+              "parentId": "tmp_conten2",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten5", "tmp_conten8"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten5": {
+              "id": "tmp_conten5",
+              "type": "frame",
+              "name": "Heading",
+              "parentId": "tmp_conten4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_conten6", "tmp_conten7"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "column",
+                    "align": "start",
+                    "gap": {
+                      "$token": "space.3"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "maxWidth": {
+                      "value": 520,
+                      "unit": "px"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_conten6": {
+              "id": "tmp_conten6",
+              "type": "text",
+              "name": "Eyebrow",
+              "parentId": "tmp_conten5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "CERITA KAMI"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.overline"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_conten7": {
+              "id": "tmp_conten7",
+              "type": "text",
+              "name": "Title",
+              "parentId": "tmp_conten5",
+              "visible": true,
+              "locked": false,
+              "tag": "h2",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dari dapur rumah ke pelanggan setia"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h2"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_conten8": {
+              "id": "tmp_conten8",
+              "type": "text",
+              "name": "Paragraph",
+              "parentId": "tmp_conten4",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kami membantu bisnis kecil dan menengah tampil profesional di dunia digital. Dengan alat yang mudah dan desain siap pakai, Anda bisa fokus pada yang terpenting: melayani pelanggan."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.body"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
