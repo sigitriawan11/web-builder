@@ -179,6 +179,45 @@ export const CreateLibraryComponentResponseSchema = z.object({
   publicId: z.string().regex(/^cmp_[0-9a-z]{6,24}$/),
 });
 
+// --- Theme preset (CMP-120/CMP-124, Mode Admin) ---
+// `theme` = definisi Theme LENGKAP (tokens + fonts) divalidasi `ThemeSchema` (document-model) di server, seperti
+// `definition` component. `mode` = terang/gelap. `version` naik tiap simpan (situs yang sudah menyalin tak tersentuh).
+export const ThemeModeSchema = z.enum(["light", "dark"]);
+
+export const LibraryThemeSummarySchema = z.object({
+  id: LibraryEntityIdSchema,
+  slug: z.string(),
+  displayName: LocalizedTextSchema,
+  mode: ThemeModeSchema,
+  tags: z.array(z.string()),
+  version: z.number().int().positive(),
+  status: LibraryStatusSchema,
+  sortOrder: z.number().int(),
+});
+export type LibraryThemeSummary = z.infer<typeof LibraryThemeSummarySchema>;
+
+export const LibraryThemeSchema = LibraryThemeSummarySchema.extend({
+  // Theme lengkap (tokens+fonts+modes). Divalidasi `ThemeSchema` document-model di server.
+  theme: z.unknown(),
+});
+export type LibraryTheme = z.infer<typeof LibraryThemeSchema>;
+
+export const LibraryThemeListSchema = z.object({ items: z.array(LibraryThemeSummarySchema) });
+export type LibraryThemeList = z.infer<typeof LibraryThemeListSchema>;
+
+// Simpan preset (edit admin). `theme` wajib; metadata opsional. Server bump `version`.
+export const SaveLibraryThemeBodySchema = z
+  .object({
+    displayName: LocalizedTextSchema.optional(),
+    mode: ThemeModeSchema.optional(),
+    tags: z.array(z.string()).optional(),
+    theme: z.unknown(),
+  })
+  .strict();
+export type SaveLibraryThemeBody = z.infer<typeof SaveLibraryThemeBodySchema>;
+
+export type ThemeMode = z.infer<typeof ThemeModeSchema>;
+
 export type LibraryDraftDefinition = z.infer<typeof LibraryDraftDefinitionSchema>;
 export type LibraryPublishedDefinition = z.infer<typeof LibraryPublishedDefinitionSchema>;
 export type CreateLibraryComponentBody = z.infer<typeof CreateLibraryComponentBodySchema>;

@@ -1,4 +1,4 @@
-import { LibraryAdminListQuerySchema } from "@platform/shared/contracts";
+import { LibraryAdminListQuerySchema, SaveLibraryThemeBodySchema } from "@platform/shared/contracts";
 import { z } from "zod";
 
 // Request admin library (CMP-159). Definisi component divalidasi lebih dalam oleh `validateComponentDefinition`
@@ -87,3 +87,9 @@ export const adminListComponentsRequest = { query: LibraryAdminListQuerySchema }
 
 // Kapabilitas user saat ini (role-gating UI admin) — tanpa params.
 export const capabilitiesRequest = {};
+
+// Theme preset (CMP-120/CMP-124). Slug kebab-case; `theme` lengkap divalidasi `ThemeSchema` di service.
+const ThemeSlugParams = z.object({ slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug kebab-case") });
+export const listThemesRequest = {};
+export const getThemeRequest = { params: ThemeSlugParams };
+export const saveThemeRequest = { params: ThemeSlugParams, body: SaveLibraryThemeBodySchema };

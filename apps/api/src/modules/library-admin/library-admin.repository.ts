@@ -11,6 +11,7 @@ const {
   documentUpdates,
   libraryCategories,
   siteComponentUsage,
+  themes,
 } = schema;
 
 export interface CategoryRow {
@@ -263,11 +264,82 @@ export async function usageByComponent(exec: DbExecutor, componentId: string): P
     .where(eq(siteComponentUsage.componentId, componentId));
   const byKey = new Map<string, UsageRow>();
   for (const row of rows) {
-    const key = `${row.version} ${row.docState}`;
+    const key = `${row.version} ${row.docState}`;
     const acc = byKey.get(key) ?? { version: row.version, docState: row.docState, siteCount: 0, instanceCount: 0 };
     acc.siteCount += 1;
     acc.instanceCount += row.instanceCount;
     byKey.set(key, acc);
   }
   return [...byKey.values()];
+}
+
+// --- Theme preset (CMP-120/CMP-124) ---
+export interface ThemeSummaryRow {
+  id: string;
+  slug: string;
+  displayName: { id: string; en: string };
+  mode: (typeof schema.themeModeEnum.enumValues)[number];
+  tags: string[];
+  version: number;
+  status: (typeof schema.libraryStatusEnum.enumValues)[number];
+  sortOrder: number;
+}
+export interface ThemeRow extends ThemeSummaryRow {
+  theme: Record<string, unknown>;
+}
+
+const themeSummaryCols = {
+  id: themes.id,
+  slug: themes.slug,
+  displayName: themes.displayName,
+  mode: themes.mode,
+  tags: themes.tags,
+  version: themes.version,
+  status: themes.status,
+  sortOrder: themes.sortOrder,
+} as const;
+
+/** Preset theme platform (owner_type='platform'), urut sortOrder lalu slug. */
+export async function listPlatformThemes(exec: DbExecutor): Promise<ThemeSummaryRow[]> {
+  return exec
+    .select(themeSummaryCols)
+    .from(themes)
+    .where(eq(themes.ownerType, "platform"))
+    .orderBy(asc(themes.sortOrder), asc(themes.slug));
+}
+
+/** Satu preset platform by slug (termasuk definisi theme lengkap). */
+export async function getPlatformThemeBySlug(exec: DbExecutor, slug: string): Promise<ThemeRow | undefined> {
+  const [row] = await exec
+    .select({ ...themeSummaryCols, theme: themes.tokens })
+    .from(themes)
+    .where(and(eq(themes.ownerType, "platform"), eq(themes.slug, slug)))
+    .limit(1);
+  return row;
+}
+
+/** Simpan preset platform (edit admin): tokens + metadata, naikkan `version`. Mengembalikan ringkasan baru. */
+export async function updatePlatformTheme(
+  exec: DbExecutor,
+  slug: string,
+  patch: {
+    theme: Record<string, unknown>;
+    displayName?: { id: string; en: string };
+    mode?: (typeof schema.themeModeEnum.enumValues)[number];
+    tags?: string[];
+  },
+): Promise<ThemeSummaryRow | undefined> {
+  const [row] = await exec
+    .update(themes)
+    .set({
+      tokens: patch.theme,
+      ...(patch.displayName ? { displayName: patch.displayName } : {}),
+      ...(patch.mode ? { mode: patch.mode } : {}),
+      ...(patch.tags ? { tags: patch.tags } : {}),
+      version: sql`${themes.version} + 1`,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(themes.ownerType, "platform"), eq(themes.slug, slug)))
+    .returning(themeSummaryCols);
+  return row;
 }

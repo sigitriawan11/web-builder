@@ -17,9 +17,12 @@ import {
   deprecateRequest,
   draftDefinitionRequest,
   editorSessionRequest,
+  getThemeRequest,
+  listThemesRequest,
   publishRequest,
   realtimeTokenRequest,
   saveDraftRequest,
+  saveThemeRequest,
   usageRequest,
   versionsRequest,
 } from "./library-admin.schema";
@@ -29,7 +32,7 @@ import { createLibraryAdminService } from "./library-admin.service";
 // (permukaan admin tidak bocor). Matriks role (CMP-010 §tabel): BACA = semua staf (`staff` read-only); EDIT DRAFT =
 // designer/library_admin/super_admin; PUBLISH/deprecate/archive = library_admin/super_admin. Tiap mutasi tulis audit.
 // Catatan scope: endpoint QA/submit/review (tabel P1 T3.3.6 + worker QA), yank/rollback (trigger immutable → keputusan
-// owner), templates & CRUD themes, enqueue thumbnail/notify (M4) menyusul.
+// owner), templates & enqueue thumbnail/notify (M4) menyusul. CRUD theme preset (CMP-124) sudah ada (`/themes`).
 const READ_ROLES = ["super_admin", "staff", "library_admin", "designer"] as const;
 const DRAFT_ROLES = ["super_admin", "library_admin", "designer"] as const;
 const PUBLISH_ROLES = ["super_admin", "library_admin"] as const;
@@ -99,5 +102,9 @@ export function createLibraryAdminRouter(deps: {
     ...guard(READ_ROLES),
     ...validated(realtimeTokenRequest, controller.realtimeToken),
   );
+  // Theme preset (CMP-120/CMP-124): baca = semua staf; simpan = designer/library_admin/super_admin (DRAFT_ROLES).
+  router.get("/themes", ...guard(READ_ROLES), ...validated(listThemesRequest, controller.listThemes));
+  router.get("/themes/:slug", ...guard(READ_ROLES), ...validated(getThemeRequest, controller.getTheme));
+  router.put("/themes/:slug", ...guard(DRAFT_ROLES), ...validated(saveThemeRequest, controller.saveTheme));
   return router;
 }

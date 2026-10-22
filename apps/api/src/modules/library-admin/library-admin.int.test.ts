@@ -1,5 +1,6 @@
 import { and, eq, schema } from "@platform/db";
 import { createTestDb, type TestDb } from "@platform/db/testing";
+import { defaultTheme } from "@platform/document-model";
 import { uuidv7 } from "@platform/shared";
 import { REALTIME_TOKEN_AUDIENCE, RealtimeTokenClaimsSchema } from "@platform/shared/contracts";
 import { verifyToken } from "@platform/shared/node";
@@ -482,5 +483,107 @@ describe("admin library CRUD (CMP-159)", () => {
       .send(createBody("tombol-sesi"));
     const { id } = made.body.data as { id: string };
     expect((await request(target).get(`/v1/admin/library/components/${id}`).set("cookie", plain)).status).toBe(404);
+  });
+});
+
+describe("admin library themes (CMP-124)", () => {
+  async function seedTheme(slug: string): Promise<void> {
+    await testDb.db
+      .insert(schema.themes)
+      .values({
+        id: uuidv7(),
+        slug,
+        ownerType: "platform",
+        displayName: { id: "Preset Uji", en: "Test Preset" },
+        tokens: defaultTheme() as unknown as Record<string, unknown>,
+        mode: "light",
+        status: "published",
+      })
+      .onConflictDoNothing();
+  }
+
+  it("non-staf → 404 di GET/PUT themes; sesi tanpa auth → 401", async () => {
+    await seedTheme("preset-non-staf");
+    const plain = await register();
+    expect((await request(target).get("/v1/admin/library/themes").set("cookie", plain)).status).toBe(404);
+    expect((await request(target).get("/v1/admin/library/themes/preset-non-staf").set("cookie", plain)).status).toBe(
+      404,
+    );
+    expect(
+      (
+        await request(target)
+          .put("/v1/admin/library/themes/preset-non-staf")
+          .set("cookie", plain)
+          .send({ theme: defaultTheme() })
+      ).status,
+    ).toBe(404);
+    expect((await request(target).get("/v1/admin/library/themes")).status).toBe(401);
+  });
+
+  it("staf: list + get preset (dengan definisi theme lengkap)", async () => {
+    await seedTheme("preset-baca");
+    const staff = await register("staff");
+    const list = await request(target).get("/v1/admin/library/themes").set("cookie", staff);
+    expect(list.status).toBe(200);
+    const found = (list.body.data.items as { slug: string; version: number }[]).find((t) => t.slug === "preset-baca");
+    expect(found?.version).toBe(1);
+
+    const one = await request(target).get("/v1/admin/library/themes/preset-baca").set("cookie", staff);
+    expect(one.status).toBe(200);
+    expect(one.body.data.slug).toBe("preset-baca");
+    // Definisi theme lengkap (tokens.color.primary ada).
+    expect((one.body.data.theme as { tokens: { color: Record<string, unknown> } }).tokens.color.primary).toBeDefined();
+
+    // Slug tak dikenal → 404.
+    expect((await request(target).get("/v1/admin/library/themes/tidak-ada").set("cookie", staff)).status).toBe(404);
+  });
+
+  it("designer menyimpan preset → version naik + audit; staf read-only → 403; theme invalid → 422", async () => {
+    await seedTheme("preset-simpan");
+    const designer = await register("designer");
+
+    // Simpan preset valid → 200, version 1 → 2.
+    const saved = await request(target)
+      .put("/v1/admin/library/themes/preset-simpan")
+      .set("cookie", designer)
+      .send({ theme: defaultTheme(), displayName: { id: "Baru", en: "New" } });
+    expect(saved.status).toBe(200);
+    expect(saved.body.data.version).toBe(2);
+    expect(saved.body.data.displayName).toEqual({ id: "Baru", en: "New" });
+
+    // Audit tercatat.
+    const [audit] = await testDb.db
+      .select()
+      .from(schema.auditLogs)
+      .where(and(eq(schema.auditLogs.action, "library_theme.save")));
+    expect(audit).toBeTruthy();
+
+    // staf (read-only) tak boleh simpan → 403.
+    const readOnly = await register("staff");
+    expect(
+      (
+        await request(target)
+          .put("/v1/admin/library/themes/preset-simpan")
+          .set("cookie", readOnly)
+          .send({ theme: defaultTheme() })
+      ).status,
+    ).toBe(403);
+
+    // theme tak sesuai ThemeSchema → 422.
+    const bad = await request(target)
+      .put("/v1/admin/library/themes/preset-simpan")
+      .set("cookie", designer)
+      .send({ theme: { tokens: {} } });
+    expect(bad.status).toBe(422);
+
+    // Slug tak dikenal → 404.
+    expect(
+      (
+        await request(target)
+          .put("/v1/admin/library/themes/tidak-ada")
+          .set("cookie", designer)
+          .send({ theme: defaultTheme() })
+      ).status,
+    ).toBe(404);
   });
 });

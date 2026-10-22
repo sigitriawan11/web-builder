@@ -6,6 +6,7 @@ import {
   componentDefToState,
   createId,
   diffComponentSchemas,
+  ThemeSchema,
   validateComponentDefinition,
 } from "@platform/document-model";
 import { AppError, uuidv7 } from "@platform/shared";
@@ -17,9 +18,13 @@ import {
   type LibraryComponentSummary,
   type LibraryComponentVersion,
   type LibraryEditorSession,
+  type LibraryTheme,
+  type LibraryThemeList,
+  type LibraryThemeSummary,
   REALTIME_TOKEN_AUDIENCE,
   REALTIME_TOKEN_TTL_SECONDS,
   type RealtimeTokenResponse,
+  type SaveLibraryThemeBody,
 } from "@platform/shared/contracts";
 import { getContext, type Logger, signToken, stableHash } from "@platform/shared/node";
 import type { z } from "zod";
@@ -373,6 +378,60 @@ export function createLibraryAdminService(deps: {
       if (!draftState) throw new AppError("NOT_FOUND");
       return { componentId: publicId, definition: validateDefinition(componentDefFromState(draftState.state)) };
     },
+
+    // --- Theme preset (CMP-120/CMP-124) ---
+    /** Daftar preset theme platform (ringkasan) untuk picker & theme matrix admin. */
+    async listThemes(): Promise<LibraryThemeList> {
+      const rows = await repo.listPlatformThemes(db);
+      return { items: rows.map(themeSummary) };
+    },
+
+    /** Satu preset platform (definisi lengkap) untuk editor theme. 404 bila tak ada. */
+    async getTheme(slug: string): Promise<LibraryTheme> {
+      const row = await repo.getPlatformThemeBySlug(db, slug);
+      if (!row) throw new AppError("NOT_FOUND");
+      return { ...themeSummary(row), theme: row.theme };
+    },
+
+    /**
+     * Simpan preset (edit admin, CMP-124): validasi `ThemeSchema`, update tokens + metadata, naikkan `version`.
+     * Situs yang sudah menyalin preset tidak tersentuh (punya salinan sendiri). 404 bila preset tak ada.
+     */
+    async saveTheme(actor: StaffActor, slug: string, input: SaveLibraryThemeBody): Promise<LibraryThemeSummary> {
+      const parsed = ThemeSchema.safeParse(input.theme);
+      if (!parsed.success) throw new AppError("VALIDATION_FAILED", undefined, { issues: parsed.error.issues });
+      const row = await repo.updatePlatformTheme(db, slug, {
+        theme: parsed.data as unknown as Record<string, unknown>,
+        ...(input.displayName ? { displayName: input.displayName } : {}),
+        ...(input.mode ? { mode: input.mode } : {}),
+        ...(input.tags ? { tags: input.tags } : {}),
+      });
+      if (!row) throw new AppError("NOT_FOUND");
+      await recordAudit(db, {
+        actorType: "staff",
+        actorId: actor.userId,
+        action: "library_theme.save",
+        targetType: "library_theme",
+        targetId: row.id,
+        ip: actor.ip ?? null,
+        userAgent: actor.userAgent ?? null,
+        metadata: { slug, version: row.version },
+      });
+      return themeSummary(row);
+    },
+  };
+}
+
+function themeSummary(row: repo.ThemeSummaryRow): LibraryThemeSummary {
+  return {
+    id: row.id,
+    slug: row.slug,
+    displayName: row.displayName,
+    mode: row.mode,
+    tags: row.tags,
+    version: row.version,
+    status: row.status,
+    sortOrder: row.sortOrder,
   };
 }
 

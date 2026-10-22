@@ -10,9 +10,12 @@ import type {
   deprecateRequest,
   draftDefinitionRequest,
   editorSessionRequest,
+  getThemeRequest,
+  listThemesRequest,
   publishRequest,
   realtimeTokenRequest,
   saveDraftRequest,
+  saveThemeRequest,
   usageRequest,
   versionsRequest,
 } from "./library-admin.schema";
@@ -78,6 +81,15 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     res.set("Cache-Control", "no-store"); // draft berubah terus; jangan di-cache.
     res.json({ data, meta: meta(res) });
   };
+  const listThemes: ValidatedHandler<typeof listThemesRequest> = async (_req, res) => {
+    res.json({ data: await service.listThemes(), meta: meta(res) });
+  };
+  const getTheme: ValidatedHandler<typeof getThemeRequest> = async (req, res) => {
+    res.json({ data: await service.getTheme(req.valid.params.slug), meta: meta(res) });
+  };
+  const saveTheme: ValidatedHandler<typeof saveThemeRequest> = async (req, res) => {
+    res.json({ data: await service.saveTheme(actor(req), req.valid.params.slug, req.valid.body), meta: meta(res) });
+  };
   return {
     create,
     saveDraft,
@@ -92,5 +104,8 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     listComponents,
     capabilities,
     versions,
+    listThemes,
+    getTheme,
+    saveTheme,
   };
 }
