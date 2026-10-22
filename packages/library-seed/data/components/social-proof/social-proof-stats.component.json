@@ -15,10 +15,21 @@
       "id": "Baris angka pencapaian sebagai bukti sosial.",
       "en": "A row of achievement numbers as social proof."
     },
-    "tags": ["social-proof", "stats"],
+    "tags": [
+      "social-proof",
+      "stats"
+    ],
     "keywords": {
-      "id": ["testimoni", "ulasan", "kepercayaan"],
-      "en": ["testimonial", "reviews", "trust"]
+      "id": [
+        "testimoni",
+        "ulasan",
+        "kepercayaan"
+      ],
+      "en": [
+        "testimonial",
+        "reviews",
+        "trust"
+      ]
     },
     "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
   },
@@ -32,7 +43,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_social0"],
+          "rootIds": [
+            "tmp_social0"
+          ],
           "nodes": {
             "tmp_social0": {
               "id": "tmp_social0",
@@ -41,7 +54,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_social1"],
+              "children": [
+                "tmp_social1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +100,9 @@
               "parentId": "tmp_social0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_social2"],
+              "children": [
+                "tmp_social2"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -118,7 +135,11 @@
               "parentId": "tmp_social1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_social3", "tmp_social6", "tmp_social9"],
+              "children": [
+                "tmp_social3",
+                "tmp_social6",
+                "tmp_social9"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -150,7 +171,10 @@
               "parentId": "tmp_social2",
               "visible": true,
               "locked": false,
-              "children": ["tmp_social4", "tmp_social5"],
+              "children": [
+                "tmp_social4",
+                "tmp_social5"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -266,7 +290,10 @@
               "parentId": "tmp_social2",
               "visible": true,
               "locked": false,
-              "children": ["tmp_social7", "tmp_social8"],
+              "children": [
+                "tmp_social7",
+                "tmp_social8"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -382,7 +409,10 @@
               "parentId": "tmp_social2",
               "visible": true,
               "locked": false,
-              "children": ["tmp_social10", "tmp_social11"],
+              "children": [
+                "tmp_social10",
+                "tmp_social11"
+              ],
               "props": {},
               "style": {
                 "base": {

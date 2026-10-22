@@ -15,10 +15,21 @@
       "id": "Kutipan besar terpusat sebagai sorotan testimoni.",
       "en": "A large centered quote as a highlighted testimonial."
     },
-    "tags": ["social-proof", "quote"],
+    "tags": [
+      "social-proof",
+      "quote"
+    ],
     "keywords": {
-      "id": ["testimoni", "ulasan", "kepercayaan"],
-      "en": ["testimonial", "reviews", "trust"]
+      "id": [
+        "testimoni",
+        "ulasan",
+        "kepercayaan"
+      ],
+      "en": [
+        "testimonial",
+        "reviews",
+        "trust"
+      ]
     },
     "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
   },
@@ -32,7 +43,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_quoteb0"],
+          "rootIds": [
+            "tmp_quoteb0"
+          ],
           "nodes": {
             "tmp_quoteb0": {
               "id": "tmp_quoteb0",
@@ -41,7 +54,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_quoteb1"],
+              "children": [
+                "tmp_quoteb1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +100,11 @@
               "parentId": "tmp_quoteb0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_quoteb2", "tmp_quoteb3", "tmp_quoteb4"],
+              "children": [
+                "tmp_quoteb2",
+                "tmp_quoteb3",
+                "tmp_quoteb4"
+              ],
               "props": {},
               "style": {
                 "base": {

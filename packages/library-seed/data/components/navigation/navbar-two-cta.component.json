@@ -1,0 +1,651 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_navbartwocta",
+  "slug": "navbar-two-cta",
+  "kind": "layout",
+  "categorySlug": "navigation",
+  "meta": {
+    "name": "NavbarTwoCta",
+    "displayName": {
+      "id": "Navbar 2 Tombol",
+      "en": "Navbar Two Buttons"
+    },
+    "description": {
+      "id": "Navbar dengan tombol masuk dan tombol daftar di kanan.",
+      "en": "Navbar with a sign-in and a sign-up button on the right."
+    },
+    "tags": ["navbar", "two-cta"],
+    "keywords": {
+      "id": ["navigasi", "menu", "header"],
+      "en": ["navbar", "menu", "header"]
+    },
+    "aiHints": "Header situs: logo kiri, 3–5 link, 1 CTA kanan. Jaga ringkas; link ke section penting."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_navbar0"],
+          "nodes": {
+            "tmp_navbar0": {
+              "id": "tmp_navbar0",
+              "type": "frame",
+              "name": "NavbarTwoCta",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_navbar1", "tmp_navbar4"],
+              "tag": "header",
+              "props": {
+                "role": "container"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.6"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.4"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.4"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.background"
+                      }
+                    }
+                  ],
+                  "strokes": [
+                    {
+                      "color": {
+                        "$token": "color.border"
+                      },
+                      "width": {
+                        "value": 1,
+                        "unit": "px"
+                      },
+                      "sides": {
+                        "bottom": true
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_navbar1": {
+              "id": "tmp_navbar1",
+              "type": "frame",
+              "name": "Logo",
+              "parentId": "tmp_navbar0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_navbar2", "tmp_navbar3"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_navbar2": {
+              "id": "tmp_navbar2",
+              "type": "frame",
+              "name": "LogoMark",
+              "parentId": "tmp_navbar1",
+              "visible": true,
+              "locked": false,
+              "children": [],
+              "props": {
+                "role": "generic"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    },
+                    "minHeight": {
+                      "value": 32,
+                      "unit": "px"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.lg"
+                  }
+                }
+              }
+            },
+            "tmp_navbar3": {
+              "id": "tmp_navbar3",
+              "type": "text",
+              "name": "Brand",
+              "parentId": "tmp_navbar1",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Brand"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.h4"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_navbar4": {
+              "id": "tmp_navbar4",
+              "type": "frame",
+              "name": "Right",
+              "parentId": "tmp_navbar0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_navbar5", "tmp_navbar10", "tmp_navbar12"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.5"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_navbar5": {
+              "id": "tmp_navbar5",
+              "type": "frame",
+              "name": "Nav",
+              "parentId": "tmp_navbar4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_navbar6", "tmp_navbar7", "tmp_navbar8", "tmp_navbar9"],
+              "tag": "nav",
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_navbar6": {
+              "id": "tmp_navbar6",
+              "type": "text",
+              "name": "Link1",
+              "parentId": "tmp_navbar5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Beranda"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onSurface"
+                  }
+                }
+              }
+            },
+            "tmp_navbar7": {
+              "id": "tmp_navbar7",
+              "type": "text",
+              "name": "Link2",
+              "parentId": "tmp_navbar5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Fitur"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_navbar8": {
+              "id": "tmp_navbar8",
+              "type": "text",
+              "name": "Link3",
+              "parentId": "tmp_navbar5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Harga"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_navbar9": {
+              "id": "tmp_navbar9",
+              "type": "text",
+              "name": "Link4",
+              "parentId": "tmp_navbar5",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kontak"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_navbar10": {
+              "id": "tmp_navbar10",
+              "type": "frame",
+              "name": "Login",
+              "parentId": "tmp_navbar4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_navbar11"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.2"
+                      },
+                      "right": {
+                        "$token": "space.5"
+                      },
+                      "bottom": {
+                        "$token": "space.2"
+                      },
+                      "left": {
+                        "$token": "space.5"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  }
+                }
+              }
+            },
+            "tmp_navbar11": {
+              "id": "tmp_navbar11",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_navbar10",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Masuk"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.primary"
+                  }
+                }
+              }
+            },
+            "tmp_navbar12": {
+              "id": "tmp_navbar12",
+              "type": "frame",
+              "name": "Signup",
+              "parentId": "tmp_navbar4",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_navbar13"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "gap": {
+                      "$token": "space.2"
+                    },
+                    "padding": {
+                      "top": {
+                        "$token": "space.2"
+                      },
+                      "right": {
+                        "$token": "space.5"
+                      },
+                      "bottom": {
+                        "$token": "space.2"
+                      },
+                      "left": {
+                        "$token": "space.5"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "radius": {
+                    "$token": "radius.md"
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.primary"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_navbar13": {
+              "id": "tmp_navbar13",
+              "type": "text",
+              "name": "Label",
+              "parentId": "tmp_navbar12",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Daftar"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.button"
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

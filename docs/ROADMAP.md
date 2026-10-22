@@ -1441,8 +1441,10 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [x] **T3.11.2** Elements batch 1: Buttons (primary/secondary/ghost/WA, size), Badges, Dividers — CMP-089 · library · Verifikasi: ≥ 10 variasi published
   - **Toolkit generator** (`scripts/builder.ts` + `scripts/catalog/*` + `pnpm --filter @platform/library-seed gen`): satu design direction (token theme, auto-layout flex, nama EN, tag semantik) → emit `.component.json` tervalidasi (`validateSeedLibrary`: insertSubtree dry-run + lint R-* + ref ikon/aset). **10 varian baru** (+ button-primary = 11): button secondary/ghost/whatsapp(brand icon)/large/small, badge solid/outline/soft, divider, icon-chip. Semua lolos lint & skema; published via import.
 - [ ] **T3.11.3** Elements batch 2: Inputs (visual), Icon+text, Media (image frame, video lite) — CMP-089 · library · Verifikasi: ≥ 12 variasi (total Elements ≥ 22)
-- [ ] **T3.11.4** Navigation: Navbar simple (5 varian), Navbar WA CTA, Navbar mobile drawer — CMP-081 · library · Verifikasi: ≥ 8 variasi
-- [ ] **T3.11.5** Navigation: Footer (4 varian) + Floating WhatsApp button — CMP-081 · library · Verifikasi: ≥ 6 variasi (total Nav ≥ 14 bersama M4)
+- [x] **T3.11.4** Navigation: Navbar simple (5 varian), Navbar WA CTA, Navbar mobile drawer — CMP-081 · library · Verifikasi: ≥ 8 variasi
+  - 8 navbar (simple/cta/whatsapp/two-cta/minimal/links-right/mobile/announcement), kind=layout, tag header/nav.
+- [x] **T3.11.5** Navigation: Footer (4 varian) + Floating WhatsApp button — CMP-081 · library · Verifikasi: ≥ 6 variasi
+  - 6: footer columns/simple/social/newsletter/minimal + floating-whatsapp (element bulat).
 - [x] **T3.11.6** Hero batch: centered, split image, background image — CMP-082 · library · Verifikasi: ≥ 10 variasi
   - 10 hero (centered/centered-badge/split-left/split-right/background/minimal/whatsapp/left-aligned/image-below/trust-logos) via toolkit; section root width fill, token+auto-layout, lolos validateSeedLibrary. Gambar = placeholder frame (swap aset nanti).
 - [x] **T3.11.7** Feature/Benefit: feature grid ikon, alternating, checklist, steps/process — CMP-083 · library · Verifikasi: ≥ 9 variasi

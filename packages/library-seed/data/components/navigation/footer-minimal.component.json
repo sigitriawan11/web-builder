@@ -1,0 +1,301 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_footerminimal",
+  "slug": "footer-minimal",
+  "kind": "layout",
+  "categorySlug": "navigation",
+  "meta": {
+    "name": "FooterMinimal",
+    "displayName": {
+      "id": "Footer Minimal",
+      "en": "Minimal Footer"
+    },
+    "description": {
+      "id": "Footer satu baris: hak cipta kiri dan tautan kanan.",
+      "en": "A one-line footer: copyright left and links right."
+    },
+    "tags": ["footer", "minimal"],
+    "keywords": {
+      "id": ["footer", "kaki", "tautan"],
+      "en": ["footer", "links"]
+    },
+    "aiHints": "Kaki situs: tautan penting, info kontak, hak cipta. Jaga rapi dan ringkas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_footer0"],
+          "nodes": {
+            "tmp_footer0": {
+              "id": "tmp_footer0",
+              "type": "frame",
+              "name": "FooterMinimal",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_footer1", "tmp_footer2"],
+              "tag": "footer",
+              "props": {
+                "role": "container"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "spaceBetween",
+                    "gap": {
+                      "$token": "space.6"
+                    },
+                    "wrap": true,
+                    "padding": {
+                      "top": {
+                        "$token": "space.6"
+                      },
+                      "right": {
+                        "$token": "space.6"
+                      },
+                      "bottom": {
+                        "$token": "space.6"
+                      },
+                      "left": {
+                        "$token": "space.6"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.surface"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "tmp_footer1": {
+              "id": "tmp_footer1",
+              "type": "text",
+              "name": "Copyright",
+              "parentId": "tmp_footer0",
+              "visible": true,
+              "locked": false,
+              "tag": "p",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "© 2026 Brand. Semua hak dilindungi."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fill"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.caption"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_footer2": {
+              "id": "tmp_footer2",
+              "type": "frame",
+              "name": "Links",
+              "parentId": "tmp_footer0",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_footer3", "tmp_footer4", "tmp_footer5"],
+              "props": {},
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "gap": {
+                      "$token": "space.4"
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  }
+                }
+              }
+            },
+            "tmp_footer3": {
+              "id": "tmp_footer3",
+              "type": "text",
+              "name": "Link0",
+              "parentId": "tmp_footer2",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Privasi"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_footer4": {
+              "id": "tmp_footer4",
+              "type": "text",
+              "name": "Link1",
+              "parentId": "tmp_footer2",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Syarat"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            },
+            "tmp_footer5": {
+              "id": "tmp_footer5",
+              "type": "text",
+              "name": "Link2",
+              "parentId": "tmp_footer2",
+              "visible": true,
+              "locked": false,
+              "tag": "span",
+              "props": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Kontak"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "typography": {
+                    "$token": "typography.bodySm"
+                  },
+                  "color": {
+                    "$token": "color.muted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

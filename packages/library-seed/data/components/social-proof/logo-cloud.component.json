@@ -15,10 +15,21 @@
       "id": "Judul kecil dengan barisan logo mitra atau klien.",
       "en": "A small title with a row of partner or client logos."
     },
-    "tags": ["social-proof", "logos"],
+    "tags": [
+      "social-proof",
+      "logos"
+    ],
     "keywords": {
-      "id": ["testimoni", "ulasan", "kepercayaan"],
-      "en": ["testimonial", "reviews", "trust"]
+      "id": [
+        "testimoni",
+        "ulasan",
+        "kepercayaan"
+      ],
+      "en": [
+        "testimonial",
+        "reviews",
+        "trust"
+      ]
     },
     "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
   },
@@ -32,7 +43,9 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": ["tmp_logocl0"],
+          "rootIds": [
+            "tmp_logocl0"
+          ],
           "nodes": {
             "tmp_logocl0": {
               "id": "tmp_logocl0",
@@ -41,7 +54,9 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": ["tmp_logocl1"],
+              "children": [
+                "tmp_logocl1"
+              ],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -85,7 +100,10 @@
               "parentId": "tmp_logocl0",
               "visible": true,
               "locked": false,
-              "children": ["tmp_logocl2", "tmp_logocl3"],
+              "children": [
+                "tmp_logocl2",
+                "tmp_logocl3"
+              ],
               "props": {},
               "style": {
                 "base": {
@@ -161,7 +179,13 @@
               "parentId": "tmp_logocl1",
               "visible": true,
               "locked": false,
-              "children": ["tmp_logocl4", "tmp_logocl5", "tmp_logocl6", "tmp_logocl7", "tmp_logocl8"],
+              "children": [
+                "tmp_logocl4",
+                "tmp_logocl5",
+                "tmp_logocl6",
+                "tmp_logocl7",
+                "tmp_logocl8"
+              ],
               "props": {},
               "style": {
                 "base": {

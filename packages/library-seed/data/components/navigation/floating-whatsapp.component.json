@@ -1,0 +1,128 @@
+{
+  "$schema": "../../../schema/component-seed.schema.json",
+  "seedVersion": 1,
+  "id": "cmp_floatingwhatsapp",
+  "slug": "floating-whatsapp",
+  "kind": "element",
+  "categorySlug": "navigation",
+  "meta": {
+    "name": "FloatingWhatsApp",
+    "displayName": {
+      "id": "Tombol WhatsApp Mengambang",
+      "en": "Floating WhatsApp Button"
+    },
+    "description": {
+      "id": "Tombol bulat WhatsApp untuk chat cepat di pojok halaman.",
+      "en": "A round WhatsApp button for quick chat in the page corner."
+    },
+    "tags": ["footer", "whatsapp", "floating"],
+    "keywords": {
+      "id": ["footer", "kaki", "tautan"],
+      "en": ["footer", "links"]
+    },
+    "aiHints": "Kaki situs: tautan penting, info kontak, hak cipta. Jaga rapi dan ringkas."
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "status": "published",
+      "changelog": {
+        "id": "Rilis awal.",
+        "en": "Initial release."
+      },
+      "definition": {
+        "subtree": {
+          "rootIds": ["tmp_floati0"],
+          "nodes": {
+            "tmp_floati0": {
+              "id": "tmp_floati0",
+              "type": "frame",
+              "name": "FloatingWhatsApp",
+              "parentId": "tmp_parent",
+              "visible": true,
+              "locked": false,
+              "children": ["tmp_floati1"],
+              "props": {
+                "role": "button"
+              },
+              "style": {
+                "base": {
+                  "layout": {
+                    "mode": "flex",
+                    "direction": "row",
+                    "align": "center",
+                    "justify": "center",
+                    "padding": {
+                      "top": {
+                        "$token": "space.4"
+                      },
+                      "right": {
+                        "$token": "space.4"
+                      },
+                      "bottom": {
+                        "$token": "space.4"
+                      },
+                      "left": {
+                        "$token": "space.4"
+                      }
+                    }
+                  },
+                  "size": {
+                    "width": {
+                      "mode": "hug"
+                    },
+                    "height": {
+                      "mode": "hug"
+                    }
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "color": {
+                        "$token": "color.success"
+                      }
+                    }
+                  ],
+                  "radius": {
+                    "$token": "radius.full"
+                  }
+                }
+              }
+            },
+            "tmp_floati1": {
+              "id": "tmp_floati1",
+              "type": "icon",
+              "name": "WaIcon",
+              "parentId": "tmp_floati0",
+              "visible": true,
+              "locked": false,
+              "props": {
+                "set": "brand",
+                "name": "whatsapp"
+              },
+              "style": {
+                "base": {
+                  "size": {
+                    "width": {
+                      "mode": "fixed",
+                      "value": 28,
+                      "unit": "px"
+                    },
+                    "height": {
+                      "mode": "fixed",
+                      "value": 28,
+                      "unit": "px"
+                    }
+                  },
+                  "color": {
+                    "$token": "color.onPrimary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -6,7 +6,9 @@ import { CTA } from "./catalog/cta";
 import { ELEMENTS } from "./catalog/elements";
 import { FAQ } from "./catalog/faq";
 import { FEATURES } from "./catalog/features";
+import { FOOTER } from "./catalog/footer";
 import { HERO } from "./catalog/hero";
+import { NAVBAR } from "./catalog/navbar";
 import { PRICING } from "./catalog/pricing";
 import { SOCIAL_PROOF } from "./catalog/social-proof";
 
@@ -15,7 +17,17 @@ import { SOCIAL_PROOF } from "./catalog/social-proof";
 
 const DATA = fileURLToPath(new URL("../data/components/", import.meta.url));
 
-const CATALOG: ComponentSpec[] = [...ELEMENTS, ...HERO, ...FEATURES, ...CTA, ...FAQ, ...PRICING, ...SOCIAL_PROOF];
+const CATALOG: ComponentSpec[] = [
+  ...ELEMENTS,
+  ...HERO,
+  ...FEATURES,
+  ...CTA,
+  ...FAQ,
+  ...PRICING,
+  ...SOCIAL_PROOF,
+  ...NAVBAR,
+  ...FOOTER,
+];
 
 let written = 0;
 for (const spec of CATALOG) {
