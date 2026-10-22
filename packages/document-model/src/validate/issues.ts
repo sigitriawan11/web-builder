@@ -56,6 +56,8 @@ export const COMPONENT_ISSUE_CODES = [
   "COMPONENT_ROOT",
   // `$prop` merujuk key yang tidak ada di propsSchema.
   "PROP_REF_UNKNOWN",
+  // `$prop` dipakai di konteks yang tidak kompatibel dengan `PropDef.type` (DM-047).
+  "PROP_REF_TYPE",
   // Key prop duplikat di propsSchema.
   "PROP_KEY_DUPLICATE",
   // Instance di dalam definisi merujuk component dirinya sendiri (langsung).

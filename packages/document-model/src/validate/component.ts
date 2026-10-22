@@ -81,6 +81,33 @@ export function validateComponentDefinition(input: unknown): ComponentValidation
   }
   // Alias binding list (DM-047): `item` scope di dalam repeater — tidak harus ada di propsSchema.
   const knownRefs = new Set<string>([...propKeys, "item", "index"]);
+  // DM-047: tipe tiap prop (untuk cek kompatibilitas `$prop` ↔ konteks pemakaian).
+  const propType = new Map((def.propsSchema as PropDef[]).map((prop) => [prop.key, prop.type]));
+
+  // Cek tipe `$prop` terhadap tipe yang diharapkan konteks. `eq` → hasil boolean (sumber tipe apa pun) → lewati.
+  // Binding scope list (`item`/`index`/`key[].field`) tidak punya tipe statis di M3 → lewati.
+  const checkPropType = (
+    ref: { $prop: string; eq?: unknown },
+    expected: readonly PropDef["type"][],
+    path: (string | number)[],
+    nodeId: string,
+  ) => {
+    if (ref.eq !== undefined) return;
+    const base = propRefBase(ref.$prop);
+    if (base === "item" || base === "index" || ref.$prop.includes("[]")) return;
+    const type = propType.get(base);
+    if (type && !expected.includes(type)) {
+      report(
+        "PROP_REF_TYPE",
+        ["nodes", nodeId, ...path],
+        msg(
+          `$prop "${ref.$prop}" bertipe ${type} tidak cocok (butuh ${expected.join("/")})`,
+          `$prop "${ref.$prop}" of type ${type} is incompatible (expected ${expected.join("/")})`,
+        ),
+        nodeId,
+      );
+    }
+  };
 
   // rootId ada & jadi root (parentId null).
   const rootNode = def.nodes[def.rootId];
@@ -148,10 +175,41 @@ export function validateComponentDefinition(input: unknown): ComponentValidation
         slotNames.add(name);
       }
     }
-    // Semua `$prop` di style/props/visible merujuk key yang dikenal (DM-047).
-    for (const value of [node.style, node.props, node.visible]) {
-      walkJsonObjects(value, [], (object) => {
+    // `visible` boleh di-binding ke prop boolean (atau tipe apa pun dengan `eq`) (DM-047).
+    if (isPropRef(node.visible)) {
+      if (!knownRefs.has(propRefBase(node.visible.$prop))) {
+        report(
+          "PROP_REF_UNKNOWN",
+          ["nodes", nodeId],
+          msg(
+            `$prop "${node.visible.$prop}" tidak ada di propsSchema`,
+            `$prop "${node.visible.$prop}" is not in propsSchema`,
+          ),
+          nodeId,
+        );
+      } else {
+        checkPropType(node.visible, ["boolean"], ["visible"], nodeId);
+      }
+    }
+
+    // Tipe konteks yang diharapkan untuk `$prop` di dalam `props`/`style`, per tipe node (DM-047).
+    const expectedFor = (key: string): readonly PropDef["type"][] | undefined => {
+      if (key === "color") return ["color"]; // fills[].color, strokes[].color, text color
+      if (node.type === "text" && key === "content") return ["text", "richText"];
+      if (node.type === "image" && key === "image") return ["image"];
+      if (node.type === "icon" && (key === "name" || key === "icon")) return ["icon"];
+      if (node.type === "frame" && key === "link") return ["link"];
+      return undefined;
+    };
+
+    // Semua `$prop` di style/props/visible merujuk key yang dikenal (DM-047) + cek kompatibilitas tipe.
+    for (const [field, value] of [
+      ["style", node.style],
+      ["props", node.props],
+    ] as const) {
+      walkJsonObjects(value, [field], (object, path) => {
         if (isPropRef(object)) {
+          const full = path();
           const base = propRefBase(object.$prop);
           if (!knownRefs.has(base)) {
             report(
@@ -160,6 +218,10 @@ export function validateComponentDefinition(input: unknown): ComponentValidation
               msg(`$prop "${object.$prop}" tidak ada di propsSchema`, `$prop "${object.$prop}" is not in propsSchema`),
               nodeId,
             );
+          } else {
+            const key = full.at(-1);
+            const expected = typeof key === "string" ? expectedFor(key) : undefined;
+            if (expected) checkPropType(object, expected, full, nodeId);
           }
         }
         return undefined;

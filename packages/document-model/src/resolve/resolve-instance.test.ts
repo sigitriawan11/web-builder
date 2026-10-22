@@ -154,11 +154,71 @@ const navDef = {
   },
 } as unknown as ComponentDefinition;
 
+// Flags: binding boolean (`visible`), enum+`eq` (`visible`), dan `fallback` (link prop tanpa default) — DM-047.
+const flagsDef = {
+  schemaVersion: 1,
+  id: "cmp_flags01",
+  version: 1,
+  name: "Flags",
+  category: "section",
+  propsSchema: [
+    { key: "showBadge", label, type: "boolean", default: true },
+    {
+      key: "align",
+      label,
+      type: "enum",
+      default: "left",
+      options: [
+        { value: "left", label },
+        { value: "center", label },
+      ],
+    },
+    { key: "href", label, type: "link" },
+  ],
+  rootId: "n_flagroot",
+  nodes: {
+    n_flagroot: {
+      id: "n_flagroot",
+      type: "frame",
+      name: "Flags",
+      parentId: null,
+      visible: true,
+      locked: false,
+      children: ["n_badge", "n_centeronly"],
+      style: { base: {} },
+      props: { role: "generic", link: { $prop: "href", fallback: { type: "url", url: "#fallback" } } },
+    },
+    n_badge: {
+      id: "n_badge",
+      type: "frame",
+      name: "Badge",
+      parentId: "n_flagroot",
+      visible: { $prop: "showBadge" },
+      locked: false,
+      children: [],
+      style: { base: {} },
+      props: { role: "generic" },
+    },
+    n_centeronly: {
+      id: "n_centeronly",
+      type: "frame",
+      name: "CenterOnly",
+      parentId: "n_flagroot",
+      visible: { $prop: "align", eq: "center" },
+      locked: false,
+      children: [],
+      style: { base: {} },
+      props: { role: "generic" },
+    },
+  },
+} as unknown as ComponentDefinition;
+
 const registry = new Map<string, ComponentDefinition>([
   ["cmp_btn@1", buttonDef],
   ["cmp_card@1", cardDef],
   ["cmp_grid@1", gridDef],
   ["cmp_nav0001@1", navDef],
+  ["cmp_flags01@1", flagsDef],
 ]);
 const ctx = {
   getComponent: (id: string, version: number) => registry.get(`${id}@${version}`),
@@ -255,6 +315,31 @@ describe("resolveInstance (DM-051)", () => {
     expect(items.map((n) => textOf(n))).toEqual(["Fitur", "Harga", "Kontak"]);
     // ID unik per item.
     expect(new Set(items.map((n) => n.id)).size).toBe(3);
+  });
+
+  it("binding boolean, enum+eq, dan fallback (DM-047)", () => {
+    const linkOf = (node: ResolvedNode) => (node.props as { link?: { url?: string } } | undefined)?.link;
+
+    // Default: showBadge=true, align=left, href kosong → fallback dipakai.
+    const def = resolveInstance(instance({ componentId: "cmp_flags01", version: 1 }), ctx);
+    expect(find(def, (n) => n.id.endsWith(":n_badge"))?.visible).toBe(true);
+    expect(find(def, (n) => n.id.endsWith(":n_centeronly"))?.visible).toBe(false);
+    expect(linkOf(def)).toEqual({ type: "url", url: "#fallback" });
+
+    // showBadge=false → badge tersembunyi; align=center → node eq terlihat.
+    const flipped = resolveInstance(
+      instance({ componentId: "cmp_flags01", version: 1, propValues: { showBadge: false, align: "center" } }),
+      ctx,
+    );
+    expect(find(flipped, (n) => n.id.endsWith(":n_badge"))?.visible).toBe(false);
+    expect(find(flipped, (n) => n.id.endsWith(":n_centeronly"))?.visible).toBe(true);
+
+    // href di-set → nilai prop dipakai, bukan fallback.
+    const withHref = resolveInstance(
+      instance({ componentId: "cmp_flags01", version: 1, propValues: { href: { type: "url", url: "https://x.id" } } }),
+      ctx,
+    );
+    expect(linkOf(withHref)).toEqual({ type: "url", url: "https://x.id" });
   });
 
   it("component hilang → placeholder (tidak crash)", () => {

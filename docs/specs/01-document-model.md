@@ -1122,7 +1122,7 @@ type PropDef = {
 ```
 
 - **Acceptance criteria**:
-  - [ ] Validator memeriksa kompatibilitas tipe `$prop` ↔ `PropDef.type`.
+  - [x] Validator memeriksa kompatibilitas tipe `$prop` ↔ `PropDef.type`.
 
 ### DM-048 Variants
 - **P0 · M3**

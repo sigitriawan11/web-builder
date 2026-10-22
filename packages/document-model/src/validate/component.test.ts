@@ -167,3 +167,38 @@ describe("validateComponentDefinition (DM-045)", () => {
     expect(validateComponentDefinition({ id: "bukan-cmp" }).issues[0]?.code).toBe("COMPONENT_SCHEMA");
   });
 });
+
+// DM-047: validator memeriksa kompatibilitas tipe `$prop` ↔ `PropDef.type`.
+describe("validateComponentDefinition — kompatibilitas tipe $prop (DM-047)", () => {
+  it("menolak text.content di-binding ke prop link (PROP_REF_TYPE)", () => {
+    const def = buttonDef();
+    def.nodes.n_btnlabel01.props = { content: { $prop: "link" } };
+    expect(validateComponentDefinition(def).issues.map((i) => i.code)).toContain("PROP_REF_TYPE");
+  });
+
+  it("menolak fills[].color di-binding ke prop text (PROP_REF_TYPE)", () => {
+    const def = buttonDef();
+    def.nodes.n_btnroot001.style = { base: { fills: [{ type: "solid", color: { $prop: "label" } }] } } as never;
+    expect(validateComponentDefinition(def).issues.map((i) => i.code)).toContain("PROP_REF_TYPE");
+  });
+
+  it("menolak visible di-binding ke prop non-boolean tanpa eq (PROP_REF_TYPE)", () => {
+    const def = buttonDef();
+    (def.nodes.n_btnlabel01 as { visible: unknown }).visible = { $prop: "label" };
+    expect(validateComponentDefinition(def).issues.map((i) => i.code)).toContain("PROP_REF_TYPE");
+  });
+
+  it("menerima visible di-binding ke enum dengan eq (boolean hasil)", () => {
+    const def = buttonDef();
+    (def.nodes.n_btnlabel01 as { visible: unknown }).visible = { $prop: "tone", eq: "primary" };
+    const codes = validateComponentDefinition(def).issues.map((i) => i.code);
+    expect(codes).not.toContain("PROP_REF_TYPE");
+  });
+
+  it("menerima binding tipe yang cocok (content↔text, link↔link, color↔color)", () => {
+    const def = buttonDef();
+    def.propsSchema.push({ key: "bg", label, type: "color", default: { $token: "color.primary" } } as never);
+    def.nodes.n_btnroot001.style = { base: { fills: [{ type: "solid", color: { $prop: "bg" } }] } } as never;
+    expect(validateComponentDefinition(def)).toMatchObject({ ok: true });
+  });
+});
