@@ -216,3 +216,43 @@ export const siteComponentUsage = pgTable(
     index("site_component_usage_site_idx").on(table.siteId),
   ],
 );
+
+// CMP-157 (P1): riwayat review library (component/template version). Append-only (hanya created_at) — jejak keputusan
+// reviewer untuk alur draft/submit/review (endpoint menyusul). `checklist` = hasil per butir checklist (jsonb).
+export const libraryReviewEntityEnum = pgEnum("library_review_entity", ["component_version", "template_version"]);
+export const libraryReviewDecisionEnum = pgEnum("library_review_decision", ["approve", "reject"]);
+
+export const libraryReviews = pgTable(
+  "library_reviews",
+  {
+    id: id(),
+    entityType: libraryReviewEntityEnum().notNull(),
+    entityId: uuid().notNull(),
+    reviewerId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    decision: libraryReviewDecisionEnum().notNull(),
+    notes: text(),
+    checklist: jsonb().$type<Record<string, unknown>>(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("library_reviews_entity_idx").on(table.entityType, table.entityId)],
+);
+
+// CMP-157/CMP-093 (P1): hasil QA otomatis per entity-version (worker QA / gate rilis). `results` = daftar temuan
+// (rule, severity, pesan). Status agregat pass/warn/fail. Append-only (history); versi terbaru = created_at terbaru.
+export const libraryQaStatusEnum = pgEnum("library_qa_status", ["pass", "warn", "fail"]);
+
+export const libraryQaResults = pgTable(
+  "library_qa_results",
+  {
+    id: id(),
+    entityType: libraryReviewEntityEnum().notNull(),
+    entityId: uuid().notNull(),
+    status: libraryQaStatusEnum().notNull(),
+    results: jsonb().$type<unknown[]>().notNull().default(sql`'[]'::jsonb`),
+    createdBy: uuid().references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("library_qa_results_entity_idx").on(table.entityType, table.entityId)],
+);
