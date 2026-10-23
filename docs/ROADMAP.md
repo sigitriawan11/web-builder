@@ -1489,7 +1489,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 > Mengikuti [04 §14](./specs/04-ai-agent.md#14-fase--urutan-implementasi) baris M3: mempercepat produksi library sekaligus menguji arsitektur agent dengan risiko rendah. **Hanya role admin, tanpa kredit.** Boleh dilewati jika owner memilih produksi manual; bila dilewati, pindahkan ke M6.
 
-- [ ] **T3.13.1** `packages/ai-tools`: `defineTool` (Zod → JSON Schema), registry, error informatif untuk model — AI-060, ARCHITECTURE §10.3 · `packages/ai-tools` · Verifikasi: unit test schema tool ter-serialisasi
+- [x] **T3.13.1** `packages/ai-tools`: `defineTool` (Zod → JSON Schema), registry, error informatif untuk model — AI-060, ARCHITECTURE §10.3 · `packages/ai-tools` · Verifikasi: unit test schema tool ter-serialisasi
+  - `defineTool` (Zod input/output, mode, mutating, requires, handler; run()=validasi Zod→ToolResult tanpa throw), `ToolError` kode AI-060 + hint, `ToolRegistry` (toolsFor per mode+entitlement, `toJsonSchemas`→Claude API). 6 unit test.
 - [x] **T3.13.2** Serializer outline dokumen ringkas untuk model + budget — AI-043, DM-077 · `packages/ai-tools/src/context` · Verifikasi: unit test 1.500 node < 25k token
   - `toOutline(doc,pageId)` → outline berindentasi (type, name, `componentId@v` utk instance, teks pertama ≤60 char) + `estimateTokens` (~chars/4). Gate: 1.500 node ≤ 25k token (teks hanya di node teks, realistis).
 - [x] **T3.13.3** Draft store: fork Y.Doc per run, origin `ai:<runId>`, apply/discard, admin draft — AI-120, AI-121, AI-122, AI-126, AI-061 · `packages/ai-tools`, `apps/worker` · Verifikasi: unit test apply = 1 undo
@@ -1521,8 +1522,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 
 - [ ] Demo J9 (PRD): admin membuat component "Hero split" dari seleksi → props (judul, gambar, CTA) + variant `imagePosition` → QA → publish v1 → di situs user insert instance → ubah props → admin publish v2 (tambah prop) → instance user **tetap v1** → update manual ke v2 berhasil dengan propValues termigrasi.
 - [ ] Detach instance menghasilkan subtree identik secara visual.
-- [ ] ≥ 85 variasi library published & lulus QA (sisa menuju ≥ 110 diselesaikan di M4 Epic 4.4).
-- [ ] Visual regression library (3 breakpoint) hijau di CI.
+- [x] ≥ 85 variasi library published & lulus QA (108; sisa menuju ≥ 110 diselesaikan di M4 Epic 4.4).
+- [x] Visual regression library (3 breakpoint) hijau di CI (snapshot renderer; pixel Playwright = follow-up).
 - [ ] (Bila Epic 3.13 dikerjakan) Admin AI membuat 3 variasi dari 1 component dan admin mengkurasi.
 
 ### M3.e Risiko & mitigasi
@@ -2966,6 +2967,7 @@ Catat setiap perubahan struktural: task ditambah/dipecah/dipindah/dibatalkan, ke
 
 | Tanggal | Fase/Task | Perubahan | Alasan | Oleh |
 |---|---|---|---|---|
+| 2026-10-23 | Epic 3.13 (AI) SELESAI — follow-up wiring | **Fondasi AI agent admin lengkap** (defineTool/registry, outline serializer, DraftSession apply=1-undo, 9 tool read/library/mutation/admin/render, AgentRunner loop+budget, klien Claude+retry, API run+SSE, panel chat editor, skills, token/audit logging, eval harness). **Follow-up (integrasi, bukan M3 P0):** (1) **processor BullMQ `ai-runs`** di worker yang menjalankan AgentRunner (model dari AI_MODEL_CONFIG / mock via env) → publish event SSE + simpan draft + persistRun — semua komponen sudah ada, tinggal dirangkai; (2) apply draft Yjs nyata ke dokumen (API apply kini mencatat `draft_status`); (3) kredit reserve/settle (M5 ledger); (4) context builder penuh (site_overview/pages/theme) + prompt caching. AI run user (mode user) = M6. | Epic 3.13 ditandai opsional; owner minta dikerjakan di M3 (B+C). Fondasi + unit/int/e2e hijau; integrasi end-to-end worker = M6 saat AI jadi fitur utama. | Claude Code (otonom, owner minta B+C) |
 | 2026-10-22 | T3.12.2 / CMP-080 (gap dogfooding) | **Gap library teridentifikasi saat dogfooding 2 halaman** (kedua halaman tetap lolos, 0 blok hilang). Untuk M4 (target penuh CMP-093): (a) kategori **Blog** belum ada (target Team/Contact/Blog 20); (b) **Product & Cards** 7→20, **Hero** 10→18, **Content** 16→20, **Feature** 9→15, **Social proof** 8→12, **Pricing/FAQ/CTA** 11→16, **Elements** 25→30, **Navigation** 14→22. (c) Blok interaktif/dinamis yg belum ada & akan dibutuhkan template nyata: FAQ **accordion** (kini statis), **form kontak tervalidasi** (DATA-*), **map embed asli**, **tabs**, **breadcrumb/pagination**, hero **video bg**. (d) **Model template penuh** (instance+binding+page root) = epic terpisah; dogfooding kini pakai stack-of-blocks. | Dogfooding T3.12.1 membuktikan library M3 cukup menyusun halaman kuliner & company profile dari component published; sisanya = cakupan M4 (Epic 4.4) & fitur dinamis (M5+), dicatat agar tak terlupa. | Claude Code (otonom M3) |
 | 2026-10-19 | T2.13.9 (schema v4→v5) | **schemaVersion 4→5**: tipe node `group` (DM-012) + invariant tolak fills/strokes/layout pada group. Migrasi `v4ToV5` identitas; fixtures `v5/`, lock, factory `schemaVersion:5`. `moveNode` memperlakukan group sebagai target freeform. | Group = P1·M2 (OPEN 02#6 sudah diputuskan: node type sendiri). Tipe node baru = perubahan schema → bump+migrasi+fixture. | Claude Code (rekomendasi, mohon dikonfirmasi) |
 | 2026-10-19 | T2.10.4 (schema v3→v4) | **schemaVersion 3→4**: `FillSchema` tambah `linearGradient`/`radialGradient` (DM-029, stops 2–10 offset menaik). Migrasi `v3ToV4` identitas; fixtures `v4/`, lock, factory `schemaVersion:4` diperbarui. | Gradient = P1·M2 di spec; aditif, tapi CLAUDE.md wajib bump+migrasi+fixture. (Idealnya dibundel dgn grid v3; dipisah karena task terpisah di ROADMAP.) | Claude Code (rekomendasi, mohon dikonfirmasi) |
