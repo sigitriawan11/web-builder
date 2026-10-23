@@ -18,6 +18,7 @@ import { requestId } from "./middleware/request-id";
 import { securityHeaders } from "./middleware/security";
 import { createAccountRouter } from "./modules/account/account.routes";
 import { createAccountService } from "./modules/account/account.service";
+import { createAiRouter } from "./modules/ai/ai.routes";
 import { createLibraryRouter } from "./modules/library/library.routes";
 import { createLibraryAdminRouter } from "./modules/library-admin/library-admin.routes";
 import { createRealtimeTokenRouter } from "./modules/realtime-token/realtime-token.routes";
@@ -157,6 +158,12 @@ export function createApp(deps: AppDeps): Express {
         ...(deps.rateLimitPrefix ? { rateLimitPrefix: deps.rateLimitPrefix } : {}),
         ...(deps.queues ? { queues: deps.queues } : {}),
       }),
+    );
+    // AI runs + SSE (AI-051) — staf (M3 admin). Non-staf → 404.
+    mountAt(
+      app,
+      "/v1/ai",
+      createAiRouter({ db: deps.db, logger: deps.logger, ...(deps.redis ? { redis: deps.redis } : {}) }),
     );
   }
 
