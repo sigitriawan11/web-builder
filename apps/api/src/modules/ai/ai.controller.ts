@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import type { Redis } from "../../lib/redis";
 import type { ValidatedHandler } from "../../middleware/validate";
-import type { createRunRequest, runEventsRequest } from "./ai.schema";
+import type { createRunRequest, runDecisionRequest, runEventsRequest } from "./ai.schema";
 import type { AiService } from "./ai.service";
 import { streamRunEvents } from "./ai.sse";
 
@@ -36,5 +36,12 @@ export function createAiController(service: AiService, redis: Redis | undefined)
     });
   };
 
-  return { create, events };
+  const apply: ValidatedHandler<typeof runDecisionRequest> = async (req, res) => {
+    res.json({ data: await service.decide(req.valid.params.runId, "applied"), meta: meta(res) });
+  };
+  const discard: ValidatedHandler<typeof runDecisionRequest> = async (req, res) => {
+    res.json({ data: await service.decide(req.valid.params.runId, "discarded"), meta: meta(res) });
+  };
+
+  return { create, events, apply, discard };
 }

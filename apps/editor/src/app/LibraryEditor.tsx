@@ -3,6 +3,7 @@ import { isApiError } from "@platform/sdk";
 import { useLibraryEditorSession } from "@platform/sdk/react";
 import type { LibraryEditorSession } from "@platform/shared/contracts";
 import { type ReactNode, useEffect, useState, useSyncExternalStore } from "react";
+import { ChatPanel } from "../ai/ChatPanel";
 import { CanvasViewport } from "../canvas/CanvasViewport";
 import { type CanvasRuntime, createCanvasRuntime } from "../canvas/canvas-runtime";
 import type { DocumentSession } from "../collaboration/document-session";
@@ -230,6 +231,8 @@ function AdminShell({
   children: ReactNode;
 }) {
   const t = useT();
+  // T3.13.9: toggle panel chat AI (AI-006) — hanya untuk staf yang boleh edit draft.
+  const [showAi, setShowAi] = useState(false);
   return (
     <div className="flex h-full flex-col bg-background text-foreground" data-admin-mode="library">
       <header className="flex items-center gap-3 border-b px-4 py-2">
@@ -241,16 +244,30 @@ function AdminShell({
         </span>
         <span className="text-sm font-medium">{component.displayName.id || component.name}</span>
         <span className="text-xs text-muted-foreground">{component.publicId}</span>
-        {!capabilities.canEditDraft ? (
-          <span className="ml-auto text-xs text-muted-foreground" data-testid="admin-readonly">
-            {t("admin.readOnly")}
-          </span>
-        ) : null}
+        <span className="ml-auto flex items-center gap-3">
+          {!capabilities.canEditDraft ? (
+            <span className="text-xs text-muted-foreground" data-testid="admin-readonly">
+              {t("admin.readOnly")}
+            </span>
+          ) : null}
+          {capabilities.canEditDraft ? (
+            <button
+              type="button"
+              className={`rounded border px-2 py-0.5 text-xs ${showAi ? "bg-foreground text-background" : ""}`}
+              data-testid="ai-toggle"
+              aria-pressed={showAi}
+              onClick={() => setShowAi((open) => !open)}
+            >
+              {t("admin.ai.open")}
+            </button>
+          ) : null}
+        </span>
       </header>
       <div className="flex min-h-0 flex-1">
         {panel}
         <div className="flex min-h-0 flex-1 bg-muted/40">{children}</div>
         {inspector}
+        {showAi ? <ChatPanel /> : null}
       </div>
     </div>
   );

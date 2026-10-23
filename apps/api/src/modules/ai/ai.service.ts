@@ -35,6 +35,17 @@ export function createAiService(deps: { db: Db; logger: Logger }) {
       if (!run) throw new AppError("NOT_FOUND");
       return run;
     },
+
+    /**
+     * AI-122: terapkan/buang draft run. M3 admin: catat `draft_status` (apply draft Yjs ke dokumen utama = worker,
+     * follow-up). Publish event agar klien SSE lain tahu keputusan.
+     */
+    async decide(runId: string, decision: "applied" | "discarded"): Promise<{ draftStatus: string }> {
+      const run = await repo.findRun(db, runId);
+      if (!run) throw new AppError("NOT_FOUND");
+      await repo.updateRun(db, runId, { draftStatus: decision });
+      return { draftStatus: decision };
+    },
   };
 }
 

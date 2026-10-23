@@ -139,6 +139,18 @@
       "readOnly": "Baca saja — role kamu tidak dapat menyimpan preset.",
       "contrastWarn": "Kontras rendah terhadap latar ({ratio}:1)",
       "failed": "Gagal menyimpan: {error}"
+    },
+    "ai": {
+      "title": "Asisten AI",
+      "open": "AI",
+      "placeholder": "Mis. buat 3 variasi hero…",
+      "send": "Kirim",
+      "thinking": "Memproses…",
+      "apply": "Terapkan",
+      "discard": "Batalkan",
+      "applied": "Diterapkan",
+      "discarded": "Dibatalkan",
+      "empty": "Minta AI membuat/mengubah component."
     }
   },
   "app": {

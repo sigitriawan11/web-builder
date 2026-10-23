@@ -6,7 +6,7 @@ import { requireAuth } from "../../middleware/auth-session";
 import { requireStaffRole } from "../../middleware/staff";
 import { validated } from "../../middleware/validate";
 import { createAiController } from "./ai.controller";
-import { createRunRequest, runEventsRequest } from "./ai.schema";
+import { createRunRequest, runDecisionRequest, runEventsRequest } from "./ai.schema";
 import { createAiService } from "./ai.service";
 
 // `/v1/ai` — run AI + SSE. M3: HANYA staf yang boleh edit draft library (AI-006 admin). Non-staf → 404 (permukaan
@@ -24,5 +24,7 @@ export function createAiRouter(deps: { db: Db; logger: Logger; redis?: Redis }):
 
   router.post("/runs", ...guard(ADMIN_ROLES), ...validated(createRunRequest, controller.create));
   router.get("/runs/:runId/events", ...guard(READ_ROLES), ...validated(runEventsRequest, controller.events));
+  router.post("/runs/:runId/apply", ...guard(ADMIN_ROLES), ...validated(runDecisionRequest, controller.apply));
+  router.post("/runs/:runId/discard", ...guard(ADMIN_ROLES), ...validated(runDecisionRequest, controller.discard));
   return router;
 }

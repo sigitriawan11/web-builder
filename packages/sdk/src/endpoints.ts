@@ -1,7 +1,10 @@
 import {
   type AcceptConsentsBody,
+  AiRunDecisionResponseSchema,
   AssetSummarySchema,
   ConsentStatusSchema,
+  type CreateAiRunBody,
+  CreateAiRunResponseSchema,
   type CreateLibraryComponentBody,
   CreateLibraryComponentResponseSchema,
   type CreateSiteBody,
@@ -45,6 +48,21 @@ const unwrap = <T>(envelope: { data: T }) => envelope.data;
 
 export function createPlatformApi(client: ApiClient) {
   return {
+    ai: {
+      /** AI-051: buat run → runId (buka event via SSE `/v1/ai/runs/:runId/events`). Staf (M3 admin). */
+      createRun: (body: CreateAiRunBody) =>
+        client.request("POST", "/v1/ai/runs", { body, schema: dataEnvelope(CreateAiRunResponseSchema) }).then(unwrap),
+      /** AI-122: terapkan draft run. */
+      apply: (runId: string) =>
+        client
+          .request("POST", `/v1/ai/runs/${runId}/apply`, { schema: dataEnvelope(AiRunDecisionResponseSchema) })
+          .then(unwrap),
+      /** AI-122: buang draft run. */
+      discard: (runId: string) =>
+        client
+          .request("POST", `/v1/ai/runs/${runId}/discard`, { schema: dataEnvelope(AiRunDecisionResponseSchema) })
+          .then(unwrap),
+    },
     workspaces: {
       /** Workspace aktif tempat user menjadi anggota (switcher dashboard), personal dulu. */
       list: () =>

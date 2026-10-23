@@ -14,3 +14,8 @@ export const runEventsRequest = {
   params: z.object({ runId: z.uuid() }),
   query: z.object({ lastEventId: z.string().max(64).optional(), close: z.coerce.boolean().optional() }),
 };
+
+// AI-122: terapkan/buang draft hasil run. M3 admin: catat keputusan (`draft_status`). Apply draft ke dokumen = worker.
+export const runDecisionRequest = {
+  params: z.object({ runId: z.uuid() }),
+};

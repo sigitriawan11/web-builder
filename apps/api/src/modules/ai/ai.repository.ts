@@ -16,3 +16,7 @@ export async function findRun(exec: DbExecutor, id: string): Promise<AiRunRow | 
   const [row] = await exec.select().from(aiRuns).where(eq(aiRuns.id, id)).limit(1);
   return row;
 }
+
+export async function updateRun(exec: DbExecutor, id: string, patch: Partial<AiRunInsert>): Promise<void> {
+  await exec.update(aiRuns).set(patch).where(eq(aiRuns.id, id));
+}

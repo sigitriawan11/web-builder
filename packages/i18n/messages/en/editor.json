@@ -139,6 +139,18 @@
       "readOnly": "Read-only — your role cannot save presets.",
       "contrastWarn": "Low contrast against background ({ratio}:1)",
       "failed": "Failed to save: {error}"
+    },
+    "ai": {
+      "title": "AI assistant",
+      "open": "AI",
+      "placeholder": "e.g. create 3 hero variations…",
+      "send": "Send",
+      "thinking": "Thinking…",
+      "apply": "Apply",
+      "discard": "Discard",
+      "applied": "Applied",
+      "discarded": "Discarded",
+      "empty": "Ask the AI to create or edit a component."
     }
   },
   "app": {
