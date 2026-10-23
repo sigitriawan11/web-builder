@@ -22,4 +22,18 @@ export interface AiToolPorts {
   searchComponents?: (query: { query?: string; category?: string; limit?: number }) => Promise<LibrarySearchResult[]>;
   // AI-006 (admin): buat draft component baru via library-admin service (DB + draft doc). Hanya mode admin_library.
   createComponentDraft?: (input: CreateComponentDraftInput) => Promise<{ componentId: string; publicId: string }>;
+  // AI-186: render screenshot halaman (renderer-service Chromium). `document` = snapshot draft; worker render→screenshot.
+  renderPreview?: (
+    input: { pageId: string; viewport: "desktop" | "mobile" },
+    document: unknown,
+  ) => Promise<RenderPreviewResult>;
+}
+
+export interface RenderPreviewResult {
+  width: number;
+  height: number;
+  // Ref gambar tersimpan (R2) bila ada; vision feedback ke model = M6. `bytes` = ukuran PNG.
+  imageRef?: string;
+  bytes?: number;
+  note?: string;
 }

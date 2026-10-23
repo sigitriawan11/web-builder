@@ -1505,7 +1505,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [x] **T3.13.8** Endpoint API run + SSE stream (admin only) — AI-051 · `apps/api/src/modules/ai` · Verifikasi: int test stream event
   - Modul `apps/api/src/modules/ai`: `POST /v1/ai/runs` (staf→buat ai_runs queued; non-staf 404) + `GET /v1/ai/runs/:runId/events` SSE (replay backlog dari Redis Stream `airun-log:<runId>` via Last-Event-ID + subscribe `airun:<runId>` + heartbeat). `publishRunEvent` (worker). int test: role-gate + replay 2 event. Processor worker (AgentRunner→publish) = follow-up.
 - [ ] **T3.13.9** Panel chat sederhana di Mode Admin (stream, Terapkan/Batalkan) — AI-006, AI-027 · `apps/editor/src/ai` · Verifikasi: e2e dengan model mock
-- [ ] **T3.13.10** Tool `render_preview` (screenshot via renderer-service) — AI-186, ARCHITECTURE §10.1 · `packages/ai-tools`, `apps/worker` · Verifikasi: int test
+- [x] **T3.13.10** Tool `render_preview` (screenshot via renderer-service) — AI-186, ARCHITECTURE §10.1 · `packages/ai-tools`, `apps/worker` · Verifikasi: int test
+  - Tool `render_preview` (port-backed, desktop/mobile) di ai-tools + port worker `createRenderPreviewPort` (render doc→HTML via renderer → screenshot renderer-service Chromium). Budget maxRenders dijaga runner. Test: tool (mock port) + port (mock rendererService → viewport+HTML benar). Vision feedback ke model = M6.
 - [ ] **T3.13.11** Skill `admin-component-authoring` & `admin-variation-generation` (konten Markdown + frontmatter) — AI-080 · `packages/ai-tools/skills` · Verifikasi: unit test loader membaca frontmatter
 - [ ] **T3.13.12** Audit log & logging token per run (admin) — AI-107, AI-160 · `apps/worker`, `packages/db` · Verifikasi: int test baris `ai_runs` terisi token
 - [x] **T3.13.13** Schema DB AI (`ai_conversations`, `ai_messages`, `ai_runs`, `ai_tool_calls`) — ARCHITECTURE §6.3 (AI) · `packages/db/src/schema/ai.ts` · Verifikasi: migration
