@@ -5,6 +5,28 @@ export { budgetFor, GLOBAL_RUN_LIMITS, RUN_BUDGETS, type RunBudget, type RunKind
 export { estimateTokens, toOutline } from "./context/outline";
 export { DraftSession } from "./draft/draft-store";
 export { TOOL_ERROR_CODES, ToolError, type ToolErrorCode, type ToolErrorPayload } from "./errors";
+export {
+  type ContentBlock,
+  type ModelClient,
+  type ModelMessage,
+  type ModelRequest,
+  type ModelToolUse,
+  type ModelTurn,
+  type ModelUsage,
+  RetryableModelError,
+  type RetryOptions,
+  type StopReason,
+  withModelRetry,
+} from "./model-client";
+export {
+  type ModelConfig,
+  ModelConfigSchema,
+  ModelRouter,
+  type ModelTask,
+  type ModelTier,
+  ModelTierSchema,
+  parseModelConfig,
+} from "./models";
 export { type ToolJsonSchema, ToolRegistry } from "./registry";
 export {
   defineTool,
