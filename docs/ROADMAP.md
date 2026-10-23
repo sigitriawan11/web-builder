@@ -1490,7 +1490,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 > Mengikuti [04 §14](./specs/04-ai-agent.md#14-fase--urutan-implementasi) baris M3: mempercepat produksi library sekaligus menguji arsitektur agent dengan risiko rendah. **Hanya role admin, tanpa kredit.** Boleh dilewati jika owner memilih produksi manual; bila dilewati, pindahkan ke M6.
 
 - [ ] **T3.13.1** `packages/ai-tools`: `defineTool` (Zod → JSON Schema), registry, error informatif untuk model — AI-060, ARCHITECTURE §10.3 · `packages/ai-tools` · Verifikasi: unit test schema tool ter-serialisasi
-- [ ] **T3.13.2** Serializer outline dokumen ringkas untuk model + budget — AI-043, DM-077 · `packages/ai-tools/src/context` · Verifikasi: unit test 1.500 node < 25k token
+- [x] **T3.13.2** Serializer outline dokumen ringkas untuk model + budget — AI-043, DM-077 · `packages/ai-tools/src/context` · Verifikasi: unit test 1.500 node < 25k token
+  - `toOutline(doc,pageId)` → outline berindentasi (type, name, `componentId@v` utk instance, teks pertama ≤60 char) + `estimateTokens` (~chars/4). Gate: 1.500 node ≤ 25k token (teks hanya di node teks, realistis).
 - [ ] **T3.13.3** Draft store: fork Y.Doc per run, origin `ai:<runId>`, apply/discard, admin draft — AI-120, AI-121, AI-122, AI-126, AI-061 · `packages/ai-tools`, `apps/worker` · Verifikasi: unit test apply = 1 undo
 - [ ] **T3.13.4** Tools Read + Library + Mutation dasar (`get_page_tree`, `get_node`, `search_components`, `insert_component`, `update_node_style`, `update_text`, `set_prop`) — AI-061, AI-102 · `packages/ai-tools/src/tools` · Verifikasi: unit test handler di Y.Doc fixture
 - [ ] **T3.13.5** Tools admin `admin_create_component_draft`, `admin_add_variant` — AI-006 · `packages/ai-tools` · Verifikasi: unit test
