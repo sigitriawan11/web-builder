@@ -456,10 +456,20 @@ importers:
         version: 5.0.4(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@5.0.4)(jsdom@30.1.2(@noble/hashes@2.4.0))(vite@8.3.4(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
 
   packages/ai-tools:
+    dependencies:
+      '@platform/document-model':
+        specifier: workspace:*
+        version: link:../document-model
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@platform/config':
         specifier: workspace:*
         version: link:../config
+      vitest:
+        specifier: 5.0.4
+        version: 5.0.4(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@5.0.4)(jsdom@30.1.2(@noble/hashes@2.4.0))(vite@8.3.4(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
 
   packages/config:
     devDependencies:
