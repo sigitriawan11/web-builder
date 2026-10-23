@@ -1501,7 +1501,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
 - [ ] **T3.13.10** Tool `render_preview` (screenshot via renderer-service) — AI-186, ARCHITECTURE §10.1 · `packages/ai-tools`, `apps/worker` · Verifikasi: int test
 - [ ] **T3.13.11** Skill `admin-component-authoring` & `admin-variation-generation` (konten Markdown + frontmatter) — AI-080 · `packages/ai-tools/skills` · Verifikasi: unit test loader membaca frontmatter
 - [ ] **T3.13.12** Audit log & logging token per run (admin) — AI-107, AI-160 · `apps/worker`, `packages/db` · Verifikasi: int test baris `ai_runs` terisi token
-- [ ] **T3.13.13** Schema DB AI (`ai_conversations`, `ai_messages`, `ai_runs`, `ai_tool_calls`) — ARCHITECTURE §6.3 (AI) · `packages/db/src/schema/ai.ts` · Verifikasi: migration
+- [x] **T3.13.13** Schema DB AI (`ai_conversations`, `ai_messages`, `ai_runs`, `ai_tool_calls`) — ARCHITECTURE §6.3 (AI) · `packages/db/src/schema/ai.ts` · Verifikasi: migration
+  - Migrasi `0018`: 4 tabel + 5 enum (run kind/status, draft status, message role, tool status). `ai_runs` kolom agregat token/kredit + base_state_vector bytea + draft_ref + touched_node_ids. Append-only (messages/tool_calls) = bigint identity. `ai_compensations` (M7 dinamis) menyusul.
 - [ ] **T3.13.14** Eval harness minimal (5 skenario admin) — AI-084 · `packages/ai-tools/evals` · Verifikasi: runner jalan dengan budget
 
 ### M3.d Exit criteria / demo

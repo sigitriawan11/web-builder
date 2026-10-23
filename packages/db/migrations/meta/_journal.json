@@ -127,6 +127,13 @@
       "when": 1792744538858,
       "tag": "0017_regular_kinsey_walden",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792745858781,
+      "tag": "0018_superb_grey_gargoyle",
+      "breakpoints": true
     }
   ]
 }
