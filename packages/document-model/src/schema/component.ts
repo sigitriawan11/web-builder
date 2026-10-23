@@ -27,6 +27,8 @@ const propBase = {
   semanticRole: z.string().max(64).optional(),
   hiddenInSimple: z.boolean().optional(),
   order: z.number().int().optional(),
+  // CMP-033: prop boleh bernilai berbeda per breakpoint bila admin mengizinkan (propValues = `{base,tablet?,mobile?}`).
+  responsiveProp: z.boolean().optional(),
   // CMP-016/DM-079: `default` = konten ID; `defaultI18n.en` = terjemahan EN (dipilih saat insert sesuai site.locale, M4).
   defaultI18n: z.strictObject({ en: JsonValueSchema }).optional(),
 };
@@ -42,6 +44,8 @@ export const PropDefSchema: z.ZodType = z.lazy(() =>
       type: z.literal("text"),
       default: z.string(),
       maxLength: z.number().int().positive().optional(),
+      // CMP-023: batas lunak — melebihi hanya memberi peringatan kuning (tidak memblok), maxLength = batas keras.
+      softMaxLength: z.number().int().positive().optional(),
       multiline: z.boolean().optional(),
     }),
     z.strictObject({ ...propBase, type: z.literal("richText"), default: RichTextDocSchema }),
@@ -96,11 +100,12 @@ type PropDefCommon = {
   semanticRole?: string;
   hiddenInSimple?: boolean;
   order?: number;
+  responsiveProp?: boolean;
   defaultI18n?: { en: unknown };
 };
 export type PropDef = PropDefCommon &
   (
-    | { type: "text"; default: string; maxLength?: number; multiline?: boolean }
+    | { type: "text"; default: string; maxLength?: number; softMaxLength?: number; multiline?: boolean }
     | { type: "richText"; default: z.infer<typeof RichTextDocSchema> }
     | { type: "number"; default: number; min?: number; max?: number; step?: number }
     | { type: "boolean"; default: boolean }

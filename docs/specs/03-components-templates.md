@@ -325,7 +325,7 @@ platform library
 - **Prioritas · Fase:** P1 · M3
 - **Deskripsi:** Admin dapat mengatur constraint: `maxLength` (text), `min/max` (number), `aspectRatio` rekomendasi (image), `allowedLinkKinds` (link), `allowCustom` (color). UI Simple mode menampilkan counter karakter dan peringatan lembut (tidak memblok) bila teks melebihi rekomendasi desain (`softMaxLength`).
 - **Acceptance criteria:**
-  - [ ] `maxLength` keras memblok input; `softMaxLength` hanya memberi warning kuning.
+  - [x] `maxLength` keras memblok input; `softMaxLength` hanya memberi warning kuning.
   - [ ] Gambar dengan rasio sangat berbeda menampilkan saran crop dengan focal point.
 
 ### CMP-024 Editable vs locked node
@@ -349,7 +349,7 @@ platform library
 - **Prioritas · Fase:** P1 · M3
 - **Deskripsi:** Props dikelompokkan (`group`) dan diurutkan (`order`). Group standar: `content` (Konten), `media` (Gambar & Media), `links` (Tautan), `appearance` (Tampilan), `advanced` (Lanjutan, collapsed default). Variant properties ditampilkan di group `appearance` di atas props lain.
 - **Acceptance criteria:**
-  - [ ] Properties panel Simple mode merender group sesuai urutan; `advanced` tertutup secara default.
+  - [x] Properties panel merender group sesuai urutan; `advanced` tertutup secara default. (Simple mode = M4; Properties panel editor di M3.)
 
 ---
 
@@ -394,7 +394,7 @@ platform library
 - **Prioritas · Fase:** P1 · M3
 - **Deskripsi:** Varian **tidak** dipakai untuk responsif. Responsif ditangani oleh style per breakpoint `{ base, tablet, mobile }` ([01](./01-document-model.md)). Namun prop/variant boleh memiliki nilai berbeda per breakpoint bila admin mengizinkan (`responsiveProp: true`), mis. `layout = row` di desktop dan `stack` di mobile.
 - **Acceptance criteria:**
-  - [ ] Prop dengan `responsiveProp: true` menampilkan ikon device di Properties panel dan nilai per breakpoint tersimpan sesuai format breakpoint.
+  - [x] Prop dengan `responsiveProp: true` menampilkan ikon device di Properties panel dan nilai per breakpoint tersimpan sesuai format breakpoint.
 
 ---
 

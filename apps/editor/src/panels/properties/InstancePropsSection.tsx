@@ -30,6 +30,25 @@ import { NumberInput } from "./inputs/NumberInput";
 // didukung sekarang: text/number/boolean/enum (image/link/icon/color = kontrol kaya, follow-up). Hanya satu instance.
 const EDITABLE = new Set(["text", "number", "boolean", "enum"]);
 
+// CMP-025: urutan group standar; `advanced` tertutup default. Prop tanpa/unknown group → `content`.
+const GROUP_ORDER = ["content", "media", "links", "appearance", "advanced"] as const;
+type GroupKey = (typeof GROUP_ORDER)[number];
+const groupKeyOf = (prop: PropDef): GroupKey => {
+  const g = prop.group ?? "content";
+  return (GROUP_ORDER as readonly string[]).includes(g) ? (g as GroupKey) : "content";
+};
+
+// CMP-033: nilai prop responsif = `{ base, tablet?, mobile? }`. Helper baca/tulis per breakpoint (back-compat flat).
+type Breakpoint = "base" | "tablet" | "mobile";
+const BREAKPOINTS: Breakpoint[] = ["base", "tablet", "mobile"];
+const isResponsiveValue = (v: unknown): v is Partial<Record<Breakpoint, unknown>> =>
+  typeof v === "object" && v !== null && "base" in v;
+const valueAt = (v: unknown, bp: Breakpoint): unknown => (isResponsiveValue(v) ? v[bp] : bp === "base" ? v : undefined);
+const setValueAt = (v: unknown, bp: Breakpoint, next: unknown): Record<string, unknown> => {
+  const base = isResponsiveValue(v) ? { ...v } : { base: v };
+  return { ...base, [bp]: next };
+};
+
 export function InstancePropsSection({
   runtime,
   node,
@@ -98,6 +117,9 @@ function Form({
   // ED-157 Go to main component: untuk library instance → panel info (nama, versi) + "Kembali ke instance". Admin
   // dapat tautan "Buka di Admin mode". (Local component = kamera pindah; menyusul bersama localComponents.)
   const [showMain, setShowMain] = useState(false);
+  // CMP-025: group `advanced` tertutup default. CMP-033: breakpoint terpilih per responsiveProp.
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [bpByProp, setBpByProp] = useState<Record<string, Breakpoint>>({});
 
   const updateVersion = () => {
     if (readOnly || latest === undefined) return;
@@ -179,6 +201,13 @@ function Form({
     variant[axis.name] !== undefined && variant[axis.name] !== axis.default;
   const hasOverrides = Object.keys(propValues).length > 0 || overrideCount > 0 || axes.some(isAxisOverridden);
 
+  // CMP-025: urut per `order`, kelompokkan per `group`, render per GROUP_ORDER (hanya group yang ada isinya).
+  const ordered = [...editable].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const groups = GROUP_ORDER.map((group) => ({
+    group,
+    props: ordered.filter((prop) => groupKeyOf(prop) === group),
+  })).filter((entry) => entry.props.length > 0);
+
   return (
     <InspectorSection id="instance-props" title={t("inspector.instance.title")}>
       {axes.length === 0 && editable.length === 0 ? (
@@ -209,25 +238,63 @@ function Form({
           </div>
         </InspectorRow>
       ))}
-      {editable.map((prop) => (
-        <InspectorRow key={prop.key} label={prop.label[locale] || prop.key}>
-          <div className="flex items-center gap-1">
-            {!readOnly && prop.key in propValues ? (
-              <OverrideDot
-                title={t("inspector.instance.overridden")}
-                testId={`instance-override-${prop.key}`}
-                onReset={() => set(prop.key, undefined)}
-              />
-            ) : null}
-            <PropControl
-              prop={prop}
-              value={propValues[prop.key]}
-              readOnly={readOnly}
-              onChange={(v) => set(prop.key, v)}
-            />
+      {/* CMP-025: props dikelompokkan (group) & diurutkan (order); `advanced` tertutup default. */}
+      {groups.map(({ group, props }) => {
+        const collapsed = group === "advanced" && !advancedOpen;
+        return (
+          <div key={group} data-testid={`instance-group-${group}`}>
+            {group === "advanced" ? (
+              <button
+                type="button"
+                className="flex w-full items-center justify-between px-3 py-1 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+                data-testid="instance-group-advanced-toggle"
+                aria-expanded={advancedOpen}
+                onClick={() => setAdvancedOpen((open) => !open)}
+              >
+                {t("inspector.instance.groups.advanced")}
+                <span>{advancedOpen ? "−" : "+"}</span>
+              </button>
+            ) : (
+              <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                {t(`inspector.instance.groups.${group}` as never)}
+              </div>
+            )}
+            {collapsed
+              ? null
+              : props.map((prop) => {
+                  const bp = bpByProp[prop.key] ?? "base";
+                  const stored = propValues[prop.key];
+                  const shown = prop.responsiveProp ? valueAt(stored, bp) : stored;
+                  return (
+                    <InspectorRow key={prop.key} label={prop.label[locale] || prop.key}>
+                      <div className="flex items-center gap-1">
+                        {!readOnly && prop.key in propValues ? (
+                          <OverrideDot
+                            title={t("inspector.instance.overridden")}
+                            testId={`instance-override-${prop.key}`}
+                            onReset={() => set(prop.key, undefined)}
+                          />
+                        ) : null}
+                        {prop.responsiveProp ? (
+                          <BreakpointToggle
+                            propKey={prop.key}
+                            value={bp}
+                            onChange={(next) => setBpByProp((prev) => ({ ...prev, [prop.key]: next }))}
+                          />
+                        ) : null}
+                        <PropControl
+                          prop={prop}
+                          value={shown}
+                          readOnly={readOnly}
+                          onChange={(v) => set(prop.key, prop.responsiveProp ? setValueAt(stored, bp, v) : v)}
+                        />
+                      </div>
+                    </InspectorRow>
+                  );
+                })}
           </div>
-        </InspectorRow>
-      ))}
+        );
+      })}
       {!readOnly && data && candidates.length > 0 ? (
         <InspectorRow label={t("inspector.instance.swap")}>
           <NativeSelect
@@ -324,6 +391,36 @@ function Form({
   );
 }
 
+// CMP-033: pemilih breakpoint (ikon device) untuk prop responsif — base/tablet/mobile.
+const BP_ICON: Record<Breakpoint, string> = { base: "🖥", tablet: "▭", mobile: "▯" };
+function BreakpointToggle({
+  propKey,
+  value,
+  onChange,
+}: {
+  propKey: string;
+  value: Breakpoint;
+  onChange: (bp: Breakpoint) => void;
+}) {
+  return (
+    <div className="flex shrink-0 overflow-hidden rounded border" data-testid={`instance-prop-bp-${propKey}`}>
+      {BREAKPOINTS.map((bp) => (
+        <button
+          key={bp}
+          type="button"
+          aria-label={bp}
+          aria-pressed={value === bp}
+          data-testid={`instance-prop-bp-${propKey}-${bp}`}
+          onClick={() => onChange(bp)}
+          className={`px-1 text-[10px] leading-4 ${value === bp ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+        >
+          {BP_ICON[bp]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ED-155: titik ungu ● penanda properti ber-override; klik → reset ke default.
 function OverrideDot({ title, testId, onReset }: { title: string; testId: string; onReset: () => void }) {
   return (
@@ -378,13 +475,29 @@ function PropControl({
         ))}
       </NativeSelect>
     );
-  // text
+  // text (CMP-023): maxLength = batas keras (blok via atribut), softMaxLength = peringatan kuning (tidak memblok).
+  const text = typeof current === "string" ? current : "";
+  const hard = prop.type === "text" ? prop.maxLength : undefined;
+  const soft = prop.type === "text" ? prop.softMaxLength : undefined;
+  const overSoft = soft !== undefined && text.length > soft;
   return (
-    <Input
-      value={typeof current === "string" ? current : ""}
-      disabled={readOnly}
-      data-testid={`instance-prop-${prop.key}`}
-      onChange={(e) => onChange(e.target.value)}
-    />
+    <div className="flex flex-col gap-0.5">
+      <Input
+        value={text}
+        disabled={readOnly}
+        maxLength={hard}
+        data-testid={`instance-prop-${prop.key}`}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {soft !== undefined || hard !== undefined ? (
+        <span
+          className={`text-[10px] ${overSoft ? "font-medium text-amber-600" : "text-muted-foreground"}`}
+          data-testid={`instance-prop-counter-${prop.key}`}
+        >
+          {text.length}
+          {soft !== undefined ? `/${soft}` : hard !== undefined ? `/${hard}` : ""}
+        </span>
+      ) : null}
+    </div>
   );
 }

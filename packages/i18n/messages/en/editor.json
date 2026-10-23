@@ -96,7 +96,10 @@
         "repeat": "Repeat (list)",
         "repeatSet": "Set",
         "repeatClear": "Clear",
-        "defaultEn": "Default (EN)"
+        "defaultEn": "Default (EN)",
+        "group": "Group",
+        "softMaxLength": "Soft limit",
+        "responsive": "Per-breakpoint value (responsive)"
       },
       "access": {
         "noDraft": "Open a draft to manage access.",
@@ -524,7 +527,14 @@
       "mainTitle": "Main component",
       "mainVersion": "Version {version}",
       "openAdmin": "Open in Admin mode",
-      "backToInstance": "Back to instance"
+      "backToInstance": "Back to instance",
+      "groups": {
+        "content": "Content",
+        "media": "Media",
+        "links": "Links",
+        "appearance": "Appearance",
+        "advanced": "Advanced"
+      }
     },
     "childOverride": {
       "title": "Edit inside instance",

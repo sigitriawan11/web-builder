@@ -96,7 +96,10 @@
         "repeat": "Ulang (list)",
         "repeatSet": "Set",
         "repeatClear": "Hapus",
-        "defaultEn": "Default (EN)"
+        "defaultEn": "Default (EN)",
+        "group": "Grup",
+        "softMaxLength": "Batas lunak",
+        "responsive": "Nilai per breakpoint (responsif)"
       },
       "access": {
         "noDraft": "Buka draft untuk mengatur akses.",
@@ -524,7 +527,14 @@
       "mainTitle": "Komponen utama",
       "mainVersion": "Versi {version}",
       "openAdmin": "Buka di Admin mode",
-      "backToInstance": "Kembali ke instance"
+      "backToInstance": "Kembali ke instance",
+      "groups": {
+        "content": "Konten",
+        "media": "Gambar & Media",
+        "links": "Tautan",
+        "appearance": "Tampilan",
+        "advanced": "Lanjutan"
+      }
     },
     "childOverride": {
       "title": "Edit di dalam instance",

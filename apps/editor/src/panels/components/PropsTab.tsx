@@ -27,6 +27,8 @@ const ADDABLE_TYPES = ["text", "number", "boolean", "color", "list", "slot"] as 
 type AddableType = (typeof ADDABLE_TYPES)[number];
 // Tipe yang tidak butuh input "default" di form.
 const NO_DEFAULT_INPUT = new Set<AddableType>(["color", "list", "slot"]);
+// CMP-025: group standar untuk pengelompokan props di Properties panel.
+const PROP_GROUPS = ["content", "media", "links", "appearance", "advanced"] as const;
 
 const ctxOf = (runtime: CanvasRuntime) => ({
   doc: runtime.doc,
@@ -34,29 +36,44 @@ const ctxOf = (runtime: CanvasRuntime) => ({
   nodeSchema: ComponentNodeSchema,
 });
 
+// CMP-025/CMP-023/CMP-033: meta constraint opsional yang bisa diatur admin saat menambah prop.
+interface PropMeta {
+  group?: string;
+  responsiveProp?: boolean;
+  softMaxLength?: number;
+}
+
 function buildProp(
   type: AddableType,
   key: string,
   label: { id: string; en: string },
   defaultText: string,
   defaultEn: string,
+  meta: PropMeta = {},
 ): PropDef {
+  // Field bersama (group/responsiveProp) — CMP-025/CMP-033.
+  const common = {
+    ...(meta.group ? { group: meta.group } : {}),
+    ...(meta.responsiveProp ? { responsiveProp: true } : {}),
+  };
   switch (type) {
     case "text":
-      // CMP-016: `default` = konten ID; `defaultI18n.en` = terjemahan EN (opsional).
+      // CMP-016: `default` = konten ID; `defaultI18n.en` = terjemahan EN (opsional). CMP-023: softMaxLength.
       return {
         key,
         label,
         type: "text",
         default: defaultText,
+        ...common,
+        ...(meta.softMaxLength ? { softMaxLength: meta.softMaxLength } : {}),
         ...(defaultEn.trim() ? { defaultI18n: { en: defaultEn.trim() } } : {}),
       };
     case "number":
-      return { key, label, type: "number", default: Number(defaultText) || 0 };
+      return { key, label, type: "number", default: Number(defaultText) || 0, ...common };
     case "boolean":
-      return { key, label, type: "boolean", default: defaultText.trim().toLowerCase() === "true" };
+      return { key, label, type: "boolean", default: defaultText.trim().toLowerCase() === "true", ...common };
     case "color":
-      return { key, label, type: "color", default: { $token: "color.primary" } };
+      return { key, label, type: "color", default: { $token: "color.primary" }, ...common };
     case "list":
       // itemSchema starter (satu sub-field teks); editor itemSchema penuh = follow-up.
       return {
@@ -65,10 +82,11 @@ function buildProp(
         type: "list",
         itemSchema: [{ key: "label", label: { id: "Label", en: "Label" }, type: "text", default: "" }],
         default: [],
+        ...common,
       };
     case "slot":
       // CMP-017: deklarasi slot (area isi). Node slot + konten default di canvas = follow-up (butuh Inspector).
-      return { key, label, type: "slot" };
+      return { key, label, type: "slot", ...common };
   }
 }
 
@@ -139,6 +157,10 @@ function PropsEditor({ runtime, canEdit, locale }: { runtime: CanvasRuntime; can
   const [type, setType] = useState<AddableType>("text");
   const [defaultText, setDefaultText] = useState("");
   const [defaultEn, setDefaultEn] = useState("");
+  // CMP-025/CMP-023/CMP-033: constraint opsional yang diatur admin.
+  const [group, setGroup] = useState("content");
+  const [responsiveProp, setResponsiveProp] = useState(false);
+  const [softMaxLength, setSoftMaxLength] = useState("");
   const keyFieldId = useId();
 
   function run<T>(result: { ok: true; value: T } | { ok: false; error: { code: string } }): boolean {
@@ -152,13 +174,20 @@ function PropsEditor({ runtime, canEdit, locale }: { runtime: CanvasRuntime; can
 
   function addProp() {
     const label = { id: labelId.trim() || key.trim(), en: labelEn.trim() || key.trim() };
-    const prop = buildProp(type, key.trim(), label, defaultText, defaultEn);
+    const soft = Number.parseInt(softMaxLength, 10);
+    const prop = buildProp(type, key.trim(), label, defaultText, defaultEn, {
+      ...(group && group !== "content" ? { group } : {}),
+      ...(responsiveProp ? { responsiveProp: true } : {}),
+      ...(Number.isFinite(soft) && soft > 0 ? { softMaxLength: soft } : {}),
+    });
     if (run(runCommand(ctxOf(runtime), addComponentProp, { prop }))) {
       setKey("");
       setLabelId("");
       setLabelEn("");
       setDefaultText("");
       setDefaultEn("");
+      setSoftMaxLength("");
+      setResponsiveProp(false);
     }
   }
 
@@ -232,6 +261,40 @@ function PropsEditor({ runtime, canEdit, locale }: { runtime: CanvasRuntime; can
               onChange={(e) => setDefaultEn(e.target.value)}
             />
           ) : null}
+          {/* CMP-025 group + CMP-023 softMaxLength (teks) + CMP-033 responsiveProp. */}
+          <div className="flex gap-2">
+            <NativeSelect
+              value={group}
+              data-testid="prop-group"
+              aria-label={t("admin.panel.props.group")}
+              onChange={(e) => setGroup(e.target.value)}
+            >
+              {PROP_GROUPS.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </NativeSelect>
+            {type === "text" ? (
+              <Input
+                type="number"
+                min={1}
+                placeholder={t("admin.panel.props.softMaxLength")}
+                value={softMaxLength}
+                data-testid="prop-soft-max"
+                onChange={(e) => setSoftMaxLength(e.target.value)}
+              />
+            ) : null}
+          </div>
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={responsiveProp}
+              data-testid="prop-responsive"
+              onChange={(e) => setResponsiveProp(e.target.checked)}
+            />
+            {t("admin.panel.props.responsive")}
+          </label>
           <Button type="submit" disabled={key.trim().length === 0}>
             {t("admin.panel.props.add")}
           </Button>
