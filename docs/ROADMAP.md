@@ -1513,7 +1513,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
   - AgentRunner akumulasi token (Σ usage tiap panggilan model) + `toolCallRecords`. `persistRun` tulis agregat ke `ai_runs` (input/output/cache tokens, iterations, toolCalls, status completed, modelId) + tiap tool call ke `ai_tool_calls` (audit AI-107). int test: Σ usage = kolom ai_runs (AI-160 AC) + ai_tool_calls terisi.
 - [x] **T3.13.13** Schema DB AI (`ai_conversations`, `ai_messages`, `ai_runs`, `ai_tool_calls`) — ARCHITECTURE §6.3 (AI) · `packages/db/src/schema/ai.ts` · Verifikasi: migration
   - Migrasi `0018`: 4 tabel + 5 enum (run kind/status, draft status, message role, tool status). `ai_runs` kolom agregat token/kredit + base_state_vector bytea + draft_ref + touched_node_ids. Append-only (messages/tool_calls) = bigint identity. `ai_compensations` (M7 dinamis) menyusul.
-- [ ] **T3.13.14** Eval harness minimal (5 skenario admin) — AI-084 · `packages/ai-tools/evals` · Verifikasi: runner jalan dengan budget
+- [x] **T3.13.14** Eval harness minimal (5 skenario admin) — AI-084 · `packages/ai-tools/evals` · Verifikasi: runner jalan dengan budget
+  - `ADMIN_EVAL_SCENARIOS` (5: create-hero, 3-pricing-variations, add-variant, self-check-render, search-before-create) + `runEvals(scenarios, executor)` (eksekutor run di-inject agar harness tetap di ai-tools) → nilai per rubric + agregat passRate/avgScore. Test: 5 skenario, eksekutor ideal lulus semua, tanpa-tool gagal, throw tercatat gagal (runner tetap selesai).
 
 ### M3.d Exit criteria / demo
 

@@ -6,6 +6,17 @@ export { estimateTokens, toOutline } from "./context/outline";
 export { DraftSession } from "./draft/draft-store";
 export { TOOL_ERROR_CODES, ToolError, type ToolErrorCode, type ToolErrorPayload } from "./errors";
 export {
+  type EvalExecutor,
+  type EvalOutcome,
+  type EvalResult,
+  type EvalScenario,
+  type EvalScore,
+  type EvalSummary,
+  runEvals,
+  usedTool,
+} from "./evals/runner";
+export { ADMIN_EVAL_SCENARIOS } from "./evals/scenarios";
+export {
   type ContentBlock,
   type ModelClient,
   type ModelMessage,
