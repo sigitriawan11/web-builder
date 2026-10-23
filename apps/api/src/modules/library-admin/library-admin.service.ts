@@ -38,6 +38,7 @@ import type {
   createComponentRequest,
   deprecateRequest,
   publishRequest,
+  rollbackRequest,
   saveDraftRequest,
 } from "./library-admin.schema";
 import { assertComponentTransition } from "./library-admin.status";
@@ -53,6 +54,7 @@ type CreateInput = z.infer<typeof createComponentRequest.body>;
 type SaveDraftInput = z.infer<typeof saveDraftRequest.body>;
 type PublishInput = z.infer<typeof publishRequest.body>;
 type DeprecateInput = z.infer<typeof deprecateRequest.body>;
+type RollbackInput = z.infer<typeof rollbackRequest.body>;
 type ArchiveInput = z.infer<NonNullable<typeof archiveRequest.body>>;
 
 // CMP-044: hash kanonik (key terurut) → stabil lintas round-trip jsonb saat verifikasi integritas load.
@@ -298,6 +300,75 @@ export function createLibraryAdminService(deps: {
         }
       }
       return { version, versionSeq };
+    },
+
+    /**
+     * CMP-046 Rollback = "republish": versi BARU yang definisinya disalin dari versi target (tak pernah menimpa versi
+     * lama). Changelog otomatis "Rollback ke <targetVersion>". Bump = terdeteksi dari diff latest↔target (menghapus
+     * prop = breaking → major, menyelesaikan OPEN rollback lintas-major); admin boleh menaikkan, tak boleh menurunkan.
+     */
+    async rollback(
+      actor: StaffActor,
+      componentId: string,
+      input: RollbackInput,
+    ): Promise<{ version: string; versionSeq: number; rolledBackTo: string }> {
+      const component = await repo.findComponent(db, componentId);
+      if (!component) throw new AppError("NOT_FOUND");
+      if (!component.latestVersionId) throw new AppError("CONFLICT", undefined, { reason: "no_published_version" });
+      const target = await repo.findVersionBySeq(db, componentId, input.targetVersionSeq);
+      if (!target) throw new AppError("NOT_FOUND");
+      if (target.id === component.latestVersionId)
+        throw new AppError("CONFLICT", undefined, { reason: "target_is_latest" });
+      // Hanya versi published yang bisa jadi target rollback (punya semver).
+      if (target.status !== "published" || !target.version)
+        throw new AppError("CONFLICT", undefined, { reason: "target_not_published" });
+      const targetVersion = target.version;
+      const definition = validateDefinition(target.definition);
+      const latest = await repo.findVersion(db, component.latestVersionId);
+      const detected = latest
+        ? diffComponentSchemas(latest.definition as unknown as ComponentDefinition, definition).bump
+        : "patch";
+      const bump = input.bump && BUMP_ORDER[input.bump] >= BUMP_ORDER[detected] ? input.bump : detected;
+      const version = bumpSemver(component.latestVersion, bump);
+      const versionSeq = (await repo.maxVersionSeq(db, componentId)) + 1;
+      const changelog = { id: `Rollback ke ${targetVersion}`, en: `Rollback to ${targetVersion}` };
+      const versionId = await withTransaction(db, logger, async (tx) => {
+        const newVersionId = await repo.insertVersion(tx, {
+          componentId,
+          status: "published",
+          version,
+          versionSeq,
+          bump,
+          definition: asJsonb(definition),
+          contentHash: contentHash(definition),
+          changelog,
+          createdBy: actor.userId,
+        });
+        await repo.updateComponent(tx, componentId, {
+          status: "published",
+          latestVersionId: newVersionId,
+          latestVersion: version,
+        });
+        return newVersionId;
+      });
+      await audit(actor, "library_component.rollback", componentId, {
+        version,
+        versionSeq,
+        targetVersion,
+        bump,
+      });
+      if (deps.queues) {
+        try {
+          await deps.queues.enqueue(
+            "thumbnails",
+            { requestId: getContext()?.requestId ?? uuidv7(), target: "component", componentVersionId: versionId },
+            { jobId: componentThumbnailJobId(versionId) },
+          );
+        } catch (error) {
+          logger.error({ err: error, componentId, versionId }, "gagal enqueue thumbnail; rollback tetap sukses");
+        }
+      }
+      return { version, versionSeq, rolledBackTo: targetVersion };
     },
 
     /** Deprecate: tetap bisa dipakai instance lama, disembunyikan dari galeri; `replacedBy` untuk saran migrasi. */

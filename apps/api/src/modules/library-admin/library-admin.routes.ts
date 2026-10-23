@@ -21,6 +21,7 @@ import {
   listThemesRequest,
   publishRequest,
   realtimeTokenRequest,
+  rollbackRequest,
   saveDraftRequest,
   saveThemeRequest,
   startDraftRequest,
@@ -87,6 +88,10 @@ export function createLibraryAdminRouter(deps: {
     ...guard(PUBLISH_ROLES),
     ...validated(deprecateRequest, controller.deprecate),
   );
+  // CMP-046 Rollback: republish definisi versi lama sebagai versi baru (publish → library_admin/super_admin).
+  router.post("/components/:id/rollback", ...guard(PUBLISH_ROLES), ...validated(rollbackRequest, controller.rollback));
+  // CMP-046 Rollback: republish definisi versi lama sebagai versi baru (publish roles).
+  router.post("/components/:id/rollback", ...guard(PUBLISH_ROLES), ...validated(rollbackRequest, controller.rollback));
   router.post("/components/:id/archive", ...guard(PUBLISH_ROLES), ...validated(archiveRequest, controller.archive));
   router.get("/components/:id/usage", ...guard(READ_ROLES), ...validated(usageRequest, controller.usage));
   router.get("/components/:id/versions", ...guard(READ_ROLES), ...validated(versionsRequest, controller.versions));

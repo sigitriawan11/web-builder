@@ -61,6 +61,15 @@ export const deprecateRequest = {
   body: z.object({ replacedBy: z.uuid().optional() }),
 };
 
+// CMP-046 Rollback: republish definisi versi `targetVersionSeq` sebagai versi baru. `bump` opsional (default terdeteksi).
+export const rollbackRequest = {
+  params: IdParams,
+  body: z.object({
+    targetVersionSeq: z.coerce.number().int().positive(),
+    bump: z.enum(["major", "minor", "patch"]).optional(),
+  }),
+};
+
 export const archiveRequest = { params: IdParams, body: z.object({}).optional() };
 
 export const usageRequest = { params: IdParams };

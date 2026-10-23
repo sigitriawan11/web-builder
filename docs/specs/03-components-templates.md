@@ -481,7 +481,7 @@ platform library
 - **Deskripsi:** Rollback **tidak mengubah** versi lama; rollback = "republish": membuat versi baru yang `definition`-nya disalin dari versi target (mis. `1.3.0` bermasalah → publish `1.3.1` berisi definisi `1.2.0`), dengan changelog otomatis "Rollback ke 1.2.0". Situs yang sudah update ke `1.3.0` mendapat notifikasi update ke `1.3.1`.
   - Dalam kondisi darurat (bug kritis), `super_admin` dapat menandai versi `yanked`: versi tidak ditawarkan sebagai target update, dan situs yang memakainya mendapat notifikasi prioritas.
 - **Acceptance criteria:**
-  - [ ] Rollback menghasilkan versi baru, tidak pernah menimpa.
+  - [x] Rollback menghasilkan versi baru, tidak pernah menimpa.
   - [ ] Versi `yanked` tidak muncul sebagai target update; tetap dapat di-render.
 
 > ❓ OPEN: Apakah rollback dari versi MAJOR ke versi sebelumnya (mis. `2.0.0` → isi `1.4.0`) dipublish sebagai `2.0.1` (schema lama di bawah major baru — membingungkan) atau `3.0.0`? Usulan: wajib `3.0.0` karena dari sudut pandang situs yang sudah di 2.x itu breaking.

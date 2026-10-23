@@ -14,6 +14,7 @@ import type {
   listThemesRequest,
   publishRequest,
   realtimeTokenRequest,
+  rollbackRequest,
   saveDraftRequest,
   saveThemeRequest,
   startDraftRequest,
@@ -49,6 +50,9 @@ export function createLibraryAdminController(service: LibraryAdminService) {
   const deprecate: ValidatedHandler<typeof deprecateRequest> = async (req, res) => {
     await service.deprecate(actor(req), req.valid.params.id, req.valid.body);
     res.status(204).end();
+  };
+  const rollback: ValidatedHandler<typeof rollbackRequest> = async (req, res) => {
+    res.json({ data: await service.rollback(actor(req), req.valid.params.id, req.valid.body), meta: meta(res) });
   };
   const archive: ValidatedHandler<typeof archiveRequest> = async (req, res) => {
     await service.archive(actor(req), req.valid.params.id, req.valid.body ?? {});
@@ -99,6 +103,7 @@ export function createLibraryAdminController(service: LibraryAdminService) {
     saveDraft,
     publish,
     deprecate,
+    rollback,
     archive,
     usage,
     editorSession,

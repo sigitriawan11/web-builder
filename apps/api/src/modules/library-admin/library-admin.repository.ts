@@ -153,6 +153,20 @@ export async function findVersion(exec: DbExecutor, versionId: string): Promise<
   return rows[0];
 }
 
+// CMP-046: versi target rollback by (component, version_seq).
+export async function findVersionBySeq(
+  exec: DbExecutor,
+  componentId: string,
+  versionSeq: number,
+): Promise<VersionRow | undefined> {
+  const rows = await exec
+    .select()
+    .from(componentVersions)
+    .where(and(eq(componentVersions.componentId, componentId), eq(componentVersions.versionSeq, versionSeq)))
+    .limit(1);
+  return rows[0];
+}
+
 export async function maxVersionSeq(exec: DbExecutor, componentId: string): Promise<number> {
   const rows = await exec
     .select({ versionSeq: componentVersions.versionSeq })

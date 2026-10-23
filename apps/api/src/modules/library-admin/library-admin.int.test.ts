@@ -486,6 +486,144 @@ describe("admin library CRUD (CMP-159)", () => {
   });
 });
 
+describe("rollback (CMP-046)", () => {
+  const defWith = (extraProps: boolean) => ({
+    schemaVersion: 1,
+    id: "cmp_rollbacktest",
+    version: 1,
+    name: "Rollback Test",
+    category: "button" as const,
+    propsSchema: extraProps
+      ? [
+          { key: "label", label, type: "text", default: "Klik" },
+          { key: "subtitle", label, type: "text", default: "Sub" },
+        ]
+      : [{ key: "label", label, type: "text", default: "Klik" }],
+    rootId: "n_root0001",
+    nodes: {
+      n_root0001: {
+        id: "n_root0001",
+        type: "text",
+        name: "Label",
+        parentId: null,
+        visible: true,
+        locked: false,
+        tag: "span",
+        style: { base: {} },
+        props: { content: { $prop: "label" } },
+      },
+    },
+  });
+
+  /** Component dengan 2 versi published (seq1 = tanpa subtitle, seq2 = dengan subtitle = latest). */
+  async function seedTwoVersions(): Promise<{ id: string; v1: string; v2: string }> {
+    const id = uuidv7();
+    const v1 = uuidv7();
+    const v2 = uuidv7();
+    await testDb.db.insert(schema.components).values({
+      id,
+      publicId: `cmp_rb${id.replace(/-/g, "").slice(-12)}`,
+      slug: `rollback-${id}`,
+      ownerType: "platform",
+      kind: "element",
+      categoryId,
+      name: "Rollback Test",
+      displayName: { id: "RB", en: "RB" },
+      description: { id: "d", en: "d" },
+      status: "published",
+      latestVersion: "0.2.0",
+      latestVersionId: v2,
+    });
+    await testDb.db.insert(schema.componentVersions).values([
+      {
+        id: v1,
+        componentId: id,
+        version: "0.1.0",
+        versionSeq: 1,
+        bump: "minor",
+        status: "published",
+        definition: defWith(false),
+        changelog: { id: "v1", en: "v1" },
+      },
+      {
+        id: v2,
+        componentId: id,
+        version: "0.2.0",
+        versionSeq: 2,
+        bump: "minor",
+        status: "published",
+        definition: defWith(true),
+        changelog: { id: "v2", en: "v2" },
+      },
+    ]);
+    return { id, v1, v2 };
+  }
+
+  it("non-publish role (designer) → 403; non-staf → 404", async () => {
+    const { id } = await seedTwoVersions();
+    const designer = await register("designer");
+    expect(
+      (
+        await request(target)
+          .post(`/v1/admin/library/components/${id}/rollback`)
+          .set("cookie", designer)
+          .send({ targetVersionSeq: 1 })
+      ).status,
+    ).toBe(403);
+    const plain = await register();
+    expect(
+      (
+        await request(target)
+          .post(`/v1/admin/library/components/${id}/rollback`)
+          .set("cookie", plain)
+          .send({ targetVersionSeq: 1 })
+      ).status,
+    ).toBe(404);
+  });
+
+  it("library_admin: rollback ke seq lama → versi BARU (tak menimpa); changelog otomatis; hapus prop = major", async () => {
+    const { id, v1, v2 } = await seedTwoVersions();
+    const admin = await register("library_admin");
+
+    const res = await request(target)
+      .post(`/v1/admin/library/components/${id}/rollback`)
+      .set("cookie", admin)
+      .send({ targetVersionSeq: 1 });
+    expect(res.status).toBe(200);
+    // Rollback 0.2.0→konten 0.1.0 = menghapus prop subtitle → breaking → major (1.0.0), seq baru 3.
+    expect(res.body.data).toMatchObject({ version: "1.0.0", versionSeq: 3, rolledBackTo: "0.1.0" });
+
+    // Versi lama TIDAK tersentuh (AC: tidak pernah menimpa).
+    const [oldV1] = await testDb.db.select().from(schema.componentVersions).where(eq(schema.componentVersions.id, v1));
+    const [oldV2] = await testDb.db.select().from(schema.componentVersions).where(eq(schema.componentVersions.id, v2));
+    expect(oldV1?.version).toBe("0.1.0");
+    expect(oldV2?.version).toBe("0.2.0");
+
+    // Versi baru = definisi target (tanpa subtitle) + changelog otomatis + latest pointer.
+    const versions = await request(target).get(`/v1/admin/library/components/${id}/versions`).set("cookie", admin);
+    const newest = versions.body.data[0] as { version: string; changelog: { en: string } };
+    expect(newest.version).toBe("1.0.0");
+    expect(newest.changelog.en).toBe("Rollback to 0.1.0");
+    const [row] = await testDb.db.select().from(schema.components).where(eq(schema.components.id, id));
+    expect(row?.latestVersion).toBe("1.0.0");
+    const audits = await testDb.db
+      .select()
+      .from(schema.auditLogs)
+      .where(and(eq(schema.auditLogs.targetId, id), eq(schema.auditLogs.action, "library_component.rollback")));
+    expect(audits.length).toBe(1);
+  });
+
+  it("rollback ke versi terbaru → CONFLICT", async () => {
+    const { id } = await seedTwoVersions();
+    const admin = await register("library_admin");
+    const res = await request(target)
+      .post(`/v1/admin/library/components/${id}/rollback`)
+      .set("cookie", admin)
+      .send({ targetVersionSeq: 2 });
+    expect(res.status).toBe(409);
+  });
+});
+
 describe("edit main component — start draft (CMP-073)", () => {
   /** Buat + publish component, lalu kosongkan draftDocumentId (seperti component seed yang hanya published). */
   async function publishedComponentWithoutDraft(): Promise<{ id: string; publicId: string }> {
