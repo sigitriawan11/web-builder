@@ -25,6 +25,7 @@
     "@aws-sdk/client-s3": "3.726.1",
     "@bull-board/api": "9.10.1",
     "@bull-board/express": "9.10.1",
+    "@platform/ai-tools": "workspace:*",
     "@platform/db": "workspace:*",
     "@platform/document-model": "workspace:*",
     "@platform/i18n": "workspace:*",

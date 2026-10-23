@@ -375,6 +375,9 @@ importers:
       '@bull-board/express':
         specifier: 9.10.1
         version: 9.10.1(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0))(typescript@7.0.2)
+      '@platform/ai-tools':
+        specifier: workspace:*
+        version: link:../../packages/ai-tools
       '@platform/db':
         specifier: workspace:*
         version: link:../../packages/db
