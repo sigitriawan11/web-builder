@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { runAgent } from "./agent-runner";
 import type { ModelClient, ModelTurn } from "./model";
-import { persistRun } from "./run-persistence";
+import { persistRun } from "./run-persistence.repository";
 
 // T3.13.12 (AI-107/AI-160): Σ usage panggilan model = kolom agregat ai_runs; tiap tool call → ai_tool_calls.
 let testDb: TestDb;

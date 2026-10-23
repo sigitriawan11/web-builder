@@ -15,20 +15,10 @@
       "id": "Grid tiga anggota tim dengan foto, nama, dan peran.",
       "en": "A grid of three team members with photo, name, and role."
     },
-    "tags": [
-      "team",
-      "grid"
-    ],
+    "tags": ["team", "grid"],
     "keywords": {
-      "id": [
-        "tim",
-        "orang",
-        "profil"
-      ],
-      "en": [
-        "team",
-        "people"
-      ]
+      "id": ["tim", "orang", "profil"],
+      "en": ["team", "people"]
     },
     "aiHints": "Tampilkan 3–8 anggota inti: foto, nama, jabatan. Jaga konsisten."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_teamgr0"
-          ],
+          "rootIds": ["tmp_teamgr0"],
           "nodes": {
             "tmp_teamgr0": {
               "id": "tmp_teamgr0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr1"
-              ],
+              "children": ["tmp_teamgr1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,10 +85,7 @@
               "parentId": "tmp_teamgr0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr2",
-                "tmp_teamgr6"
-              ],
+              "children": ["tmp_teamgr2", "tmp_teamgr6"],
               "props": {},
               "style": {
                 "base": {
@@ -135,11 +118,7 @@
               "parentId": "tmp_teamgr1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr3",
-                "tmp_teamgr4",
-                "tmp_teamgr5"
-              ],
+              "children": ["tmp_teamgr3", "tmp_teamgr4", "tmp_teamgr5"],
               "props": {},
               "style": {
                 "base": {
@@ -302,11 +281,7 @@
               "parentId": "tmp_teamgr1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr7",
-                "tmp_teamgr15",
-                "tmp_teamgr23"
-              ],
+              "children": ["tmp_teamgr7", "tmp_teamgr15", "tmp_teamgr23"],
               "props": {},
               "style": {
                 "base": {
@@ -338,12 +313,7 @@
               "parentId": "tmp_teamgr6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr8",
-                "tmp_teamgr9",
-                "tmp_teamgr10",
-                "tmp_teamgr11"
-              ],
+              "children": ["tmp_teamgr8", "tmp_teamgr9", "tmp_teamgr10", "tmp_teamgr11"],
               "props": {},
               "style": {
                 "base": {
@@ -499,11 +469,7 @@
               "parentId": "tmp_teamgr7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr12",
-                "tmp_teamgr13",
-                "tmp_teamgr14"
-              ],
+              "children": ["tmp_teamgr12", "tmp_teamgr13", "tmp_teamgr14"],
               "props": {},
               "style": {
                 "base": {
@@ -627,12 +593,7 @@
               "parentId": "tmp_teamgr6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr16",
-                "tmp_teamgr17",
-                "tmp_teamgr18",
-                "tmp_teamgr19"
-              ],
+              "children": ["tmp_teamgr16", "tmp_teamgr17", "tmp_teamgr18", "tmp_teamgr19"],
               "props": {},
               "style": {
                 "base": {
@@ -788,11 +749,7 @@
               "parentId": "tmp_teamgr15",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr20",
-                "tmp_teamgr21",
-                "tmp_teamgr22"
-              ],
+              "children": ["tmp_teamgr20", "tmp_teamgr21", "tmp_teamgr22"],
               "props": {},
               "style": {
                 "base": {
@@ -916,12 +873,7 @@
               "parentId": "tmp_teamgr6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr24",
-                "tmp_teamgr25",
-                "tmp_teamgr26",
-                "tmp_teamgr27"
-              ],
+              "children": ["tmp_teamgr24", "tmp_teamgr25", "tmp_teamgr26", "tmp_teamgr27"],
               "props": {},
               "style": {
                 "base": {
@@ -1077,11 +1029,7 @@
               "parentId": "tmp_teamgr23",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_teamgr28",
-                "tmp_teamgr29",
-                "tmp_teamgr30"
-              ],
+              "children": ["tmp_teamgr28", "tmp_teamgr29", "tmp_teamgr30"],
               "props": {},
               "style": {
                 "base": {

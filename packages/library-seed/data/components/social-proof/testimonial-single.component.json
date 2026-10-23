@@ -15,21 +15,10 @@
       "id": "Satu kutipan pelanggan besar dengan foto dan nama di tengah.",
       "en": "A single large customer quote with photo and name, centered."
     },
-    "tags": [
-      "social-proof",
-      "testimonial"
-    ],
+    "tags": ["social-proof", "testimonial"],
     "keywords": {
-      "id": [
-        "testimoni",
-        "ulasan",
-        "kepercayaan"
-      ],
-      "en": [
-        "testimonial",
-        "reviews",
-        "trust"
-      ]
+      "id": ["testimoni", "ulasan", "kepercayaan"],
+      "en": ["testimonial", "reviews", "trust"]
     },
     "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_testim0"
-          ],
+          "rootIds": ["tmp_testim0"],
           "nodes": {
             "tmp_testim0": {
               "id": "tmp_testim0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim1"
-              ],
+              "children": ["tmp_testim1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -108,10 +93,7 @@
               "parentId": "tmp_testim0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim2",
-                "tmp_testim3"
-              ],
+              "children": ["tmp_testim2", "tmp_testim3"],
               "props": {},
               "style": {
                 "base": {
@@ -187,10 +169,7 @@
               "parentId": "tmp_testim1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim4",
-                "tmp_testim5"
-              ],
+              "children": ["tmp_testim4", "tmp_testim5"],
               "props": {},
               "style": {
                 "base": {
@@ -259,10 +238,7 @@
               "parentId": "tmp_testim3",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim6",
-                "tmp_testim7"
-              ],
+              "children": ["tmp_testim6", "tmp_testim7"],
               "props": {},
               "style": {
                 "base": {

@@ -15,21 +15,10 @@
       "id": "Hero dengan CTA WhatsApp untuk UMKM.",
       "en": "Hero with a WhatsApp CTA for small businesses."
     },
-    "tags": [
-      "hero",
-      "whatsapp",
-      "umkm"
-    ],
+    "tags": ["hero", "whatsapp", "umkm"],
     "keywords": {
-      "id": [
-        "hero",
-        "pembuka",
-        "judul utama"
-      ],
-      "en": [
-        "hero",
-        "headline"
-      ]
+      "id": ["hero", "pembuka", "judul utama"],
+      "en": ["hero", "headline"]
     },
     "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_herowh0"
-          ],
+          "rootIds": ["tmp_herowh0"],
           "nodes": {
             "tmp_herowh0": {
               "id": "tmp_herowh0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herowh1"
-              ],
+              "children": ["tmp_herowh1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,10 +85,7 @@
               "parentId": "tmp_herowh0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herowh2",
-                "tmp_herowh9"
-              ],
+              "children": ["tmp_herowh2", "tmp_herowh9"],
               "props": {},
               "style": {
                 "base": {
@@ -136,11 +118,7 @@
               "parentId": "tmp_herowh1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herowh3",
-                "tmp_herowh4",
-                "tmp_herowh5"
-              ],
+              "children": ["tmp_herowh3", "tmp_herowh4", "tmp_herowh5"],
               "props": {},
               "style": {
                 "base": {
@@ -303,10 +281,7 @@
               "parentId": "tmp_herowh1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herowh7",
-                "tmp_herowh8"
-              ],
+              "children": ["tmp_herowh7", "tmp_herowh8"],
               "props": {
                 "role": "button"
               },
@@ -438,9 +413,7 @@
               "parentId": "tmp_herowh1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herowh6"
-              ],
+              "children": ["tmp_herowh6"],
               "props": {},
               "style": {
                 "base": {

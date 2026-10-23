@@ -15,21 +15,10 @@
       "id": "Angka rating besar dengan bintang dan jumlah ulasan.",
       "en": "A large rating number with stars and the number of reviews."
     },
-    "tags": [
-      "social-proof",
-      "rating"
-    ],
+    "tags": ["social-proof", "rating"],
     "keywords": {
-      "id": [
-        "testimoni",
-        "ulasan",
-        "kepercayaan"
-      ],
-      "en": [
-        "testimonial",
-        "reviews",
-        "trust"
-      ]
+      "id": ["testimoni", "ulasan", "kepercayaan"],
+      "en": ["testimonial", "reviews", "trust"]
     },
     "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_rating0"
-          ],
+          "rootIds": ["tmp_rating0"],
           "nodes": {
             "tmp_rating0": {
               "id": "tmp_rating0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_rating1"
-              ],
+              "children": ["tmp_rating1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,11 +85,7 @@
               "parentId": "tmp_rating0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_rating2",
-                "tmp_rating3",
-                "tmp_rating9"
-              ],
+              "children": ["tmp_rating2", "tmp_rating3", "tmp_rating9"],
               "props": {},
               "style": {
                 "base": {
@@ -180,13 +161,7 @@
               "parentId": "tmp_rating1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_rating4",
-                "tmp_rating5",
-                "tmp_rating6",
-                "tmp_rating7",
-                "tmp_rating8"
-              ],
+              "children": ["tmp_rating4", "tmp_rating5", "tmp_rating6", "tmp_rating7", "tmp_rating8"],
               "props": {},
               "style": {
                 "base": {

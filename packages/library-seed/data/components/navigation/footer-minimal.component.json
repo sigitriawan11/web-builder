@@ -15,20 +15,10 @@
       "id": "Footer satu baris: hak cipta kiri dan tautan kanan.",
       "en": "A one-line footer: copyright left and links right."
     },
-    "tags": [
-      "footer",
-      "minimal"
-    ],
+    "tags": ["footer", "minimal"],
     "keywords": {
-      "id": [
-        "footer",
-        "kaki",
-        "tautan"
-      ],
-      "en": [
-        "footer",
-        "links"
-      ]
+      "id": ["footer", "kaki", "tautan"],
+      "en": ["footer", "links"]
     },
     "aiHints": "Kaki situs: tautan penting, info kontak, hak cipta. Jaga rapi dan ringkas."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_footer0"
-          ],
+          "rootIds": ["tmp_footer0"],
           "nodes": {
             "tmp_footer0": {
               "id": "tmp_footer0",
@@ -53,10 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer1",
-                "tmp_footer2"
-              ],
+              "children": ["tmp_footer1", "tmp_footer2"],
               "tag": "footer",
               "props": {
                 "role": "container"
@@ -156,11 +141,7 @@
               "parentId": "tmp_footer0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer3",
-                "tmp_footer4",
-                "tmp_footer5"
-              ],
+              "children": ["tmp_footer3", "tmp_footer4", "tmp_footer5"],
               "props": {},
               "style": {
                 "base": {

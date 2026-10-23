@@ -15,21 +15,10 @@
       "id": "Kartu layanan dengan ikon, judul, dan deskripsi singkat.",
       "en": "A service card with an icon, title, and short description."
     },
-    "tags": [
-      "service",
-      "card"
-    ],
+    "tags": ["service", "card"],
     "keywords": {
-      "id": [
-        "produk",
-        "kartu",
-        "layanan"
-      ],
-      "en": [
-        "product",
-        "card",
-        "service"
-      ]
+      "id": ["produk", "kartu", "layanan"],
+      "en": ["product", "card", "service"]
     },
     "aiHints": "Satu kartu layanan/benefit. Ikon + judul + 1 kalimat."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_servic0"
-          ],
+          "rootIds": ["tmp_servic0"],
           "nodes": {
             "tmp_servic0": {
               "id": "tmp_servic0",
@@ -54,11 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic1",
-                "tmp_servic2",
-                "tmp_servic3"
-              ],
+              "children": ["tmp_servic1", "tmp_servic2", "tmp_servic3"],
               "props": {
                 "role": "card"
               },

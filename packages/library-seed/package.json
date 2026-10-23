@@ -10,7 +10,7 @@
   "scripts": {
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "gen": "tsx scripts/generate.ts"
+    "gen": "tsx scripts/generate.ts && biome check --write data/components data/templates"
   },
   "dependencies": {
     "@platform/document-model": "workspace:*",

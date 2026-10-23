@@ -15,21 +15,10 @@
       "id": "Daftar menu restoran dengan nama, deskripsi, dan harga.",
       "en": "A restaurant menu list with name, description, and price."
     },
-    "tags": [
-      "content",
-      "menu"
-    ],
+    "tags": ["content", "menu"],
     "keywords": {
-      "id": [
-        "konten",
-        "teks",
-        "galeri"
-      ],
-      "en": [
-        "content",
-        "text",
-        "gallery"
-      ]
+      "id": ["konten", "teks", "galeri"],
+      "en": ["content", "text", "gallery"]
     },
     "aiHints": "Blok konten informatif. Jaga keterbacaan: paragraf pendek, heading jelas."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_conten0"
-          ],
+          "rootIds": ["tmp_conten0"],
           "nodes": {
             "tmp_conten0": {
               "id": "tmp_conten0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten1"
-              ],
+              "children": ["tmp_conten1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,10 +85,7 @@
               "parentId": "tmp_conten0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten2",
-                "tmp_conten5"
-              ],
+              "children": ["tmp_conten2", "tmp_conten5"],
               "props": {},
               "style": {
                 "base": {
@@ -136,10 +118,7 @@
               "parentId": "tmp_conten1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten3",
-                "tmp_conten4"
-              ],
+              "children": ["tmp_conten3", "tmp_conten4"],
               "props": {},
               "style": {
                 "base": {
@@ -259,12 +238,7 @@
               "parentId": "tmp_conten1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten6",
-                "tmp_conten11",
-                "tmp_conten16",
-                "tmp_conten21"
-              ],
+              "children": ["tmp_conten6", "tmp_conten11", "tmp_conten16", "tmp_conten21"],
               "props": {},
               "style": {
                 "base": {
@@ -298,10 +272,7 @@
               "parentId": "tmp_conten5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten7",
-                "tmp_conten10"
-              ],
+              "children": ["tmp_conten7", "tmp_conten10"],
               "props": {},
               "style": {
                 "base": {
@@ -332,10 +303,7 @@
               "parentId": "tmp_conten6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten8",
-                "tmp_conten9"
-              ],
+              "children": ["tmp_conten8", "tmp_conten9"],
               "props": {},
               "style": {
                 "base": {
@@ -494,10 +462,7 @@
               "parentId": "tmp_conten5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten12",
-                "tmp_conten15"
-              ],
+              "children": ["tmp_conten12", "tmp_conten15"],
               "props": {},
               "style": {
                 "base": {
@@ -528,10 +493,7 @@
               "parentId": "tmp_conten11",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten13",
-                "tmp_conten14"
-              ],
+              "children": ["tmp_conten13", "tmp_conten14"],
               "props": {},
               "style": {
                 "base": {
@@ -690,10 +652,7 @@
               "parentId": "tmp_conten5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten17",
-                "tmp_conten20"
-              ],
+              "children": ["tmp_conten17", "tmp_conten20"],
               "props": {},
               "style": {
                 "base": {
@@ -724,10 +683,7 @@
               "parentId": "tmp_conten16",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten18",
-                "tmp_conten19"
-              ],
+              "children": ["tmp_conten18", "tmp_conten19"],
               "props": {},
               "style": {
                 "base": {
@@ -886,10 +842,7 @@
               "parentId": "tmp_conten5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten22",
-                "tmp_conten25"
-              ],
+              "children": ["tmp_conten22", "tmp_conten25"],
               "props": {},
               "style": {
                 "base": {
@@ -920,10 +873,7 @@
               "parentId": "tmp_conten21",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten23",
-                "tmp_conten24"
-              ],
+              "children": ["tmp_conten23", "tmp_conten24"],
               "props": {},
               "style": {
                 "base": {

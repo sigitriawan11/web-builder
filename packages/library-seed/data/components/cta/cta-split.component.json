@@ -15,20 +15,10 @@
       "id": "Teks ajakan di kiri dan tombol di kanan dalam satu baris.",
       "en": "CTA copy on the left and a button on the right in one row."
     },
-    "tags": [
-      "cta",
-      "split"
-    ],
+    "tags": ["cta", "split"],
     "keywords": {
-      "id": [
-        "ajakan",
-        "cta",
-        "daftar"
-      ],
-      "en": [
-        "cta",
-        "sign up"
-      ]
+      "id": ["ajakan", "cta", "daftar"],
+      "en": ["cta", "sign up"]
     },
     "aiHints": "Ajakan bertindak di akhir halaman: 1 kalimat kuat + 1 tombol jelas."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_ctaspl0"
-          ],
+          "rootIds": ["tmp_ctaspl0"],
           "nodes": {
             "tmp_ctaspl0": {
               "id": "tmp_ctaspl0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctaspl1"
-              ],
+              "children": ["tmp_ctaspl1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -107,9 +93,7 @@
               "parentId": "tmp_ctaspl0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctaspl2"
-              ],
+              "children": ["tmp_ctaspl2"],
               "props": {},
               "style": {
                 "base": {
@@ -142,10 +126,7 @@
               "parentId": "tmp_ctaspl1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctaspl3",
-                "tmp_ctaspl8"
-              ],
+              "children": ["tmp_ctaspl3", "tmp_ctaspl8"],
               "props": {},
               "style": {
                 "base": {
@@ -176,10 +157,7 @@
               "parentId": "tmp_ctaspl2",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctaspl4",
-                "tmp_ctaspl5"
-              ],
+              "children": ["tmp_ctaspl4", "tmp_ctaspl5"],
               "props": {},
               "style": {
                 "base": {
@@ -299,9 +277,7 @@
               "parentId": "tmp_ctaspl2",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctaspl7"
-              ],
+              "children": ["tmp_ctaspl7"],
               "props": {
                 "role": "button"
               },
@@ -402,9 +378,7 @@
               "parentId": "tmp_ctaspl2",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctaspl6"
-              ],
+              "children": ["tmp_ctaspl6"],
               "props": {},
               "style": {
                 "base": {

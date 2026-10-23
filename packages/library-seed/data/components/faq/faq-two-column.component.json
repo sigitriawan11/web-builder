@@ -15,20 +15,10 @@
       "id": "Pertanyaan tersusun dalam dua kolom agar lebih ringkas.",
       "en": "Questions arranged in two columns for a compact layout."
     },
-    "tags": [
-      "faq",
-      "two-column"
-    ],
+    "tags": ["faq", "two-column"],
     "keywords": {
-      "id": [
-        "faq",
-        "tanya jawab",
-        "pertanyaan"
-      ],
-      "en": [
-        "faq",
-        "questions"
-      ]
+      "id": ["faq", "tanya jawab", "pertanyaan"],
+      "en": ["faq", "questions"]
     },
     "aiHints": "4–8 pertanyaan umum calon pelanggan + jawaban singkat & jelas."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_faqtwo0"
-          ],
+          "rootIds": ["tmp_faqtwo0"],
           "nodes": {
             "tmp_faqtwo0": {
               "id": "tmp_faqtwo0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo1"
-              ],
+              "children": ["tmp_faqtwo1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,10 +85,7 @@
               "parentId": "tmp_faqtwo0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo2",
-                "tmp_faqtwo4"
-              ],
+              "children": ["tmp_faqtwo2", "tmp_faqtwo4"],
               "props": {},
               "style": {
                 "base": {
@@ -135,9 +118,7 @@
               "parentId": "tmp_faqtwo1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo3"
-              ],
+              "children": ["tmp_faqtwo3"],
               "props": {},
               "style": {
                 "base": {
@@ -214,10 +195,7 @@
               "parentId": "tmp_faqtwo1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo5",
-                "tmp_faqtwo15"
-              ],
+              "children": ["tmp_faqtwo5", "tmp_faqtwo15"],
               "props": {},
               "style": {
                 "base": {
@@ -248,11 +226,7 @@
               "parentId": "tmp_faqtwo4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo6",
-                "tmp_faqtwo9",
-                "tmp_faqtwo12"
-              ],
+              "children": ["tmp_faqtwo6", "tmp_faqtwo9", "tmp_faqtwo12"],
               "props": {},
               "style": {
                 "base": {
@@ -282,10 +256,7 @@
               "parentId": "tmp_faqtwo5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo7",
-                "tmp_faqtwo8"
-              ],
+              "children": ["tmp_faqtwo7", "tmp_faqtwo8"],
               "props": {},
               "style": {
                 "base": {
@@ -401,10 +372,7 @@
               "parentId": "tmp_faqtwo5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo10",
-                "tmp_faqtwo11"
-              ],
+              "children": ["tmp_faqtwo10", "tmp_faqtwo11"],
               "props": {},
               "style": {
                 "base": {
@@ -520,10 +488,7 @@
               "parentId": "tmp_faqtwo5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo13",
-                "tmp_faqtwo14"
-              ],
+              "children": ["tmp_faqtwo13", "tmp_faqtwo14"],
               "props": {},
               "style": {
                 "base": {
@@ -639,11 +604,7 @@
               "parentId": "tmp_faqtwo4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo16",
-                "tmp_faqtwo19",
-                "tmp_faqtwo22"
-              ],
+              "children": ["tmp_faqtwo16", "tmp_faqtwo19", "tmp_faqtwo22"],
               "props": {},
               "style": {
                 "base": {
@@ -673,10 +634,7 @@
               "parentId": "tmp_faqtwo15",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo17",
-                "tmp_faqtwo18"
-              ],
+              "children": ["tmp_faqtwo17", "tmp_faqtwo18"],
               "props": {},
               "style": {
                 "base": {
@@ -792,10 +750,7 @@
               "parentId": "tmp_faqtwo15",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo20",
-                "tmp_faqtwo21"
-              ],
+              "children": ["tmp_faqtwo20", "tmp_faqtwo21"],
               "props": {},
               "style": {
                 "base": {
@@ -911,10 +866,7 @@
               "parentId": "tmp_faqtwo15",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqtwo23",
-                "tmp_faqtwo24"
-              ],
+              "children": ["tmp_faqtwo23", "tmp_faqtwo24"],
               "props": {},
               "style": {
                 "base": {

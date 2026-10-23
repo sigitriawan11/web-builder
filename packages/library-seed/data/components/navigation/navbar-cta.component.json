@@ -15,21 +15,10 @@
       "id": "Logo, menu navigasi, dan satu tombol ajakan di kanan.",
       "en": "Logo, navigation menu, and a single call-to-action button."
     },
-    "tags": [
-      "navbar",
-      "cta"
-    ],
+    "tags": ["navbar", "cta"],
     "keywords": {
-      "id": [
-        "navigasi",
-        "menu",
-        "header"
-      ],
-      "en": [
-        "navbar",
-        "menu",
-        "header"
-      ]
+      "id": ["navigasi", "menu", "header"],
+      "en": ["navbar", "menu", "header"]
     },
     "aiHints": "Header situs: logo kiri, 3–5 link, 1 CTA kanan. Jaga ringkas; link ke section penting."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_navbar0"
-          ],
+          "rootIds": ["tmp_navbar0"],
           "nodes": {
             "tmp_navbar0": {
               "id": "tmp_navbar0",
@@ -54,10 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar1",
-                "tmp_navbar4"
-              ],
+              "children": ["tmp_navbar1", "tmp_navbar4"],
               "tag": "header",
               "props": {
                 "role": "container"
@@ -127,10 +111,7 @@
               "parentId": "tmp_navbar0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar2",
-                "tmp_navbar3"
-              ],
+              "children": ["tmp_navbar2", "tmp_navbar3"],
               "props": {},
               "style": {
                 "base": {
@@ -242,10 +223,7 @@
               "parentId": "tmp_navbar0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar5",
-                "tmp_navbar10"
-              ],
+              "children": ["tmp_navbar5", "tmp_navbar10"],
               "props": {},
               "style": {
                 "base": {
@@ -275,12 +253,7 @@
               "parentId": "tmp_navbar4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar6",
-                "tmp_navbar7",
-                "tmp_navbar8",
-                "tmp_navbar9"
-              ],
+              "children": ["tmp_navbar6", "tmp_navbar7", "tmp_navbar8", "tmp_navbar9"],
               "tag": "nav",
               "props": {},
               "style": {
@@ -483,9 +456,7 @@
               "parentId": "tmp_navbar4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar11"
-              ],
+              "children": ["tmp_navbar11"],
               "props": {
                 "role": "button"
               },

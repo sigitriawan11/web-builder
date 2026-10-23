@@ -15,20 +15,10 @@
       "id": "Tiga langkah bernomor untuk menjelaskan cara kerja layanan.",
       "en": "Three numbered steps explaining how the service works."
     },
-    "tags": [
-      "features",
-      "steps"
-    ],
+    "tags": ["features", "steps"],
     "keywords": {
-      "id": [
-        "fitur",
-        "keunggulan",
-        "manfaat"
-      ],
-      "en": [
-        "features",
-        "benefits"
-      ]
+      "id": ["fitur", "keunggulan", "manfaat"],
+      "en": ["features", "benefits"]
     },
     "aiHints": "Daftar 3–6 keunggulan. Tiap item: ikon relevan, judul 2–4 kata, 1 kalimat manfaat konkret."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_featur0"
-          ],
+          "rootIds": ["tmp_featur0"],
           "nodes": {
             "tmp_featur0": {
               "id": "tmp_featur0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur1"
-              ],
+              "children": ["tmp_featur1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,10 +85,7 @@
               "parentId": "tmp_featur0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur2",
-                "tmp_featur6"
-              ],
+              "children": ["tmp_featur2", "tmp_featur6"],
               "props": {},
               "style": {
                 "base": {
@@ -135,11 +118,7 @@
               "parentId": "tmp_featur1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur3",
-                "tmp_featur4",
-                "tmp_featur5"
-              ],
+              "children": ["tmp_featur3", "tmp_featur4", "tmp_featur5"],
               "props": {},
               "style": {
                 "base": {
@@ -302,11 +281,7 @@
               "parentId": "tmp_featur1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur7",
-                "tmp_featur12",
-                "tmp_featur17"
-              ],
+              "children": ["tmp_featur7", "tmp_featur12", "tmp_featur17"],
               "props": {},
               "style": {
                 "base": {
@@ -338,11 +313,7 @@
               "parentId": "tmp_featur6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur8",
-                "tmp_featur10",
-                "tmp_featur11"
-              ],
+              "children": ["tmp_featur8", "tmp_featur10", "tmp_featur11"],
               "props": {},
               "style": {
                 "base": {
@@ -372,9 +343,7 @@
               "parentId": "tmp_featur7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur9"
-              ],
+              "children": ["tmp_featur9"],
               "props": {},
               "style": {
                 "base": {
@@ -546,11 +515,7 @@
               "parentId": "tmp_featur6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur13",
-                "tmp_featur15",
-                "tmp_featur16"
-              ],
+              "children": ["tmp_featur13", "tmp_featur15", "tmp_featur16"],
               "props": {},
               "style": {
                 "base": {
@@ -580,9 +545,7 @@
               "parentId": "tmp_featur12",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur14"
-              ],
+              "children": ["tmp_featur14"],
               "props": {},
               "style": {
                 "base": {
@@ -754,11 +717,7 @@
               "parentId": "tmp_featur6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur18",
-                "tmp_featur20",
-                "tmp_featur21"
-              ],
+              "children": ["tmp_featur18", "tmp_featur20", "tmp_featur21"],
               "props": {},
               "style": {
                 "base": {
@@ -788,9 +747,7 @@
               "parentId": "tmp_featur17",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur19"
-              ],
+              "children": ["tmp_featur19"],
               "props": {},
               "style": {
                 "base": {

@@ -15,20 +15,10 @@
       "id": "Gambar di kiri, teks dan tombol di kanan — dua kolom.",
       "en": "Image left, text and buttons right — two columns."
     },
-    "tags": [
-      "hero",
-      "split"
-    ],
+    "tags": ["hero", "split"],
     "keywords": {
-      "id": [
-        "hero",
-        "pembuka",
-        "judul utama"
-      ],
-      "en": [
-        "hero",
-        "headline"
-      ]
+      "id": ["hero", "pembuka", "judul utama"],
+      "en": ["hero", "headline"]
     },
     "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_herosp0"
-          ],
+          "rootIds": ["tmp_herosp0"],
           "nodes": {
             "tmp_herosp0": {
               "id": "tmp_herosp0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp1"
-              ],
+              "children": ["tmp_herosp1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,9 +85,7 @@
               "parentId": "tmp_herosp0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp2"
-              ],
+              "children": ["tmp_herosp2"],
               "props": {},
               "style": {
                 "base": {
@@ -134,10 +118,7 @@
               "parentId": "tmp_herosp1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp13",
-                "tmp_herosp3"
-              ],
+              "children": ["tmp_herosp13", "tmp_herosp3"],
               "props": {},
               "style": {
                 "base": {
@@ -167,10 +148,7 @@
               "parentId": "tmp_herosp2",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp4",
-                "tmp_herosp12"
-              ],
+              "children": ["tmp_herosp4", "tmp_herosp12"],
               "props": {},
               "style": {
                 "base": {
@@ -200,11 +178,7 @@
               "parentId": "tmp_herosp3",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp5",
-                "tmp_herosp6",
-                "tmp_herosp7"
-              ],
+              "children": ["tmp_herosp5", "tmp_herosp6", "tmp_herosp7"],
               "props": {},
               "style": {
                 "base": {
@@ -363,9 +337,7 @@
               "parentId": "tmp_herosp3",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp9"
-              ],
+              "children": ["tmp_herosp9"],
               "props": {
                 "role": "button"
               },
@@ -466,9 +438,7 @@
               "parentId": "tmp_herosp3",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp11"
-              ],
+              "children": ["tmp_herosp11"],
               "props": {
                 "role": "button"
               },
@@ -561,10 +531,7 @@
               "parentId": "tmp_herosp3",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herosp8",
-                "tmp_herosp10"
-              ],
+              "children": ["tmp_herosp8", "tmp_herosp10"],
               "props": {},
               "style": {
                 "base": {

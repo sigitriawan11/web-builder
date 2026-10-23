@@ -15,20 +15,10 @@
       "id": "Enam keunggulan berikon tersusun dalam dua kolom.",
       "en": "Six icon benefits arranged in two columns."
     },
-    "tags": [
-      "features",
-      "icon-list"
-    ],
+    "tags": ["features", "icon-list"],
     "keywords": {
-      "id": [
-        "fitur",
-        "keunggulan",
-        "manfaat"
-      ],
-      "en": [
-        "features",
-        "benefits"
-      ]
+      "id": ["fitur", "keunggulan", "manfaat"],
+      "en": ["features", "benefits"]
     },
     "aiHints": "Daftar 3–6 keunggulan. Tiap item: ikon relevan, judul 2–4 kata, 1 kalimat manfaat konkret."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_featur0"
-          ],
+          "rootIds": ["tmp_featur0"],
           "nodes": {
             "tmp_featur0": {
               "id": "tmp_featur0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur1"
-              ],
+              "children": ["tmp_featur1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,10 +85,7 @@
               "parentId": "tmp_featur0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur2",
-                "tmp_featur4"
-              ],
+              "children": ["tmp_featur2", "tmp_featur4"],
               "props": {},
               "style": {
                 "base": {
@@ -135,9 +118,7 @@
               "parentId": "tmp_featur1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur3"
-              ],
+              "children": ["tmp_featur3"],
               "props": {},
               "style": {
                 "base": {
@@ -214,10 +195,7 @@
               "parentId": "tmp_featur1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur5",
-                "tmp_featur15"
-              ],
+              "children": ["tmp_featur5", "tmp_featur15"],
               "props": {},
               "style": {
                 "base": {
@@ -249,11 +227,7 @@
               "parentId": "tmp_featur4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur6",
-                "tmp_featur9",
-                "tmp_featur12"
-              ],
+              "children": ["tmp_featur6", "tmp_featur9", "tmp_featur12"],
               "props": {},
               "style": {
                 "base": {
@@ -283,10 +257,7 @@
               "parentId": "tmp_featur5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur7",
-                "tmp_featur8"
-              ],
+              "children": ["tmp_featur7", "tmp_featur8"],
               "props": {},
               "style": {
                 "base": {
@@ -390,10 +361,7 @@
               "parentId": "tmp_featur5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur10",
-                "tmp_featur11"
-              ],
+              "children": ["tmp_featur10", "tmp_featur11"],
               "props": {},
               "style": {
                 "base": {
@@ -497,10 +465,7 @@
               "parentId": "tmp_featur5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur13",
-                "tmp_featur14"
-              ],
+              "children": ["tmp_featur13", "tmp_featur14"],
               "props": {},
               "style": {
                 "base": {
@@ -604,11 +569,7 @@
               "parentId": "tmp_featur4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur16",
-                "tmp_featur19",
-                "tmp_featur22"
-              ],
+              "children": ["tmp_featur16", "tmp_featur19", "tmp_featur22"],
               "props": {},
               "style": {
                 "base": {
@@ -638,10 +599,7 @@
               "parentId": "tmp_featur15",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur17",
-                "tmp_featur18"
-              ],
+              "children": ["tmp_featur17", "tmp_featur18"],
               "props": {},
               "style": {
                 "base": {
@@ -745,10 +703,7 @@
               "parentId": "tmp_featur15",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur20",
-                "tmp_featur21"
-              ],
+              "children": ["tmp_featur20", "tmp_featur21"],
               "props": {},
               "style": {
                 "base": {
@@ -852,10 +807,7 @@
               "parentId": "tmp_featur15",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_featur23",
-                "tmp_featur24"
-              ],
+              "children": ["tmp_featur23", "tmp_featur24"],
               "props": {},
               "style": {
                 "base": {

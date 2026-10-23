@@ -15,21 +15,10 @@
       "id": "Bagian layanan dengan tiga kartu ber-ikon dan judul.",
       "en": "A services section with three icon cards and a heading."
     },
-    "tags": [
-      "service",
-      "grid"
-    ],
+    "tags": ["service", "grid"],
     "keywords": {
-      "id": [
-        "produk",
-        "kartu",
-        "layanan"
-      ],
-      "en": [
-        "product",
-        "card",
-        "service"
-      ]
+      "id": ["produk", "kartu", "layanan"],
+      "en": ["product", "card", "service"]
     },
     "aiHints": "Tiga layanan/benefit utama dalam grid. Ikon konsisten."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_servic0"
-          ],
+          "rootIds": ["tmp_servic0"],
           "nodes": {
             "tmp_servic0": {
               "id": "tmp_servic0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic1"
-              ],
+              "children": ["tmp_servic1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,10 +85,7 @@
               "parentId": "tmp_servic0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic2",
-                "tmp_servic5"
-              ],
+              "children": ["tmp_servic2", "tmp_servic5"],
               "props": {},
               "style": {
                 "base": {
@@ -136,10 +118,7 @@
               "parentId": "tmp_servic1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic3",
-                "tmp_servic4"
-              ],
+              "children": ["tmp_servic3", "tmp_servic4"],
               "props": {},
               "style": {
                 "base": {
@@ -259,11 +238,7 @@
               "parentId": "tmp_servic1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic6",
-                "tmp_servic10",
-                "tmp_servic14"
-              ],
+              "children": ["tmp_servic6", "tmp_servic10", "tmp_servic14"],
               "props": {},
               "style": {
                 "base": {
@@ -295,11 +270,7 @@
               "parentId": "tmp_servic5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic7",
-                "tmp_servic8",
-                "tmp_servic9"
-              ],
+              "children": ["tmp_servic7", "tmp_servic8", "tmp_servic9"],
               "props": {
                 "role": "card"
               },
@@ -473,11 +444,7 @@
               "parentId": "tmp_servic5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic11",
-                "tmp_servic12",
-                "tmp_servic13"
-              ],
+              "children": ["tmp_servic11", "tmp_servic12", "tmp_servic13"],
               "props": {
                 "role": "card"
               },
@@ -651,11 +618,7 @@
               "parentId": "tmp_servic5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_servic15",
-                "tmp_servic16",
-                "tmp_servic17"
-              ],
+              "children": ["tmp_servic15", "tmp_servic16", "tmp_servic17"],
               "props": {
                 "role": "card"
               },

@@ -15,21 +15,10 @@
       "id": "Paragraf singkat dengan barisan logo klien di bawahnya.",
       "en": "A short paragraph with a row of client logos below."
     },
-    "tags": [
-      "content",
-      "logos"
-    ],
+    "tags": ["content", "logos"],
     "keywords": {
-      "id": [
-        "konten",
-        "teks",
-        "galeri"
-      ],
-      "en": [
-        "content",
-        "text",
-        "gallery"
-      ]
+      "id": ["konten", "teks", "galeri"],
+      "en": ["content", "text", "gallery"]
     },
     "aiHints": "Blok konten informatif. Jaga keterbacaan: paragraf pendek, heading jelas."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_conten0"
-          ],
+          "rootIds": ["tmp_conten0"],
           "nodes": {
             "tmp_conten0": {
               "id": "tmp_conten0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten1"
-              ],
+              "children": ["tmp_conten1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,10 +85,7 @@
               "parentId": "tmp_conten0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten2",
-                "tmp_conten4"
-              ],
+              "children": ["tmp_conten2", "tmp_conten4"],
               "props": {},
               "style": {
                 "base": {
@@ -136,9 +118,7 @@
               "parentId": "tmp_conten1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten3"
-              ],
+              "children": ["tmp_conten3"],
               "props": {},
               "style": {
                 "base": {
@@ -215,13 +195,7 @@
               "parentId": "tmp_conten1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_conten5",
-                "tmp_conten6",
-                "tmp_conten7",
-                "tmp_conten8",
-                "tmp_conten9"
-              ],
+              "children": ["tmp_conten5", "tmp_conten6", "tmp_conten7", "tmp_conten8", "tmp_conten9"],
               "props": {},
               "style": {
                 "base": {

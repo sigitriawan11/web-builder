@@ -52,7 +52,7 @@ describe("defineTool (AI-060/AI-102)", () => {
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.error.code).toBe("INVALID_INPUT");
-      expect((res.error.details?.issues as string[]).join()).toContain("text");
+      expect((res.error.details?.issues as string[] | undefined)?.join() ?? "").toContain("text");
       expect(res.error.hint).toBeTruthy();
     }
   });
@@ -97,6 +97,7 @@ describe("ToolRegistry (AI-101)", () => {
     const schemas = ToolRegistry.toJsonSchemas([echo]);
     expect(schemas[0]?.name).toBe("echo");
     expect(schemas[0]?.input_schema).toMatchObject({ type: "object" });
-    expect((schemas[0]?.input_schema as { properties: Record<string, unknown> }).properties).toHaveProperty("text");
+    const schema0 = schemas[0]?.input_schema as { properties: Record<string, unknown> } | undefined;
+    expect(schema0?.properties).toHaveProperty("text");
   });
 });

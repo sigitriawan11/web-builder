@@ -171,12 +171,8 @@
           "name": "assets_workspace_id_workspaces_id_fk",
           "tableFrom": "assets",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -184,12 +180,8 @@
           "name": "assets_site_id_sites_id_fk",
           "tableFrom": "assets",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -197,12 +189,8 @@
           "name": "assets_uploaded_by_users_id_fk",
           "tableFrom": "assets",
           "tableTo": "users",
-          "columnsFrom": [
-            "uploaded_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -253,12 +241,8 @@
           "name": "storage_usage_workspace_id_workspaces_id_fk",
           "tableFrom": "storage_usage",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -579,12 +563,8 @@
           "name": "consents_user_id_users_id_fk",
           "tableFrom": "consents",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -592,12 +572,8 @@
           "name": "consents_workspace_id_workspaces_id_fk",
           "tableFrom": "consents",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -704,12 +680,8 @@
           "name": "document_snapshots_document_id_documents_id_fk",
           "tableFrom": "document_snapshots",
           "tableTo": "documents",
-          "columnsFrom": [
-            "document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -717,12 +689,8 @@
           "name": "document_snapshots_created_by_users_id_fk",
           "tableFrom": "document_snapshots",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -827,12 +795,8 @@
           "name": "document_updates_document_id_documents_id_fk",
           "tableFrom": "document_updates",
           "tableTo": "documents",
-          "columnsFrom": [
-            "document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -840,12 +804,8 @@
           "name": "document_updates_actor_id_users_id_fk",
           "tableFrom": "document_updates",
           "tableTo": "users",
-          "columnsFrom": [
-            "actor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -963,12 +923,8 @@
           "name": "documents_workspace_id_workspaces_id_fk",
           "tableFrom": "documents",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -976,12 +932,8 @@
           "name": "documents_site_id_sites_id_fk",
           "tableFrom": "documents",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -989,12 +941,8 @@
           "name": "documents_last_snapshot_id_document_snapshots_id_fk",
           "tableFrom": "documents",
           "tableTo": "document_snapshots",
-          "columnsFrom": [
-            "last_snapshot_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["last_snapshot_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1138,12 +1086,8 @@
           "name": "accounts_user_id_users_id_fk",
           "tableFrom": "accounts",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1243,12 +1187,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1258,9 +1198,7 @@
         "sessions_token_unique": {
           "name": "sessions_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -1528,12 +1466,8 @@
           "name": "component_version_thumbnails_component_version_id_component_versions_id_fk",
           "tableFrom": "component_version_thumbnails",
           "tableTo": "component_versions",
-          "columnsFrom": [
-            "component_version_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["component_version_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1694,12 +1628,8 @@
           "name": "component_versions_component_id_components_id_fk",
           "tableFrom": "component_versions",
           "tableTo": "components",
-          "columnsFrom": [
-            "component_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["component_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1707,12 +1637,8 @@
           "name": "component_versions_created_by_users_id_fk",
           "tableFrom": "component_versions",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2042,12 +1968,8 @@
           "name": "components_category_id_library_categories_id_fk",
           "tableFrom": "components",
           "tableTo": "library_categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["category_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2055,12 +1977,8 @@
           "name": "components_draft_document_id_documents_id_fk",
           "tableFrom": "components",
           "tableTo": "documents",
-          "columnsFrom": [
-            "draft_document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["draft_document_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2068,12 +1986,8 @@
           "name": "components_replaced_by_component_id_components_id_fk",
           "tableFrom": "components",
           "tableTo": "components",
-          "columnsFrom": [
-            "replaced_by_component_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["replaced_by_component_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2081,12 +1995,8 @@
           "name": "components_created_by_users_id_fk",
           "tableFrom": "components",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2096,9 +2006,7 @@
         "components_publicId_unique": {
           "name": "components_publicId_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "public_id"
-          ]
+          "columns": ["public_id"]
         }
       },
       "policies": {},
@@ -2187,12 +2095,8 @@
           "name": "library_categories_parent_id_library_categories_id_fk",
           "tableFrom": "library_categories",
           "tableTo": "library_categories",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2202,9 +2106,7 @@
         "library_categories_slug_unique": {
           "name": "library_categories_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -2290,12 +2192,8 @@
           "name": "library_qa_results_created_by_users_id_fk",
           "tableFrom": "library_qa_results",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2390,12 +2288,8 @@
           "name": "library_reviews_reviewer_id_users_id_fk",
           "tableFrom": "library_reviews",
           "tableTo": "users",
-          "columnsFrom": [
-            "reviewer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reviewer_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -2513,12 +2407,8 @@
           "name": "site_component_usage_site_id_sites_id_fk",
           "tableFrom": "site_component_usage",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2526,12 +2416,8 @@
           "name": "site_component_usage_component_id_components_id_fk",
           "tableFrom": "site_component_usage",
           "tableTo": "components",
-          "columnsFrom": [
-            "component_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["component_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2539,12 +2425,8 @@
           "name": "site_component_usage_component_version_id_component_versions_id_fk",
           "tableFrom": "site_component_usage",
           "tableTo": "component_versions",
-          "columnsFrom": [
-            "component_version_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["component_version_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2552,12 +2434,7 @@
       "compositePrimaryKeys": {
         "site_component_usage_site_id_component_id_version_doc_state_pk": {
           "name": "site_component_usage_site_id_component_id_version_doc_state_pk",
-          "columns": [
-            "site_id",
-            "component_id",
-            "version",
-            "doc_state"
-          ]
+          "columns": ["site_id", "component_id", "version", "doc_state"]
         }
       },
       "uniqueConstraints": {},
@@ -2872,12 +2749,8 @@
           "name": "dead_letter_jobs_resolved_by_users_id_fk",
           "tableFrom": "dead_letter_jobs",
           "tableTo": "users",
-          "columnsFrom": [
-            "resolved_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["resolved_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2994,12 +2867,8 @@
           "name": "site_pages_site_id_sites_id_fk",
           "tableFrom": "site_pages",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3007,10 +2876,7 @@
       "compositePrimaryKeys": {
         "site_pages_site_id_page_id_pk": {
           "name": "site_pages_site_id_page_id_pk",
-          "columns": [
-            "site_id",
-            "page_id"
-          ]
+          "columns": ["site_id", "page_id"]
         }
       },
       "uniqueConstraints": {},
@@ -3109,12 +2975,8 @@
           "name": "sites_workspace_id_workspaces_id_fk",
           "tableFrom": "sites",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -3122,12 +2984,8 @@
           "name": "sites_document_id_documents_id_fk",
           "tableFrom": "sites",
           "tableTo": "documents",
-          "columnsFrom": [
-            "document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3135,12 +2993,8 @@
           "name": "sites_created_by_users_id_fk",
           "tableFrom": "sites",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -3150,9 +3004,7 @@
         "sites_document_id_key": {
           "name": "sites_document_id_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "document_id"
-          ]
+          "columns": ["document_id"]
         }
       },
       "policies": {},
@@ -3257,12 +3109,8 @@
           "name": "workspace_invitations_workspace_id_workspaces_id_fk",
           "tableFrom": "workspace_invitations",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3270,12 +3118,8 @@
           "name": "workspace_invitations_invited_by_users_id_fk",
           "tableFrom": "workspace_invitations",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -3283,12 +3127,8 @@
           "name": "workspace_invitations_accepted_user_id_users_id_fk",
           "tableFrom": "workspace_invitations",
           "tableTo": "users",
-          "columnsFrom": [
-            "accepted_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["accepted_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -3298,9 +3138,7 @@
         "workspace_invitations_token_hash_key": {
           "name": "workspace_invitations_token_hash_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
+          "columns": ["token_hash"]
         }
       },
       "policies": {},
@@ -3389,12 +3227,8 @@
           "name": "workspace_members_workspace_id_workspaces_id_fk",
           "tableFrom": "workspace_members",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3402,12 +3236,8 @@
           "name": "workspace_members_user_id_users_id_fk",
           "tableFrom": "workspace_members",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3415,12 +3245,8 @@
           "name": "workspace_members_invited_by_users_id_fk",
           "tableFrom": "workspace_members",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -3428,10 +3254,7 @@
       "compositePrimaryKeys": {
         "workspace_members_workspace_id_user_id_pk": {
           "name": "workspace_members_workspace_id_user_id_pk",
-          "columns": [
-            "workspace_id",
-            "user_id"
-          ]
+          "columns": ["workspace_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -3547,12 +3370,8 @@
           "name": "workspaces_owner_user_id_users_id_fk",
           "tableFrom": "workspaces",
           "tableTo": "users",
-          "columnsFrom": [
-            "owner_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3562,9 +3381,7 @@
         "workspaces_slug_unique": {
           "name": "workspaces_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -3576,266 +3393,142 @@
     "public.asset_kind": {
       "name": "asset_kind",
       "schema": "public",
-      "values": [
-        "image",
-        "video",
-        "file",
-        "font",
-        "svg"
-      ]
+      "values": ["image", "video", "file", "font", "svg"]
     },
     "public.asset_status": {
       "name": "asset_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "ready",
-        "rejected"
-      ]
+      "values": ["pending", "ready", "rejected"]
     },
     "public.audit_actor_type": {
       "name": "audit_actor_type",
       "schema": "public",
-      "values": [
-        "user",
-        "staff",
-        "system",
-        "ai"
-      ]
+      "values": ["user", "staff", "system", "ai"]
     },
     "public.consent_type": {
       "name": "consent_type",
       "schema": "public",
-      "values": [
-        "terms",
-        "privacy",
-        "marketing",
-        "dpa",
-        "aup"
-      ]
+      "values": ["terms", "privacy", "marketing", "dpa", "aup"]
     },
     "public.document_kind": {
       "name": "document_kind",
       "schema": "public",
-      "values": [
-        "site",
-        "component",
-        "template"
-      ]
+      "values": ["site", "component", "template"]
     },
     "public.document_snapshot_kind": {
       "name": "document_snapshot_kind",
       "schema": "public",
-      "values": [
-        "auto",
-        "named",
-        "publish",
-        "pre_ai",
-        "migration"
-      ]
+      "values": ["auto", "named", "publish", "pre_ai", "migration"]
     },
     "public.document_update_origin": {
       "name": "document_update_origin",
       "schema": "public",
-      "values": [
-        "local",
-        "ai",
-        "server",
-        "migration"
-      ]
+      "values": ["local", "ai", "server", "migration"]
     },
     "public.locale": {
       "name": "locale",
       "schema": "public",
-      "values": [
-        "id",
-        "en"
-      ]
+      "values": ["id", "en"]
     },
     "public.staff_role": {
       "name": "staff_role",
       "schema": "public",
-      "values": [
-        "super_admin",
-        "staff",
-        "library_admin",
-        "designer"
-      ]
+      "values": ["super_admin", "staff", "library_admin", "designer"]
     },
     "public.user_status": {
       "name": "user_status",
       "schema": "public",
-      "values": [
-        "active",
-        "pending_deletion",
-        "suspended",
-        "banned"
-      ]
+      "values": ["active", "pending_deletion", "suspended", "banned"]
     },
     "public.component_kind": {
       "name": "component_kind",
       "schema": "public",
-      "values": [
-        "element",
-        "block",
-        "section",
-        "page",
-        "layout"
-      ]
+      "values": ["element", "block", "section", "page", "layout"]
     },
     "public.component_thumbnail_breakpoint": {
       "name": "component_thumbnail_breakpoint",
       "schema": "public",
-      "values": [
-        "base",
-        "tablet",
-        "mobile"
-      ]
+      "values": ["base", "tablet", "mobile"]
     },
     "public.library_category_type": {
       "name": "library_category_type",
       "schema": "public",
-      "values": [
-        "functional",
-        "industry"
-      ]
+      "values": ["functional", "industry"]
     },
     "public.library_owner_type": {
       "name": "library_owner_type",
       "schema": "public",
-      "values": [
-        "platform",
-        "user",
-        "vendor"
-      ]
+      "values": ["platform", "user", "vendor"]
     },
     "public.library_qa_status": {
       "name": "library_qa_status",
       "schema": "public",
-      "values": [
-        "pass",
-        "warn",
-        "fail"
-      ]
+      "values": ["pass", "warn", "fail"]
     },
     "public.library_review_decision": {
       "name": "library_review_decision",
       "schema": "public",
-      "values": [
-        "approve",
-        "reject"
-      ]
+      "values": ["approve", "reject"]
     },
     "public.library_review_entity": {
       "name": "library_review_entity",
       "schema": "public",
-      "values": [
-        "component_version",
-        "template_version"
-      ]
+      "values": ["component_version", "template_version"]
     },
     "public.library_scope": {
       "name": "library_scope",
       "schema": "public",
-      "values": [
-        "component",
-        "template",
-        "both"
-      ]
+      "values": ["component", "template", "both"]
     },
     "public.library_status": {
       "name": "library_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "in_review",
-        "published",
-        "deprecated",
-        "archived"
-      ]
+      "values": ["draft", "in_review", "published", "deprecated", "archived"]
     },
     "public.theme_mode": {
       "name": "theme_mode",
       "schema": "public",
-      "values": [
-        "light",
-        "dark"
-      ]
+      "values": ["light", "dark"]
     },
     "public.usage_doc_state": {
       "name": "usage_doc_state",
       "schema": "public",
-      "values": [
-        "draft",
-        "published"
-      ]
+      "values": ["draft", "published"]
     },
     "public.version_bump": {
       "name": "version_bump",
       "schema": "public",
-      "values": [
-        "major",
-        "minor",
-        "patch"
-      ]
+      "values": ["major", "minor", "patch"]
     },
     "public.dead_letter_status": {
       "name": "dead_letter_status",
       "schema": "public",
-      "values": [
-        "open",
-        "retried",
-        "discarded"
-      ]
+      "values": ["open", "retried", "discarded"]
     },
     "public.site_status": {
       "name": "site_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "published",
-        "suspended",
-        "archived"
-      ]
+      "values": ["draft", "published", "suspended", "archived"]
     },
     "public.invitation_status": {
       "name": "invitation_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "accepted",
-        "revoked",
-        "expired"
-      ]
+      "values": ["pending", "accepted", "revoked", "expired"]
     },
     "public.workspace_role": {
       "name": "workspace_role",
       "schema": "public",
-      "values": [
-        "owner",
-        "admin",
-        "editor",
-        "viewer",
-        "billing"
-      ]
+      "values": ["owner", "admin", "editor", "viewer", "billing"]
     },
     "public.workspace_status": {
       "name": "workspace_status",
       "schema": "public",
-      "values": [
-        "active",
-        "read_only",
-        "suspended",
-        "deleted"
-      ]
+      "values": ["active", "read_only", "suspended", "deleted"]
     },
     "public.workspace_type": {
       "name": "workspace_type",
       "schema": "public",
-      "values": [
-        "personal",
-        "team"
-      ]
+      "values": ["personal", "team"]
     }
   },
   "schemas": {},

@@ -15,21 +15,10 @@
       "id": "Daftar layanan dengan harga di sisi kanan tiap baris.",
       "en": "A list of services with prices aligned to the right of each row."
     },
-    "tags": [
-      "pricing",
-      "service",
-      "list"
-    ],
+    "tags": ["pricing", "service", "list"],
     "keywords": {
-      "id": [
-        "harga",
-        "paket",
-        "biaya"
-      ],
-      "en": [
-        "pricing",
-        "plans"
-      ]
+      "id": ["harga", "paket", "biaya"],
+      "en": ["pricing", "plans"]
     },
     "aiHints": "Tampilkan 1–3 paket; sorot paket populer; daftar fitur jelas + 1 tombol per paket."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_pricin0"
-          ],
+          "rootIds": ["tmp_pricin0"],
           "nodes": {
             "tmp_pricin0": {
               "id": "tmp_pricin0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin1"
-              ],
+              "children": ["tmp_pricin1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,10 +85,7 @@
               "parentId": "tmp_pricin0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin2",
-                "tmp_pricin5"
-              ],
+              "children": ["tmp_pricin2", "tmp_pricin5"],
               "props": {},
               "style": {
                 "base": {
@@ -136,10 +118,7 @@
               "parentId": "tmp_pricin1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin3",
-                "tmp_pricin4"
-              ],
+              "children": ["tmp_pricin3", "tmp_pricin4"],
               "props": {},
               "style": {
                 "base": {
@@ -259,12 +238,7 @@
               "parentId": "tmp_pricin1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin6",
-                "tmp_pricin9",
-                "tmp_pricin12",
-                "tmp_pricin15"
-              ],
+              "children": ["tmp_pricin6", "tmp_pricin9", "tmp_pricin12", "tmp_pricin15"],
               "props": {},
               "style": {
                 "base": {
@@ -298,10 +272,7 @@
               "parentId": "tmp_pricin5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin7",
-                "tmp_pricin8"
-              ],
+              "children": ["tmp_pricin7", "tmp_pricin8"],
               "props": {},
               "style": {
                 "base": {
@@ -418,10 +389,7 @@
               "parentId": "tmp_pricin5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin10",
-                "tmp_pricin11"
-              ],
+              "children": ["tmp_pricin10", "tmp_pricin11"],
               "props": {},
               "style": {
                 "base": {
@@ -538,10 +506,7 @@
               "parentId": "tmp_pricin5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin13",
-                "tmp_pricin14"
-              ],
+              "children": ["tmp_pricin13", "tmp_pricin14"],
               "props": {},
               "style": {
                 "base": {
@@ -658,10 +623,7 @@
               "parentId": "tmp_pricin5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin16",
-                "tmp_pricin17"
-              ],
+              "children": ["tmp_pricin16", "tmp_pricin17"],
               "props": {},
               "style": {
                 "base": {

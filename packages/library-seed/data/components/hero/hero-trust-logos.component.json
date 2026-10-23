@@ -15,21 +15,10 @@
       "id": "Hero terpusat dengan baris logo mitra untuk membangun kepercayaan.",
       "en": "Centered hero with a row of partner logos to build trust."
     },
-    "tags": [
-      "hero",
-      "logos",
-      "trust"
-    ],
+    "tags": ["hero", "logos", "trust"],
     "keywords": {
-      "id": [
-        "hero",
-        "pembuka",
-        "judul utama"
-      ],
-      "en": [
-        "hero",
-        "headline"
-      ]
+      "id": ["hero", "pembuka", "judul utama"],
+      "en": ["hero", "headline"]
     },
     "aiHints": "Pembuka halaman: judul kuat 4–8 kata, subjudul 1 kalimat manfaat, 1 CTA utama (+1 sekunder opsional)."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_herotr0"
-          ],
+          "rootIds": ["tmp_herotr0"],
           "nodes": {
             "tmp_herotr0": {
               "id": "tmp_herotr0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herotr1"
-              ],
+              "children": ["tmp_herotr1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,11 +85,7 @@
               "parentId": "tmp_herotr0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herotr2",
-                "tmp_herotr9",
-                "tmp_herotr10"
-              ],
+              "children": ["tmp_herotr2", "tmp_herotr9", "tmp_herotr10"],
               "props": {},
               "style": {
                 "base": {
@@ -137,10 +118,7 @@
               "parentId": "tmp_herotr1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herotr3",
-                "tmp_herotr4"
-              ],
+              "children": ["tmp_herotr3", "tmp_herotr4"],
               "props": {},
               "style": {
                 "base": {
@@ -260,9 +238,7 @@
               "parentId": "tmp_herotr1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herotr6"
-              ],
+              "children": ["tmp_herotr6"],
               "props": {
                 "role": "button"
               },
@@ -363,9 +339,7 @@
               "parentId": "tmp_herotr1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herotr8"
-              ],
+              "children": ["tmp_herotr8"],
               "props": {
                 "role": "button"
               },
@@ -458,10 +432,7 @@
               "parentId": "tmp_herotr1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herotr5",
-                "tmp_herotr7"
-              ],
+              "children": ["tmp_herotr5", "tmp_herotr7"],
               "props": {},
               "style": {
                 "base": {
@@ -493,12 +464,7 @@
               "parentId": "tmp_herotr1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_herotr11",
-                "tmp_herotr12",
-                "tmp_herotr13",
-                "tmp_herotr14"
-              ],
+              "children": ["tmp_herotr11", "tmp_herotr12", "tmp_herotr13", "tmp_herotr14"],
               "props": {},
               "style": {
                 "base": {

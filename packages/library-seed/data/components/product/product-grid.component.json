@@ -15,21 +15,10 @@
       "id": "Bagian katalog dengan judul dan beberapa kartu produk.",
       "en": "A catalog section with a title and several product cards."
     },
-    "tags": [
-      "product",
-      "grid"
-    ],
+    "tags": ["product", "grid"],
     "keywords": {
-      "id": [
-        "produk",
-        "kartu",
-        "layanan"
-      ],
-      "en": [
-        "product",
-        "card",
-        "service"
-      ]
+      "id": ["produk", "kartu", "layanan"],
+      "en": ["product", "card", "service"]
     },
     "aiHints": "Katalog produk 3+ item dalam grid. Judul di atas."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_produc0"
-          ],
+          "rootIds": ["tmp_produc0"],
           "nodes": {
             "tmp_produc0": {
               "id": "tmp_produc0",
@@ -54,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc1"
-              ],
+              "children": ["tmp_produc1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -100,10 +85,7 @@
               "parentId": "tmp_produc0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc2",
-                "tmp_produc6"
-              ],
+              "children": ["tmp_produc2", "tmp_produc6"],
               "props": {},
               "style": {
                 "base": {
@@ -136,11 +118,7 @@
               "parentId": "tmp_produc1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc3",
-                "tmp_produc4",
-                "tmp_produc5"
-              ],
+              "children": ["tmp_produc3", "tmp_produc4", "tmp_produc5"],
               "props": {},
               "style": {
                 "base": {
@@ -303,11 +281,7 @@
               "parentId": "tmp_produc1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc7",
-                "tmp_produc16",
-                "tmp_produc25"
-              ],
+              "children": ["tmp_produc7", "tmp_produc16", "tmp_produc25"],
               "props": {},
               "style": {
                 "base": {
@@ -339,10 +313,7 @@
               "parentId": "tmp_produc6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc8",
-                "tmp_produc10"
-              ],
+              "children": ["tmp_produc8", "tmp_produc10"],
               "props": {
                 "role": "card"
               },
@@ -396,9 +367,7 @@
               "parentId": "tmp_produc7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc9"
-              ],
+              "children": ["tmp_produc9"],
               "props": {},
               "style": {
                 "base": {
@@ -461,11 +430,7 @@
               "parentId": "tmp_produc7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc11",
-                "tmp_produc12",
-                "tmp_produc14"
-              ],
+              "children": ["tmp_produc11", "tmp_produc12", "tmp_produc14"],
               "props": {},
               "style": {
                 "base": {
@@ -552,9 +517,7 @@
               "parentId": "tmp_produc10",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc13"
-              ],
+              "children": ["tmp_produc13"],
               "props": {},
               "style": {
                 "base": {
@@ -627,9 +590,7 @@
               "parentId": "tmp_produc10",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc15"
-              ],
+              "children": ["tmp_produc15"],
               "props": {
                 "role": "button"
               },
@@ -730,10 +691,7 @@
               "parentId": "tmp_produc6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc17",
-                "tmp_produc19"
-              ],
+              "children": ["tmp_produc17", "tmp_produc19"],
               "props": {
                 "role": "card"
               },
@@ -787,9 +745,7 @@
               "parentId": "tmp_produc16",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc18"
-              ],
+              "children": ["tmp_produc18"],
               "props": {},
               "style": {
                 "base": {
@@ -852,11 +808,7 @@
               "parentId": "tmp_produc16",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc20",
-                "tmp_produc21",
-                "tmp_produc23"
-              ],
+              "children": ["tmp_produc20", "tmp_produc21", "tmp_produc23"],
               "props": {},
               "style": {
                 "base": {
@@ -943,9 +895,7 @@
               "parentId": "tmp_produc19",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc22"
-              ],
+              "children": ["tmp_produc22"],
               "props": {},
               "style": {
                 "base": {
@@ -1018,9 +968,7 @@
               "parentId": "tmp_produc19",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc24"
-              ],
+              "children": ["tmp_produc24"],
               "props": {
                 "role": "button"
               },
@@ -1121,10 +1069,7 @@
               "parentId": "tmp_produc6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc26",
-                "tmp_produc28"
-              ],
+              "children": ["tmp_produc26", "tmp_produc28"],
               "props": {
                 "role": "card"
               },
@@ -1178,9 +1123,7 @@
               "parentId": "tmp_produc25",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc27"
-              ],
+              "children": ["tmp_produc27"],
               "props": {},
               "style": {
                 "base": {
@@ -1243,11 +1186,7 @@
               "parentId": "tmp_produc25",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc29",
-                "tmp_produc30",
-                "tmp_produc32"
-              ],
+              "children": ["tmp_produc29", "tmp_produc30", "tmp_produc32"],
               "props": {},
               "style": {
                 "base": {
@@ -1334,9 +1273,7 @@
               "parentId": "tmp_produc28",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc31"
-              ],
+              "children": ["tmp_produc31"],
               "props": {},
               "style": {
                 "base": {
@@ -1409,9 +1346,7 @@
               "parentId": "tmp_produc28",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_produc33"
-              ],
+              "children": ["tmp_produc33"],
               "props": {
                 "role": "button"
               },

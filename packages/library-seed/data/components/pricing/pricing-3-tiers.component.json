@@ -15,20 +15,10 @@
       "id": "Tiga kartu paket harga dengan paket tengah disorot populer.",
       "en": "Three pricing cards with the middle plan highlighted as popular."
     },
-    "tags": [
-      "pricing",
-      "tiers"
-    ],
+    "tags": ["pricing", "tiers"],
     "keywords": {
-      "id": [
-        "harga",
-        "paket",
-        "biaya"
-      ],
-      "en": [
-        "pricing",
-        "plans"
-      ]
+      "id": ["harga", "paket", "biaya"],
+      "en": ["pricing", "plans"]
     },
     "aiHints": "Tampilkan 1–3 paket; sorot paket populer; daftar fitur jelas + 1 tombol per paket."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_pricin0"
-          ],
+          "rootIds": ["tmp_pricin0"],
           "nodes": {
             "tmp_pricin0": {
               "id": "tmp_pricin0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin1"
-              ],
+              "children": ["tmp_pricin1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,10 +85,7 @@
               "parentId": "tmp_pricin0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin2",
-                "tmp_pricin6"
-              ],
+              "children": ["tmp_pricin2", "tmp_pricin6"],
               "props": {},
               "style": {
                 "base": {
@@ -135,11 +118,7 @@
               "parentId": "tmp_pricin1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin3",
-                "tmp_pricin4",
-                "tmp_pricin5"
-              ],
+              "children": ["tmp_pricin3", "tmp_pricin4", "tmp_pricin5"],
               "props": {},
               "style": {
                 "base": {
@@ -302,11 +281,7 @@
               "parentId": "tmp_pricin1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin7",
-                "tmp_pricin24",
-                "tmp_pricin44"
-              ],
+              "children": ["tmp_pricin7", "tmp_pricin24", "tmp_pricin44"],
               "props": {},
               "style": {
                 "base": {
@@ -338,12 +313,7 @@
               "parentId": "tmp_pricin6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin8",
-                "tmp_pricin9",
-                "tmp_pricin12",
-                "tmp_pricin22"
-              ],
+              "children": ["tmp_pricin8", "tmp_pricin9", "tmp_pricin12", "tmp_pricin22"],
               "props": {
                 "role": "card"
               },
@@ -454,10 +424,7 @@
               "parentId": "tmp_pricin7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin10",
-                "tmp_pricin11"
-              ],
+              "children": ["tmp_pricin10", "tmp_pricin11"],
               "props": {},
               "style": {
                 "base": {
@@ -573,11 +540,7 @@
               "parentId": "tmp_pricin7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin13",
-                "tmp_pricin16",
-                "tmp_pricin19"
-              ],
+              "children": ["tmp_pricin13", "tmp_pricin16", "tmp_pricin19"],
               "props": {},
               "style": {
                 "base": {
@@ -607,10 +570,7 @@
               "parentId": "tmp_pricin12",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin14",
-                "tmp_pricin15"
-              ],
+              "children": ["tmp_pricin14", "tmp_pricin15"],
               "props": {},
               "style": {
                 "base": {
@@ -714,10 +674,7 @@
               "parentId": "tmp_pricin12",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin17",
-                "tmp_pricin18"
-              ],
+              "children": ["tmp_pricin17", "tmp_pricin18"],
               "props": {},
               "style": {
                 "base": {
@@ -821,10 +778,7 @@
               "parentId": "tmp_pricin12",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin20",
-                "tmp_pricin21"
-              ],
+              "children": ["tmp_pricin20", "tmp_pricin21"],
               "props": {},
               "style": {
                 "base": {
@@ -928,9 +882,7 @@
               "parentId": "tmp_pricin7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin23"
-              ],
+              "children": ["tmp_pricin23"],
               "props": {
                 "role": "button"
               },
@@ -1042,12 +994,7 @@
               "parentId": "tmp_pricin6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin25",
-                "tmp_pricin26",
-                "tmp_pricin29",
-                "tmp_pricin42"
-              ],
+              "children": ["tmp_pricin25", "tmp_pricin26", "tmp_pricin29", "tmp_pricin42"],
               "props": {
                 "role": "card"
               },
@@ -1158,10 +1105,7 @@
               "parentId": "tmp_pricin24",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin27",
-                "tmp_pricin28"
-              ],
+              "children": ["tmp_pricin27", "tmp_pricin28"],
               "props": {},
               "style": {
                 "base": {
@@ -1277,12 +1221,7 @@
               "parentId": "tmp_pricin24",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin30",
-                "tmp_pricin33",
-                "tmp_pricin36",
-                "tmp_pricin39"
-              ],
+              "children": ["tmp_pricin30", "tmp_pricin33", "tmp_pricin36", "tmp_pricin39"],
               "props": {},
               "style": {
                 "base": {
@@ -1312,10 +1251,7 @@
               "parentId": "tmp_pricin29",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin31",
-                "tmp_pricin32"
-              ],
+              "children": ["tmp_pricin31", "tmp_pricin32"],
               "props": {},
               "style": {
                 "base": {
@@ -1419,10 +1355,7 @@
               "parentId": "tmp_pricin29",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin34",
-                "tmp_pricin35"
-              ],
+              "children": ["tmp_pricin34", "tmp_pricin35"],
               "props": {},
               "style": {
                 "base": {
@@ -1526,10 +1459,7 @@
               "parentId": "tmp_pricin29",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin37",
-                "tmp_pricin38"
-              ],
+              "children": ["tmp_pricin37", "tmp_pricin38"],
               "props": {},
               "style": {
                 "base": {
@@ -1633,10 +1563,7 @@
               "parentId": "tmp_pricin29",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin40",
-                "tmp_pricin41"
-              ],
+              "children": ["tmp_pricin40", "tmp_pricin41"],
               "props": {},
               "style": {
                 "base": {
@@ -1740,9 +1667,7 @@
               "parentId": "tmp_pricin24",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin43"
-              ],
+              "children": ["tmp_pricin43"],
               "props": {
                 "role": "button"
               },
@@ -1843,12 +1768,7 @@
               "parentId": "tmp_pricin6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin45",
-                "tmp_pricin46",
-                "tmp_pricin49",
-                "tmp_pricin59"
-              ],
+              "children": ["tmp_pricin45", "tmp_pricin46", "tmp_pricin49", "tmp_pricin59"],
               "props": {
                 "role": "card"
               },
@@ -1959,10 +1879,7 @@
               "parentId": "tmp_pricin44",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin47",
-                "tmp_pricin48"
-              ],
+              "children": ["tmp_pricin47", "tmp_pricin48"],
               "props": {},
               "style": {
                 "base": {
@@ -2078,11 +1995,7 @@
               "parentId": "tmp_pricin44",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin50",
-                "tmp_pricin53",
-                "tmp_pricin56"
-              ],
+              "children": ["tmp_pricin50", "tmp_pricin53", "tmp_pricin56"],
               "props": {},
               "style": {
                 "base": {
@@ -2112,10 +2025,7 @@
               "parentId": "tmp_pricin49",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin51",
-                "tmp_pricin52"
-              ],
+              "children": ["tmp_pricin51", "tmp_pricin52"],
               "props": {},
               "style": {
                 "base": {
@@ -2219,10 +2129,7 @@
               "parentId": "tmp_pricin49",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin54",
-                "tmp_pricin55"
-              ],
+              "children": ["tmp_pricin54", "tmp_pricin55"],
               "props": {},
               "style": {
                 "base": {
@@ -2326,10 +2233,7 @@
               "parentId": "tmp_pricin49",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin57",
-                "tmp_pricin58"
-              ],
+              "children": ["tmp_pricin57", "tmp_pricin58"],
               "props": {},
               "style": {
                 "base": {
@@ -2433,9 +2337,7 @@
               "parentId": "tmp_pricin44",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_pricin60"
-              ],
+              "children": ["tmp_pricin60"],
               "props": {
                 "role": "button"
               },

@@ -15,20 +15,10 @@
       "id": "Footer dengan brand dan beberapa kolom tautan serta hak cipta.",
       "en": "Footer with brand and several link columns plus copyright."
     },
-    "tags": [
-      "footer",
-      "columns"
-    ],
+    "tags": ["footer", "columns"],
     "keywords": {
-      "id": [
-        "footer",
-        "kaki",
-        "tautan"
-      ],
-      "en": [
-        "footer",
-        "links"
-      ]
+      "id": ["footer", "kaki", "tautan"],
+      "en": ["footer", "links"]
     },
     "aiHints": "Kaki situs: tautan penting, info kontak, hak cipta. Jaga rapi dan ringkas."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_footer0"
-          ],
+          "rootIds": ["tmp_footer0"],
           "nodes": {
             "tmp_footer0": {
               "id": "tmp_footer0",
@@ -53,10 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer1",
-                "tmp_footer20"
-              ],
+              "children": ["tmp_footer1", "tmp_footer20"],
               "tag": "footer",
               "props": {
                 "role": "container"
@@ -111,12 +96,7 @@
               "parentId": "tmp_footer0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer2",
-                "tmp_footer5",
-                "tmp_footer10",
-                "tmp_footer15"
-              ],
+              "children": ["tmp_footer2", "tmp_footer5", "tmp_footer10", "tmp_footer15"],
               "props": {},
               "style": {
                 "base": {
@@ -147,10 +127,7 @@
               "parentId": "tmp_footer1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer3",
-                "tmp_footer4"
-              ],
+              "children": ["tmp_footer3", "tmp_footer4"],
               "props": {},
               "style": {
                 "base": {
@@ -262,12 +239,7 @@
               "parentId": "tmp_footer1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer6",
-                "tmp_footer7",
-                "tmp_footer8",
-                "tmp_footer9"
-              ],
+              "children": ["tmp_footer6", "tmp_footer7", "tmp_footer8", "tmp_footer9"],
               "props": {},
               "style": {
                 "base": {
@@ -469,12 +441,7 @@
               "parentId": "tmp_footer1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer11",
-                "tmp_footer12",
-                "tmp_footer13",
-                "tmp_footer14"
-              ],
+              "children": ["tmp_footer11", "tmp_footer12", "tmp_footer13", "tmp_footer14"],
               "props": {},
               "style": {
                 "base": {
@@ -676,12 +643,7 @@
               "parentId": "tmp_footer1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_footer16",
-                "tmp_footer17",
-                "tmp_footer18",
-                "tmp_footer19"
-              ],
+              "children": ["tmp_footer16", "tmp_footer17", "tmp_footer18", "tmp_footer19"],
               "props": {},
               "style": {
                 "base": {

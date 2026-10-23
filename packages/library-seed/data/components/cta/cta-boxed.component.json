@@ -15,20 +15,10 @@
       "id": "Kotak berlatar primer dengan judul putih dan tombol sekunder.",
       "en": "A primary-filled box with white title and a secondary button."
     },
-    "tags": [
-      "cta",
-      "boxed"
-    ],
+    "tags": ["cta", "boxed"],
     "keywords": {
-      "id": [
-        "ajakan",
-        "cta",
-        "daftar"
-      ],
-      "en": [
-        "cta",
-        "sign up"
-      ]
+      "id": ["ajakan", "cta", "daftar"],
+      "en": ["cta", "sign up"]
     },
     "aiHints": "Ajakan bertindak di akhir halaman: 1 kalimat kuat + 1 tombol jelas."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_ctabox0"
-          ],
+          "rootIds": ["tmp_ctabox0"],
           "nodes": {
             "tmp_ctabox0": {
               "id": "tmp_ctabox0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctabox1"
-              ],
+              "children": ["tmp_ctabox1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,9 +85,7 @@
               "parentId": "tmp_ctabox0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctabox2"
-              ],
+              "children": ["tmp_ctabox2"],
               "props": {},
               "style": {
                 "base": {
@@ -134,11 +118,7 @@
               "parentId": "tmp_ctabox1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctabox3",
-                "tmp_ctabox4",
-                "tmp_ctabox5"
-              ],
+              "children": ["tmp_ctabox3", "tmp_ctabox4", "tmp_ctabox5"],
               "props": {
                 "role": "card"
               },
@@ -281,9 +261,7 @@
               "parentId": "tmp_ctabox2",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_ctabox6"
-              ],
+              "children": ["tmp_ctabox6"],
               "props": {
                 "role": "button"
               },

@@ -15,20 +15,10 @@
       "id": "Area peta besar dengan kartu alamat dan tombol arah di atasnya.",
       "en": "A large map area with an address card and directions button over it."
     },
-    "tags": [
-      "contact",
-      "map"
-    ],
+    "tags": ["contact", "map"],
     "keywords": {
-      "id": [
-        "kontak",
-        "alamat",
-        "hubungi"
-      ],
-      "en": [
-        "contact",
-        "address"
-      ]
+      "id": ["kontak", "alamat", "hubungi"],
+      "en": ["contact", "address"]
     },
     "aiHints": "Sematan peta lokasi + alamat singkat. Peta asli via DATA-*/embed."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_mapemb0"
-          ],
+          "rootIds": ["tmp_mapemb0"],
           "nodes": {
             "tmp_mapemb0": {
               "id": "tmp_mapemb0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_mapemb1"
-              ],
+              "children": ["tmp_mapemb1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,11 +85,7 @@
               "parentId": "tmp_mapemb0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_mapemb2",
-                "tmp_mapemb4",
-                "tmp_mapemb6"
-              ],
+              "children": ["tmp_mapemb2", "tmp_mapemb4", "tmp_mapemb6"],
               "props": {},
               "style": {
                 "base": {
@@ -136,9 +118,7 @@
               "parentId": "tmp_mapemb1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_mapemb3"
-              ],
+              "children": ["tmp_mapemb3"],
               "props": {},
               "style": {
                 "base": {
@@ -215,9 +195,7 @@
               "parentId": "tmp_mapemb1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_mapemb5"
-              ],
+              "children": ["tmp_mapemb5"],
               "props": {
                 "role": "generic"
               },
@@ -294,10 +272,7 @@
               "parentId": "tmp_mapemb1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_mapemb7",
-                "tmp_mapemb8"
-              ],
+              "children": ["tmp_mapemb7", "tmp_mapemb8"],
               "props": {},
               "style": {
                 "base": {
@@ -372,9 +347,7 @@
               "parentId": "tmp_mapemb6",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_mapemb9"
-              ],
+              "children": ["tmp_mapemb9"],
               "props": {
                 "role": "button"
               },

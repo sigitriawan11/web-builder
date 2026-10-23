@@ -15,20 +15,10 @@
       "id": "Daftar FAQ ringkas dengan ajakan menghubungi di bawahnya.",
       "en": "A compact FAQ list with a contact prompt below."
     },
-    "tags": [
-      "faq",
-      "cta"
-    ],
+    "tags": ["faq", "cta"],
     "keywords": {
-      "id": [
-        "faq",
-        "tanya jawab",
-        "pertanyaan"
-      ],
-      "en": [
-        "faq",
-        "questions"
-      ]
+      "id": ["faq", "tanya jawab", "pertanyaan"],
+      "en": ["faq", "questions"]
     },
     "aiHints": "4–8 pertanyaan umum calon pelanggan + jawaban singkat & jelas."
   },
@@ -42,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_faqwit0"
-          ],
+          "rootIds": ["tmp_faqwit0"],
           "nodes": {
             "tmp_faqwit0": {
               "id": "tmp_faqwit0",
@@ -53,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit1"
-              ],
+              "children": ["tmp_faqwit1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -99,11 +85,7 @@
               "parentId": "tmp_faqwit0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit2",
-                "tmp_faqwit4",
-                "tmp_faqwit17"
-              ],
+              "children": ["tmp_faqwit2", "tmp_faqwit4", "tmp_faqwit17"],
               "props": {},
               "style": {
                 "base": {
@@ -136,9 +118,7 @@
               "parentId": "tmp_faqwit1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit3"
-              ],
+              "children": ["tmp_faqwit3"],
               "props": {},
               "style": {
                 "base": {
@@ -215,12 +195,7 @@
               "parentId": "tmp_faqwit1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit5",
-                "tmp_faqwit8",
-                "tmp_faqwit11",
-                "tmp_faqwit14"
-              ],
+              "children": ["tmp_faqwit5", "tmp_faqwit8", "tmp_faqwit11", "tmp_faqwit14"],
               "props": {},
               "style": {
                 "base": {
@@ -254,10 +229,7 @@
               "parentId": "tmp_faqwit4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit6",
-                "tmp_faqwit7"
-              ],
+              "children": ["tmp_faqwit6", "tmp_faqwit7"],
               "props": {},
               "style": {
                 "base": {
@@ -373,10 +345,7 @@
               "parentId": "tmp_faqwit4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit9",
-                "tmp_faqwit10"
-              ],
+              "children": ["tmp_faqwit9", "tmp_faqwit10"],
               "props": {},
               "style": {
                 "base": {
@@ -492,10 +461,7 @@
               "parentId": "tmp_faqwit4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit12",
-                "tmp_faqwit13"
-              ],
+              "children": ["tmp_faqwit12", "tmp_faqwit13"],
               "props": {},
               "style": {
                 "base": {
@@ -611,10 +577,7 @@
               "parentId": "tmp_faqwit4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_faqwit15",
-                "tmp_faqwit16"
-              ],
+              "children": ["tmp_faqwit15", "tmp_faqwit16"],
               "props": {},
               "style": {
                 "base": {

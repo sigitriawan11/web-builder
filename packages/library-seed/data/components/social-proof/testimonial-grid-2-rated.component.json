@@ -15,22 +15,10 @@
       "id": "Dua kartu testimoni dengan bintang rating di atas kutipan.",
       "en": "Two testimonial cards with star ratings above the quote."
     },
-    "tags": [
-      "social-proof",
-      "testimonial",
-      "rating"
-    ],
+    "tags": ["social-proof", "testimonial", "rating"],
     "keywords": {
-      "id": [
-        "testimoni",
-        "ulasan",
-        "kepercayaan"
-      ],
-      "en": [
-        "testimonial",
-        "reviews",
-        "trust"
-      ]
+      "id": ["testimoni", "ulasan", "kepercayaan"],
+      "en": ["testimonial", "reviews", "trust"]
     },
     "aiHints": "Bukti sosial jujur: kutipan pelanggan nyata, nama + usaha, rating bintang. Hindari klaim berlebihan."
   },
@@ -44,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_testim0"
-          ],
+          "rootIds": ["tmp_testim0"],
           "nodes": {
             "tmp_testim0": {
               "id": "tmp_testim0",
@@ -55,9 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim1"
-              ],
+              "children": ["tmp_testim1"],
               "tag": "section",
               "props": {
                 "role": "section"
@@ -101,10 +85,7 @@
               "parentId": "tmp_testim0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim2",
-                "tmp_testim4"
-              ],
+              "children": ["tmp_testim2", "tmp_testim4"],
               "props": {},
               "style": {
                 "base": {
@@ -137,9 +118,7 @@
               "parentId": "tmp_testim1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim3"
-              ],
+              "children": ["tmp_testim3"],
               "props": {},
               "style": {
                 "base": {
@@ -216,10 +195,7 @@
               "parentId": "tmp_testim1",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim5",
-                "tmp_testim18"
-              ],
+              "children": ["tmp_testim5", "tmp_testim18"],
               "props": {},
               "style": {
                 "base": {
@@ -251,11 +227,7 @@
               "parentId": "tmp_testim4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim6",
-                "tmp_testim12",
-                "tmp_testim13"
-              ],
+              "children": ["tmp_testim6", "tmp_testim12", "tmp_testim13"],
               "props": {
                 "role": "card"
               },
@@ -323,13 +295,7 @@
               "parentId": "tmp_testim5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim7",
-                "tmp_testim8",
-                "tmp_testim9",
-                "tmp_testim10",
-                "tmp_testim11"
-              ],
+              "children": ["tmp_testim7", "tmp_testim8", "tmp_testim9", "tmp_testim10", "tmp_testim11"],
               "props": {},
               "style": {
                 "base": {
@@ -557,10 +523,7 @@
               "parentId": "tmp_testim5",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim14",
-                "tmp_testim15"
-              ],
+              "children": ["tmp_testim14", "tmp_testim15"],
               "props": {},
               "style": {
                 "base": {
@@ -629,10 +592,7 @@
               "parentId": "tmp_testim13",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim16",
-                "tmp_testim17"
-              ],
+              "children": ["tmp_testim16", "tmp_testim17"],
               "props": {},
               "style": {
                 "base": {
@@ -745,11 +705,7 @@
               "parentId": "tmp_testim4",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim19",
-                "tmp_testim25",
-                "tmp_testim26"
-              ],
+              "children": ["tmp_testim19", "tmp_testim25", "tmp_testim26"],
               "props": {
                 "role": "card"
               },
@@ -817,13 +773,7 @@
               "parentId": "tmp_testim18",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim20",
-                "tmp_testim21",
-                "tmp_testim22",
-                "tmp_testim23",
-                "tmp_testim24"
-              ],
+              "children": ["tmp_testim20", "tmp_testim21", "tmp_testim22", "tmp_testim23", "tmp_testim24"],
               "props": {},
               "style": {
                 "base": {
@@ -1051,10 +1001,7 @@
               "parentId": "tmp_testim18",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim27",
-                "tmp_testim28"
-              ],
+              "children": ["tmp_testim27", "tmp_testim28"],
               "props": {},
               "style": {
                 "base": {
@@ -1123,10 +1070,7 @@
               "parentId": "tmp_testim26",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_testim29",
-                "tmp_testim30"
-              ],
+              "children": ["tmp_testim29", "tmp_testim30"],
               "props": {},
               "style": {
                 "base": {

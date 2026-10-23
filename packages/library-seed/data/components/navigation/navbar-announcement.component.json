@@ -15,21 +15,10 @@
       "id": "Baris pengumuman tipis di atas navbar dengan logo dan tombol.",
       "en": "A thin announcement bar above the navbar with logo and button."
     },
-    "tags": [
-      "navbar",
-      "announcement"
-    ],
+    "tags": ["navbar", "announcement"],
     "keywords": {
-      "id": [
-        "navigasi",
-        "menu",
-        "header"
-      ],
-      "en": [
-        "navbar",
-        "menu",
-        "header"
-      ]
+      "id": ["navigasi", "menu", "header"],
+      "en": ["navbar", "menu", "header"]
     },
     "aiHints": "Header situs: logo kiri, 3–5 link, 1 CTA kanan. Jaga ringkas; link ke section penting."
   },
@@ -43,9 +32,7 @@
       },
       "definition": {
         "subtree": {
-          "rootIds": [
-            "tmp_navbar0"
-          ],
+          "rootIds": ["tmp_navbar0"],
           "nodes": {
             "tmp_navbar0": {
               "id": "tmp_navbar0",
@@ -54,10 +41,7 @@
               "parentId": "tmp_parent",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar1",
-                "tmp_navbar3"
-              ],
+              "children": ["tmp_navbar1", "tmp_navbar3"],
               "props": {},
               "style": {
                 "base": {
@@ -84,9 +68,7 @@
               "parentId": "tmp_navbar0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar2"
-              ],
+              "children": ["tmp_navbar2"],
               "props": {},
               "style": {
                 "base": {
@@ -179,10 +161,7 @@
               "parentId": "tmp_navbar0",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar4",
-                "tmp_navbar7"
-              ],
+              "children": ["tmp_navbar4", "tmp_navbar7"],
               "tag": "header",
               "props": {
                 "role": "container"
@@ -252,10 +231,7 @@
               "parentId": "tmp_navbar3",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar5",
-                "tmp_navbar6"
-              ],
+              "children": ["tmp_navbar5", "tmp_navbar6"],
               "props": {},
               "style": {
                 "base": {
@@ -367,10 +343,7 @@
               "parentId": "tmp_navbar3",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar8",
-                "tmp_navbar13"
-              ],
+              "children": ["tmp_navbar8", "tmp_navbar13"],
               "props": {},
               "style": {
                 "base": {
@@ -400,12 +373,7 @@
               "parentId": "tmp_navbar7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar9",
-                "tmp_navbar10",
-                "tmp_navbar11",
-                "tmp_navbar12"
-              ],
+              "children": ["tmp_navbar9", "tmp_navbar10", "tmp_navbar11", "tmp_navbar12"],
               "tag": "nav",
               "props": {},
               "style": {
@@ -608,9 +576,7 @@
               "parentId": "tmp_navbar7",
               "visible": true,
               "locked": false,
-              "children": [
-                "tmp_navbar14"
-              ],
+              "children": ["tmp_navbar14"],
               "props": {
                 "role": "button"
               },
