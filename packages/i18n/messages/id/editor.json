@@ -519,7 +519,12 @@
       "dropped": "{count} konten tidak terbawa",
       "resetAll": "Reset semua override",
       "overridden": "Diubah dari default — klik untuk reset",
-      "editMain": "Edit komponen utama"
+      "editMain": "Edit komponen utama",
+      "goToMain": "Lihat komponen utama",
+      "mainTitle": "Komponen utama",
+      "mainVersion": "Versi {version}",
+      "openAdmin": "Buka di Admin mode",
+      "backToInstance": "Kembali ke instance"
     },
     "childOverride": {
       "title": "Edit di dalam instance",

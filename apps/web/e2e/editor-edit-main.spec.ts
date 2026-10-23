@@ -140,3 +140,26 @@ test("user biasa: tombol Edit komponen utama tidak muncul", async ({ page }) => 
   await expect(page.getByTestId("inspector").getByTestId("instance-detach")).toBeVisible();
   await expect(page.getByTestId("inspector").getByTestId("instance-edit-main")).toHaveCount(0);
 });
+
+test("ED-157 Go to main: panel info + Kembali ke instance (admin: Buka di Admin mode)", async ({ page }) => {
+  await seedPublished();
+  const email = uniqueEmail("gotomain-admin");
+  await register(page, email);
+  await expect(page).toHaveURL(/\/verify-email\?step=code/);
+  await setStaffRole(email, "library_admin");
+
+  await insertInstance(page);
+  const inspector = page.getByTestId("inspector");
+
+  // "Lihat komponen utama" → panel info (versi) + tautan Admin + "Kembali ke instance".
+  await inspector.getByTestId("instance-go-to-main").click();
+  const info = inspector.getByTestId("instance-main-info");
+  await expect(info).toBeVisible();
+  await expect(info).toContainText("1");
+  await expect(inspector.getByTestId("instance-open-admin")).toBeVisible();
+
+  // "Kembali ke instance" menutup panel (seperti Figma).
+  await inspector.getByTestId("instance-back-to-instance").click();
+  await expect(inspector.getByTestId("instance-main-info")).toHaveCount(0);
+  await expect(inspector.getByTestId("instance-go-to-main")).toBeVisible();
+});

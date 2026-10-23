@@ -1402,7 +1402,8 @@ Termasuk: DM component (DM-018, DM-019, DM-045–DM-051, DM-044 preset), ED M3 (
   - Catatan (2026-10-21): tombol Detach di `InstancePropsSection` → `detachInstance` dgn ctx `getComponent` dari definisi yang sudah di-fetch panel (satu langkah undo). e2e: detach → tak ada node instance tersisa. **SISA:** dialog konfirmasi eksplisit (kini langsung).
 - [x] **T3.6.9** Update versi component di instance (manual, admin/dev; UI user penuh di M4) — ED-158 · `apps/editor` · Verifikasi: e2e
   - Command `updateInstanceVersion` (DM) pin ulang `props.version` + `componentDeps[componentId]`, unit-test. Inspector tampilkan tombol "Update to vN" bila versi published terbaru (`useLibraryComponents`) > versi yang di-pin. Migrasi `propValues` otomatis saat MAJOR = follow-up (M4). E2E sisip selalu pin versi terbaru → skenario tombol (pin lama + versi baru) butuh republish flow yang belum ada di editor situs; dicover unit-test.
-- [ ] **T3.6.10** (P1) Go to main component — ED-157 · `apps/editor` · Verifikasi: e2e
+- [x] **T3.6.10** (P1) Go to main component — ED-157 · `apps/editor` · Verifikasi: e2e
+  - Panel instance: "Lihat komponen utama" → info panel (nama + versi) + "Kembali ke instance" (semua user); admin dapat "Buka di Admin mode" (reuse start-draft T3.4.15). Local-component (kamera pindah + pilih main lintas-page) = follow-up bersama localComponents. e2e di `editor-edit-main.spec.ts`.
 
 #### Epic 3.7 — Thumbnail & renderer service
 

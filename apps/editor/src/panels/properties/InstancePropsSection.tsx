@@ -95,6 +95,9 @@ function Form({
     // Draft dibuka di tab baru (CMP-073); situs user tak berubah sampai admin publish & update.
     window.open(libraryDraftUrl(result.id), "_blank", "noopener");
   };
+  // ED-157 Go to main component: untuk library instance → panel info (nama, versi) + "Kembali ke instance". Admin
+  // dapat tautan "Buka di Admin mode". (Local component = kamera pindah; menyusul bersama localComponents.)
+  const [showMain, setShowMain] = useState(false);
 
   const updateVersion = () => {
     if (readOnly || latest === undefined) return;
@@ -279,6 +282,43 @@ function Form({
             {t("inspector.instance.editMain")}
           </Button>
         </div>
+      ) : null}
+      {/* ED-157: Go to main component — panel info library untuk semua user + "Kembali ke instance". */}
+      {data ? (
+        showMain ? (
+          <div className="mx-3 mt-2 rounded border bg-muted/40 p-3 text-xs" data-testid="instance-main-info">
+            <div className="font-medium text-muted-foreground">{t("inspector.instance.mainTitle")}</div>
+            <div className="mt-1 text-sm">{current?.displayName[locale] || current?.name || componentId}</div>
+            <div className="text-muted-foreground">{t("inspector.instance.mainVersion", { version })}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {canEditMain ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  data-testid="instance-open-admin"
+                  disabled={startDraft.isPending}
+                  onClick={() => void editMain()}
+                >
+                  {t("inspector.instance.openAdmin")}
+                </Button>
+              ) : null}
+              <Button
+                variant="outline"
+                size="sm"
+                data-testid="instance-back-to-instance"
+                onClick={() => setShowMain(false)}
+              >
+                {t("inspector.instance.backToInstance")}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2 px-3 pt-2">
+            <Button variant="outline" size="sm" data-testid="instance-go-to-main" onClick={() => setShowMain(true)}>
+              {t("inspector.instance.goToMain")}
+            </Button>
+          </div>
+        )
       ) : null}
     </InspectorSection>
   );

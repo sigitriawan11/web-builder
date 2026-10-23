@@ -1964,7 +1964,7 @@ Konsep, versioning, publish library, dan aturan override didefinisikan di [03-co
 - Prioritas: P1 · Fase: M3
 - Deskripsi: Untuk local component: kamera pindah & memilih main component (bisa beda page). Untuk library component: tampilkan panel info (nama, versi, changelog, preview) — user biasa tidak bisa mengedit library; Admin mendapat tautan "Buka di Admin mode".
 - Acceptance criteria:
-  - [ ] Tombol "Kembali ke instance" muncul setelah go to main (seperti Figma).
+  - [x] Tombol "Kembali ke instance" muncul setelah go to main (seperti Figma).
 
 ### ED-158 Update versi component
 - Prioritas: P0 · Fase: M3

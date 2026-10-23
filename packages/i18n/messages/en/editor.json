@@ -519,7 +519,12 @@
       "dropped": "{count} content not carried over",
       "resetAll": "Reset all overrides",
       "overridden": "Changed from default — click to reset",
-      "editMain": "Edit main component"
+      "editMain": "Edit main component",
+      "goToMain": "View main component",
+      "mainTitle": "Main component",
+      "mainVersion": "Version {version}",
+      "openAdmin": "Open in Admin mode",
+      "backToInstance": "Back to instance"
     },
     "childOverride": {
       "title": "Edit inside instance",
